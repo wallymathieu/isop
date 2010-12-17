@@ -15,7 +15,12 @@ namespace ConsoleHelpers
 		{
 			Longname=longname;
 		}
+		public bool Recognizes(string argument)
+		{
+			return true;
+		}
 	}
+	
 	public class ArgumentWithParameters
 	{
 		public Argument Argument{get;private set;}
@@ -28,13 +33,23 @@ namespace ConsoleHelpers
 	}
 	public class ArgumentParser
 	{
+		private IEnumerable<string> arguments;
+		private	IEnumerable<Argument> actions;
 		public ArgumentParser(IEnumerable<string> arguments,IEnumerable<Argument> actions)
 		{
-			
+			this.arguments = arguments;
+			this.actions = actions;
 		}
-		public IEnumerable<ArgumentWithParameters> GetArguments ()
+		public IEnumerable<ArgumentWithParameters> GetInvokedArguments ()
 		{
-			throw new System.NotImplementedException ();
+			return actions.Select(act=>
+				new{
+					arguments= arguments.Where(arg=>act.Recognizes(arg)),
+					action=act
+				})
+				.Where(couple=>couple.arguments.Any())
+				.Select(couple=> new ArgumentWithParameters(couple.action,couple.arguments.First()))
+				;
 		}
 	}
 	
@@ -52,13 +67,14 @@ namespace ConsoleHelpers
 			var arg = new Argument("argument");
 			
 			var parser = new ArgumentParser(new []{"-a"},new[]{arg});	
-			var arguments = parser.GetArguments();
+			var arguments = parser.GetInvokedArguments();
 			Assert.That(arguments.Count(),Is.EqualTo(1));
 			var arg1=arguments.First();
 			Assert.That(arg1.Argument,Is.EqualTo(arg));
 		}
 
 
+		
 
 	}
 }
