@@ -15,9 +15,14 @@ namespace ConsoleHelpers
 		{
 			Longname=longname;
 		}
+		
 		public bool Recognizes(string argument)
 		{
-			return true;
+			if (argument.StartsWith("-"+Longname[0]))
+				return true;
+			if (argument.StartsWith("--"+Longname))
+				return true;
+			return false;
 		}
 	}
 	
@@ -73,8 +78,29 @@ namespace ConsoleHelpers
 			Assert.That(arg1.Argument,Is.EqualTo(arg));
 		}
 
-
+		[Test]
+		public void Given_several_arguments_Then_the_correct_one_is_recognized()
+		{
+			var arg = new Argument("beta");
+			
+			var parser = new ArgumentParser(new []{"-a","-b"},new[]{arg});	
+			var arguments = parser.GetInvokedArguments();
+			Assert.That(arguments.Count(),Is.EqualTo(1));
+			var arg1=arguments.First();
+			Assert.That(arg1.Parameter,Is.EqualTo("-b"));
+		}
 		
-
+		[Test]
+		public void Recognizes_longform()
+		{
+			var arg = new Argument("beta");
+			
+			var parser = new ArgumentParser(new []{"-a","--beta"},new[]{arg});	
+			var arguments = parser.GetInvokedArguments();
+			Assert.That(arguments.Count(),Is.EqualTo(1));
+			var arg1=arguments.First();
+			Assert.That(arg1.Parameter,Is.EqualTo("--beta"));
+		}
+		
 	}
 }
