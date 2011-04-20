@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>ConsoleHelpers</RootNamespace>
+    <RootNamespace>Helpers</RootNamespace>
     <AssemblyName>ConsoleHelpers</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
@@ -37,29 +37,19 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.5.9.10348, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.2.5.9.10348\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.mocks, Version=2.5.9.10348, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.2.5.9.10348\lib\nunit.mocks.dll</HintPath>
-    </Reference>
-    <Reference Include="pnunit.framework, Version=1.0.4000.25744, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.2.5.9.10348\lib\pnunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArgumentParserBuilder.cs" />
-    <Compile Include="ArgumentParserTests.cs" />
+    <Compile Include="Console\ArgumentParserBuilder.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="ArgumentParser.cs" />
-    <Compile Include="ClassAndMethodRecognizer.cs" />
+    <Compile Include="Console\ArgumentParser.cs" />
+    <Compile Include="Console\ClassAndMethodRecognizer.cs" />
     <Compile Include="ListExtensions.cs" />
-    <Compile Include="ListExtensionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
