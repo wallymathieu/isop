@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
@@ -34,12 +35,14 @@ namespace Helpers.Console
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
             var methodInfo = FindMethodInfo(arg);
-            var argumentRecognizers = methodInfo.GetParameters()
+            var parameterInfos = methodInfo.GetParameters();
+            var argumentRecognizers = parameterInfos
                 .Select(parameterInfo => new ArgumentRecognizer(parameterInfo.Name)).ToList();
             var parser = new ArgumentParser(argumentRecognizers);
             var parsedArguments = parser.Parse(arg);
             parsedArguments.RecognizedAction = methodInfo;
-            parsedArguments.RecognizedActionParameters = parsedArguments.RecognizedArguments.Select(arg1=>(object)arg1.Value);
+            parsedArguments.RecognizedActionParameters =
+                parsedArguments.RecognizedArguments.Select((arg1, i) => Convert.ChangeType(arg1.Value, parameterInfos[i].ParameterType));
             return parsedArguments;
         }
     }

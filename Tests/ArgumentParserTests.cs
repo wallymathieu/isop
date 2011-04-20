@@ -84,13 +84,13 @@ namespace Helpers.Tests
         {
             var arguments = ArgumentParser.Build()
                 .Recognize(typeof(MyController))
-                .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "value3", "--param1", "value1" });
+                .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1" });
             Assert.That(arguments.RecognizedAction.Name, Is.EqualTo("Action"));
-            Assert.That(arguments.RecognizedActionParameters, Is.EquivalentTo(new object[] { "value1", "value2", "value3" }));
+            Assert.That(arguments.RecognizedActionParameters, Is.EquivalentTo(new object[] { "value1", "value2", 3 }));
         }
         private class MyController
         {
-            public string Action(string param1, string param2, string param3) { return ""; }
+            public string Action(string param1, string param2, int param3) { return ""; }
         }
         [Test]
         public void It_can_write_a_message_about_unrecognized_parameters()
