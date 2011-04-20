@@ -9,5 +9,6 @@ _ReSharper.*
 *.suo
 *.cache
 ~$*
-
+*.swp
+*.*~
 test-results/
