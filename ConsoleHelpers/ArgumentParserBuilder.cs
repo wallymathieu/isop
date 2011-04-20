@@ -7,12 +7,12 @@ namespace ConsoleHelpers
     {
         private readonly IList<ArgumentRecognizer> _actions = new List<ArgumentRecognizer>();
 
-        public ArgumentParserBuilder Argument(string longname)
+        public ArgumentParserBuilder Recognize(string longname)
         {
-            return Argument(longname, null);
+            return Recognize(longname, null);
         }
 
-        public ArgumentParserBuilder Argument(string longname, Predicate<string> recognizes)
+        public ArgumentParserBuilder Recognize(string longname, Predicate<string> recognizes)
         {
             _actions.Add(new ArgumentRecognizer(longname,recognizes));
             return this;

@@ -17,7 +17,7 @@ namespace ConsoleHelpers
         public void Recognizes_shortform()
         {
             var parser = ArgumentParser.Build()
-                .Argument("argument")
+                .Recognize("argument")
                 .Parse(new[] { "-a" });
             var arguments = parser.RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -29,7 +29,7 @@ namespace ConsoleHelpers
         public void Given_several_arguments_Then_the_correct_one_is_recognized()
         {
             var arguments = ArgumentParser.Build()
-                .Argument("beta")
+                .Recognize("beta")
                 .Parse(new[] { "-a", "-b" }).RecognizedArguments;
 
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -41,7 +41,7 @@ namespace ConsoleHelpers
         public void Recognizes_longform()
         {
             var arguments = ArgumentParser.Build()
-                .Argument("beta")
+                .Recognize("beta")
                 .Parse(new[] { "-a", "--beta" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -52,7 +52,7 @@ namespace ConsoleHelpers
         public void It_can_parse_parameter_value()
         {
             var arguments = ArgumentParser.Build()
-                .Argument("beta")
+                .Recognize("beta")
                 .Parse(new []{"-a","--beta", "value"}).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -64,7 +64,7 @@ namespace ConsoleHelpers
         public void It_can_report_unrecognized_parameters()
         {
             var arguments = ArgumentParser.Build()
-               .Argument("beta")
+               .Recognize("beta")
                .Parse(new[] { "-a", "--beta" }).UnRecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
