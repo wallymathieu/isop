@@ -10,18 +10,20 @@ namespace Helpers.Console
     /// Represents the long name of an argument. For instance "file" of the commandline argument --file. 
     /// Usually you might want it to recognize -f as well.
     /// </summary>
-    public struct ArgumentName
+    public class ArgumentName
     {
         public ArgumentName(string value)
-            : this(value, null)
+            : this(value, null, value)
         { }
 
-        public ArgumentName(string value, string shortValue)
-            : this()
+        public ArgumentName(string value, string shortValue,string original)
+            
         {
             Value = value;
             ShortValue = shortValue;
+            this.original = original;
         }
+        private string original;
         public string Value { get; private set; }
         public string ShortValue { get; private set; }
         private static Regex argPattern = new Regex(@"\&(.)");
@@ -29,8 +31,8 @@ namespace Helpers.Console
         {
             var match = argPattern.Match(value);
             if (match.Success)
-                return new ArgumentName(value.Replace("&",""),match.Groups[1].Value);
-            return new ArgumentName(value, null);
+                return new ArgumentName(value.Replace("&",""),match.Groups[1].Value, value);
+            return new ArgumentName(value, null, value);
         }
         /// <summary>
         /// Default recognizer of argument names. Will try to match "--name" and "-n" if shortvalue is supplied
@@ -42,6 +44,23 @@ namespace Helpers.Console
             return (!String.IsNullOrEmpty(ShortValue) ? argument.StartsWith("-" + ShortValue) : false)
                 || argument.StartsWith("--" + Value);
         }
+        public override bool Equals(object obj)
+        {
+            if (obj is ArgumentName)
+            {
+                var other = (ArgumentName)obj;
+                return Value.Equals(other.Value) && ShortValue.Equals(other.ShortValue);
+            }
+            return false;
+        }
+        public override int GetHashCode()
+        {
+            return this.Value.GetHashCode() ^ this.ShortValue.GetHashCode();
+        }
+        public override string ToString()
+        {
+            return original;
+        }
     }
     /// <summary>
     /// class to enable extensions of the behavior of what is recognized as arguments.
@@ -50,14 +69,21 @@ namespace Helpers.Console
     {
         private readonly Predicate<string> _recognizes;
         public ArgumentName ArgumentName { get; private set; }
+        public Action<string> Action { get; set; }
+
         public ArgumentRecognizer(ArgumentName argumentName)
-            : this(argumentName, null)
+            : this(argumentName, null,null)
         { }
 
         public ArgumentRecognizer(ArgumentName argumentName, Predicate<string> recognizes)
+            : this(argumentName, recognizes, null)
+        { }
+
+        public ArgumentRecognizer(ArgumentName argumentName, Predicate<string> recognizes,Action<string> action)
         {
             _recognizes = recognizes;
             ArgumentName = argumentName;
+            Action = action;
         }
 
         public bool Recognizes(string argument)
@@ -102,21 +128,33 @@ namespace Helpers.Console
         public MethodInfo RecognizedAction { get; set; }
 
         public IEnumerable<object> RecognizedActionParameters { get; set; }
+
+        public IEnumerable<ArgumentRecognizer> Recognizers { get; set; }
+
+        public string UnRecognizedArgumentsMessage()
+        {
+            return 
+string.Format(@"Unrecognized arguments: 
+{0}
+Did you mean any of these arguments?
+{1}", String.Join(",",UnRecognizedArguments.Select(arg=>arg.Value).ToArray()), 
+    String.Join(",",Recognizers.Select(rec=>rec.ArgumentName.ToString()).ToArray()));
+        }
     }
     public class ArgumentParser
     {
         public static ArgumentParserBuilder Build() { return new ArgumentParserBuilder(); }
-        private readonly IEnumerable<ArgumentRecognizer> _actions;
+        private readonly IEnumerable<ArgumentRecognizer> _recognizers;
 
-        public ArgumentParser(IEnumerable<ArgumentRecognizer> actions)
+        public ArgumentParser(IEnumerable<ArgumentRecognizer> recognizers)
         {
-            _actions = actions;
+            _recognizers = recognizers;
         }
 
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
             var argumentList = arguments.ToList();
-            var recognized = _actions.Select(act =>
+            var recognized = _recognizers.Select(act =>
                                              new
                                                  {
                                                      arguments = argumentList.FindIndexAndValues(act.Recognizes),
@@ -150,6 +188,7 @@ namespace Helpers.Console
 
             return new ParsedArguments
             {
+                Recognizers = _recognizers.ToArray(),
                 RecognizedArguments = invokedArguments,
                 UnRecognizedArguments = unRecognizedArguments
             };

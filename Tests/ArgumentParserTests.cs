@@ -91,5 +91,16 @@ namespace Helpers.Tests
         {
             public string Action(string param1, string param2, string param3) { return ""; }
         }
+        [Test]
+        public void It_can_write_a_message_about_unrecognized_parameters()
+        {
+            var val = ArgumentParser.Build()
+                .Recognize("beta")
+                .Parse(new[] { "-a", "value", "--beta" }).UnRecognizedArgumentsMessage();
+
+            Assert.That(val, Is.StringContaining("-a"));
+            Assert.That(val, Is.StringContaining("value"));
+            Assert.That(val, Is.StringContaining("beta"));
+        }
     }
 }
