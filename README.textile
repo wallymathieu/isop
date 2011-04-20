@@ -7,8 +7,7 @@ h2. Goal
 The goal is to be able to write code like:
 someprogram.exe My Action --argument value
 And hooking it up by writing something like:
-<pre>
-static void Main(string[] args)
+<pre>static void Main(string[] args)
 {
   var arguments = ArgumentParser.Build()
                 .Recognize(typeof(MyController))
