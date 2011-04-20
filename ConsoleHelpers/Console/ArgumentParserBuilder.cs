@@ -29,16 +29,22 @@ namespace Helpers.Console
             _argumentRecognizers.Add(new ArgumentRecognizer(argumentName, recognizes, action));
             return this;
         }
-        public ParsedArguments Parse(IEnumerable<string> arg)
+        public ClassAndMethodRecognizer.ParsedMethod ParseMethod(IEnumerable<string> arg)
         {
-            var methodRecognizer=_classAndMethodRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
-            if (null!=methodRecognizer)
+            var methodRecognizer = _classAndMethodRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
+            if (null != methodRecognizer)
             {
+                _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
                 return methodRecognizer.Parse(arg);
             }
+            throw new Exception("Missing matching method");
+        }
+
+        public ParsedArguments Parse(IEnumerable<string> arg)
+        {
             var argumentParser = new ArgumentParser(_argumentRecognizers);
             _argumentRecognizers = new List<ArgumentRecognizer>();
-            _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
+
             return argumentParser.Parse(arg);
         }
 

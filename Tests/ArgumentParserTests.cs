@@ -84,7 +84,7 @@ namespace Helpers.Tests
         {
             var arguments = ArgumentParser.Build()
                 .Recognize(typeof(MyController))
-                .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3,4" });
+                .ParseMethod(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3,4" });
             Assert.That(arguments.RecognizedAction.Name, Is.EqualTo("Action"));
             Assert.That(arguments.RecognizedActionParameters, Is.EquivalentTo(new object[] { "value1", "value2", 3, 3.4m}));
         }
