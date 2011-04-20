@@ -1,6 +1,6 @@
-using NUnit.Framework;
 using System.Linq;
 using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace ConsoleHelpers
 {
@@ -25,11 +25,14 @@ namespace ConsoleHelpers
 	
 	public class ArgumentWithParameters
 	{
-		public Argument Argument{get;private set;}
+        public string Value { get; private set; }
+	    public Argument Argument{get;private set;}
 		public string Parameter{get;private set;}
-		public ArgumentWithParameters(Argument argument,string parameter)
+
+	    public ArgumentWithParameters(Argument argument,string parameter,string value=null)
 		{
-			Argument = argument;
+	        Value = value;
+	        Argument = argument;
 			Parameter = parameter;
 		}
 	}
@@ -44,60 +47,18 @@ namespace ConsoleHelpers
 		}
 		public IEnumerable<ArgumentWithParameters> GetInvokedArguments ()
 		{
-			return actions.Select(act=>
+		    var argumentList = arguments.ToList();
+		    return actions.Select(act=>
 				new{
-					arguments= arguments.Where(arg=>act.Recognizes(arg)),
+					arguments= argumentList.FindIndexAndValues(act.Recognizes),
 					action=act
 				})
 				.Where(couple=>couple.arguments.Any())
-				.Select(couple=> new ArgumentWithParameters(couple.action,couple.arguments.First()))
+				.Select(couple=> new ArgumentWithParameters(
+                    couple.action,
+                    couple.arguments.First().Value,
+                    argumentList.GetForIndexOrDefault( couple.arguments.First().Key+1)))
 				;
 		}
-	}
-	
-	[TestFixture]
-	public class ArgumentParserTests
-	{
-		[SetUp]
-		public void SetUp(){}
-		[TearDown]
-		public void TearDown(){}
-		
-		[Test]
-		public void Recognizes_shortform()
-		{
-			var arg = new Argument("argument");
-			
-			var parser = new ArgumentParser(new []{"-a"},new[]{arg});	
-			var arguments = parser.GetInvokedArguments();
-			Assert.That(arguments.Count(),Is.EqualTo(1));
-			var arg1=arguments.First();
-			Assert.That(arg1.Argument,Is.EqualTo(arg));
-		}
-
-		[Test]
-		public void Given_several_arguments_Then_the_correct_one_is_recognized()
-		{
-			var arg = new Argument("beta");
-			
-			var parser = new ArgumentParser(new []{"-a","-b"},new[]{arg});	
-			var arguments = parser.GetInvokedArguments();
-			Assert.That(arguments.Count(),Is.EqualTo(1));
-			var arg1=arguments.First();
-			Assert.That(arg1.Parameter,Is.EqualTo("-b"));
-		}
-		
-		[Test]
-		public void Recognizes_longform()
-		{
-			var arg = new Argument("beta");
-			
-			var parser = new ArgumentParser(new []{"-a","--beta"},new[]{arg});	
-			var arguments = parser.GetInvokedArguments();
-			Assert.That(arguments.Count(),Is.EqualTo(1));
-			var arg1=arguments.First();
-			Assert.That(arg1.Parameter,Is.EqualTo("--beta"));
-		}
-		
 	}
 }
