@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 
 namespace ConsoleHelpers
 {
     [TestFixture]
-    public class ArgumentParserTests
+    internal class ArgumentParserTests
     {
         [SetUp]
         public void SetUp() { }
@@ -69,6 +70,20 @@ namespace ConsoleHelpers
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.EqualTo("-a"));
+        }
+
+        [Test]
+        public void It_can_parse_class_and_method()
+        {
+            var arguments = ArgumentParser.Build()
+                .Recognize(typeof(MyController))
+                .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "value3", "--param1", "value1" });
+            Assert.That(arguments.RecognizedAction.Name, Is.EqualTo("Action"));
+            Assert.That(arguments.RecognizedActionParameters, Is.EquivalentTo(new object[] { "value1", "value2", "value3" }));
+        }
+        private class MyController
+        {
+            public string Action(string param1, string param2, string param3) { return ""; }
         }
     }
 }

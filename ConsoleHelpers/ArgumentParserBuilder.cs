@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ConsoleHelpers
 {
     public class ArgumentParserBuilder
     {
-        private readonly IList<ArgumentRecognizer> _actions = new List<ArgumentRecognizer>();
+        private IList<ArgumentRecognizer> _argumentRecognizers = new List<ArgumentRecognizer>();
+        private IList<ClassAndMethodRecognizer> _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
+        
         public ArgumentParserBuilder Recognize(ArgumentName argumentName)
         {
             return Recognize(argumentName, null);
@@ -13,14 +16,27 @@ namespace ConsoleHelpers
 
         public ArgumentParserBuilder Recognize(ArgumentName argumentName, Predicate<string> recognizes)
         {
-            _actions.Add(new ArgumentRecognizer(argumentName,recognizes));
+            _argumentRecognizers.Add(new ArgumentRecognizer(argumentName,recognizes));
             return this;
         }
 
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
-            var argumentParser = new ArgumentParser(_actions);
+            var methodRecognizer=_classAndMethodRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
+            if (null!=methodRecognizer)
+            {
+                return methodRecognizer.Parse(arg);
+            }
+            var argumentParser = new ArgumentParser(_argumentRecognizers);
+            _argumentRecognizers = new List<ArgumentRecognizer>();
+            _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
             return argumentParser.Parse(arg);
+        }
+
+        public ArgumentParserBuilder Recognize(Type arg)
+        {
+            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg));
+            return this;
         }
     }
 }

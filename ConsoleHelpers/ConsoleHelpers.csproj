@@ -54,6 +54,7 @@
     <Compile Include="ArgumentParserTests.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="ArgumentParser.cs" />
+    <Compile Include="ClassAndMethodRecognizer.cs" />
     <Compile Include="ListExtensions.cs" />
     <Compile Include="ListExtensionTests.cs" />
   </ItemGroup>

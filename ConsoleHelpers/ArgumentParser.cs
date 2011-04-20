@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace ConsoleHelpers
 {
@@ -90,6 +91,10 @@ namespace ConsoleHelpers
         public IEnumerable<RecognizedArgument> RecognizedArguments { get; set; }
 
         public IEnumerable<UnrecognizedValue> UnRecognizedArguments { get; set; }
+
+        public MethodInfo RecognizedAction { get; set; }
+
+        public IEnumerable<object> RecognizedActionParameters { get; set; }
     }
     public class ArgumentParser
     {
@@ -100,7 +105,6 @@ namespace ConsoleHelpers
         {
             _actions = actions;
         }
-
 
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {

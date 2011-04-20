@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace ConsoleHelpers
 {
     [TestFixture]
-    public class ListExtensionTests
+    internal class ListExtensionTests
     {
         [Test]
         public void GetForIndexOrDefault_Can_return_default_for_values_outside_of_range()
