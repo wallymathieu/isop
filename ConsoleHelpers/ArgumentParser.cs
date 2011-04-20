@@ -39,6 +39,9 @@ namespace ConsoleHelpers
                 || argument.StartsWith("--" + Value);
         }
     }
+    /// <summary>
+    /// class to enable extensions of the behavior of what is recognized as arguments.
+    /// </summary>
     public class ArgumentRecognizer
     {
         private readonly Predicate<string> _recognizes;
@@ -130,7 +133,11 @@ namespace ConsoleHelpers
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
                 .Select(v => new UnrecognizedValue(v.value));
 
-            return new ParsedArguments { RecognizedArguments = invokedArguments, UnRecognizedArguments = unRecognizedArguments };
+            return new ParsedArguments
+            {
+                RecognizedArguments = invokedArguments,
+                UnRecognizedArguments = unRecognizedArguments
+            };
         }
     }
 }
