@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Helpers.Console;
 using NUnit.Framework;
 
@@ -101,6 +102,16 @@ namespace Helpers.Tests
             Assert.That(val, Is.StringContaining("-a"));
             Assert.That(val, Is.StringContaining("value"));
             Assert.That(val, Is.StringContaining("beta"));
+        }
+        [Test]
+        public void It_can_invoke_recognized()
+        {
+            var count = 0;
+            ArgumentParser.Build()
+                           .RecognizeAction("beta", arg => count++)
+                           .RecognizeAction("alpha", arg => Assert.Fail())
+                           .Parse(new[] { "-a", "value", "--beta" }).Invoke();
+            Assert.That(count, Is.EqualTo(1));
         }
     }
 }

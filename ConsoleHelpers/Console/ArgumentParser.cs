@@ -140,6 +140,14 @@ Did you mean any of these arguments?
 {1}", String.Join(",",UnRecognizedArguments.Select(arg=>arg.Value).ToArray()), 
     String.Join(",",Recognizers.Select(rec=>rec.ArgumentName.ToString()).ToArray()));
         }
+
+        public void Invoke()
+        {
+            foreach (var argument in RecognizedArguments.Where(argument => null != argument.Recognizer.Action))
+            {
+                argument.Recognizer.Action(argument.Value);
+            }
+        }
     }
     public class ArgumentParser
     {
