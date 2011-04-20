@@ -17,19 +17,19 @@ namespace ConsoleHelpers
         public void Recognizes_shortform()
         {
             var parser = ArgumentParser.Build()
-                .Recognize("argument")
+                .Recognize(new ArgumentLongname("argument", "a"))
                 .Parse(new[] { "-a" });
             var arguments = parser.RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.ArgumentRecognizer.ArgumentLongname, Is.EqualTo("argument"));
+            Assert.That(arg1.ArgumentRecognizer.ArgumentLongname.Value, Is.EqualTo("argument"));
         }
 
         [Test]
         public void Given_several_arguments_Then_the_correct_one_is_recognized()
         {
             var arguments = ArgumentParser.Build()
-                .Recognize("beta")
+                .Recognize(new ArgumentLongname("beta", "b"))
                 .Parse(new[] { "-a", "-b" }).RecognizedArguments;
 
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -53,7 +53,7 @@ namespace ConsoleHelpers
         {
             var arguments = ArgumentParser.Build()
                 .Recognize("beta")
-                .Parse(new []{"-a","--beta", "value"}).RecognizedArguments;
+                .Parse(new[] { "-a", "--beta", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.Argument, Is.EqualTo("--beta"));

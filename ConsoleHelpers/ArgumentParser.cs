@@ -1,19 +1,48 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using NUnit.Framework;
 
 namespace ConsoleHelpers
 {
+    /// <summary>
+    /// Represents the long name of an argument. For instance file of the commandline argument --file. 
+    /// Usually you might want it to recognize -f as well.
+    /// </summary>
+    public struct ArgumentLongname
+    {
+        public ArgumentLongname(string value)
+            : this(value, null)
+        {
+        }
+
+        public ArgumentLongname(string value, string shortValue)
+            : this()
+        {
+            Value = value;
+            ShortValue = shortValue;
+        }
+        public string Value { get; private set; }
+        public string ShortValue { get; private set; }
+
+        public static implicit operator ArgumentLongname(string value)
+        {
+            return new ArgumentLongname(value, null);
+        }
+        public bool Recognize(string argument)
+        {
+            return (!String.IsNullOrEmpty(ShortValue) ? argument.StartsWith("-" + ShortValue) : false)
+                || argument.StartsWith("--" + Value);
+        }
+    }
     public class ArgumentRecognizer
     {
         private readonly Predicate<string> _recognizes;
-        public string ArgumentLongname { get; private set; }
-        public ArgumentRecognizer(string argumentLongname)
+        public ArgumentLongname ArgumentLongname { get; private set; }
+        public ArgumentRecognizer(ArgumentLongname argumentLongname)
             : this(argumentLongname, null)
-        {}
+        { }
 
-        public ArgumentRecognizer(string argumentLongname, Predicate<string> recognizes)
+        public ArgumentRecognizer(ArgumentLongname argumentLongname, Predicate<string> recognizes)
         {
             _recognizes = recognizes;
             ArgumentLongname = argumentLongname;
@@ -21,16 +50,7 @@ namespace ConsoleHelpers
 
         public bool Recognizes(string argument)
         {
-            return null != _recognizes ? _recognizes(argument) : DefaultRecognizer(argument);
-        }
-
-        public bool DefaultRecognizer(string argument)
-        {
-            if (argument.StartsWith("-" + ArgumentLongname[0]))
-                return true;
-            if (argument.StartsWith("--" + ArgumentLongname))
-                return true;
-            return false;
+            return null != _recognizes ? _recognizes(argument) : ArgumentLongname.Recognize(argument);
         }
     }
 
@@ -72,7 +92,7 @@ namespace ConsoleHelpers
             _actions = actions;
         }
 
-       
+
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
             var argumentList = arguments.ToList();
@@ -93,10 +113,10 @@ namespace ConsoleHelpers
 
 
             var unRecognizedArguments = argumentList
-                .Select((value, i) => new {i, value})
-                .Where(indexAndValue =>  !recognizedIndexes.Contains(indexAndValue.i))
-                .Select(v=>new UnrecognizedValue (v.value));
-                
+                .Select((value, i) => new { i, value })
+                .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
+                .Select(v => new UnrecognizedValue(v.value));
+
             return new ParsedArguments { RecognizedArguments = invokedArguments, UnRecognizedArguments = unRecognizedArguments };
         }
     }
