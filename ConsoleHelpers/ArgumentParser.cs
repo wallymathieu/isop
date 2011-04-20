@@ -8,14 +8,14 @@ namespace ConsoleHelpers
     /// Represents the long name of an argument. For instance file of the commandline argument --file. 
     /// Usually you might want it to recognize -f as well.
     /// </summary>
-    public struct ArgumentLongname
+    public struct ArgumentName
     {
-        public ArgumentLongname(string value)
+        public ArgumentName(string value)
             : this(value, null)
         {
         }
 
-        public ArgumentLongname(string value, string shortValue)
+        public ArgumentName(string value, string shortValue)
             : this()
         {
             Value = value;
@@ -24,9 +24,9 @@ namespace ConsoleHelpers
         public string Value { get; private set; }
         public string ShortValue { get; private set; }
 
-        public static implicit operator ArgumentLongname(string value)
+        public static implicit operator ArgumentName(string value)
         {
-            return new ArgumentLongname(value, null);
+            return new ArgumentName(value, null);
         }
         public bool Recognize(string argument)
         {
@@ -37,20 +37,20 @@ namespace ConsoleHelpers
     public class ArgumentRecognizer
     {
         private readonly Predicate<string> _recognizes;
-        public ArgumentLongname ArgumentLongname { get; private set; }
-        public ArgumentRecognizer(ArgumentLongname argumentLongname)
-            : this(argumentLongname, null)
+        public ArgumentName ArgumentName { get; private set; }
+        public ArgumentRecognizer(ArgumentName argumentName)
+            : this(argumentName, null)
         { }
 
-        public ArgumentRecognizer(ArgumentLongname argumentLongname, Predicate<string> recognizes)
+        public ArgumentRecognizer(ArgumentName argumentName, Predicate<string> recognizes)
         {
             _recognizes = recognizes;
-            ArgumentLongname = argumentLongname;
+            ArgumentName = argumentName;
         }
 
         public bool Recognizes(string argument)
         {
-            return null != _recognizes ? _recognizes(argument) : ArgumentLongname.Recognize(argument);
+            return null != _recognizes ? _recognizes(argument) : ArgumentName.Recognize(argument);
         }
     }
 
