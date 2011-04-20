@@ -9,10 +9,17 @@ namespace Helpers.Console
     public class ClassAndMethodRecognizer
     {
         public Type Type { get; private set; }
+        private readonly Func<Object,Type,Object> _changeType;
 
         public ClassAndMethodRecognizer(Type type)
+            : this(type, Convert.ChangeType)
+        {
+        }
+
+        public ClassAndMethodRecognizer(Type type, Func<Object,Type,Object> changeType)
         {
             Type = type;
+            _changeType = changeType;
         }
 
         public bool Recognize(IEnumerable<string> arg)
@@ -42,7 +49,7 @@ namespace Helpers.Console
             var parsedArguments = parser.Parse(arg);
             parsedArguments.RecognizedAction = methodInfo;
             parsedArguments.RecognizedActionParameters =
-                parsedArguments.RecognizedArguments.Select((arg1, i) => Convert.ChangeType(arg1.Value, parameterInfos[i].ParameterType));
+                parsedArguments.RecognizedArguments.Select((arg1, i) => _changeType(arg1.Value, parameterInfos[i].ParameterType));
             return parsedArguments;
         }
     }
