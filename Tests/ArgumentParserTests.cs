@@ -16,7 +16,7 @@ namespace Helpers.Tests
         public void Recognizes_shortform()
         {
             var parser = ArgumentParser.Build()
-                .Recognize(new ArgumentName("argument", "a"))
+                .Recognize("&argument")
                 .Parse(new[] { "-a" });
             var arguments = parser.RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -28,7 +28,7 @@ namespace Helpers.Tests
         public void Given_several_arguments_Then_the_correct_one_is_recognized()
         {
             var arguments = ArgumentParser.Build()
-                .Recognize(new ArgumentName("beta", "b"))
+                .Recognize("&beta")
                 .Parse(new[] { "-a", "-b" }).RecognizedArguments;
 
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -64,10 +64,18 @@ namespace Helpers.Tests
         {
             var arguments = ArgumentParser.Build()
                .Recognize("beta")
-               .Parse(new[] { "-a", "--beta" }).UnRecognizedArguments;
-            Assert.That(arguments.Count(), Is.EqualTo(1));
-            var arg1 = arguments.First();
-            Assert.That(arg1.Value, Is.EqualTo("-a"));
+               .Parse(new[] { "-a", "value", "--beta" }).UnRecognizedArguments;
+
+            Assert.That(arguments.Select(arg => arg.Value), Is.EquivalentTo(new[] { "-a", "value" }));
+        }
+        [Test]
+        public void It_wont_report_matched_parameters()
+        {
+            var arguments = ArgumentParser.Build()
+                .Recognize("beta")
+                .Parse(new[] { "--beta", "value" }).UnRecognizedArguments;
+
+            Assert.That(arguments.Count(),Is.EqualTo(0));
         }
 
         [Test]

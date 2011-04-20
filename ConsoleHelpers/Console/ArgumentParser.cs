@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Helpers.Console
 {
@@ -23,9 +24,12 @@ namespace Helpers.Console
         }
         public string Value { get; private set; }
         public string ShortValue { get; private set; }
-
+        private static Regex argPattern = new Regex(@"\&(.)");
         public static implicit operator ArgumentName(string value)
         {
+            var match = argPattern.Match(value);
+            if (match.Success)
+                return new ArgumentName(value.Replace("&",""),match.Groups[1].Value);
             return new ArgumentName(value, null);
         }
         /// <summary>
@@ -119,14 +123,25 @@ namespace Helpers.Console
                                                      action = act
                                                  })
                 .Where(couple => couple.arguments.Any());
-            var invokedArguments = recognized
-                .Select(couple => new RecognizedArgument(
-                                      couple.action,
-                                      couple.arguments.First().Value,
-                                      argumentList.GetForIndexOrDefault(couple.arguments.First().Key + 1)));
             var recognizedIndexes = recognized.SelectMany(couple => couple.arguments.Select(arg => arg.Key))
-                .Distinct();
-
+              .ToList();
+            var invokedArguments = recognized
+                .Select(couple =>
+                            {
+                                var value = string.Empty;
+                                var index=couple.arguments.First().Key + 1;
+                                if (index < argumentList.Count && index >= 0)
+                                {
+                                    value = argumentList[index];
+                                    recognizedIndexes.Add(index);
+                                }
+                                return new RecognizedArgument(
+                                    couple.action,
+                                    couple.arguments.First().Value,
+                                    value);
+                            })
+                            .ToList();//In order to execute the above select
+      
 
             var unRecognizedArguments = argumentList
                 .Select((value, i) => new { i, value })
