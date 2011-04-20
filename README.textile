@@ -7,12 +7,12 @@ h2. Goal
 The goal is to be able to write code like:
 someprogram.exe My Action --argument value
 And hooking it up by writing something like:
-<pre>static void Main(string[] args)
-{
-  var arguments = ArgumentParser.Build()
-                .Recognize(typeof(MyController))
-                .Parse(args);
-  arguments.RecognizedAction.Invoke(Activator.CreateInstance(typeof(MyController)),
-      arguments.RecognizedActionParameters.ToArray());
+<code>static void Main(string[] args)<br/>
+{<br/>
+  var arguments = ArgumentParser.Build()<br/>
+                .Recognize(typeof(MyController))<br/>
+                .Parse(args);<br/>
+  arguments.RecognizedAction.Invoke(Activator.CreateInstance(typeof(MyController)),<br/>
+      arguments.RecognizedActionParameters.ToArray());<br/>
 }
-</pre>
+</code>
