@@ -22,7 +22,7 @@ namespace ConsoleHelpers
             var arguments = parser.RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.ArgumentRecognizer.ArgumentName.Value, Is.EqualTo("argument"));
+            Assert.That(arg1.Recognizer.ArgumentName.Value, Is.EqualTo("argument"));
         }
 
         [Test]

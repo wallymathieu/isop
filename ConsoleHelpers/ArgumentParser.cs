@@ -5,15 +5,14 @@ using System.Collections.Generic;
 namespace ConsoleHelpers
 {
     /// <summary>
-    /// Represents the long name of an argument. For instance file of the commandline argument --file. 
+    /// Represents the long name of an argument. For instance "file" of the commandline argument --file. 
     /// Usually you might want it to recognize -f as well.
     /// </summary>
     public struct ArgumentName
     {
         public ArgumentName(string value)
             : this(value, null)
-        {
-        }
+        { }
 
         public ArgumentName(string value, string shortValue)
             : this()
@@ -28,6 +27,11 @@ namespace ConsoleHelpers
         {
             return new ArgumentName(value, null);
         }
+        /// <summary>
+        /// Default recognizer of argument names. Will try to match "--name" and "-n" if shortvalue is supplied
+        /// </summary>
+        /// <param name="argument"></param>
+        /// <returns></returns>
         public bool Recognize(string argument)
         {
             return (!String.IsNullOrEmpty(ShortValue) ? argument.StartsWith("-" + ShortValue) : false)
@@ -56,14 +60,20 @@ namespace ConsoleHelpers
 
     public class RecognizedArgument
     {
+        /// <summary>
+        /// the matched value if any, for instance the "value" of the expression "--argument value"
+        /// </summary>
         public string Value { get; private set; }
-        public ArgumentRecognizer ArgumentRecognizer { get; private set; }
+        public ArgumentRecognizer Recognizer { get; private set; }
+        /// <summary>
+        /// the "argument" of the expression "--argument"
+        /// </summary>
         public string Argument { get; private set; }
 
         public RecognizedArgument(ArgumentRecognizer argumentRecognizer, string parameter, string value = null)
         {
             Value = value;
-            ArgumentRecognizer = argumentRecognizer;
+            Recognizer = argumentRecognizer;
             Argument = parameter;
         }
     }
@@ -73,7 +83,6 @@ namespace ConsoleHelpers
         {
             Value = value;
         }
-
         public string Value { get; private set; }
     }
     public class ParsedArguments
