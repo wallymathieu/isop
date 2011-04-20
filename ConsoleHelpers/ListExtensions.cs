@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace ConsoleHelpers
+namespace Helpers
 {
     public static class ListExtensions
     {

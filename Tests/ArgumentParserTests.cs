@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
+﻿using System.Linq;
+using Helpers.Console;
 using NUnit.Framework;
 
-namespace ConsoleHelpers
+namespace Helpers.Tests
 {
     [TestFixture]
     internal class ArgumentParserTests

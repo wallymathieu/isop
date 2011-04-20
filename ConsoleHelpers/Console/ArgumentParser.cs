@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace ConsoleHelpers
+namespace Helpers.Console
 {
     /// <summary>
     /// Represents the long name of an argument. For instance "file" of the commandline argument --file. 
