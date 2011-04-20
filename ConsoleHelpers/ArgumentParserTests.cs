@@ -19,10 +19,10 @@ namespace ConsoleHelpers
             var parser = ArgumentParser.Build()
                 .Argument("argument")
                 .Parse(new[] { "-a" });
-            var arguments = parser.InvokedArguments;
+            var arguments = parser.RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Argument.Longname, Is.EqualTo("argument"));
+            Assert.That(arg1.ArgumentRecognizer.ArgumentLongname, Is.EqualTo("argument"));
         }
 
         [Test]
@@ -30,11 +30,11 @@ namespace ConsoleHelpers
         {
             var arguments = ArgumentParser.Build()
                 .Argument("beta")
-                .Parse(new[] { "-a", "-b" }).InvokedArguments;
+                .Parse(new[] { "-a", "-b" }).RecognizedArguments;
 
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Parameter, Is.EqualTo("-b"));
+            Assert.That(arg1.Argument, Is.EqualTo("-b"));
         }
 
         [Test]
@@ -42,10 +42,10 @@ namespace ConsoleHelpers
         {
             var arguments = ArgumentParser.Build()
                 .Argument("beta")
-                .Parse(new[] { "-a", "--beta" }).InvokedArguments;
+                .Parse(new[] { "-a", "--beta" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Parameter, Is.EqualTo("--beta"));
+            Assert.That(arg1.Argument, Is.EqualTo("--beta"));
         }
 
         [Test]
@@ -53,17 +53,22 @@ namespace ConsoleHelpers
         {
             var arguments = ArgumentParser.Build()
                 .Argument("beta")
-                .Parse(new []{"-a","--beta", "value"}).InvokedArguments;
+                .Parse(new []{"-a","--beta", "value"}).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Parameter, Is.EqualTo("--beta"));
+            Assert.That(arg1.Argument, Is.EqualTo("--beta"));
             Assert.That(arg1.Value, Is.EqualTo("value"));
         }
 
-        [Test,Ignore("Not implemented")]
+        [Test]
         public void It_can_report_unrecognized_parameters()
         {
-            Assert.Fail();
+            var arguments = ArgumentParser.Build()
+               .Argument("beta")
+               .Parse(new[] { "-a", "--beta" }).UnRecognizedArguments;
+            Assert.That(arguments.Count(), Is.EqualTo(1));
+            var arg1 = arguments.First();
+            Assert.That(arg1.Value, Is.EqualTo("-a"));
         }
     }
 }

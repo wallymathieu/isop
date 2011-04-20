@@ -5,18 +5,18 @@ using NUnit.Framework;
 
 namespace ConsoleHelpers
 {
-    delegate void ActionDelegate();
-    public class Argument
+    public class ArgumentRecognizer
     {
         private readonly Predicate<string> _recognizes;
-        public string Longname { get; private set; }
-        public Argument(string longname)
-            : this(longname, null)
-        {        }
-        public Argument(string longname, Predicate<string> recognizes)
+        public string ArgumentLongname { get; private set; }
+        public ArgumentRecognizer(string argumentLongname)
+            : this(argumentLongname, null)
+        {}
+
+        public ArgumentRecognizer(string argumentLongname, Predicate<string> recognizes)
         {
             _recognizes = recognizes;
-            Longname = longname;
+            ArgumentLongname = argumentLongname;
         }
 
         public bool Recognizes(string argument)
@@ -26,59 +26,78 @@ namespace ConsoleHelpers
 
         public bool DefaultRecognizer(string argument)
         {
-            if (argument.StartsWith("-" + Longname[0]))
+            if (argument.StartsWith("-" + ArgumentLongname[0]))
                 return true;
-            if (argument.StartsWith("--" + Longname))
+            if (argument.StartsWith("--" + ArgumentLongname))
                 return true;
             return false;
         }
     }
 
-    public class ArgumentWithParameters
+    public class RecognizedArgument
     {
         public string Value { get; private set; }
-        public Argument Argument { get; private set; }
-        public string Parameter { get; private set; }
+        public ArgumentRecognizer ArgumentRecognizer { get; private set; }
+        public string Argument { get; private set; }
 
-        public ArgumentWithParameters(Argument argument, string parameter, string value = null)
+        public RecognizedArgument(ArgumentRecognizer argumentRecognizer, string parameter, string value = null)
         {
             Value = value;
-            Argument = argument;
-            Parameter = parameter;
+            ArgumentRecognizer = argumentRecognizer;
+            Argument = parameter;
         }
+    }
+    public class UnrecognizedValue
+    {
+        public UnrecognizedValue(string value)
+        {
+            Value = value;
+        }
+
+        public string Value { get; private set; }
     }
     public class ParsedArguments
     {
-        public IEnumerable<ArgumentWithParameters> InvokedArguments { get; set; }
+        public IEnumerable<RecognizedArgument> RecognizedArguments { get; set; }
 
+        public IEnumerable<UnrecognizedValue> UnRecognizedArguments { get; set; }
     }
     public class ArgumentParser
     {
         public static ArgumentParserBuilder Build() { return new ArgumentParserBuilder(); }
-        private readonly IEnumerable<Argument> _actions;
+        private readonly IEnumerable<ArgumentRecognizer> _actions;
 
-        public ArgumentParser(IEnumerable<Argument> actions)
+        public ArgumentParser(IEnumerable<ArgumentRecognizer> actions)
         {
             _actions = actions;
         }
 
-        public IEnumerable<ArgumentWithParameters> InvokedArguments { get; private set; }
-
+       
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
             var argumentList = arguments.ToList();
-            InvokedArguments = _actions.Select(act =>
-                                                      new
-                                                          {
-                                                              arguments = argumentList.FindIndexAndValues(act.Recognizes),
-                                                              action = act
-                                                          })
-                .Where(couple => couple.arguments.Any())
-                .Select(couple => new ArgumentWithParameters(
+            var recognized = _actions.Select(act =>
+                                             new
+                                                 {
+                                                     arguments = argumentList.FindIndexAndValues(act.Recognizes),
+                                                     action = act
+                                                 })
+                .Where(couple => couple.arguments.Any());
+            var invokedArguments = recognized
+                .Select(couple => new RecognizedArgument(
                                       couple.action,
                                       couple.arguments.First().Value,
                                       argumentList.GetForIndexOrDefault(couple.arguments.First().Key + 1)));
-            return new ParsedArguments { InvokedArguments = InvokedArguments };
+            var recognizedIndexes = recognized.SelectMany(couple => couple.arguments.Select(arg => arg.Key))
+                .Distinct();
+
+
+            var unRecognizedArguments = argumentList
+                .Select((value, i) => new {i, value})
+                .Where(indexAndValue =>  !recognizedIndexes.Contains(indexAndValue.i))
+                .Select(v=>new UnrecognizedValue (v.value));
+                
+            return new ParsedArguments { RecognizedArguments = invokedArguments, UnRecognizedArguments = unRecognizedArguments };
         }
     }
 }
