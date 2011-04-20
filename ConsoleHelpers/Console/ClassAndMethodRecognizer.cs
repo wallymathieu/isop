@@ -39,18 +39,34 @@ namespace Helpers.Console
             return null;
         }
 
-        public ParsedArguments Parse(IEnumerable<string> arg)
+        public ParsedMethod Parse(IEnumerable<string> arg)
         {
             var methodInfo = FindMethodInfo(arg);
             var parameterInfos = methodInfo.GetParameters();
             var argumentRecognizers = parameterInfos
                 .Select(parameterInfo => new ArgumentRecognizer(parameterInfo.Name)).ToList();
+
             var parser = new ArgumentParser(argumentRecognizers);
+            
             var parsedArguments = parser.Parse(arg);
-            parsedArguments.RecognizedAction = methodInfo;
-            parsedArguments.RecognizedActionParameters =
-                parsedArguments.RecognizedArguments.Select((arg1, i) => _changeType(arg1.Value, parameterInfos[i].ParameterType));
-            return parsedArguments;
+            return new ParsedMethod
+                       {
+                           Arguments = parsedArguments,
+                           RecognizedAction = methodInfo,
+                           RecognizedActionParameters = parsedArguments.RecognizedArguments
+                               .Select(
+                                   (arg1, i) => _changeType(arg1.Value, parameterInfos[i].ParameterType))
+                               .ToList()
+                       };
+        }
+
+        public class ParsedMethod
+        {
+            public MethodInfo RecognizedAction { get; set; }
+
+            public IEnumerable<object> RecognizedActionParameters { get; set; }
+
+            public ParsedArguments Arguments { get; set; }
         }
     }
 }

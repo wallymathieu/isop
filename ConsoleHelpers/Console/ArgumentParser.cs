@@ -125,10 +125,6 @@ namespace Helpers.Console
 
         public IEnumerable<UnrecognizedValue> UnRecognizedArguments { get; set; }
 
-        public MethodInfo RecognizedAction { get; set; }
-
-        public IEnumerable<object> RecognizedActionParameters { get; set; }
-
         public IEnumerable<ArgumentRecognizer> Recognizers { get; set; }
 
         public string UnRecognizedArgumentsMessage()
