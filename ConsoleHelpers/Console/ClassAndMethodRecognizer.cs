@@ -9,17 +9,11 @@ namespace Helpers.Console
     public class ClassAndMethodRecognizer
     {
         public Type Type { get; private set; }
-        private readonly Func<Object,Type,Object> _changeType;
-
+        /// <summary>
+        /// </summary>
         public ClassAndMethodRecognizer(Type type)
-            : this(type, Convert.ChangeType)
-        {
-        }
-
-        public ClassAndMethodRecognizer(Type type, Func<Object,Type,Object> changeType)
         {
             Type = type;
-            _changeType = changeType;
         }
 
         public bool Recognize(IEnumerable<string> arg)
@@ -38,7 +32,12 @@ namespace Helpers.Console
             }
             return null;
         }
-
+        /// <summary>
+        /// Note that in order to register a converter you can use:
+        /// TypeDescriptor.AddAttributes(typeof(AType), new TypeConverterAttribute(typeof(ATypeConverter)));
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <returns></returns>
         public ParsedMethod Parse(IEnumerable<string> arg)
         {
             var methodInfo = FindMethodInfo(arg);
@@ -55,7 +54,7 @@ namespace Helpers.Console
                            RecognizedAction = methodInfo,
                            RecognizedActionParameters = parsedArguments.RecognizedArguments
                                .Select(
-                                   (arg1, i) => _changeType(arg1.Value, parameterInfos[i].ParameterType))
+                                   (arg1, i) => TypeDescriptor.GetConverter(parameterInfos[i].ParameterType).ConvertFrom(arg1.Value))
                                .ToList()
                        };
         }
