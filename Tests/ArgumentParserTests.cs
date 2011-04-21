@@ -108,8 +108,8 @@ namespace Helpers.Tests
         {
             var count = 0;
             ArgumentParser.Build()
-                           .RecognizeAction("beta", arg => count++)
-                           .RecognizeAction("alpha", arg => Assert.Fail())
+                           .Action("beta", arg => count++)
+                           .Action("alpha", arg => Assert.Fail())
                            .Parse(new[] { "-a", "value", "--beta" }).Invoke();
             Assert.That(count, Is.EqualTo(1));
         }

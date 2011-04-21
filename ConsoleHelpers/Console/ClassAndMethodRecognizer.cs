@@ -58,14 +58,14 @@ namespace Helpers.Console
                                .ToList()
                        };
         }
+    }
 
-        public class ParsedMethod
-        {
-            public MethodInfo RecognizedAction { get; set; }
+    public class ParsedMethod
+    {
+        public MethodInfo RecognizedAction { get; set; }
 
-            public IEnumerable<object> RecognizedActionParameters { get; set; }
+        public IEnumerable<object> RecognizedActionParameters { get; set; }
 
-            public ParsedArguments Arguments { get; set; }
-        }
+        public ParsedArguments Arguments { get; set; }
     }
 }
