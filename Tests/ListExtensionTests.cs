@@ -8,21 +8,6 @@ namespace Helpers.Tests
     internal class ListExtensionTests
     {
         [Test]
-        public void GetForIndexOrDefault_Can_return_default_for_values_outside_of_range()
-        {
-            Assert.That(new[] { 1, 2, 3 }.ToList().GetForIndexOrDefault(3), Is.EqualTo(0));
-        }
-        [Test]
-        public void GetForIndexOrDefault_Can_return_value_for_index_inside_range()
-        {
-            Assert.That(new[] { 1, 2, 3 }.ToList().GetForIndexOrDefault(1), Is.EqualTo(2));
-        }
-        [Test]
-        public void GetForIndexOrDefault_Can_return_value_for_first_index_inside_range()
-        {
-            Assert.That(new[] { 1, 2, 3 }.ToList().GetForIndexOrDefault(0), Is.EqualTo(1));
-        }
-        [Test]
         public void FindIndexAndValues_Can_return_correct_index()
         {
             Assert.That(new[] { "1", "2", "3" }.ToList().FindIndexAndValues(value => value == "1"), 

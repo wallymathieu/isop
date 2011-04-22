@@ -14,11 +14,5 @@ namespace Helpers
                     yield return new KeyValuePair<int, TValue>(i, v);
             }
         }
-        public static TValue GetForIndexOrDefault<TValue>(this IList<TValue> self, int index)
-        {
-            if (index >= self.Count || index < 0)
-                return default(TValue);
-            return self[index];
-        }
     }
 }
