@@ -43,10 +43,10 @@ namespace Helpers.Console
             var methodInfo = FindMethodInfo(arg);
             var parameterInfos = methodInfo.GetParameters();
             var argumentRecognizers = parameterInfos
-                .Select(parameterInfo => new ArgumentRecognizer(parameterInfo.Name)).ToList();
+                .Select(parameterInfo => new ArgumentRecognizer(parameterInfo.Name, required: true)).ToList();
 
             var parser = new ArgumentParser(argumentRecognizers);
-            
+
             var parsedArguments = parser.Parse(arg);
             return new ParsedMethod
                        {
@@ -55,17 +55,29 @@ namespace Helpers.Console
                            RecognizedActionParameters = parsedArguments.RecognizedArguments
                                .Select(
                                    (arg1, i) => TypeDescriptor.GetConverter(parameterInfos[i].ParameterType).ConvertFrom(arg1.Value))
-                               .ToList()
+                               .ToList(),
+                           RecognizedClass = Type
                        };
         }
     }
 
     public class ParsedMethod
     {
+        public Type RecognizedClass;
         public MethodInfo RecognizedAction { get; set; }
 
         public IEnumerable<object> RecognizedActionParameters { get; set; }
 
         public ParsedArguments Arguments { get; set; }
+
+        public void Invoke()
+        {
+            Invoke(Activator.CreateInstance);
+        }
+
+        public void Invoke(Func<Type, object> factory)
+        {
+            RecognizedAction.Invoke(factory(RecognizedClass), RecognizedActionParameters.ToArray());
+        }
     }
 }

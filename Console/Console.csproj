@@ -46,6 +46,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ConsoleHelpers\ConsoleHelpers.csproj">
+      <Project>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</Project>
+      <Name>ConsoleHelpers</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -8,25 +8,16 @@ namespace Helpers.Console
     {
         private IList<ArgumentRecognizer> _argumentRecognizers = new List<ArgumentRecognizer>();
         private IList<ClassAndMethodRecognizer> _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
-        
-        public ArgumentParserBuilder Recognize(ArgumentName argumentName)
-        {
-            return Recognize(argumentName, null);
-        }
 
-        public ArgumentParserBuilder Recognize(ArgumentName argumentName, Predicate<string> recognizes)
+        public ArgumentParserBuilder Recognize(Argument argument, Predicate<string> recognizes=null, bool required=false)
         {
-            _argumentRecognizers.Add(new ArgumentRecognizer(argumentName,recognizes));
+            _argumentRecognizers.Add(new ArgumentRecognizer(argument, recognizes, null, required));
             return this;
         }
 
-        public ArgumentParserBuilder Action(ArgumentName argumentName, Action<string> action)
+        public ArgumentParserBuilder Action(Argument argument, Action<string> action, Predicate<string> recognizes = null, bool required = false)
         {
-            return Action(argumentName, action, null);
-        }
-        public ArgumentParserBuilder Action(ArgumentName argumentName, Action<string> action, Predicate<string> recognizes)
-        {
-            _argumentRecognizers.Add(new ArgumentRecognizer(argumentName, recognizes, action));
+            _argumentRecognizers.Add(new ArgumentRecognizer(argument, recognizes, action, required));
             return this;
         }
         public ParsedMethod ParseMethod(IEnumerable<string> arg)

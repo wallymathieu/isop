@@ -1,39 +1,62 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Helpers.Console
 {
-    /// <summary>
-    /// Represents the long name of an argument. For instance "file" of the commandline argument --file. 
-    /// Usually you might want it to recognize -f as well.
-    /// </summary>
-    public class ArgumentName
+    [Serializable]
+    public class MissingArgumentException : Exception
     {
-        public ArgumentName(string value)
+        public List<Argument> Arguments;
+        public MissingArgumentException() { }
+
+        public MissingArgumentException(string message) : base(message) { }
+
+        public MissingArgumentException(string message, Exception inner) : base(message, inner) { }
+
+        protected MissingArgumentException(
+            SerializationInfo info,
+            StreamingContext context)
+            : base(info, context)
+        {
+        }
+    }
+    /// <summary>
+    /// Represents the argument. For instance "file" of the commandline argument --file. 
+    /// Usually you might want it to recognize -f as well. For instance using Argument.Parse("&file"), or the implicit 
+    /// string cast operator.
+    /// </summary>
+    public class Argument
+    {
+        public Argument(string value)
             : this(value, null, value)
         { }
 
-        public ArgumentName(string value, string shortValue,string original)
-            
+        public Argument(string value, string shortValue, string original)
         {
             Value = value;
             ShortValue = shortValue;
-            this.original = original;
+            _original = original;
         }
-        private string original;
+        private readonly string _original;
         public string Value { get; private set; }
         public string ShortValue { get; private set; }
-        private static Regex argPattern = new Regex(@"\&(.)");
-        public static implicit operator ArgumentName(string value)
+        private static readonly Regex ArgPattern = new Regex(@"\&(.)");
+        public static implicit operator Argument(string value)
         {
-            var match = argPattern.Match(value);
-            if (match.Success)
-                return new ArgumentName(value.Replace("&",""),match.Groups[1].Value, value);
-            return new ArgumentName(value, null, value);
+            return Parse(value);
         }
+
+        public static Argument Parse(string value)
+        {
+            var match = ArgPattern.Match(value);
+            if (match.Success)
+                return new Argument(value.Replace("&", ""), match.Groups[1].Value, value);
+            return new Argument(value, null, value);
+        }
+
         /// <summary>
         /// Default recognizer of argument names. Will try to match "--name" and "-n" if shortvalue is supplied
         /// </summary>
@@ -46,20 +69,20 @@ namespace Helpers.Console
         }
         public override bool Equals(object obj)
         {
-            if (obj is ArgumentName)
+            if (obj is Argument)
             {
-                var other = (ArgumentName)obj;
+                var other = (Argument)obj;
                 return Value.Equals(other.Value) && ShortValue.Equals(other.ShortValue);
             }
             return false;
         }
         public override int GetHashCode()
         {
-            return this.Value.GetHashCode() ^ this.ShortValue.GetHashCode();
+            return Value.GetHashCode() ^ ShortValue.GetHashCode();
         }
         public override string ToString()
         {
-            return original;
+            return _original;
         }
     }
     /// <summary>
@@ -68,27 +91,21 @@ namespace Helpers.Console
     public class ArgumentRecognizer
     {
         private readonly Predicate<string> _recognizes;
-        public ArgumentName ArgumentName { get; private set; }
+        public Argument Argument { get; private set; }
         public Action<string> Action { get; set; }
+        public bool Required { get; set; }
 
-        public ArgumentRecognizer(ArgumentName argumentName)
-            : this(argumentName, null,null)
-        { }
-
-        public ArgumentRecognizer(ArgumentName argumentName, Predicate<string> recognizes)
-            : this(argumentName, recognizes, null)
-        { }
-
-        public ArgumentRecognizer(ArgumentName argumentName, Predicate<string> recognizes,Action<string> action)
+        public ArgumentRecognizer(Argument argument, Predicate<string> recognizes = null, Action<string> action = null, bool required = false)
         {
             _recognizes = recognizes;
-            ArgumentName = argumentName;
+            Argument = argument;
             Action = action;
+            Required = required;
         }
 
         public bool Recognizes(string argument)
         {
-            return null != _recognizes ? _recognizes(argument) : ArgumentName.Recognize(argument);
+            return null != _recognizes ? _recognizes(argument) : Argument.Recognize(argument);
         }
     }
 
@@ -129,12 +146,12 @@ namespace Helpers.Console
 
         public string UnRecognizedArgumentsMessage()
         {
-            return 
+            return
 string.Format(@"Unrecognized arguments: 
 {0}
 Did you mean any of these arguments?
-{1}", String.Join(",",UnRecognizedArguments.Select(arg=>arg.Value).ToArray()), 
-    String.Join(",",Recognizers.Select(rec=>rec.ArgumentName.ToString()).ToArray()));
+{1}", String.Join(",", UnRecognizedArguments.Select(arg => arg.Value).ToArray()),
+    String.Join(",", Recognizers.Select(rec => rec.Argument.ToString()).ToArray()));
         }
 
         public void Invoke()
@@ -158,38 +175,45 @@ Did you mean any of these arguments?
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
             var argumentList = arguments.ToList();
-            var recognized = _recognizers.Select(act =>
+            var recognizedArguments = _recognizers.Select(act =>
                                              new
                                                  {
-                                                     arguments = argumentList.FindIndexAndValues(act.Recognizes),
-                                                     action = act
+                                                     Arguments = argumentList.FindIndexAndValues(act.Recognizes),
+                                                     Recognizer = act
                                                  })
-                .Where(couple => couple.arguments.Any());
-            var recognizedIndexes = recognized.SelectMany(couple => couple.arguments.Select(arg => arg.Key))
+                .Where(couple => couple.Arguments.Any());
+            var recognizedIndexes = recognizedArguments
+              .SelectMany(recognizedArgument => recognizedArgument.Arguments.Select(arg => arg.Key))
               .ToList();
-            var invokedArguments = recognized
+            var invokedArguments = recognizedArguments
                 .Select(couple =>
                             {
                                 var value = string.Empty;
-                                var index=couple.arguments.First().Key + 1;
+                                var index = couple.Arguments.First().Key + 1;
                                 if (index < argumentList.Count && index >= 0)
                                 {
                                     value = argumentList[index];
                                     recognizedIndexes.Add(index);
                                 }
                                 return new RecognizedArgument(
-                                    couple.action,
-                                    couple.arguments.First().Value,
+                                    couple.Recognizer,
+                                    couple.Arguments.First().Value,
                                     value);
                             })
                             .ToList();//In order to execute the above select
-      
+
 
             var unRecognizedArguments = argumentList
                 .Select((value, i) => new { i, value })
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
                 .Select(v => new UnrecognizedValue(v.value));
 
+            var unMatchedRequiredArguments = _recognizers.Where(recognizer => recognizer.Required)
+                .Where(recognizer => !recognizedArguments.Any(recogn => recogn.Recognizer.Equals( recognizer)));
+            if (unMatchedRequiredArguments.Any())
+            {
+                throw new MissingArgumentException("Missing arguments") { Arguments=unMatchedRequiredArguments.Select(unmatched=>unmatched.Argument).ToList()};
+            }
             return new ParsedArguments
             {
                 Recognizers = _recognizers.ToArray(),
