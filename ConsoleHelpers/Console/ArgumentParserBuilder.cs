@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace Helpers.Console
@@ -8,8 +9,9 @@ namespace Helpers.Console
     {
         private IList<ArgumentRecognizer> _argumentRecognizers = new List<ArgumentRecognizer>();
         private IList<ClassAndMethodRecognizer> _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
+        private CultureInfo _cultureInfo;
 
-        public ArgumentParserBuilder Recognize(Argument argument, Predicate<string> recognizes=null, bool required=false)
+        public ArgumentParserBuilder Recognize(Argument argument, Predicate<string> recognizes = null, bool required = false)
         {
             _argumentRecognizers.Add(new ArgumentRecognizer(argument, recognizes, null, required));
             return this;
@@ -20,6 +22,11 @@ namespace Helpers.Console
             _argumentRecognizers.Add(new ArgumentRecognizer(argument, recognizes, action, required));
             return this;
         }
+        public ArgumentParserBuilder SetCulture(CultureInfo cultureInfo)
+        {
+            _cultureInfo = cultureInfo; return this;
+        }
+
         public ParsedMethod ParseMethod(IEnumerable<string> arg)
         {
             var methodRecognizer = _classAndMethodRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
@@ -38,10 +45,10 @@ namespace Helpers.Console
 
             return argumentParser.Parse(arg);
         }
-
-        public ArgumentParserBuilder Recognize(Type arg)
+        
+        public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null)
         {
-            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg));
+            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg, _cultureInfo ?? cultureInfo));
             return this;
         }
     }

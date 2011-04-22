@@ -1,27 +1,18 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Helpers.Console
 {
-    [Serializable]
     public class MissingArgumentException : Exception
     {
-        public List<Argument> Arguments;
+        public List<string> Arguments;
         public MissingArgumentException() { }
 
         public MissingArgumentException(string message) : base(message) { }
 
         public MissingArgumentException(string message, Exception inner) : base(message, inner) { }
-
-        protected MissingArgumentException(
-            SerializationInfo info,
-            StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
     /// <summary>
     /// Represents the argument. For instance "file" of the commandline argument --file. 
@@ -64,9 +55,10 @@ namespace Helpers.Console
         /// <returns></returns>
         public bool Recognize(string argument)
         {
-            return (!String.IsNullOrEmpty(ShortValue) ? argument.StartsWith("-" + ShortValue) : false)
-                || argument.StartsWith("--" + Value);
+            return (!String.IsNullOrEmpty(ShortValue) ? argument.StartsWith("-" + ShortValue, StringComparison.OrdinalIgnoreCase) : false)
+                || argument.StartsWith("--" + Value, StringComparison.OrdinalIgnoreCase);
         }
+
         public override bool Equals(object obj)
         {
             if (obj is Argument)
@@ -128,31 +120,13 @@ namespace Helpers.Console
             Argument = parameter;
         }
     }
-    public class UnrecognizedValue
-    {
-        public UnrecognizedValue(string value)
-        {
-            Value = value;
-        }
-        public string Value { get; private set; }
-    }
     public class ParsedArguments
     {
         public IEnumerable<RecognizedArgument> RecognizedArguments { get; set; }
 
-        public IEnumerable<UnrecognizedValue> UnRecognizedArguments { get; set; }
+        public IEnumerable<string> UnRecognizedArguments { get; set; }
 
         public IEnumerable<ArgumentRecognizer> Recognizers { get; set; }
-
-        public string UnRecognizedArgumentsMessage()
-        {
-            return
-string.Format(@"Unrecognized arguments: 
-{0}
-Did you mean any of these arguments?
-{1}", String.Join(",", UnRecognizedArguments.Select(arg => arg.Value).ToArray()),
-    String.Join(",", Recognizers.Select(rec => rec.Argument.ToString()).ToArray()));
-        }
 
         public void Invoke()
         {
@@ -206,13 +180,13 @@ Did you mean any of these arguments?
             var unRecognizedArguments = argumentList
                 .Select((value, i) => new { i, value })
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
-                .Select(v => new UnrecognizedValue(v.value));
+                .Select(v => v.value);
 
             var unMatchedRequiredArguments = _recognizers.Where(recognizer => recognizer.Required)
-                .Where(recognizer => !recognizedArguments.Any(recogn => recogn.Recognizer.Equals( recognizer)));
+                .Where(recognizer => !recognizedArguments.Any(recogn => recogn.Recognizer.Equals(recognizer)));
             if (unMatchedRequiredArguments.Any())
             {
-                throw new MissingArgumentException("Missing arguments") { Arguments=unMatchedRequiredArguments.Select(unmatched=>unmatched.Argument).ToList()};
+                throw new MissingArgumentException("Missing arguments") { Arguments = unMatchedRequiredArguments.Select(unmatched => unmatched.Argument.ToString()).ToList() };
             }
             return new ParsedArguments
             {

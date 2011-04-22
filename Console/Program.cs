@@ -6,19 +6,30 @@ using Helpers.Console;
 
 namespace Console
 {
+    /// <summary>
+    /// This is a sample usage of console helpers:
+    /// </summary>
     class Program
     {
         static void Main(string[] args)
         {
             try
             {
-                var arguments = ArgumentParser.Build()
+                var parsedMethod = ArgumentParser.Build()
                            .Recognize(typeof(MyController))
                            .ParseMethod(args);
-                if (arguments.Arguments.UnRecognizedArguments.Any())//Warning:
-                    System.Console.WriteLine(arguments.Arguments.UnRecognizedArgumentsMessage());
-
-                arguments.Invoke();
+                var arguments = parsedMethod.Arguments;
+                if (arguments.UnRecognizedArguments.Any())//Warning:
+                {
+                    var unRecognizedArgumentsMessage = string.Format(
+@"Unrecognized arguments: 
+{0}
+Did you mean any of these arguments?
+{1}", String.Join(",", arguments.UnRecognizedArguments.ToArray()),
+      String.Join(",", arguments.Recognizers.Select(rec => rec.Argument.ToString()).ToArray()));
+                    System.Console.WriteLine(unRecognizedArgumentsMessage);
+                }
+                parsedMethod.Invoke();
             }
             catch (MissingArgumentException ex)
             {

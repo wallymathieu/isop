@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -8,12 +9,14 @@ namespace Helpers.Console
 {
     public class ClassAndMethodRecognizer
     {
+        private readonly CultureInfo _culture;
         public Type Type { get; private set; }
         /// <summary>
         /// </summary>
-        public ClassAndMethodRecognizer(Type type)
+        public ClassAndMethodRecognizer(Type type, CultureInfo cultureInfo = null)
         {
             Type = type;
+            _culture = cultureInfo?? CultureInfo.CurrentCulture;
         }
 
         public bool Recognize(IEnumerable<string> arg)
@@ -23,11 +26,11 @@ namespace Helpers.Console
 
         private MethodInfo FindMethodInfo(IEnumerable<string> arg)
         {
-            var foundClassName = Type.Name.Replace("Controller", "").Equals(arg.ElementAtOrDefault(0), StringComparison.InvariantCultureIgnoreCase);
+            var foundClassName = Type.Name.Replace("Controller", "").Equals(arg.ElementAtOrDefault(0), StringComparison.OrdinalIgnoreCase);
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1);
-                var methodInfo = Type.GetMethods().FirstOrDefault(method => method.Name.Equals(methodName, StringComparison.InvariantCultureIgnoreCase));
+                var methodInfo = Type.GetMethods().FirstOrDefault(method => method.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase));
                 return methodInfo;
             }
             return null;
@@ -54,7 +57,7 @@ namespace Helpers.Console
                            RecognizedAction = methodInfo,
                            RecognizedActionParameters = parsedArguments.RecognizedArguments
                                .Select(
-                                   (arg1, i) => TypeDescriptor.GetConverter(parameterInfos[i].ParameterType).ConvertFrom(arg1.Value))
+                                   (arg1, i) => TypeDescriptor.GetConverter(parameterInfos[i].ParameterType).ConvertFrom(null, _culture, arg1.Value))
                                .ToList(),
                            RecognizedClass = Type
                        };

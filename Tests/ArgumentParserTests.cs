@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using Helpers.Console;
 using NUnit.Framework;
@@ -63,11 +64,11 @@ namespace Helpers.Tests
         [Test]
         public void It_can_report_unrecognized_parameters()
         {
-            var arguments = ArgumentParser.Build()
+            var unRecognizedArguments = ArgumentParser.Build()
                .Recognize("beta")
                .Parse(new[] { "-a", "value", "--beta" }).UnRecognizedArguments;
 
-            Assert.That(arguments.Select(arg => arg.Value), Is.EquivalentTo(new[] { "-a", "value" }));
+            Assert.That(unRecognizedArguments, Is.EquivalentTo(new[] { "-a", "value" }));
         }
         [Test]
         public void It_wont_report_matched_parameters()
@@ -91,8 +92,9 @@ namespace Helpers.Tests
         public void It_can_parse_class_and_method()
         {
             var arguments = ArgumentParser.Build()
+                .SetCulture(CultureInfo.InvariantCulture)
                 .Recognize(typeof(MyController))
-                .ParseMethod(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3,4" });
+                .ParseMethod(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
             Assert.That(arguments.RecognizedAction.Name, Is.EqualTo("Action"));
             Assert.That(arguments.RecognizedActionParameters, Is.EquivalentTo(new object[] { "value1", "value2", 3, 3.4m}));
         }
@@ -101,8 +103,9 @@ namespace Helpers.Tests
         {
             var count = 0;
             var arguments = ArgumentParser.Build()
+              .SetCulture(CultureInfo.InvariantCulture)
               .Recognize(typeof(MyController))
-              .ParseMethod(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3,4" });
+              .ParseMethod(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
             Func<Type, object> factory = (Type t) =>
                                              {
                                                  Assert.That(t, Is.EqualTo(typeof(MyController)));
@@ -124,17 +127,6 @@ namespace Helpers.Tests
             public string Action(string param1, string param2, int param3, decimal param4) { return OnAction(param1,param2,param3,param4); }
         }
 
-        [Test]
-        public void It_can_write_a_message_about_unrecognized_parameters()
-        {
-            var val = ArgumentParser.Build()
-                .Recognize("beta")
-                .Parse(new[] { "-a", "value", "--beta" }).UnRecognizedArgumentsMessage();
-
-            Assert.That(val, Is.StringContaining("-a"));
-            Assert.That(val, Is.StringContaining("value"));
-            Assert.That(val, Is.StringContaining("beta"));
-        }
         [Test]
         public void It_can_invoke_recognized()
         {
