@@ -12,7 +12,6 @@ static void Main(string[] args)
   var arguments = ArgumentParser.Build()
                 .Recognize(typeof(MyController))
                 .Parse(args);
-  arguments.RecognizedAction.Invoke(Activator.CreateInstance(typeof(MyController)),
-      arguments.RecognizedActionParameters.ToArray());
+  arguments.Invoke();
 }
-
+So that the class with the name My or MyController and the method with the name Action gets invoked.
