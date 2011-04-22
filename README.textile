@@ -15,3 +15,6 @@ static void Main(string[] args)
   arguments.Invoke();
 }
 So that the class with the name My or MyController and the method with the name Action gets invoked.
+
+h2. Example
+Look at the Example project for the most resent example of how it is used. 
