@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleHelpers", "ConsoleHe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{55C48544-BD4E-4101-A42C-CCCEB2F92304}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console", "Console\Console.csproj", "{02596ACA-3C85-4353-8744-5F0A172BA757}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console", "Example\Console.csproj", "{02596ACA-3C85-4353-8744-5F0A172BA757}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
