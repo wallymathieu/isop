@@ -91,10 +91,10 @@ namespace Helpers.Tests
         [Test]
         public void It_can_parse_class_and_method()
         {
-            var arguments = ArgumentParser.Build()
-                .SetCulture(CultureInfo.InvariantCulture)
-                .Recognize(typeof(MyController))
-                .ParseMethod(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+            var arguments = (ParsedMethod) ArgumentParser.Build()
+                                               .SetCulture(CultureInfo.InvariantCulture)
+                                               .Recognize(typeof(MyController))
+                                               .Parse( new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
             Assert.That(arguments.RecognizedAction.Name, Is.EqualTo("Action"));
             Assert.That(arguments.RecognizedActionParameters, Is.EquivalentTo(new object[] { "value1", "value2", 3, 3.4m}));
         }
@@ -102,10 +102,10 @@ namespace Helpers.Tests
         public void It_can_parse_class_and_method_and_execute()
         {
             var count = 0;
-            var arguments = ArgumentParser.Build()
-              .SetCulture(CultureInfo.InvariantCulture)
-              .Recognize(typeof(MyController))
-              .ParseMethod(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+            var arguments = (ParsedMethod) ArgumentParser.Build()
+                                               .SetCulture(CultureInfo.InvariantCulture)
+                                               .Recognize(typeof(MyController))
+                                               .Parse( new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
             Func<Type, object> factory = (Type t) =>
                                              {
                                                  Assert.That(t, Is.EqualTo(typeof(MyController)));

@@ -51,9 +51,8 @@ namespace Helpers.Console
             var parser = new ArgumentParser(argumentRecognizers);
 
             var parsedArguments = parser.Parse(arg);
-            return new ParsedMethod
+            return new ParsedMethod(parsedArguments)
                        {
-                           Arguments = parsedArguments,
                            RecognizedAction = methodInfo,
                            RecognizedActionParameters = parsedArguments.RecognizedArguments
                                .Select(
@@ -64,16 +63,19 @@ namespace Helpers.Console
         }
     }
 
-    public class ParsedMethod
+    public class ParsedMethod : ParsedArguments
     {
+        public ParsedMethod(ParsedArguments parsedArguments)
+            :base(parsedArguments)
+        {
+            
+        }
         public Type RecognizedClass;
         public MethodInfo RecognizedAction { get; set; }
 
         public IEnumerable<object> RecognizedActionParameters { get; set; }
 
-        public ParsedArguments Arguments { get; set; }
-
-        public void Invoke()
+        public override void Invoke()
         {
             Invoke(Activator.CreateInstance);
         }

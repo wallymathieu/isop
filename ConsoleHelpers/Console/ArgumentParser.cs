@@ -122,13 +122,26 @@ namespace Helpers.Console
     }
     public class ParsedArguments
     {
+        public ParsedArguments()
+        {
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parsedArguments"></param>
+        public ParsedArguments(ParsedArguments parsedArguments)
+        {
+            this.RecognizedArguments = parsedArguments.RecognizedArguments;
+            this.Recognizers = parsedArguments.Recognizers;
+            this.UnRecognizedArguments = parsedArguments.UnRecognizedArguments;
+        }
         public IEnumerable<RecognizedArgument> RecognizedArguments { get; set; }
 
         public IEnumerable<string> UnRecognizedArguments { get; set; }
 
         public IEnumerable<ArgumentRecognizer> Recognizers { get; set; }
 
-        public void Invoke()
+        public virtual void Invoke()
         {
             foreach (var argument in RecognizedArguments.Where(argument => null != argument.Recognizer.Action))
             {

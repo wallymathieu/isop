@@ -27,7 +27,7 @@ namespace Helpers.Console
             _cultureInfo = cultureInfo; return this;
         }
 
-        public ParsedMethod ParseMethod(IEnumerable<string> arg)
+        public ParsedArguments Parse(IEnumerable<string> arg)
         {
             var methodRecognizer = _classAndMethodRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
             if (null != methodRecognizer)
@@ -35,11 +35,6 @@ namespace Helpers.Console
                 _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
                 return methodRecognizer.Parse(arg);
             }
-            throw new Exception("Missing matching method");
-        }
-
-        public ParsedArguments Parse(IEnumerable<string> arg)
-        {
             var argumentParser = new ArgumentParser(_argumentRecognizers);
             _argumentRecognizers = new List<ArgumentRecognizer>();
 

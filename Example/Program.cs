@@ -16,17 +16,16 @@ namespace Console
             try
             {
                 var parsedMethod = ArgumentParser.Build()
-                           .Recognize(typeof(MyController))
-                           .ParseMethod(args);
-                var arguments = parsedMethod.Arguments;
-                if (arguments.UnRecognizedArguments.Any())//Warning:
+                                                      .Recognize(typeof(MyController))
+                                                      .Parse( args);
+                if (parsedMethod.UnRecognizedArguments.Any())//Warning:
                 {
                     var unRecognizedArgumentsMessage = string.Format(
 @"Unrecognized arguments: 
 {0}
 Did you mean any of these arguments?
-{1}", String.Join(",", arguments.UnRecognizedArguments.ToArray()),
-      String.Join(",", arguments.Recognizers.Select(rec => rec.Argument.ToString()).ToArray()));
+{1}", String.Join(",", parsedMethod.UnRecognizedArguments.ToArray()),
+      String.Join(",", parsedMethod.Recognizers.Select(rec => rec.Argument.ToString()).ToArray()));
                     System.Console.WriteLine(unRecognizedArgumentsMessage);
                 }
                 parsedMethod.Invoke();
