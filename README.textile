@@ -9,10 +9,10 @@ someprogram.exe My Action --argument value
 And hooking it up by writing something like:
 static void Main(string[] args)
 {
-  var arguments = ArgumentParser.Build()
+  var parsedMethod = ArgumentParser.Build()
                 .Recognize(typeof(MyController))
-                .Parse(args);
-  arguments.Invoke();
+                .ParseMethod(args);
+  parsedMethod.Invoke();
 }
 So that the class with the name My or MyController and the method with the name Action gets invoked.
 
