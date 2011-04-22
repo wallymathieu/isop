@@ -22,8 +22,6 @@ namespace Helpers.Console
             return Parse(value);
         }
 
-        //private static readonly Regex OptionArgumentPattern = new Regex(@"[^=:]*([=:]?)");
-
         public static Argument Parse(string value)
         {
             OptionArgument optionArgument;
@@ -34,7 +32,11 @@ namespace Helpers.Console
                 return visualStudioArgument;
             throw new NotImplementedException(value);
         }
-
+        /// <summary>
+        /// todo: this should be a regex matcher like "(-|/|--)([^:=]*)([:=]?)"
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public string GetArgumentStartPattern(string name)
         {
             return (name.Length == 1 ? "-" : "--") + name;
