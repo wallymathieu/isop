@@ -46,7 +46,7 @@ namespace Helpers.Console
             var methodInfo = FindMethodInfo(arg);
             var parameterInfos = methodInfo.GetParameters();
             var argumentRecognizers = parameterInfos
-                .Select(parameterInfo => new ArgumentRecognizer(parameterInfo.Name, required: true)).ToList();
+                .Select(parameterInfo => new ArgumentWithOptions(parameterInfo.Name, required: true)).ToList();
 
             var parser = new ArgumentParser(argumentRecognizers);
 

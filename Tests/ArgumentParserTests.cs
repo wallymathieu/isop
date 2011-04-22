@@ -23,7 +23,7 @@ namespace Helpers.Tests
             var arguments = parser.RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Recognizer.Argument.Value, Is.EqualTo("argument"));
+            Assert.That(arg1.WithOptions.Argument.ToString(), Is.EqualTo("&argument"));
         }
 
         [Test]
@@ -60,7 +60,29 @@ namespace Helpers.Tests
             Assert.That(arg1.Argument, Is.EqualTo("--beta"));
             Assert.That(arg1.Value, Is.EqualTo("value"));
         }
-
+        [Test]
+        public void It_can_parse_parameter_with_equals()
+        {
+            var arguments = ArgumentParser.Build()
+                .Recognize("beta=")
+                .Parse(new[] { "-a", "--beta=test", "value" }).RecognizedArguments;
+            Assert.That(arguments.Count(), Is.EqualTo(1));
+            var arg1 = arguments.First();
+            Assert.That(arg1.Value, Is.EqualTo("test"));
+            Assert.That(arg1.Argument, Is.EqualTo("--beta=test"));
+        }
+        [Test]
+        public void It_can_parse_parameter_alias()
+        {
+            var arguments = ArgumentParser.Build()
+                .Recognize("beta|b=")
+                .Parse(new[] { "-a", "-b=test", "value" }).RecognizedArguments;
+            Assert.That(arguments.Count(), Is.EqualTo(1));
+            var arg1 = arguments.First();
+            Assert.That(arg1.WithOptions.Argument.ToString(), Is.EqualTo("beta|b="));
+            Assert.That(arg1.Value, Is.EqualTo("test"));
+            Assert.That(arg1.Argument, Is.EqualTo("-b=test"));
+        }
         [Test]
         public void It_can_report_unrecognized_parameters()
         {
@@ -77,13 +99,13 @@ namespace Helpers.Tests
                 .Recognize("beta")
                 .Parse(new[] { "--beta", "value" }).UnRecognizedArguments;
 
-            Assert.That(arguments.Count(),Is.EqualTo(0));
+            Assert.That(arguments.Count(), Is.EqualTo(0));
         }
         [Test]
         public void It_will_fail_if_argument_not_supplied_and_it_is_required()
         {
-            Assert.Throws<MissingArgumentException>(()=> ArgumentParser.Build()
-               .Recognize("beta",required:true)
+            Assert.Throws<MissingArgumentException>(() => ArgumentParser.Build()
+               .Recognize("beta", required: true)
                .Parse(new[] { "-a", "value" }));
 
         }
@@ -91,28 +113,27 @@ namespace Helpers.Tests
         [Test]
         public void It_can_parse_class_and_method()
         {
-            var arguments = (ParsedMethod) ArgumentParser.Build()
+            var arguments = (ParsedMethod)ArgumentParser.Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(MyController))
-                                               .Parse( new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
             Assert.That(arguments.RecognizedAction.Name, Is.EqualTo("Action"));
-            Assert.That(arguments.RecognizedActionParameters, Is.EquivalentTo(new object[] { "value1", "value2", 3, 3.4m}));
+            Assert.That(arguments.RecognizedActionParameters, Is.EquivalentTo(new object[] { "value1", "value2", 3, 3.4m }));
         }
         [Test]
         public void It_can_parse_class_and_method_and_execute()
         {
             var count = 0;
-            var arguments = (ParsedMethod) ArgumentParser.Build()
+            var arguments = (ParsedMethod)ArgumentParser.Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(MyController))
-                                               .Parse( new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
             Func<Type, object> factory = (Type t) =>
                                              {
                                                  Assert.That(t, Is.EqualTo(typeof(MyController)));
                                                  return
                                                      (object)
-                                                     new MyController()
-                                                         {OnAction = (p1, p2, p3, p4) => (count++).ToString()};
+                                                     new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
                                              };
             arguments.Invoke(factory);
             Assert.That(count, Is.EqualTo(count));
@@ -121,10 +142,10 @@ namespace Helpers.Tests
         {
             public MyController()
             {
-                OnAction = (p1,p2,p3,p4) => string.Empty;
+                OnAction = (p1, p2, p3, p4) => string.Empty;
             }
-            public Func<string,string,int,decimal,string> OnAction { get; set; }
-            public string Action(string param1, string param2, int param3, decimal param4) { return OnAction(param1,param2,param3,param4); }
+            public Func<string, string, int, decimal, string> OnAction { get; set; }
+            public string Action(string param1, string param2, int param3, decimal param4) { return OnAction(param1, param2, param3, param4); }
         }
 
         [Test]

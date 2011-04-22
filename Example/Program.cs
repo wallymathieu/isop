@@ -25,7 +25,7 @@ namespace Console
 {0}
 Did you mean any of these arguments?
 {1}", String.Join(",", parsedMethod.UnRecognizedArguments.ToArray()),
-      String.Join(",", parsedMethod.Recognizers.Select(rec => rec.Argument.ToString()).ToArray()));
+      String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Argument.ToString()).ToArray()));
                     System.Console.WriteLine(unRecognizedArgumentsMessage);
                 }
                 parsedMethod.Invoke();

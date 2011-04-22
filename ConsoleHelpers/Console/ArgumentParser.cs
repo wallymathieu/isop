@@ -14,90 +14,179 @@ namespace Helpers.Console
 
         public MissingArgumentException(string message, Exception inner) : base(message, inner) { }
     }
-    /// <summary>
-    /// Represents the argument. For instance "file" of the commandline argument --file. 
-    /// Usually you might want it to recognize -f as well. For instance using Argument.Parse("&file"), or the implicit 
-    /// string cast operator.
-    /// </summary>
+
     public class Argument
     {
-        public Argument(string value)
-            : this(value, null, value)
-        { }
-
-        public Argument(string value, string shortValue, string original)
-        {
-            Value = value;
-            ShortValue = shortValue;
-            _original = original;
-        }
-        private readonly string _original;
-        public string Value { get; private set; }
-        public string ShortValue { get; private set; }
-        private static readonly Regex ArgPattern = new Regex(@"\&(.)");
         public static implicit operator Argument(string value)
         {
             return Parse(value);
         }
 
+        //private static readonly Regex OptionArgumentPattern = new Regex(@"[^=:]*([=:]?)");
+
         public static Argument Parse(string value)
         {
-            var match = ArgPattern.Match(value);
-            if (match.Success)
-                return new Argument(value.Replace("&", ""), match.Groups[1].Value, value);
-            return new Argument(value, null, value);
+            OptionArgument optionArgument;
+            if (OptionArgument.TryParse(value, out optionArgument))
+                return optionArgument;
+            VisualStudioArgument visualStudioArgument;
+            if (VisualStudioArgument.TryParse(value, out visualStudioArgument))
+                return visualStudioArgument;
+            throw new NotImplementedException(value);
         }
 
-        /// <summary>
-        /// Default recognizer of argument names. Will try to match "--name" and "-n" if shortvalue is supplied
-        /// </summary>
-        /// <param name="argument"></param>
-        /// <returns></returns>
-        public bool Recognize(string argument)
+        public string GetArgumentStartPattern(string name)
         {
-            return (!String.IsNullOrEmpty(ShortValue) ? argument.StartsWith("-" + ShortValue, StringComparison.OrdinalIgnoreCase) : false)
-                || argument.StartsWith("--" + Value, StringComparison.OrdinalIgnoreCase);
+            return (name.Length == 1 ? "-" : "--") + name;
         }
 
-        public override bool Equals(object obj)
+        public string Prototype { get; protected set; }
+        public string[] Aliases { get; protected set; }
+        public string Delimiter { get; protected set; }
+
+        public virtual bool RecognizeName(string name, string argument)
         {
-            if (obj is Argument)
+            return argument.StartsWith(GetArgumentStartPattern(name), StringComparison.OrdinalIgnoreCase);
+        }
+
+        public virtual bool TryParse(string argument, out string value)
+        {
+            value = null;
+            if (string.IsNullOrEmpty(Delimiter))
             {
-                var other = (Argument)obj;
-                return Value.Equals(other.Value) && ShortValue.Equals(other.ShortValue);
+                return false;
+            }
+            var cname = Aliases.FirstOrDefault(name => RecognizeName(name, argument));
+            if (!string.IsNullOrEmpty(cname))
+            {
+                value = argument.Replace(GetArgumentStartPattern(cname), "")
+                    .Replace(Delimiter, "");
+                return true;
             }
             return false;
         }
-        public override int GetHashCode()
+
+        public virtual bool Recognize(string argument)
         {
-            return Value.GetHashCode() ^ ShortValue.GetHashCode();
+            return Aliases.Any(name => RecognizeName(name, argument));
         }
+
         public override string ToString()
         {
-            return _original;
+            return Prototype;
+        }
+
+        public virtual bool TryParseValue(string nextargument, out string value)
+        {
+            value = null;
+            if (!nextargument.StartsWith("-"))
+            {
+                value = nextargument.TrimStart('-');
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public class OptionArgument : Argument
+    {
+        public OptionArgument(string prototype, string[] names, string delimiter)
+        {
+            Prototype = prototype;
+            Aliases = names;
+            Delimiter = delimiter;
+        }
+
+        public static bool TryParse(string value, out OptionArgument optionArgument)
+        {
+            if (value.Contains("|"))
+            {
+                var prototype = value;
+                var names = prototype.TrimEnd('=', ':').Split('|');
+                string delimiter = null;
+                var last = prototype.Last();
+                switch (last)
+                {
+                    case '=':
+                    case ':':
+                        delimiter = last.ToString();
+                        break;
+                    default:
+                        break;
+                }
+                optionArgument = new OptionArgument(prototype, names, delimiter);
+                return true;
+            }
+            optionArgument = null;
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Represents the argument. For instance "file" of the commandline argument --file. 
+    /// Usually you might want it to recognize -f as well. For instance using Argument.Parse("&file"), or the implicit 
+    /// string cast operator.
+    /// </summary>
+    public class VisualStudioArgument : Argument
+    {
+        /// <summary>
+        /// same pattern as in visual studio external tools: &amp;tool
+        /// </summary>
+        public static readonly Regex VisualStudioArgPattern = new Regex(@"(\&?)(.)[^=:]*([=:]?)");
+
+        public static bool TryParse(string value, out VisualStudioArgument visualStudioArgument)
+        {
+            //TODO: need to do some cleaning here
+            var match = VisualStudioArgPattern.Match(value);
+            if (match.Success)
+            {
+                var aliases = new List<string>();
+                string val;
+                if (match.Groups[1].Length > 0)
+                {
+                    val = value.Replace("&", "");
+                    if (match.Groups[2].Length > 0)
+                        aliases.Add( match.Groups[2].Value);
+                }
+                else
+                {
+                    val = value;
+                }
+                string delimiter;
+                if (match.Groups[3].Length > 0)
+                {
+                    delimiter = match.Groups[3].Value;
+                    val = val.Replace(delimiter, "");
+                }
+                else delimiter = null;
+                aliases.Add(val);
+
+                visualStudioArgument = new VisualStudioArgument
+                {
+                    Prototype = value,
+                    Aliases = aliases.ToArray(),
+                    Delimiter = delimiter
+                };
+                return true;
+            }
+            visualStudioArgument = null;
+            return false;
         }
     }
     /// <summary>
     /// class to enable extensions of the behavior of what is recognized as arguments.
     /// </summary>
-    public class ArgumentRecognizer
+    public class ArgumentWithOptions
     {
-        private readonly Predicate<string> _recognizes;
         public Argument Argument { get; private set; }
         public Action<string> Action { get; set; }
         public bool Required { get; set; }
 
-        public ArgumentRecognizer(Argument argument, Predicate<string> recognizes = null, Action<string> action = null, bool required = false)
+        public ArgumentWithOptions(Argument argument, Action<string> action = null, bool required = false)
         {
-            _recognizes = recognizes;
             Argument = argument;
             Action = action;
             Required = required;
-        }
-
-        public bool Recognizes(string argument)
-        {
-            return null != _recognizes ? _recognizes(argument) : Argument.Recognize(argument);
         }
     }
 
@@ -107,16 +196,16 @@ namespace Helpers.Console
         /// the matched value if any, for instance the "value" of the expression "--argument value"
         /// </summary>
         public string Value { get; private set; }
-        public ArgumentRecognizer Recognizer { get; private set; }
+        public ArgumentWithOptions WithOptions { get; private set; }
         /// <summary>
         /// the "argument" of the expression "--argument"
         /// </summary>
         public string Argument { get; private set; }
 
-        public RecognizedArgument(ArgumentRecognizer argumentRecognizer, string parameter, string value = null)
+        public RecognizedArgument(ArgumentWithOptions argumentWithOptions, string parameter, string value = null)
         {
             Value = value;
-            Recognizer = argumentRecognizer;
+            WithOptions = argumentWithOptions;
             Argument = parameter;
         }
     }
@@ -131,41 +220,41 @@ namespace Helpers.Console
         /// <param name="parsedArguments"></param>
         public ParsedArguments(ParsedArguments parsedArguments)
         {
-            this.RecognizedArguments = parsedArguments.RecognizedArguments;
-            this.Recognizers = parsedArguments.Recognizers;
-            this.UnRecognizedArguments = parsedArguments.UnRecognizedArguments;
+            RecognizedArguments = parsedArguments.RecognizedArguments;
+            ArgumentWithOptions = parsedArguments.ArgumentWithOptions;
+            UnRecognizedArguments = parsedArguments.UnRecognizedArguments;
         }
         public IEnumerable<RecognizedArgument> RecognizedArguments { get; set; }
 
         public IEnumerable<string> UnRecognizedArguments { get; set; }
 
-        public IEnumerable<ArgumentRecognizer> Recognizers { get; set; }
+        public IEnumerable<ArgumentWithOptions> ArgumentWithOptions { get; set; }
 
         public virtual void Invoke()
         {
-            foreach (var argument in RecognizedArguments.Where(argument => null != argument.Recognizer.Action))
+            foreach (var argument in RecognizedArguments.Where(argument => null != argument.WithOptions.Action))
             {
-                argument.Recognizer.Action(argument.Value);
+                argument.WithOptions.Action(argument.Value);
             }
         }
     }
     public class ArgumentParser
     {
         public static ArgumentParserBuilder Build() { return new ArgumentParserBuilder(); }
-        private readonly IEnumerable<ArgumentRecognizer> _recognizers;
+        private readonly IEnumerable<ArgumentWithOptions> _argumentWithOptions;
 
-        public ArgumentParser(IEnumerable<ArgumentRecognizer> recognizers)
+        public ArgumentParser(IEnumerable<ArgumentWithOptions> argumentWithOptions)
         {
-            _recognizers = recognizers;
+            _argumentWithOptions = argumentWithOptions;
         }
 
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
             var argumentList = arguments.ToList();
-            var recognizedArguments = _recognizers.Select(act =>
+            var recognizedArguments = _argumentWithOptions.Select(act =>
                                              new
                                                  {
-                                                     Arguments = argumentList.FindIndexAndValues(act.Recognizes),
+                                                     Arguments = argumentList.FindIndexAndValues(argument => act.Argument.Recognize(argument)),
                                                      Recognizer = act
                                                  })
                 .Where(couple => couple.Arguments.Any());
@@ -173,29 +262,15 @@ namespace Helpers.Console
               .SelectMany(recognizedArgument => recognizedArgument.Arguments.Select(arg => arg.Key))
               .ToList();
             var invokedArguments = recognizedArguments
-                .Select(couple =>
-                            {
-                                var value = string.Empty;
-                                var index = couple.Arguments.First().Key + 1;
-                                if (index < argumentList.Count && index >= 0)
-                                {
-                                    value = argumentList[index];
-                                    recognizedIndexes.Add(index);
-                                }
-                                return new RecognizedArgument(
-                                    couple.Recognizer,
-                                    couple.Arguments.First().Value,
-                                    value);
-                            })
+                .Select(couple => Parse(couple.Arguments.First(), couple.Recognizer, argumentList, recognizedIndexes))
                             .ToList();//In order to execute the above select
-
 
             var unRecognizedArguments = argumentList
                 .Select((value, i) => new { i, value })
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
                 .Select(v => v.value);
 
-            var unMatchedRequiredArguments = _recognizers.Where(recognizer => recognizer.Required)
+            var unMatchedRequiredArguments = _argumentWithOptions.Where(recognizer => recognizer.Required)
                 .Where(recognizer => !recognizedArguments.Any(recogn => recogn.Recognizer.Equals(recognizer)));
             if (unMatchedRequiredArguments.Any())
             {
@@ -203,10 +278,39 @@ namespace Helpers.Console
             }
             return new ParsedArguments
             {
-                Recognizers = _recognizers.ToArray(),
+                ArgumentWithOptions = _argumentWithOptions.ToArray(),
                 RecognizedArguments = invokedArguments,
                 UnRecognizedArguments = unRecognizedArguments
             };
+        }
+
+        private static RecognizedArgument Parse(KeyValuePair<int, string> argument, ArgumentWithOptions argumentWithOptions, List<string> argumentList, List<int> recognizedIndexes)
+        {
+            //TODO: need to clean up the below:
+            var parameter = argument.Value;
+            var value = string.Empty;
+
+            string parsedvalue;
+
+            if (argumentWithOptions.Argument.TryParse(parameter, out parsedvalue))
+                value = parsedvalue;
+            else
+            {
+                var index = argument.Key + 1;
+                if (index < argumentList.Count && index >= 0)
+                {
+                    if (argumentWithOptions.Argument.TryParseValue(argumentList[index], out parsedvalue))
+                    {
+                        value = parsedvalue;
+                        recognizedIndexes.Add(index);
+                    }
+                }
+
+            }
+            return new RecognizedArgument(
+                argumentWithOptions,
+                parameter,
+                value);
         }
     }
 }
