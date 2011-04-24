@@ -56,10 +56,23 @@ namespace Helpers.Console
                            RecognizedAction = methodInfo,
                            RecognizedActionParameters = parsedArguments.RecognizedArguments
                                .Select(
-                                   (arg1, i) => TypeDescriptor.GetConverter(parameterInfos[i].ParameterType).ConvertFrom(null, _culture, arg1.Value))
+                                   (arg1, i) => ConvertFrom(parameterInfos, i, arg1))
                                .ToList(),
                            RecognizedClass = Type
                        };
+        }
+
+        private object ConvertFrom(ParameterInfo[] parameterInfos, int i, RecognizedArgument arg1)
+        {
+            try
+            {
+                var value = TypeDescriptor.GetConverter(parameterInfos[i].ParameterType).ConvertFrom(null, _culture, arg1.Value);
+                return value;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("value:"+arg1.Value,e);
+            }
         }
     }
 

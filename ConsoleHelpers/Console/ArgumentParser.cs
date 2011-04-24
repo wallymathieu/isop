@@ -32,61 +32,14 @@ namespace Helpers.Console
                 return visualStudioArgument;
             throw new NotImplementedException(value);
         }
-        /// <summary>
-        /// todo: this should be a regex matcher like "(-|/|--)([^:=]*)([:=]?)"
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public string GetArgumentStartPattern(string name)
-        {
-            return (name.Length == 1 ? "-" : "--") + name;
-        }
 
         public string Prototype { get; protected set; }
         public string[] Aliases { get; protected set; }
         public string Delimiter { get; protected set; }
 
-        public virtual bool RecognizeName(string name, string argument)
-        {
-            return argument.StartsWith(GetArgumentStartPattern(name), StringComparison.OrdinalIgnoreCase);
-        }
-
-        public virtual bool TryParse(string argument, out string value)
-        {
-            value = null;
-            if (string.IsNullOrEmpty(Delimiter))
-            {
-                return false;
-            }
-            var cname = Aliases.FirstOrDefault(name => RecognizeName(name, argument));
-            if (!string.IsNullOrEmpty(cname))
-            {
-                value = argument.Replace(GetArgumentStartPattern(cname), "")
-                    .Replace(Delimiter, "");
-                return true;
-            }
-            return false;
-        }
-
-        public virtual bool Recognize(string argument)
-        {
-            return Aliases.Any(name => RecognizeName(name, argument));
-        }
-
         public override string ToString()
         {
             return Prototype;
-        }
-
-        public virtual bool TryParseValue(string nextargument, out string value)
-        {
-            value = null;
-            if (!nextargument.StartsWith("-"))
-            {
-                value = nextargument.TrimStart('-');
-                return true;
-            }
-            return false;
         }
     }
 
@@ -148,7 +101,7 @@ namespace Helpers.Console
                 {
                     val = value.Replace("&", "");
                     if (match.Groups[2].Length > 0)
-                        aliases.Add( match.Groups[2].Value);
+                        aliases.Add(match.Groups[2].Value);
                 }
                 else
                 {
@@ -189,6 +142,11 @@ namespace Helpers.Console
             Argument = argument;
             Action = action;
             Required = required;
+        }
+
+        public bool HasAlias(string value)
+        {
+            return Argument.Aliases.Any(alias=> value.Equals(alias,StringComparison.OrdinalIgnoreCase));
         }
     }
 
@@ -252,28 +210,56 @@ namespace Helpers.Console
 
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
+            var lexer = new ArgumentLexer(arguments);
+            var recognizedIndexes=new List<int>();
+            
+            IList<RecognizedArgument> recognized=new List<RecognizedArgument>();
+            while (lexer.HasMore())
+            {
+                var current = lexer.Next();
+                switch (current.TokenType)
+                {
+                    case TokenType.Argument:
+                        break;
+                    case TokenType.Parameter:
+                        var argumentWithOptions = _argumentWithOptions
+                            .SingleOrDefault(argopt=> argopt.HasAlias(current.Value));
+                        if (null == argumentWithOptions)
+                            continue;                        
+                        string value;
+                        recognizedIndexes.Add(current.Index);
+                        if (lexer.Peek().TokenType==TokenType.ParameterValue)
+                        {
+                            var paramValue = lexer.Next();
+                            recognizedIndexes.Add(paramValue.Index);
+                            value=paramValue.Value;
+                        }
+                        else
+                        {
+                            value = string.Empty;
+                        }
+
+                        recognized.Add(new RecognizedArgument(
+                                    argumentWithOptions,
+                                    current.Value,
+                                    value));
+                        break;
+                    case TokenType.ParameterValue:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(current.TokenType.ToString());
+                }
+            }
+
             var argumentList = arguments.ToList();
-            var recognizedArguments = _argumentWithOptions.Select(act =>
-                                             new
-                                                 {
-                                                     Arguments = argumentList.FindIndexAndValues(argument => act.Argument.Recognize(argument)),
-                                                     Recognizer = act
-                                                 })
-                .Where(couple => couple.Arguments.Any());
-            var recognizedIndexes = recognizedArguments
-              .SelectMany(recognizedArgument => recognizedArgument.Arguments.Select(arg => arg.Key))
-              .ToList();
-            var invokedArguments = recognizedArguments
-                .Select(couple => Parse(couple.Arguments.First(), couple.Recognizer, argumentList, recognizedIndexes))
-                            .ToList();//In order to execute the above select
 
             var unRecognizedArguments = argumentList
                 .Select((value, i) => new { i, value })
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
                 .Select(v => v.value);
 
-            var unMatchedRequiredArguments = _argumentWithOptions.Where(recognizer => recognizer.Required)
-                .Where(recognizer => !recognizedArguments.Any(recogn => recogn.Recognizer.Equals(recognizer)));
+            var unMatchedRequiredArguments = _argumentWithOptions.Where(argumentWithOptions => argumentWithOptions.Required)
+                .Where(argumentWithOptions => !recognized.Any(recogn => recogn.WithOptions.Equals(argumentWithOptions)));
             if (unMatchedRequiredArguments.Any())
             {
                 throw new MissingArgumentException("Missing arguments") { Arguments = unMatchedRequiredArguments.Select(unmatched => unmatched.Argument.ToString()).ToList() };
@@ -281,38 +267,9 @@ namespace Helpers.Console
             return new ParsedArguments
             {
                 ArgumentWithOptions = _argumentWithOptions.ToArray(),
-                RecognizedArguments = invokedArguments,
+                RecognizedArguments = recognized,
                 UnRecognizedArguments = unRecognizedArguments
             };
-        }
-
-        private static RecognizedArgument Parse(KeyValuePair<int, string> argument, ArgumentWithOptions argumentWithOptions, List<string> argumentList, List<int> recognizedIndexes)
-        {
-            //TODO: need to clean up the below:
-            var parameter = argument.Value;
-            var value = string.Empty;
-
-            string parsedvalue;
-
-            if (argumentWithOptions.Argument.TryParse(parameter, out parsedvalue))
-                value = parsedvalue;
-            else
-            {
-                var index = argument.Key + 1;
-                if (index < argumentList.Count && index >= 0)
-                {
-                    if (argumentWithOptions.Argument.TryParseValue(argumentList[index], out parsedvalue))
-                    {
-                        value = parsedvalue;
-                        recognizedIndexes.Add(index);
-                    }
-                }
-
-            }
-            return new RecognizedArgument(
-                argumentWithOptions,
-                parameter,
-                value);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Helpers.Tests
 
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Argument, Is.EqualTo("-b"));
+            Assert.That(arg1.Argument, Is.EqualTo("b"));
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace Helpers.Tests
                 .Parse(new[] { "-a", "--beta" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Argument, Is.EqualTo("--beta"));
+            Assert.That(arg1.Argument, Is.EqualTo("beta"));
         }
 
         [Test]
@@ -57,7 +57,7 @@ namespace Helpers.Tests
                 .Parse(new[] { "-a", "--beta", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Argument, Is.EqualTo("--beta"));
+            Assert.That(arg1.Argument, Is.EqualTo("beta"));
             Assert.That(arg1.Value, Is.EqualTo("value"));
         }
         [Test]
@@ -69,7 +69,7 @@ namespace Helpers.Tests
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.EqualTo("test"));
-            Assert.That(arg1.Argument, Is.EqualTo("--beta=test"));
+            Assert.That(arg1.Argument, Is.EqualTo("beta"));
         }
         [Test]
         public void It_can_parse_parameter_alias()
@@ -81,7 +81,7 @@ namespace Helpers.Tests
             var arg1 = arguments.First();
             Assert.That(arg1.WithOptions.Argument.ToString(), Is.EqualTo("beta|b="));
             Assert.That(arg1.Value, Is.EqualTo("test"));
-            Assert.That(arg1.Argument, Is.EqualTo("-b=test"));
+            Assert.That(arg1.Argument, Is.EqualTo("b"));
         }
         [Test]
         public void It_can_report_unrecognized_parameters()

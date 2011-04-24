@@ -45,6 +45,7 @@
     <Compile Include="Console\ArgumentParserBuilder.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Console\ArgumentParser.cs" />
+    <Compile Include="Console\ArgumentLexer.cs" />
     <Compile Include="Console\ClassAndMethodRecognizer.cs" />
     <Compile Include="ListExtensions.cs" />
   </ItemGroup>
