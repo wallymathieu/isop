@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 
 namespace Helpers.Console
 {
@@ -10,6 +11,7 @@ namespace Helpers.Console
         private IList<ArgumentWithOptions> _argumentRecognizers = new List<ArgumentWithOptions>();
         private IList<ClassAndMethodRecognizer> _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
         private CultureInfo _cultureInfo;
+        private TypeConverterFunc _typeConverter;
 
         public ArgumentParserBuilder Recognize(Argument argument, bool required = false)
         {
@@ -33,6 +35,10 @@ namespace Helpers.Console
         {
             _cultureInfo = cultureInfo; return this;
         }
+        public ArgumentParserBuilder SetTypeConverter(TypeConverterFunc typeconverter)
+        {
+            _typeConverter = typeconverter; return this;
+        }
 
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
@@ -55,10 +61,10 @@ namespace Helpers.Console
             return argumentParser.Parse(arg);
         }
         
-        public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null)
+        public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter=null)
         {
             if (_argumentRecognizers.Any()) throw new NotImplementedException("Will not recognize any non class recognizers.");
-            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg, _cultureInfo ?? cultureInfo));
+            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
             return this;
         }
     }

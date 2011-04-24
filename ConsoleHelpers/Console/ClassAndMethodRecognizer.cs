@@ -7,16 +7,18 @@ using System.Reflection;
 
 namespace Helpers.Console
 {
+    public delegate object TypeConverterFunc(Type type, string s);
     public class ClassAndMethodRecognizer
     {
         private readonly CultureInfo _culture;
         public Type Type { get; private set; }
         /// <summary>
         /// </summary>
-        public ClassAndMethodRecognizer(Type type, CultureInfo cultureInfo = null)
+        public ClassAndMethodRecognizer(Type type, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
+            _typeConverter = typeConverter ?? DefaultConvertFrom;
             Type = type;
-            _culture = cultureInfo?? CultureInfo.CurrentCulture;
+            _culture = cultureInfo ?? CultureInfo.CurrentCulture;
         }
 
         public bool Recognize(IEnumerable<string> arg)
@@ -51,11 +53,11 @@ namespace Helpers.Console
             var parser = new ArgumentParser(argumentRecognizers);
 
             var parsedArguments = parser.Parse(arg);
-            var recognizedActionParameters = from paramInfo in parameterInfos 
-                                             join recognizedArgument in parsedArguments.RecognizedArguments on 
+            var recognizedActionParameters = from paramInfo in parameterInfos
+                                             join recognizedArgument in parsedArguments.RecognizedArguments on
                                                 paramInfo.Name.ToLowerInvariant()
-                                                equals recognizedArgument.Argument.ToLowerInvariant() 
-                                             select ConvertFrom(recognizedArgument, paramInfo);
+                                                equals recognizedArgument.Argument.ToLowerInvariant()
+                                             select ConvertFrom1(recognizedArgument, paramInfo);
 
             return new ParsedMethod(parsedArguments)
                        {
@@ -65,26 +67,30 @@ namespace Helpers.Console
                        };
         }
 
-        private object ConvertFrom(RecognizedArgument arg1, ParameterInfo parameterInfo)
+        private object ConvertFrom1(RecognizedArgument arg1, ParameterInfo parameterInfo)
         {
             try
             {
-                var value = TypeDescriptor.GetConverter(parameterInfo.ParameterType).ConvertFrom(null, _culture, arg1.Value);
-                return value;
+                return _typeConverter(parameterInfo.ParameterType, arg1.Value);
             }
             catch (Exception e)
             {
-                throw new Exception(string.Format("Could not parse {0} with value: {1}", arg1.WithOptions.Argument, arg1.Value),e);
+                throw new Exception(string.Format("Could not parse {0} with value: {1}", arg1.WithOptions.Argument, arg1.Value), e);
             }
+        }
+        private readonly TypeConverterFunc _typeConverter;
+        private object DefaultConvertFrom(Type type, string s)
+        {
+            return TypeDescriptor.GetConverter(type).ConvertFrom(null, _culture, s);
         }
     }
 
     public class ParsedMethod : ParsedArguments
     {
         public ParsedMethod(ParsedArguments parsedArguments)
-            :base(parsedArguments)
+            : base(parsedArguments)
         {
-            
+
         }
         public Type RecognizedClass;
         public MethodInfo RecognizedAction { get; set; }
