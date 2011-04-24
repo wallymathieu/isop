@@ -36,11 +36,18 @@ namespace Helpers.Console
 
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
-            var methodRecognizer = _classAndMethodRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
-            if (null != methodRecognizer)
+            if (_classAndMethodRecognizers.Any())
             {
-                _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
-                return methodRecognizer.Parse(arg);
+                var methodRecognizer = _classAndMethodRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
+                if (null != methodRecognizer)
+                {
+                    _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
+                    return methodRecognizer.Parse(arg);
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException("No class or method found.");
+                }
             }
             var argumentParser = new ArgumentParser(_argumentRecognizers);
             _argumentRecognizers = new List<ArgumentWithOptions>();
