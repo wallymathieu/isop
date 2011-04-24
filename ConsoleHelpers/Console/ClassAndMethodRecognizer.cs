@@ -51,27 +51,30 @@ namespace Helpers.Console
             var parser = new ArgumentParser(argumentRecognizers);
 
             var parsedArguments = parser.Parse(arg);
+            var recognizedActionParameters = from paramInfo in parameterInfos 
+                                             join recognizedArgument in parsedArguments.RecognizedArguments on 
+                                                paramInfo.Name.ToLowerInvariant()
+                                                equals recognizedArgument.Argument.ToLowerInvariant() 
+                                             select ConvertFrom(recognizedArgument, paramInfo);
+
             return new ParsedMethod(parsedArguments)
                        {
                            RecognizedAction = methodInfo,
-                           RecognizedActionParameters = parsedArguments.RecognizedArguments
-                               .Select(
-                                   (arg1, i) => ConvertFrom(parameterInfos, i, arg1))
-                               .ToList(),
+                           RecognizedActionParameters = recognizedActionParameters,
                            RecognizedClass = Type
                        };
         }
 
-        private object ConvertFrom(ParameterInfo[] parameterInfos, int i, RecognizedArgument arg1)
+        private object ConvertFrom(RecognizedArgument arg1, ParameterInfo parameterInfo)
         {
             try
             {
-                var value = TypeDescriptor.GetConverter(parameterInfos[i].ParameterType).ConvertFrom(null, _culture, arg1.Value);
+                var value = TypeDescriptor.GetConverter(parameterInfo.ParameterType).ConvertFrom(null, _culture, arg1.Value);
                 return value;
             }
             catch (Exception e)
             {
-                throw new Exception("value:"+arg1.Value,e);
+                throw new Exception(string.Format("Could not parse {0} with value: {1}", arg1.WithOptions.Argument, arg1.Value),e);
             }
         }
     }
