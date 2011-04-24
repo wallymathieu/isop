@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Helpers.Console
 {
-    public delegate object TypeConverterFunc(Type type, string s);
+    public delegate object TypeConverterFunc(Type type, string s, CultureInfo cultureInfo);
     public class ClassAndMethodRecognizer
     {
         private readonly CultureInfo _culture;
@@ -71,7 +71,7 @@ namespace Helpers.Console
         {
             try
             {
-                return _typeConverter(parameterInfo.ParameterType, arg1.Value);
+                return _typeConverter(parameterInfo.ParameterType, arg1.Value, _culture);
             }
             catch (Exception e)
             {
@@ -79,9 +79,9 @@ namespace Helpers.Console
             }
         }
         private readonly TypeConverterFunc _typeConverter;
-        private object DefaultConvertFrom(Type type, string s)
+        private static object DefaultConvertFrom(Type type, string s, CultureInfo cultureInfo)
         {
-            return TypeDescriptor.GetConverter(type).ConvertFrom(null, _culture, s);
+            return TypeDescriptor.GetConverter(type).ConvertFrom(null, cultureInfo, s);
         }
     }
 
