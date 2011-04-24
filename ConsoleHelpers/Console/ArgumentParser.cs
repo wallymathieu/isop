@@ -51,7 +51,12 @@ namespace Helpers.Console
             Aliases = names;
             Delimiter = delimiter;
         }
-
+        /// <summary>
+        /// Note: this is accept invalid patterns.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="optionArgument"></param>
+        /// <returns></returns>
         public static bool TryParse(string value, out OptionArgument optionArgument)
         {
             if (value.Contains("|"))
@@ -87,7 +92,7 @@ namespace Helpers.Console
         /// <summary>
         /// same pattern as in visual studio external tools: &amp;tool
         /// </summary>
-        public static readonly Regex VisualStudioArgPattern = new Regex(@"(\&?)(.)[^=:]*([=:]?)");
+        public static readonly Regex VisualStudioArgPattern = new Regex(@"(?<prefix>\&?)(?<alias>.)[^=:]*(?<equals>[=:]?)");
 
         public static bool TryParse(string value, out VisualStudioArgument visualStudioArgument)
         {
@@ -97,20 +102,20 @@ namespace Helpers.Console
             {
                 var aliases = new List<string>();
                 string val;
-                if (match.Groups[1].Length > 0)
+                if (match.Groups["prefix"].Length > 0)
                 {
                     val = value.Replace("&", "");
-                    if (match.Groups[2].Length > 0)
-                        aliases.Add(match.Groups[2].Value);
+                    if (match.Groups["alias"].Length > 0)
+                        aliases.Add(match.Groups["alias"].Value);
                 }
                 else
                 {
                     val = value;
                 }
                 string delimiter;
-                if (match.Groups[3].Length > 0)
+                if (match.Groups["equals"].Length > 0)
                 {
-                    delimiter = match.Groups[3].Value;
+                    delimiter = match.Groups["equals"].Value;
                     val = val.Replace(delimiter, "");
                 }
                 else delimiter = null;
