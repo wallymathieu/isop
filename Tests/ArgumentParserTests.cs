@@ -90,7 +90,10 @@ namespace Helpers.Tests
                .Recognize("beta")
                .Parse(new[] { "-a", "value", "--beta" }).UnRecognizedArguments;
 
-            Assert.That(unRecognizedArguments, Is.EquivalentTo(new[] { "-a", "value" }));
+            Assert.That(unRecognizedArguments, Is.EquivalentTo(new[] {
+                new UnrecognizedArgument {Index = 0,Value = "-a"},
+                new UnrecognizedArgument {Index = 1,Value = "value" }
+            }));
         }
         [Test]
         public void It_wont_report_matched_parameters()
@@ -109,6 +112,18 @@ namespace Helpers.Tests
                .Parse(new[] { "-a", "value" }));
 
         }
+        [Test]
+        public void It_can_recognize_arguments()
+        {
+            var arguments = ArgumentParser.Build()
+                .Argument("alpha")
+                .Parse(new[] { "alpha" }).RecognizedArguments;
+            Assert.That(arguments.Count(), Is.EqualTo(1));
+            var arg1 = arguments.First();
+            Assert.That(arg1.WithOptions.Argument.ToString(), Is.EqualTo("alpha"));
+            Assert.That(arg1.Value, Is.Null);
+            Assert.That(arg1.Argument, Is.EqualTo("alpha"));
+        }
 
         [Test]
         public void It_can_parse_class_and_method()
@@ -119,6 +134,7 @@ namespace Helpers.Tests
                                                .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
             Assert.That(arguments.RecognizedAction.Name, Is.EqualTo("Action"));
             Assert.That(arguments.RecognizedActionParameters, Is.EquivalentTo(new object[] { "value1", "value2", 3, 3.4m }));
+            Assert.That(!arguments.UnRecognizedArguments.Any());
         }
         [Test]
         public void It_can_parse_class_and_method_and_execute()

@@ -161,6 +161,7 @@ namespace Helpers.Console
         }
         public override bool Equals(object obj)
         {
+            if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != typeof(Token)) return false;
             return Equals((Token)obj);
@@ -168,6 +169,7 @@ namespace Helpers.Console
 
         public bool Equals(Token other)
         {
+            if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Equals(other.Value, Value) && Equals(other.TokenType, TokenType);
         }

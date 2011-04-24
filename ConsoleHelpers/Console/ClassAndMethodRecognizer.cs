@@ -48,7 +48,9 @@ namespace Helpers.Console
             var methodInfo = FindMethodInfo(arg);
             var parameterInfos = methodInfo.GetParameters();
             var argumentRecognizers = parameterInfos
-                .Select(parameterInfo => new ArgumentWithOptions(parameterInfo.Name, required: true)).ToList();
+                .Select(parameterInfo => 
+                    new ArgumentWithOptions(ArgumentParameter.Parse(parameterInfo.Name), required: true))
+                .ToList();
 
             var parser = new ArgumentParser(argumentRecognizers);
 
@@ -58,7 +60,7 @@ namespace Helpers.Console
                                                 paramInfo.Name.ToLowerInvariant()
                                                 equals recognizedArgument.Argument.ToLowerInvariant()
                                              select ConvertFrom1(recognizedArgument, paramInfo);
-
+            parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments.Where(unrecognized=>unrecognized.Index>=2);
             return new ParsedMethod(parsedArguments)
                        {
                            RecognizedAction = methodInfo,
