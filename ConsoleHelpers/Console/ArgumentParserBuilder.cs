@@ -13,14 +13,14 @@ namespace Helpers.Console
         private CultureInfo _cultureInfo;
         private TypeConverterFunc _typeConverter;
 
-        public ArgumentParserBuilder Recognize(ArgumentParameter argument, bool required = false)
+        public ArgumentParserBuilder Parameter(ArgumentParameter argument, bool required = false)
         {
             if (_classAndMethodRecognizers.Any()) throw new NotImplementedException("Will not recognize any non class recognizers.");
             _argumentRecognizers.Add(new ArgumentWithOptions(argument, null, required));
             return this;
         }
 
-        public ArgumentParserBuilder Action(ArgumentParameter argument, Action<string> action, bool required = false)
+        public ArgumentParserBuilder Parameter(ArgumentParameter argument, Action<string> action, bool required = false)
         {
             if (_classAndMethodRecognizers.Any()) throw new NotImplementedException("Will not recognize any non class recognizers.");
             _argumentRecognizers.Add(new ArgumentWithOptions(argument, action, required));
