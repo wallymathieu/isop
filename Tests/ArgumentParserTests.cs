@@ -18,7 +18,7 @@ namespace Helpers.Tests
         public void Recognizes_shortform()
         {
             var parser = ArgumentParser.Build()
-                .Recognize("&argument")
+                .Parameter("&argument")
                 .Parse(new[] { "-a" });
             var arguments = parser.RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -30,7 +30,7 @@ namespace Helpers.Tests
         public void Given_several_arguments_Then_the_correct_one_is_recognized()
         {
             var arguments = ArgumentParser.Build()
-                .Recognize("&beta")
+                .Parameter("&beta")
                 .Parse(new[] { "-a", "-b" }).RecognizedArguments;
 
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -42,7 +42,7 @@ namespace Helpers.Tests
         public void Recognizes_longform()
         {
             var arguments = ArgumentParser.Build()
-                .Recognize("beta")
+                .Parameter("beta")
                 .Parse(new[] { "-a", "--beta" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -53,7 +53,7 @@ namespace Helpers.Tests
         public void It_can_parse_parameter_value()
         {
             var arguments = ArgumentParser.Build()
-                .Recognize("beta")
+                .Parameter("beta")
                 .Parse(new[] { "-a", "--beta", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -64,7 +64,7 @@ namespace Helpers.Tests
         public void It_can_parse_parameter_with_equals()
         {
             var arguments = ArgumentParser.Build()
-                .Recognize("beta=")
+                .Parameter("beta=")
                 .Parse(new[] { "-a", "--beta=test", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -75,7 +75,7 @@ namespace Helpers.Tests
         public void It_can_parse_parameter_alias()
         {
             var arguments = ArgumentParser.Build()
-                .Recognize("beta|b=")
+                .Parameter("beta|b=")
                 .Parse(new[] { "-a", "-b=test", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -87,7 +87,7 @@ namespace Helpers.Tests
         public void It_can_report_unrecognized_parameters()
         {
             var unRecognizedArguments = ArgumentParser.Build()
-               .Recognize("beta")
+               .Parameter("beta")
                .Parse(new[] { "-a", "value", "--beta" }).UnRecognizedArguments;
 
             Assert.That(unRecognizedArguments, Is.EquivalentTo(new[] {
@@ -99,7 +99,7 @@ namespace Helpers.Tests
         public void It_wont_report_matched_parameters()
         {
             var arguments = ArgumentParser.Build()
-                .Recognize("beta")
+                .Parameter("beta")
                 .Parse(new[] { "--beta", "value" }).UnRecognizedArguments;
 
             Assert.That(arguments.Count(), Is.EqualTo(0));
@@ -108,7 +108,7 @@ namespace Helpers.Tests
         public void It_will_fail_if_argument_not_supplied_and_it_is_required()
         {
             Assert.Throws<MissingArgumentException>(() => ArgumentParser.Build()
-               .Recognize("beta", required: true)
+               .Parameter("beta", required: true)
                .Parse(new[] { "-a", "value" }));
 
         }
@@ -169,8 +169,8 @@ namespace Helpers.Tests
         {
             var count = 0;
             ArgumentParser.Build()
-                           .Action("beta", arg => count++)
-                           .Action("alpha", arg => Assert.Fail())
+                           .Parameter("beta", arg => count++)
+                           .Parameter("alpha", arg => Assert.Fail())
                            .Parse(new[] { "-a", "value", "--beta" }).Invoke();
             Assert.That(count, Is.EqualTo(1));
         }
