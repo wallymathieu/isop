@@ -32,7 +32,8 @@ namespace Helpers.Console
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1);
-                var methodInfo = Type.GetMethods().FirstOrDefault(method => method.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase));
+                var methodInfo = Type.GetMethods().FirstOrDefault(method => method.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase)) ??
+                                 Type.GetMethods().FirstOrDefault(method => method.Name.Equals("index", StringComparison.OrdinalIgnoreCase));
                 return methodInfo;
             }
             return null;
