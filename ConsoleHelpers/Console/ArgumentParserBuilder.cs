@@ -12,18 +12,19 @@ namespace Helpers.Console
         private IList<ClassAndMethodRecognizer> _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
         private CultureInfo _cultureInfo;
         private TypeConverterFunc _typeConverter;
+        private HelpForClassAndMethod _helpForClassAndMethod = new HelpForClassAndMethod();
+        private HelpForArgumentWithOptions _helpForArgumentWithOptions = new HelpForArgumentWithOptions();
+        //public ArgumentParserBuilder Parameter(ArgumentParameter argument, bool required = false, string description = null)
+        //{
+        //    if (_classAndMethodRecognizers.Any()) throw new NotImplementedException("Will not recognize any non class recognizers.");
+        //    _argumentRecognizers.Add(new ArgumentWithOptions(argument, null, required, description));
+        //    return this;
+        //}
 
-        public ArgumentParserBuilder Parameter(ArgumentParameter argument, bool required = false)
+        public ArgumentParserBuilder Parameter(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null)
         {
             if (_classAndMethodRecognizers.Any()) throw new NotImplementedException("Will not recognize any non class recognizers.");
-            _argumentRecognizers.Add(new ArgumentWithOptions(argument, null, required));
-            return this;
-        }
-
-        public ArgumentParserBuilder Parameter(ArgumentParameter argument, Action<string> action, bool required = false)
-        {
-            if (_classAndMethodRecognizers.Any()) throw new NotImplementedException("Will not recognize any non class recognizers.");
-            _argumentRecognizers.Add(new ArgumentWithOptions(argument, action, required));
+            _argumentRecognizers.Add(new ArgumentWithOptions(argument, action, required, description));
             return this;
         }
         /// <summary>
@@ -52,7 +53,7 @@ namespace Helpers.Console
                 }
                 else
                 {
-                    throw new ArgumentOutOfRangeException("No class or method found.");
+                    throw new NoClassOrMethodFoundException("No class or method found.");
                 }
             }
             var argumentParser = new ArgumentParser(_argumentRecognizers);
@@ -60,18 +61,100 @@ namespace Helpers.Console
 
             return argumentParser.Parse(arg);
         }
-        
-        public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter=null)
+
+        public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
             if (_argumentRecognizers.Any()) throw new NotImplementedException("Will not recognize any non class recognizers.");
             _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
             return this;
         }
 
-        public ArgumentParserBuilder Argument(Argument argument,Action<string> action=null, bool required=false)
+        public ArgumentParserBuilder Argument(Argument argument, Action<string> action = null, bool required = false, string description = null)
         {
-            _argumentRecognizers.Add(new ArgumentWithOptions(argument,action,required));
+            _argumentRecognizers.Add(new ArgumentWithOptions(argument, action, required, description));
             return this;
+        }
+
+        public String Help()
+        {
+            if (_classAndMethodRecognizers.Any())
+            {
+                return _helpForClassAndMethod.Help(_classAndMethodRecognizers);
+            }
+            else
+            {
+                return _helpForArgumentWithOptions.Help(_argumentRecognizers);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="theCommandsAre">default: "The commands are:"</param>
+        /// <param name="helpCommandForMoreInformation">default: "Se 'COMMANDNAME' help command for more information"</param>
+        /// <returns></returns>
+        public ArgumentParserBuilder HelpTextCommandsAre(string theCommandsAre, string helpCommandForMoreInformation)
+        {
+            _helpForClassAndMethod.TheCommandsAre = theCommandsAre;
+            _helpForClassAndMethod.HelpCommandForMoreInformation = helpCommandForMoreInformation;
+            return this;
+        }
+        
+        public ArgumentParserBuilder HelpTextArgumentsAre(string TheArgumentsAre)
+        {
+            _helpForArgumentWithOptions.TheArgumentsAre = TheArgumentsAre;
+            return this;
+        }
+
+        public string HelpFor(string command)
+        {
+            return _helpForClassAndMethod.Help(_classAndMethodRecognizers, command);
+        }
+    }
+    public class HelpForArgumentWithOptions
+    {
+        public string TheArgumentsAre { get; set; }
+
+        public HelpForArgumentWithOptions()
+        {
+            TheArgumentsAre = "The arguments are:";
+        }
+        public string Help(IEnumerable<ArgumentWithOptions> argumentWithOptionses)
+        {
+            return TheArgumentsAre + Environment.NewLine +
+                   String.Join(Environment.NewLine,
+                               argumentWithOptionses.Select(ar => "  " + ar.Help()).ToArray());
+        }
+    }
+    public class HelpForClassAndMethod
+    {
+        public string TheCommandsAre { get; set; }
+        public string HelpCommandForMoreInformation { get; set; }
+        
+        public string HelpSubCommandForMoreInformation { get; set; }
+
+        public HelpForClassAndMethod()
+        {
+            
+            HelpSubCommandForMoreInformation = "Se 'COMMANDNAME' help <command> <subcommand> for more information";
+
+            HelpCommandForMoreInformation = "Se 'COMMANDNAME' help <command> for more information";
+            TheCommandsAre = "The commands are:";
+        }
+
+        public string Help(IEnumerable<ClassAndMethodRecognizer> classAndMethodRecognizers)
+        {
+            return TheCommandsAre + Environment.NewLine +
+                   String.Join(Environment.NewLine,
+                               classAndMethodRecognizers.Select(cmr => "  " + cmr.Help(true)).ToArray())
+                   + Environment.NewLine
+                   + Environment.NewLine
+                   + HelpCommandForMoreInformation;
+        }
+
+        public string Help(IEnumerable<ClassAndMethodRecognizer> classAndMethodRecognizers, string command)
+        {
+            throw new NotImplementedException();
         }
     }
 }

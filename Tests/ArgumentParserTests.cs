@@ -154,6 +154,7 @@ namespace Helpers.Tests
             arguments.Invoke(factory);
             Assert.That(count, Is.EqualTo(count));
         }
+
         private class MyController
         {
             public MyController()
@@ -162,6 +163,35 @@ namespace Helpers.Tests
             }
             public Func<string, string, int, decimal, string> OnAction { get; set; }
             public string Action(string param1, string param2, int param3, decimal param4) { return OnAction(param1, param2, param3, param4); }
+        }
+
+        [Test]
+        public void It_can_parse_class_and_default_method_and_execute()
+        {
+            var count = 0;
+            var arguments = (ParsedMethod)ArgumentParser.Build()
+                                               .SetCulture(CultureInfo.InvariantCulture)
+                                               .Recognize(typeof(WithIndexController))
+                                               .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+            Func<Type, object> factory = (Type t) =>
+            {
+                Assert.That(t, Is.EqualTo(typeof(WithIndexController)));
+                return
+                    (object)
+                    new WithIndexController() { OnIndex = (p1, p2, p3, p4) => (count++).ToString() };
+            };
+            arguments.Invoke(factory);
+            Assert.That(count, Is.EqualTo(count));
+        }
+
+        private class WithIndexController
+        {
+            public WithIndexController()
+            {
+                OnIndex = (p1, p2, p3, p4) => string.Empty;
+            }
+            public Func<string, string, int, decimal, string> OnIndex { get; set; }
+            public string Index(string param1, string param2, int param3, decimal param4) { return OnIndex(param1, param2, param3, param4); }
         }
 
         [Test]
@@ -174,5 +204,59 @@ namespace Helpers.Tests
                            .Parse(new[] { "-a", "value", "--beta" }).Invoke();
             Assert.That(count, Is.EqualTo(1));
         }
+
+        [Test]
+        public void It_can_report_usage_for_simple_parameters()
+        {
+            var usage =ArgumentParser.Build()
+                                    .Parameter("beta", arg => { },description:"Some description about beta")
+                                    .Parameter("alpha", arg => { })
+                                    .Help();
+            var tab = '\t';
+            Assert.That(usage, Is.EqualTo(@"The arguments are:
+  --beta"+tab+@"Some description about beta
+  --alpha"));
+        }
+
+
+        internal class AnotherController
+        {
+            public void Action1() { }
+            public void Action2() { }
+        }
+
+        [Test]
+        public void It_can_report_usage_for_controllers()
+        {
+            var usage = ArgumentParser.Build()
+                                    .Recognize(typeof(MyController))
+                                    .Recognize(typeof(AnotherController))
+                                    .HelpTextCommandsAre("The commands are:", 
+                                        "Se 'COMMANDNAME' help <command> for more information")
+                                    .Help();
+            var tab = '\t';
+            Assert.That(usage, Is.EqualTo(@"The commands are:
+  My
+  Another
+
+Se 'COMMANDNAME' help <command> for more information"));
+        }
+
+        [Test]
+        public void It_can_report_usage_for_controllers_and_actions()
+        {
+            var usage = ArgumentParser.Build()
+                                    .Recognize(typeof(MyController))
+                                    .Recognize(typeof(AnotherController))
+                                    .HelpFor("Another");
+            var tab = '\t';
+            Assert.That(usage, Is.EqualTo(@"The sub commands for Another are:
+  
+  Another
+
+Se 'COMMANDNAME' help <command> <subcommand> for more information"));
+        }
     }
+
+  
 }

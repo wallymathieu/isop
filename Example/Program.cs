@@ -11,12 +11,12 @@ namespace Console
     {
         static void Main(string[] args)
         {
+            var parserBuilder = ArgumentParser.Build()
+                       .Recognize(typeof(MyController))
+                       .Recognize(typeof(CustomerController));
             try
             {
-                var parsedMethod = ArgumentParser.Build()
-                                                      .Recognize(typeof(MyController))
-                                                      .Recognize(typeof(CustomerController))
-                                                      .Parse(args);
+                var parsedMethod = parserBuilder.Parse(args);
                 if (parsedMethod.UnRecognizedArguments.Any())//Warning:
                 {
                     var unRecognizedArgumentsMessage = string.Format(
@@ -32,8 +32,14 @@ Did you mean any of these arguments?
             catch (MissingArgumentException ex)
             {
                 System.Console.WriteLine("Missing argument(s)");
-                if (null != ex.Arguments)
-                    System.Console.WriteLine(String.Join(", ", ex.Arguments.Select(arg => arg.ToString())));
+
+                System.Console.WriteLine(parserBuilder.Help());
+            }
+            catch (NoClassOrMethodFoundException ex)
+            {
+                System.Console.WriteLine("Missing argument(s) or wrong argument(s)");
+
+                System.Console.WriteLine(parserBuilder.Help());
             }
         }
     }

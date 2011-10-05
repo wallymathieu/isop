@@ -28,7 +28,7 @@ namespace Helpers.Console
 
         private MethodInfo FindMethodInfo(IEnumerable<string> arg)
         {
-            var foundClassName = Type.Name.Replace("Controller", "").Equals(arg.ElementAtOrDefault(0), StringComparison.OrdinalIgnoreCase);
+            var foundClassName = ClassName().Equals(arg.ElementAtOrDefault(0), StringComparison.OrdinalIgnoreCase);
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1);
@@ -37,6 +37,12 @@ namespace Helpers.Console
             }
             return null;
         }
+
+        private string ClassName()
+        {
+            return Type.Name.Replace("Controller", "");
+        }
+
         /// <summary>
         /// Note that in order to register a converter you can use:
         /// TypeDescriptor.AddAttributes(typeof(AType), new TypeConverterAttribute(typeof(ATypeConverter)));
@@ -84,6 +90,12 @@ namespace Helpers.Console
         private static object DefaultConvertFrom(Type type, string s, CultureInfo cultureInfo)
         {
             return TypeDescriptor.GetConverter(type).ConvertFrom(null, cultureInfo, s);
+        }
+
+        public string Help(bool simpleDescription)
+        {
+            if (simpleDescription) return ClassName();
+            throw new NotImplementedException();
         }
     }
 

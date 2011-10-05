@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Helpers.Console
@@ -15,7 +16,15 @@ namespace Helpers.Console
         public MissingArgumentException(string message, Exception inner) : base(message, inner) { }
     }
 
-    public class ArgumentBase
+    public class NoClassOrMethodFoundException : Exception
+    {
+        public NoClassOrMethodFoundException(){}
+
+        public NoClassOrMethodFoundException(string message) : base(message){}
+
+        public NoClassOrMethodFoundException(string message, Exception inner) : base(message, inner){}
+    }
+    public abstract class ArgumentBase
     {
         public string Prototype { get; protected set; }
 
@@ -23,6 +32,9 @@ namespace Helpers.Console
         {
             return Prototype;
         }
+
+        public abstract string Help();
+        
     }
 
     public class Argument : ArgumentBase
@@ -30,6 +42,11 @@ namespace Helpers.Console
         public static implicit operator Argument(string value)
         {
             return new Argument { Prototype = value};
+        }
+
+        public override string Help()
+        {
+            return "--" +  Prototype;
         }
     }
 
@@ -54,6 +71,14 @@ namespace Helpers.Console
 
         public string[] Aliases { get; protected set; }
         public string Delimiter { get; protected set; }
+        public override string Help()
+        {
+            return "--" + string.Join(", or ", Aliases)
+                +(string.IsNullOrEmpty(Delimiter)
+                    ? ""
+                    : " "+Delimiter)
+                    ;
+        }
     }
     /// <summary>
     /// Represents the parameter. For instance "file" of the commandline argument --file. 
@@ -155,12 +180,14 @@ namespace Helpers.Console
     /// </summary>
     public class ArgumentWithOptions
     {
+        public string Description { get; private set; }
         public ArgumentBase Argument { get; private set; }
         public Action<string> Action { get; set; }
         public bool Required { get; set; }
 
-        public ArgumentWithOptions(ArgumentBase argument, Action<string> action = null, bool required = false)
+        public ArgumentWithOptions(ArgumentBase argument, Action<string> action = null, bool required = false, string description=null)
         {
+            Description = description;
             Argument = argument;
             Action = action;
             Required = required;
@@ -175,6 +202,14 @@ namespace Helpers.Console
             if (Argument is ArgumentParameter)
                 return ((ArgumentParameter)Argument).Aliases.Any(alias => value.Equals(alias, StringComparison.OrdinalIgnoreCase));
             return false;
+        }
+
+        public string Help()
+        {
+            return Argument.Help()
+                +(String.IsNullOrEmpty(Description)
+                    ? "" 
+                    : "\t"+Description);
         }
     }
 
