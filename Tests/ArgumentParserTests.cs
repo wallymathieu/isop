@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Helpers.Tests
 {
     [TestFixture]
-    internal class ArgumentParserTests
+    public class ArgumentParserTests
     {
         [SetUp]
         public void SetUp() { }

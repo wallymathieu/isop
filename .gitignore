@@ -12,3 +12,4 @@ _ReSharper.*
 *.swp
 *.*~
 test-results/
+ConsoleHelpers.userprefs

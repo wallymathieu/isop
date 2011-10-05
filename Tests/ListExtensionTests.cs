@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace Helpers.Tests
 {
     [TestFixture]
-    internal class ListExtensionTests
+    public class ListExtensionTests
     {
         [Test]
         public void FindIndexAndValues_Can_return_correct_index()
