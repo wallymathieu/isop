@@ -8,19 +8,23 @@ namespace Helpers.Console
 {
     public class ArgumentParserBuilder
     {
-        private IList<ArgumentWithOptions> _argumentRecognizers = new List<ArgumentWithOptions>();
-        private IList<ClassAndMethodRecognizer> _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
+        private readonly IList<ArgumentWithOptions> _argumentRecognizers;
+        private readonly IList<ClassAndMethodRecognizer> _classAndMethodRecognizers;
         private CultureInfo _cultureInfo;
         private TypeConverterFunc _typeConverter;
 		private Func<Type,Object> _factory;
-        private HelpForClassAndMethod _helpForClassAndMethod = new HelpForClassAndMethod();
-        private HelpForArgumentWithOptions _helpForArgumentWithOptions = new HelpForArgumentWithOptions();
-        //public ArgumentParserBuilder Parameter(ArgumentParameter argument, bool required = false, string description = null)
-        //{
-        //    if (_classAndMethodRecognizers.Any()) throw new NotImplementedException("Will not recognize any non class recognizers.");
-        //    _argumentRecognizers.Add(new ArgumentWithOptions(argument, null, required, description));
-        //    return this;
-        //}
+        private readonly HelpForClassAndMethod _helpForClassAndMethod;
+        private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
+        private HelpController _helpController;
+
+        public ArgumentParserBuilder()
+        {
+            _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
+            _argumentRecognizers = new List<ArgumentWithOptions>();
+            _helpForClassAndMethod = new HelpForClassAndMethod(_classAndMethodRecognizers);
+            _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
+            _helpController = new HelpController(_helpForArgumentWithOptions, _helpForClassAndMethod);
+        }
 
         public ArgumentParserBuilder Parameter(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null)
         {
@@ -50,7 +54,7 @@ namespace Helpers.Console
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
 			var argumentParser = new ArgumentParser(_argumentRecognizers);
-            _argumentRecognizers = new List<ArgumentWithOptions>();
+            
 			var parsedArgs = argumentParser.Parse(arg);
 			
             if (_classAndMethodRecognizers.Any())
@@ -58,7 +62,6 @@ namespace Helpers.Console
                 var methodRecognizer = _classAndMethodRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
                 if (null != methodRecognizer)
                 {
-                    _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
 					var parsedMethod = methodRecognizer.Parse(arg);
 					parsedMethod.Factory = this._factory;
                     return parsedArgs.Merge( parsedMethod);
@@ -85,14 +88,7 @@ namespace Helpers.Console
 
         public String Help()
         {
-            if (_classAndMethodRecognizers.Any())
-            {
-                return _helpForClassAndMethod.Help(_classAndMethodRecognizers);
-            }
-            else
-            {
-                return _helpForArgumentWithOptions.Help(_argumentRecognizers);
-            }
+            return _helpController.Index();
         }
 
         /// <summary>
@@ -119,50 +115,5 @@ namespace Helpers.Console
             return _helpForClassAndMethod.Help(_classAndMethodRecognizers, command);
         }
     }
-    public class HelpForArgumentWithOptions
-    {
-        public string TheArgumentsAre { get; set; }
-
-        public HelpForArgumentWithOptions()
-        {
-            TheArgumentsAre = "The arguments are:";
-        }
-        public string Help(IEnumerable<ArgumentWithOptions> argumentWithOptionses)
-        {
-            return TheArgumentsAre + Environment.NewLine +
-                   String.Join(Environment.NewLine,
-                               argumentWithOptionses.Select(ar => "  " + ar.Help()).ToArray());
-        }
-    }
-    public class HelpForClassAndMethod
-    {
-        public string TheCommandsAre { get; set; }
-        public string HelpCommandForMoreInformation { get; set; }
-        
-        public string HelpSubCommandForMoreInformation { get; set; }
-
-        public HelpForClassAndMethod()
-        {
-            
-            HelpSubCommandForMoreInformation = "Se 'COMMANDNAME' help <command> <subcommand> for more information";
-
-            HelpCommandForMoreInformation = "Se 'COMMANDNAME' help <command> for more information";
-            TheCommandsAre = "The commands are:";
-        }
-
-        public string Help(IEnumerable<ClassAndMethodRecognizer> classAndMethodRecognizers)
-        {
-            return TheCommandsAre + Environment.NewLine +
-                   String.Join(Environment.NewLine,
-                               classAndMethodRecognizers.Select(cmr => "  " + cmr.Help(true)).ToArray())
-                   + Environment.NewLine
-                   + Environment.NewLine
-                   + HelpCommandForMoreInformation;
-        }
-
-        public string Help(IEnumerable<ClassAndMethodRecognizer> classAndMethodRecognizers, string command)
-        {
-            throw new NotImplementedException();
-        }
-    }
+   
 }
