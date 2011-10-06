@@ -142,10 +142,46 @@ namespace Helpers.Tests
 											   .SetFactory(factory)
                                                .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
            
-            arguments.Invoke();
-            Assert.That(count, Is.EqualTo(count));
+			Assert.That(arguments.UnRecognizedArguments.Count(),Is.EqualTo(0));
+			arguments.Invoke();
+            Assert.That(count, Is.EqualTo(1));
         }
-
+		
+		[Test]
+        public void It_can_parse_class_and_method_and_fail()
+        {
+			var builder = ArgumentParser.Build()
+                                               .SetCulture(CultureInfo.InvariantCulture)
+                                               .Recognize(typeof(MyController));
+           
+			Assert.Throws<MissingArgumentException>(()=>builder.Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" }));
+        }
+		
+		[Test]
+        public void It_can_parse_class_and_method_and_also_arguments_and_execute()
+        {
+            var count = 0;
+			var countArg = 0;
+             Func<Type, object> factory = (Type t) =>
+                                             {
+                                                 Assert.That(t, Is.EqualTo(typeof(MyController)));
+                                                 return
+                                                     (object)
+                                                     new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
+                                             };
+			var arguments = ArgumentParser.Build()
+                                               .SetCulture(CultureInfo.InvariantCulture)
+                                               .Recognize(typeof(MyController))
+											   .Parameter("beta", arg=>countArg++)
+											   .SetFactory(factory)
+                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4", "--beta"});
+           
+            Assert.That(arguments.UnRecognizedArguments.Count(),Is.EqualTo(0));
+			arguments.Invoke();
+            Assert.That(count, Is.EqualTo(1));
+			Assert.That(countArg, Is.EqualTo(1));
+        }
+		
         private class MyController
         {
             public MyController()
@@ -174,8 +210,9 @@ namespace Helpers.Tests
 											   .SetFactory(factory)
                                                .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
-            arguments.Invoke();
-            Assert.That(count, Is.EqualTo(count));
+            Assert.That(arguments.UnRecognizedArguments.Count(),Is.EqualTo(0));
+			arguments.Invoke();
+            Assert.That(count, Is.EqualTo(1));
         }
 
         private class WithIndexController
@@ -228,7 +265,6 @@ namespace Helpers.Tests
                                     .HelpTextCommandsAre("The commands are:", 
                                         "Se 'COMMANDNAME' help <command> for more information")
                                     .Help();
-            var tab = '\t';
             Assert.That(usage, Is.EqualTo(@"The commands are:
   My
   Another
@@ -243,7 +279,6 @@ Se 'COMMANDNAME' help <command> for more information"));
                                     .Recognize(typeof(MyController))
                                     .Recognize(typeof(AnotherController))
                                     .HelpFor("Another");
-            var tab = '\t';
             Assert.That(usage, Is.EqualTo(@"The sub commands for Another are:
   
   Another
