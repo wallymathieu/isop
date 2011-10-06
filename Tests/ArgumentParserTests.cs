@@ -124,34 +124,25 @@ namespace Helpers.Tests
             Assert.That(arg1.Value, Is.Null);
             Assert.That(arg1.Argument, Is.EqualTo("alpha"));
         }
-
-        [Test]
-        public void It_can_parse_class_and_method()
-        {
-            var arguments = (ParsedMethod)ArgumentParser.Build()
-                                               .SetCulture(CultureInfo.InvariantCulture)
-                                               .Recognize(typeof(MyController))
-                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
-            Assert.That(arguments.RecognizedAction.Name, Is.EqualTo("Action"));
-            Assert.That(arguments.RecognizedActionParameters, Is.EquivalentTo(new object[] { "value1", "value2", 3, 3.4m }));
-            Assert.That(!arguments.UnRecognizedArguments.Any());
-        }
+      
         [Test]
         public void It_can_parse_class_and_method_and_execute()
         {
             var count = 0;
-            var arguments = (ParsedMethod)ArgumentParser.Build()
-                                               .SetCulture(CultureInfo.InvariantCulture)
-                                               .Recognize(typeof(MyController))
-                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
-            Func<Type, object> factory = (Type t) =>
+             Func<Type, object> factory = (Type t) =>
                                              {
                                                  Assert.That(t, Is.EqualTo(typeof(MyController)));
                                                  return
                                                      (object)
                                                      new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
                                              };
-            arguments.Invoke(factory);
+			var arguments = ArgumentParser.Build()
+                                               .SetCulture(CultureInfo.InvariantCulture)
+                                               .Recognize(typeof(MyController))
+											   .SetFactory(factory)
+                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+           
+            arguments.Invoke();
             Assert.That(count, Is.EqualTo(count));
         }
 
@@ -168,11 +159,7 @@ namespace Helpers.Tests
         [Test]
         public void It_can_parse_class_and_default_method_and_execute()
         {
-            var count = 0;
-            var arguments = (ParsedMethod)ArgumentParser.Build()
-                                               .SetCulture(CultureInfo.InvariantCulture)
-                                               .Recognize(typeof(WithIndexController))
-                                               .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+			var count = 0;
             Func<Type, object> factory = (Type t) =>
             {
                 Assert.That(t, Is.EqualTo(typeof(WithIndexController)));
@@ -180,7 +167,14 @@ namespace Helpers.Tests
                     (object)
                     new WithIndexController() { OnIndex = (p1, p2, p3, p4) => (count++).ToString() };
             };
-            arguments.Invoke(factory);
+			
+            var arguments = ArgumentParser.Build()
+                                               .SetCulture(CultureInfo.InvariantCulture)
+                                               .Recognize(typeof(WithIndexController))
+											   .SetFactory(factory)
+                                               .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+
+            arguments.Invoke();
             Assert.That(count, Is.EqualTo(count));
         }
 

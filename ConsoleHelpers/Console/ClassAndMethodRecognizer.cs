@@ -105,8 +105,9 @@ namespace Helpers.Console
         public ParsedMethod(ParsedArguments parsedArguments)
             : base(parsedArguments)
         {
-
         }
+		public Func<Type,Object> Factory{get;set;}
+		
         public Type RecognizedClass;
         public MethodInfo RecognizedAction { get; set; }
 
@@ -114,12 +115,8 @@ namespace Helpers.Console
 
         public override void Invoke()
         {
-            Invoke(Activator.CreateInstance);
-        }
-
-        public void Invoke(Func<Type, object> factory)
-        {
-            RecognizedAction.Invoke(factory(RecognizedClass), RecognizedActionParameters.ToArray());
-        }
+			var factory = this.Factory ??Activator.CreateInstance;
+			RecognizedAction.Invoke(factory(RecognizedClass), RecognizedActionParameters.ToArray());
+		}
     }
 }

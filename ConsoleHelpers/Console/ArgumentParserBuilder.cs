@@ -12,6 +12,7 @@ namespace Helpers.Console
         private IList<ClassAndMethodRecognizer> _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
         private CultureInfo _cultureInfo;
         private TypeConverterFunc _typeConverter;
+		private Func<Type,Object> _factory;
         private HelpForClassAndMethod _helpForClassAndMethod = new HelpForClassAndMethod();
         private HelpForArgumentWithOptions _helpForArgumentWithOptions = new HelpForArgumentWithOptions();
         //public ArgumentParserBuilder Parameter(ArgumentParameter argument, bool required = false, string description = null)
@@ -23,7 +24,6 @@ namespace Helpers.Console
 
         public ArgumentParserBuilder Parameter(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null)
         {
-            if (_classAndMethodRecognizers.Any()) throw new NotImplementedException("Will not recognize any non class recognizers.");
             _argumentRecognizers.Add(new ArgumentWithOptions(argument, action, required, description));
             return this;
         }
@@ -40,31 +40,39 @@ namespace Helpers.Console
         {
             _typeConverter = typeconverter; return this;
         }
-
+		
+		public ArgumentParserBuilder SetFactory(Func<Type,Object> factory)
+		{
+			this._factory = factory;
+			return this;
+		}
+		
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
+			var argumentParser = new ArgumentParser(_argumentRecognizers);
+            _argumentRecognizers = new List<ArgumentWithOptions>();
+			var parsedArgs = argumentParser.Parse(arg);
+			
             if (_classAndMethodRecognizers.Any())
             {
                 var methodRecognizer = _classAndMethodRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
                 if (null != methodRecognizer)
                 {
                     _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
-                    return methodRecognizer.Parse(arg);
+					var parsedMethod = methodRecognizer.Parse(arg);
+					parsedMethod.Factory = this._factory;
+                    return parsedArgs.Merge( parsedMethod);
                 }
                 else
                 {
                     throw new NoClassOrMethodFoundException("No class or method found.");
                 }
             }
-            var argumentParser = new ArgumentParser(_argumentRecognizers);
-            _argumentRecognizers = new List<ArgumentWithOptions>();
-
-            return argumentParser.Parse(arg);
+            return parsedArgs;
         }
 
         public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
-            if (_argumentRecognizers.Any()) throw new NotImplementedException("Will not recognize any non class recognizers.");
             _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
             return this;
         }

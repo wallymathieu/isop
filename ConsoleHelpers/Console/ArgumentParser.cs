@@ -231,6 +231,25 @@ namespace Helpers.Console
             WithOptions = argumentWithOptions;
             Argument = parameter;
         }
+		public override int GetHashCode ()
+		{
+			return this.Argument.GetHashCode()+this.WithOptions.GetHashCode()+(this.Value??"").GetHashCode()+1794;
+		}
+		public override bool Equals (object obj)
+		{
+			if (ReferenceEquals(obj,null))
+				return false;
+			if (ReferenceEquals(obj,this))
+				return true;
+			if (obj is RecognizedArgument)
+			{
+				var rec = obj as RecognizedArgument;
+				return this.Argument.Equals(rec.Argument)
+					&& this.WithOptions.Equals(rec.WithOptions)
+				    && string.Equals(this.Value,rec.Value);
+			}
+			return false;
+		}
     }
     public class ParsedArguments
     {
@@ -260,7 +279,34 @@ namespace Helpers.Console
                 argument.WithOptions.Action(argument.Value);
             }
         }
+		
+		public ParsedArguments Merge(ParsedArguments args)
+		{
+			return Merge(this,args);
+		}
+		public static ParsedArguments Merge(ParsedArguments first, ParsedArguments second)
+		{
+			return new MergedParsedArguments(first,second);
+		}
     }
+	public class MergedParsedArguments:ParsedArguments
+	{
+		private ParsedArguments first;
+		private ParsedArguments second;
+		public MergedParsedArguments (ParsedArguments first, ParsedArguments second)
+		{
+			this.first = first;
+			this.second = second;
+			this.RecognizedArguments = first.RecognizedArguments.Union(second.RecognizedArguments);
+			this.ArgumentWithOptions = first.ArgumentWithOptions.Union(second.ArgumentWithOptions);
+			this.UnRecognizedArguments = first.UnRecognizedArguments.Intersect(second.UnRecognizedArguments);
+		}
+		public override void Invoke ()
+		{
+			first.Invoke();
+			second.Invoke();
+		}
+	}
 
     public class UnrecognizedArgument
     {
