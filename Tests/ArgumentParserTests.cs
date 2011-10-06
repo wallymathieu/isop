@@ -279,9 +279,10 @@ Se 'COMMANDNAME' help <command> for more information"));
                                     .Recognize(typeof(MyController))
                                     .Recognize(typeof(AnotherController))
                                     .HelpFor("Another");
-            Assert.That(usage, Is.EqualTo(@"The sub commands for Another are:
-  
-  Another
+            Assert.That(usage, Is.EqualTo(@"The sub commands for Another
+
+  Action1
+  Action2
 
 Se 'COMMANDNAME' help <command> <subcommand> for more information"));
         }

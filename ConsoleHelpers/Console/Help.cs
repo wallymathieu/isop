@@ -28,6 +28,19 @@ namespace Helpers.Console
             }
             return sb.ToString().Trim(' ','\t','\r','\n');
         }
+		public string Index(string command)
+        {
+            var sb = new StringBuilder();
+            if (helpForArgumentWithOptions.CanHelp(command))
+            {
+              sb.AppendLine(helpForArgumentWithOptions.Help(command));
+            }
+            if (helpForClassAndMethod.CanHelp(command))
+            {
+                sb.AppendLine(helpForClassAndMethod.Help(command));
+            }
+            return sb.ToString().Trim(' ','\t','\r','\n');
+        }
     }
 
     public class HelpForArgumentWithOptions
@@ -41,22 +54,26 @@ namespace Helpers.Console
             TheArgumentsAre = "The arguments are:";
         }
 
-        public string Help()
+        public string Help(string val=null)
         {
-            return TheArgumentsAre + Environment.NewLine +
+			if (string.IsNullOrEmpty(val))
+	            return TheArgumentsAre + Environment.NewLine +
                    String.Join(Environment.NewLine,
                                argumentWithOptionses.Select(ar => "  " + ar.Help()).ToArray());
-        }
+        	return argumentWithOptionses.First(ar=>ar.Argument.Prototype.Equals(val)).Help();
+		}
 
-        public bool CanHelp()
+        public bool CanHelp(string val=null)
         {
-            return argumentWithOptionses.Any();
+            if (string.IsNullOrEmpty(val)) return argumentWithOptionses.Any();
+			return argumentWithOptionses.Any(ar=>ar.Argument.Prototype.Equals(val));
         }
     }
     public class HelpForClassAndMethod
     {
         readonly IEnumerable<ClassAndMethodRecognizer> classAndMethodRecognizers;
         public string TheCommandsAre { get; set; }
+		public string TheSubCommandsFor { get; set; }
         public string HelpCommandForMoreInformation { get; set; }
 
         public string HelpSubCommandForMoreInformation { get; set; }
@@ -69,26 +86,29 @@ namespace Helpers.Console
 
             HelpCommandForMoreInformation = "Se 'COMMANDNAME' help <command> for more information";
             TheCommandsAre = "The commands are:";
+			TheSubCommandsFor = "The sub commands for ";
         }
 
-        public string Help()
+        public string Help(string val=null)
         {
-            return TheCommandsAre + Environment.NewLine +
+            if (string.IsNullOrEmpty(val)) return TheCommandsAre + Environment.NewLine +
                    String.Join(Environment.NewLine,
                                classAndMethodRecognizers.Select(cmr => "  " + cmr.Help(true)).ToArray())
                    + Environment.NewLine
                    + Environment.NewLine
                    + HelpCommandForMoreInformation;
+			
+			return TheSubCommandsFor+
+				classAndMethodRecognizers.First(cmr=>cmr.ClassName().Equals(val)).Help(false)
+					+ Environment.NewLine
+					+ Environment.NewLine
+					+ HelpSubCommandForMoreInformation;
         }
 
-        public string Help(IEnumerable<ClassAndMethodRecognizer> classAndMethodRecognizers, string command)
+        public bool CanHelp(string val=null)
         {
-            throw new NotImplementedException();
-        }
-
-        public bool CanHelp()
-        {
-            return classAndMethodRecognizers.Any();
+            if (string.IsNullOrEmpty(val)) return classAndMethodRecognizers.Any();
+			return classAndMethodRecognizers.Any(cmr=>cmr.ClassName().Equals(val));
         }
     }
 }

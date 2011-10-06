@@ -32,14 +32,18 @@ namespace Helpers.Console
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1);
-                var methodInfo = Type.GetMethods().FirstOrDefault(method => method.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase)) ??
-                                 Type.GetMethods().FirstOrDefault(method => method.Name.Equals("index", StringComparison.OrdinalIgnoreCase));
+                var methodInfo = GetMethods().FirstOrDefault(method => method.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase)) ??
+                                 GetMethods().FirstOrDefault(method => method.Name.Equals("index", StringComparison.OrdinalIgnoreCase));
                 return methodInfo;
             }
             return null;
         }
-
-        private string ClassName()
+		private IEnumerable<MethodInfo> GetMethods()
+		{
+			return Type.GetMethods(BindingFlags.Public| BindingFlags.Instance).Where(m=>!m.DeclaringType.Equals(typeof(Object)));
+		}
+		
+        public string ClassName()
         {
             return Type.Name.Replace("Controller", "");
         }
@@ -96,7 +100,11 @@ namespace Helpers.Console
         public string Help(bool simpleDescription)
         {
             if (simpleDescription) return ClassName();
-            throw new NotImplementedException();
+			
+			return ClassName()
+				+Environment.NewLine
+				+Environment.NewLine
+				+String.Join(Environment.NewLine, GetMethods().Select(m=>"  "+m.Name).ToArray());
         }
     }
 

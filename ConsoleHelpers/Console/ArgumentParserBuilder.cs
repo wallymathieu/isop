@@ -112,7 +112,7 @@ namespace Helpers.Console
 
         public string HelpFor(string command)
         {
-            return _helpForClassAndMethod.Help(_classAndMethodRecognizers, command);
+            return _helpController.Index(command);
         }
     }
    
