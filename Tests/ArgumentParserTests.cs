@@ -286,6 +286,39 @@ Se 'COMMANDNAME' help <command> for more information"));
 
 Se 'COMMANDNAME' help <command> <subcommand> for more information"));
         }
+		
+		[Test]
+        public void It_can_report_usage_for_controllers_with_description()
+        {
+            var usage = ArgumentParser.Build()
+                                    .Recognize(typeof(DescriptionController))
+                                    .Help();
+            Assert.That(usage, Is.EqualTo(@"The commands are:
+  Description  Some description
+
+Se 'COMMANDNAME' help <command> for more information"));
+        }
+		
+		[Test]
+        public void It_can_report_usage_for_controllers_and_actions_with_description()
+        {
+            var usage = ArgumentParser.Build()
+                                    .Recognize(typeof(DescriptionController))
+                                    .HelpFor("Description");
+            Assert.That(usage, Is.EqualTo(@"The sub commands for Description
+
+  Action1  Some description 1
+  Action2  Some description 2
+
+Se 'COMMANDNAME' help <command> <subcommand> for more information"));
+        }
+		
+		
+		internal class DescriptionController
+		{
+			public void Action1(){}
+			public void Action2(){}
+		}
     }
 
   
