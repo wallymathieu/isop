@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-
+using System.Text;
 namespace Helpers.Console
 {
     public class MissingArgumentException : Exception
@@ -272,12 +272,13 @@ namespace Helpers.Console
 
         public IEnumerable<ArgumentWithOptions> ArgumentWithOptions { get; set; }
 
-        public virtual void Invoke()
+        public virtual String Invoke()
         {
             foreach (var argument in RecognizedArguments.Where(argument => null != argument.WithOptions.Action))
             {
                 argument.WithOptions.Action(argument.Value);
             }
+			return String.Empty;
         }
 		
 		public ParsedArguments Merge(ParsedArguments args)
@@ -301,10 +302,12 @@ namespace Helpers.Console
 			this.ArgumentWithOptions = first.ArgumentWithOptions.Union(second.ArgumentWithOptions);
 			this.UnRecognizedArguments = first.UnRecognizedArguments.Intersect(second.UnRecognizedArguments);
 		}
-		public override void Invoke ()
+		public override string Invoke ()
 		{
-			first.Invoke();
-			second.Invoke();
+			var sb = new StringBuilder();
+			sb.AppendLine(first.Invoke());
+			sb.AppendLine(second.Invoke());
+			return sb.ToString().Trim('\n','\r',' ','\t');
 		}
 	}
 

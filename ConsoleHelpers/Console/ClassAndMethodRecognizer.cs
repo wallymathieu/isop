@@ -12,15 +12,17 @@ namespace Helpers.Console
     {
         private readonly CultureInfo _culture;
         public Type Type { get; private set; }
+		private readonly object instance;
         /// <summary>
         /// </summary>
-        public ClassAndMethodRecognizer(Type type, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
+        public ClassAndMethodRecognizer(Object instance=null,Type type=null, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
+			this.instance = instance;
             _typeConverter = typeConverter ?? DefaultConvertFrom;
             Type = type;
             _culture = cultureInfo ?? CultureInfo.CurrentCulture;
         }
-
+		
         public bool Recognize(IEnumerable<string> arg)
         {
             return null != FindMethodInfo(arg);
@@ -76,7 +78,8 @@ namespace Helpers.Console
                        {
                            RecognizedAction = methodInfo,
                            RecognizedActionParameters = recognizedActionParameters,
-                           RecognizedClass = Type
+                           RecognizedClass = Type,
+						   Instance = instance
                        };
         }
 
@@ -120,11 +123,26 @@ namespace Helpers.Console
         public MethodInfo RecognizedAction { get; set; }
 
         public IEnumerable<object> RecognizedActionParameters { get; set; }
-
-        public override void Invoke()
+		public Object Instance { get; set; }
+        public override String Invoke()
         {
-			var factory = this.Factory ??Activator.CreateInstance;
-			RecognizedAction.Invoke(factory(RecognizedClass), RecognizedActionParameters.ToArray());
+			object instance;
+			if (null==Instance)
+			{
+				var factory = this.Factory ??Activator.CreateInstance;
+				instance = factory(RecognizedClass);
+			}else
+			{
+				instance = Instance;
+			}
+			var retval = RecognizedAction.Invoke(instance, RecognizedActionParameters.ToArray());
+			if (retval != null)
+			{
+				return retval.ToString();
+			}else
+			{
+				return "";
+			}
 		}
     }
 }

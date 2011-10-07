@@ -24,6 +24,7 @@ namespace Helpers.Console
             _helpForClassAndMethod = new HelpForClassAndMethod(_classAndMethodRecognizers);
             _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
             _helpController = new HelpController(_helpForArgumentWithOptions, _helpForClassAndMethod);
+			Recognize(_helpController);
         }
 
         public ArgumentParserBuilder Parameter(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null)
@@ -66,20 +67,21 @@ namespace Helpers.Console
 					parsedMethod.Factory = this._factory;
                     return parsedArgs.Merge( parsedMethod);
                 }
-                else
-                {
-                    throw new NoClassOrMethodFoundException("No class or method found.");
-                }
             }
             return parsedArgs;
         }
 
         public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
-            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
+            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(null, arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
             return this;
         }
-
+		public ArgumentParserBuilder Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
+        {
+            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg, arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
+            return this;
+        }
+		
         public ArgumentParserBuilder Argument(Argument argument, Action<string> action = null, bool required = false, string description = null)
         {
             _argumentRecognizers.Add(new ArgumentWithOptions(argument, action, required, description));
@@ -88,7 +90,7 @@ namespace Helpers.Console
 
         public String Help()
         {
-            return _helpController.Index();
+			return this.Parse(new []{"Help"}).Invoke();// return _helpController.Index();
         }
 
         /// <summary>
@@ -112,7 +114,7 @@ namespace Helpers.Console
 
         public string HelpFor(string command)
         {
-            return _helpController.Index(command);
+            return this.Parse(new []{"Help",command}).Invoke();//_helpController.Index(command);
         }
     }
    

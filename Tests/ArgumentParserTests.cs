@@ -244,7 +244,7 @@ namespace Helpers.Tests
                                     .Parameter("alpha", arg => { })
                                     .Help();
             var tab = '\t';
-            Assert.That(usage, Is.EqualTo(@"The arguments are:
+            Assert.That(usage, Is.StringContaining(@"The arguments are:
   --beta"+tab+@"Some description about beta
   --alpha"));
         }
@@ -266,6 +266,7 @@ namespace Helpers.Tests
                                         "Se 'COMMANDNAME' help <command> for more information")
                                     .Help();
             Assert.That(usage, Is.EqualTo(@"The commands are:
+  Help
   My
   Another
 
@@ -318,6 +319,15 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information"));
 		{
 			public void Action1(){}
 			public void Action2(){}
+			public string Help(string command)
+			{
+				switch (command) {
+				case "Action1": return "Some description 1";
+				case "Action2": return "Some description 2";
+				default:
+					return "Some description";
+				}
+			}
 		}
     }
 

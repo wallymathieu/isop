@@ -30,6 +30,8 @@ namespace Helpers.Console
         }
 		public string Index(string command)
         {
+			if (String.IsNullOrEmpty(command))
+				return Index();
             var sb = new StringBuilder();
             if (helpForArgumentWithOptions.CanHelp(command))
             {
