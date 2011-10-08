@@ -61,6 +61,22 @@ namespace Helpers.Tests
             Assert.That(arg1.Value, Is.EqualTo("value"));
         }
         [Test]
+        public void It_can_parse_ordinalparameters()
+        {
+            OrdinalParameter o;
+            Assert.That(OrdinalParameter.TryParse("#1first",out o));
+        }
+        [Test]
+        public void It_can_parse_ordinal_parameter_value()
+        {
+            var arguments = ArgumentParser.Build()
+                .Parameter("#0first")
+                .Parse(new[] { "first" }).RecognizedArguments;
+            Assert.That(arguments.Count(), Is.EqualTo(1));
+            var arg1 = arguments.First();
+            Assert.That(arg1.Argument, Is.EqualTo("first"));
+        }
+        [Test]
         public void It_can_parse_parameter_with_equals()
         {
             var arguments = ArgumentParser.Build()

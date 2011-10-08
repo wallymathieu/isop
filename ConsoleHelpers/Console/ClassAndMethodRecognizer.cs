@@ -7,12 +7,45 @@ using System.Reflection;
 
 namespace Helpers.Console
 {
+	public class Transform
+    {
+        public MethodInfo Accept (IEnumerable<MethodInfo> methods, String methodName)
+        {
+            var methodInfo = methods.FirstOrDefault (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase)) ??
+                                 methods.FirstOrDefault (method => method.Name.Equals ("index", StringComparison.OrdinalIgnoreCase));
+            return methodInfo;
+        }
+
+        public IEnumerable<Object> GetParametersForMethod (MethodInfo method, IEnumerable<string> arg, ParsedArguments parsedArguments, Func<RecognizedArgument,ParameterInfo,Object> ConvertFrom1)
+        {
+            var parameterInfos = method.GetParameters ();
+            var parameters = (from paramInfo in parameterInfos
+                   join recognizedArgument in parsedArguments.RecognizedArguments on
+                                                paramInfo.Name.ToLowerInvariant ()
+                                                equals recognizedArgument.Argument.ToLowerInvariant ()
+                   select ConvertFrom1 (recognizedArgument, paramInfo)).ToList ();
+            return parameters;
+        }
+
+        public IEnumerable<ArgumentWithOptions> GetRecognizers (MethodInfo method)
+        {
+            var parameterInfos = method.GetParameters ();
+            var recognizers = parameterInfos
+                .Select (parameterInfo => 
+                    new ArgumentWithOptions (ArgumentParameter.Parse (parameterInfo.Name), required: true))
+                .ToList ();
+            recognizers.Insert(0,new ArgumentWithOptions(ArgumentParameter.Parse("#1"+method.Name), required: true));
+            return recognizers;
+        }
+    }
+	
     public delegate object TypeConverterFunc(Type type, string s, CultureInfo cultureInfo);
     public class ClassAndMethodRecognizer
     {
         private readonly CultureInfo _culture;
         public Type Type { get; private set; }
 		private readonly object instance;
+		private readonly Transform transform = new Transform();
         /// <summary>
         /// </summary>
         public ClassAndMethodRecognizer(Object instance=null,Type type=null, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
@@ -34,8 +67,7 @@ namespace Helpers.Console
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1);
-                var methodInfo = GetMethods().FirstOrDefault(method => method.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase)) ??
-                                 GetMethods().FirstOrDefault(method => method.Name.Equals("index", StringComparison.OrdinalIgnoreCase));
+				var methodInfo = transform.Accept(GetMethods(),methodName);
                 return methodInfo;
             }
             return null;
@@ -59,21 +91,17 @@ namespace Helpers.Console
         public ParsedMethod Parse(IEnumerable<string> arg)
         {
             var methodInfo = FindMethodInfo(arg);
-            var parameterInfos = methodInfo.GetParameters();
-            var argumentRecognizers = parameterInfos
-                .Select(parameterInfo => 
-                    new ArgumentWithOptions(ArgumentParameter.Parse(parameterInfo.Name), required: true))
-                .ToList();
+
+            var argumentRecognizers = transform.GetRecognizers(methodInfo);
 
             var parser = new ArgumentParser(argumentRecognizers);
 
             var parsedArguments = parser.Parse(arg);
-            var recognizedActionParameters = from paramInfo in parameterInfos
-                                             join recognizedArgument in parsedArguments.RecognizedArguments on
-                                                paramInfo.Name.ToLowerInvariant()
-                                                equals recognizedArgument.Argument.ToLowerInvariant()
-                                             select ConvertFrom1(recognizedArgument, paramInfo);
-            parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments.Where(unrecognized=>unrecognized.Index>=2);
+            var recognizedActionParameters = transform.GetParametersForMethod(methodInfo, arg, parsedArguments, ConvertFrom1);
+            
+			parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments
+				.Where(unrecognized=>unrecognized.Index>=2); //NOTE: should be different!
+			
             return new ParsedMethod(parsedArguments)
                        {
                            RecognizedAction = methodInfo,

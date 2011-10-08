@@ -27,7 +27,7 @@ namespace Helpers.Console
     public abstract class ArgumentBase
     {
         public string Prototype { get; protected set; }
-
+        public int? Ordinal { get; protected set; } 
         public override string ToString()
         {
             return Prototype;
@@ -60,6 +60,9 @@ namespace Helpers.Console
 
         public static ArgumentParameter Parse(string value)
         {
+            OrdinalParameter ordinalParameter;
+            if (OrdinalParameter.TryParse(value, out ordinalParameter))
+                return ordinalParameter;
             OptionParameter optionParameter;
             if (OptionParameter.TryParse(value, out optionParameter))
                 return optionParameter;
@@ -80,6 +83,42 @@ namespace Helpers.Console
                     ;
         }
     }
+    public class OrdinalParameter: ArgumentParameter
+    {
+        public OrdinalParameter(string prototype, string[] names, string delimiter, int ordinal)
+        {
+            Prototype = prototype;
+            Aliases = names;
+            Delimiter = delimiter;
+            Ordinal = ordinal;
+        }
+        private static Regex pattern=new Regex(@"#(?<ord>\d*)(?<rest>.*)");
+        public static bool TryParse(string value, out OrdinalParameter ordinalParameter)
+        {
+            var match = pattern.Match(value);
+            if (match.Success)
+            {
+                var prototype = value;
+                var names = match.Groups["rest"].Value.TrimEnd('=', ':').Split('|');
+                string delimiter = null;
+                var last = prototype.Last();
+                switch (last)
+                {
+                    case '=':
+                    case ':':
+                        delimiter = last.ToString();
+                        break;
+                    default:
+                        break;
+                }
+                ordinalParameter = new OrdinalParameter(prototype, names, delimiter, int.Parse(match.Groups["ord"].Value));
+                return true;
+            }
+            ordinalParameter = null;
+            return false;
+        }
+    }
+    
     /// <summary>
     /// Represents the parameter. For instance "file" of the commandline argument --file. 
     /// Usually you might want it to recognize -f as well. For instance using Argument.Parse("file|f"), or the implicit 
@@ -366,11 +405,21 @@ namespace Helpers.Console
                 {
                     case TokenType.Argument:
                         {
+                            // TODO : move recognize into ArgumentBase
                             var argumentWithOptions = _argumentWithOptions
                                .SingleOrDefault(argopt => argopt.Argument
                                    .Prototype.Equals(current.Value,StringComparison.OrdinalIgnoreCase));
                             if (null == argumentWithOptions)
-                                continue;
+                            {
+                                argumentWithOptions = _argumentWithOptions
+                                        .Where(argopt => argopt.Argument.Ordinal.HasValue)
+                                        .SingleOrDefault(argopt => argopt.Argument.Ordinal.Value.Equals(current.Index)
+                                          && argopt.HasAlias(current.Value));
+                                if (null == argumentWithOptions)
+                                {
+                                    continue;
+                                }
+                            }
                             recognizedIndexes.Add(current.Index);
                             recognized.Add(new RecognizedArgument(
                                         argumentWithOptions,
