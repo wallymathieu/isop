@@ -11,25 +11,34 @@ namespace Helpers.Console
     {
         // Lexer -> 
         // Arg(ControllerName),Param(..),.. -> Arg(ControllerName),Arg('Index'),... 
-        public void Rewrite(ArgumentLexer arg)
+        public ArgumentLexer Rewrite(ArgumentLexer arg)
         {
-            
+            var indexToken= new Token("Index", TokenType.Argument,1);
+            var tokens = arg.ToList();
+            if (tokens.Count()>=2 
+                && tokens[1].TokenType!=TokenType.Argument 
+                && tokens[0].TokenType==TokenType.Argument)
+            {
+                tokens.Insert(1,indexToken);
+            }
+            else if (tokens.Count()==1 
+                && tokens[0].TokenType==TokenType.Argument)
+            {
+                tokens.Add(indexToken);
+            }
+            return new ArgumentLexer(tokens);
         }
     }
 	
     public delegate object TypeConverterFunc(Type type, string s, CultureInfo cultureInfo);
     public class ClassAndMethodRecognizer
     {
-        private MethodInfo Accept (IEnumerable<MethodInfo> methods, String methodName)
+        private MethodInfo Accept (IEnumerable<MethodInfo> methods, String methodName, ArgumentLexer lexer)
         {
-            var methodInfo = methods.FirstOrDefault (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase)) ;
-            if (methodInfo==null)
-            {
-                methodInfo = methods.Where(method => 
-                    method.Name.Equals ("index", StringComparison.OrdinalIgnoreCase))
-                    .OrderBy(method=>method.GetParameters().Length)
-                    .FirstOrDefault();
-            }
+            var methodInfo = methods
+                .Where (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase))
+                .Where(method=>method.GetParameters().Length<=lexer.Count(t=>t.TokenType==TokenType.Parameter))
+                .FirstOrDefault();
             return methodInfo;
         }
 
@@ -73,16 +82,18 @@ namespace Helpers.Console
 		
         public bool Recognize(IEnumerable<string> arg)
         {
-            return null != FindMethodInfo(arg);
+            //TODO: Inefficient
+            var lexer = transform.Rewrite( new ArgumentLexer(arg));
+            return null != FindMethodInfo(lexer);
         }
 
-        private MethodInfo FindMethodInfo(IEnumerable<string> arg)
+        private MethodInfo FindMethodInfo(ArgumentLexer arg)
         {
-            var foundClassName = ClassName().Equals(arg.ElementAtOrDefault(0), StringComparison.OrdinalIgnoreCase);
+            var foundClassName = ClassName().Equals(arg.ElementAtOrDefault(0).Value, StringComparison.OrdinalIgnoreCase);
             if (foundClassName)
             {
-                var methodName = arg.ElementAtOrDefault(1);
-				var methodInfo = Accept(GetMethods(),methodName);
+                var methodName = arg.ElementAtOrDefault(1).Value;
+				var methodInfo = Accept(GetMethods(),methodName, arg);
                 return methodInfo;
             }
             return null;
@@ -105,9 +116,9 @@ namespace Helpers.Console
         /// <returns></returns>
         public ParsedMethod Parse(IEnumerable<string> arg)
         {
-            var lexer = new ArgumentLexer(arg);
-            
-            var methodInfo = FindMethodInfo(arg);
+            var lexer = transform.Rewrite( new ArgumentLexer(arg));
+               
+            var methodInfo = FindMethodInfo(lexer);
 
             var argumentRecognizers = GetRecognizers(methodInfo);
 

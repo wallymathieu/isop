@@ -6,34 +6,61 @@ using System.Text.RegularExpressions;
 
 namespace Helpers.Console
 {
-    public class ArgumentLexer : IEnumerable<Token>//TODO: IEnumerator<Token>
+    public class PeekEnumerable<T>:IEnumerable<T>
     {
-        private static readonly Regex ParamPattern = new Regex("(?<paramPrefix>--|/|-)(?<param>[^:=]*)([:=]?)(?<paramValue>.*)");
+        public PeekEnumerable(IEnumerable<T> enumerable)
+        {
+            _buffer = enumerable.ToList();
+        }
         private int _currentIndex = -1;
-        private List<Token> _buffer;
-        private static readonly Token None = new Token("None", TokenType.None, -1);
-
-        public ArgumentLexer(IEnumerable<string> arg)
-            :this(Lex(arg.ToList()))
-        {
-        }
-        public ArgumentLexer(IEnumerable<Token> tokens)
-        {
-            _buffer = new List<Token>(tokens);
-        }
-
-        public bool HasMore() { return _currentIndex+1<_buffer.Count(); }
-
-        public Token Current()
+        private List<T> _buffer;
+        public T Current()
         {
             if (_currentIndex < _buffer.Count())
             {
                 return _buffer[_currentIndex];
             }
-            throw new ArgumentOutOfRangeException("_currentIndex >= ");
+            throw new ArgumentOutOfRangeException("_currentIndex >= count");
+        }
+        public bool HasMore() { return _currentIndex+1<_buffer.Count(); }
+        public T Next()
+        {
+            _currentIndex++;
+            return Current();
         }
 
-        private static IEnumerable<Token> Lex(IList<string> _arg)
+        public T Peek()
+        {
+             var idx = _currentIndex+1; 
+             if (idx<_buffer.Count())
+                 return _buffer[idx];
+             return default(T);
+        }
+        public IEnumerator<T> GetEnumerator()
+        {
+            return this._buffer.GetEnumerator();
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+    }
+    
+    public class ArgumentLexer : List<Token>
+    {
+        private static readonly Regex ParamPattern = new Regex("(?<paramPrefix>--|/|-)(?<param>[^:=]*)([:=]?)(?<paramValue>.*)");
+        
+        public ArgumentLexer(IEnumerable<string> arg)
+            :this(Lex(arg.ToList()))
+        {
+        }
+        public ArgumentLexer(IEnumerable<Token> tokens)
+            :base(tokens)
+        {
+        }
+
+        public static IEnumerable<Token> Lex(IList<string> _arg)
         {
             int _currentIndex = 0;
             int length = _arg.Count();
@@ -71,52 +98,29 @@ namespace Helpers.Console
                 }
             }
         }
-
-        public Token Next()
-        {
-            _currentIndex++;
-            return Current();
-        }
-
-        public Token Peek()
-        {
-             var idx = _currentIndex+1; 
-             if (idx<_buffer.Count())
-                 return _buffer[idx];
-             return None;
-        }
-
-        public IEnumerator<Token> GetEnumerator()
-        {
-            return this._buffer.GetEnumerator();
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
     }
     
     public enum TokenType
     {
+        None,
         Argument,
         Parameter,
         ParameterValue,
-        None
     }
-    public class Token
+    public struct Token
     {
-        public string Value { get; private set; }
-        public TokenType TokenType { get; private set; }
+        public string Value;
+        public TokenType TokenType;
         /// <summary>
         /// the index in the argument array
         /// </summary>
-        public int Index { get; private set; }
-
+        public int Index;
+        
         public Token(string value, TokenType tokenType, int index)
         {
-            Value = value;
-            TokenType = tokenType;
-            Index = index;
+            this.Value = value;
+            this.TokenType = tokenType;
+            this.Index = index;
         }
         public override bool Equals(object obj)
         {

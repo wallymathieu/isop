@@ -397,10 +397,10 @@ namespace Helpers.Console
             return Parse(lexer, arguments);
         }
         
-        public ParsedArguments Parse(ArgumentLexer lexer,IEnumerable<string> arguments)
+        public ParsedArguments Parse(ArgumentLexer lex,IEnumerable<string> arguments)
         {
             var recognizedIndexes=new List<int>();
-            
+            var lexer = new PeekEnumerable<Token>(lex);
             IList<RecognizedArgument> recognized=new List<RecognizedArgument>();
             while (lexer.HasMore())
             {
@@ -411,6 +411,7 @@ namespace Helpers.Console
                         {
                             // TODO : move recognize into ArgumentBase
                             var argumentWithOptions = _argumentWithOptions
+                               .Where(argopt => !argopt.Argument.Ordinal.HasValue)
                                .SingleOrDefault(argopt => argopt.Argument
                                    .Prototype.Equals(current.Value,StringComparison.OrdinalIgnoreCase));
                             if (null == argumentWithOptions)

@@ -55,7 +55,7 @@ namespace Helpers.Tests
         [Test]
         public void It_can_peek_tokenized_value()
         {
-            var lexer = new ArgumentLexer(new[] { "--parameter=parametervalue" , "argument"});
+            var lexer = new PeekEnumerable<Token>( new ArgumentLexer(new[] { "--parameter=parametervalue" , "argument"}));
             lexer.Next();
             var first = lexer.Peek();
             Assert.That(first, Is.EqualTo(new Token("parametervalue", TokenType.ParameterValue, 1)));
