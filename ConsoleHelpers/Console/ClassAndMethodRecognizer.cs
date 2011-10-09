@@ -38,6 +38,7 @@ namespace Helpers.Console
             var methodInfo = methods
                 .Where (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase))
                 .Where(method=>method.GetParameters().Length<=lexer.Count(t=>t.TokenType==TokenType.Parameter))
+                .OrderByDescending(method=>method.GetParameters().Length)
                 .FirstOrDefault();
             return methodInfo;
         }
