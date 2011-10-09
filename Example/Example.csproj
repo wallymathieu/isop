@@ -11,7 +11,6 @@
     <RootNamespace>Isop.Example</RootNamespace>
     <AssemblyName>Console</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -38,7 +37,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -47,7 +45,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleHelpers\Isop.csproj">
+    <ProjectReference Include="..\Isop\Isop.csproj">
       <Project>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</Project>
       <Name>Isop</Name>
     </ProjectReference>

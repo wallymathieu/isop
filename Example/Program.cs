@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Helpers.Console;
+using Isop.Console;
 
 namespace Isop.Example
 {

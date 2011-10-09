@@ -58,7 +58,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleHelpers\Isop.csproj">
+    <ProjectReference Include="..\Isop\Isop.csproj">
       <Project>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</Project>
       <Name>Isop</Name>
     </ProjectReference>
