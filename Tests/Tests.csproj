@@ -8,7 +8,7 @@
     <ProjectGuid>{55C48544-BD4E-4101-A42C-CCCEB2F92304}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Helpers.Tests</RootNamespace>
+    <RootNamespace>Isop.Tests</RootNamespace>
     <AssemblyName>Tests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -58,9 +58,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleHelpers\ConsoleHelpers.csproj">
+    <ProjectReference Include="..\ConsoleHelpers\Isop.csproj">
       <Project>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</Project>
-      <Name>ConsoleHelpers</Name>
+      <Name>Isop</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

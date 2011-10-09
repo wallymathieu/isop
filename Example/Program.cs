@@ -2,7 +2,7 @@
 using System.Linq;
 using Helpers.Console;
 
-namespace Console
+namespace Isop.Example
 {
     /// <summary>
     /// This is a sample usage of console helpers:

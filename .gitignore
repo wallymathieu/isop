@@ -12,7 +12,7 @@ _ReSharper.*
 *.swp
 *.*~
 test-results/
-ConsoleHelpers.userprefs
+*.userprefs
 ConsoleHelpers/ConsoleHelpers.pidb
 Example/Example.pidb
 Tests/Tests.pidb

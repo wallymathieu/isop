@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Text;
-namespace Helpers.Console
+namespace Isop.Console
 {
     public class MissingArgumentException : Exception
     {

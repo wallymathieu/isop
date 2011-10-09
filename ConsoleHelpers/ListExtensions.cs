@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Helpers
+namespace Isop
 {
     public static class ListExtensions
     {

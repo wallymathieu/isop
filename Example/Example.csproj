@@ -8,7 +8,7 @@
     <ProjectGuid>{02596ACA-3C85-4353-8744-5F0A172BA757}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Console</RootNamespace>
+    <RootNamespace>Isop.Example</RootNamespace>
     <AssemblyName>Console</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -47,9 +47,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleHelpers\ConsoleHelpers.csproj">
+    <ProjectReference Include="..\ConsoleHelpers\Isop.csproj">
       <Project>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</Project>
-      <Name>ConsoleHelpers</Name>
+      <Name>Isop</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

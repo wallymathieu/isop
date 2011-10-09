@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Helpers.Console;
+using Isop.Console;
 using NUnit.Framework;
 
-namespace Helpers.Tests
+namespace Isop.Tests
 {
     /// <summary>
     /// argument --parameter parametervalue

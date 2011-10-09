@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
-namespace Helpers.Console
+namespace Isop.Console
 {
     public class ArgumentParserBuilder
     {

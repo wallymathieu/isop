@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Helpers</RootNamespace>
+    <RootNamespace>Isop</RootNamespace>
     <AssemblyName>ConsoleHelpers</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
@@ -49,7 +49,7 @@
     <Compile Include="Console\ClassAndMethodRecognizer.cs" />
     <Compile Include="Console\Help.cs" />
     <Compile Include="ListExtensions.cs" />
-    <Compile Include="Console\Container.cs" />
+    <Compile Include="TypeContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 
-namespace Helpers.Tests
+namespace Isop.Tests
 {
     [TestFixture]
     public class ListExtensionTests

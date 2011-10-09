@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleHelpers", "ConsoleHelpers\ConsoleHelpers.csproj", "{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop", "ConsoleHelpers\Isop.csproj", "{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{55C48544-BD4E-4101-A42C-CCCEB2F92304}"
 EndProject
@@ -66,7 +66,7 @@ Global
 		{55C48544-BD4E-4101-A42C-CCCEB2F92304}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = ConsoleHelpers\ConsoleHelpers.csproj
+		StartupItem = ConsoleHelpers\Isop.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None

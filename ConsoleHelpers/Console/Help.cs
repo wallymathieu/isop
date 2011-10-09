@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-namespace Helpers.Console
+namespace Isop.Console
 {
     public class HelpController
     {

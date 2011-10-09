@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using Helpers.Console;
+using Isop.Console;
 using NUnit.Framework;
 
-namespace Helpers.Tests
+namespace Isop.Tests
 {
     [TestFixture]
     public class ArgumentParserTests
