@@ -115,7 +115,7 @@ namespace Isop.Console
 
         public string HelpFor(string command)
         {
-            return this.Parse(new []{"Help", "--command", command}).Invoke();//_helpController.Index(command);
+            return this.Parse(new []{"Help", command}).Invoke();//_helpController.Index(command);
         }
     }
    
