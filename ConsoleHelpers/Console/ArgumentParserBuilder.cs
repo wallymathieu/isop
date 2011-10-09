@@ -12,16 +12,16 @@ namespace Helpers.Console
         private readonly IList<ClassAndMethodRecognizer> _classAndMethodRecognizers;
         private CultureInfo _cultureInfo;
         private TypeConverterFunc _typeConverter;
-		private Func<Type,Object> _factory;
+		private Func<Type,Object> _factory{get{return container.Factory;}set{container.Factory=value;}}
         private readonly HelpForClassAndMethod _helpForClassAndMethod;
         private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
-
+        private TypeContainer container=new TypeContainer();
         public ArgumentParserBuilder()
         {
             _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
             _argumentRecognizers = new List<ArgumentWithOptions>();
-            _helpForClassAndMethod = new HelpForClassAndMethod(_classAndMethodRecognizers);
+            _helpForClassAndMethod = new HelpForClassAndMethod(_classAndMethodRecognizers,container);
             _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
             _helpController = new HelpController(_helpForArgumentWithOptions, _helpForClassAndMethod);
 			Recognize(_helpController);
@@ -64,7 +64,7 @@ namespace Helpers.Console
                 if (null != methodRecognizer)
                 {
 					var parsedMethod = methodRecognizer.Parse(arg);
-					parsedMethod.Factory = this._factory;
+					parsedMethod.Factory = this.container.CreateInstance;
                     return parsedArgs.Merge( parsedMethod);
                 }
             }
@@ -73,12 +73,13 @@ namespace Helpers.Console
 
         public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
-            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(null, arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
+            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
             return this;
         }
 		public ArgumentParserBuilder Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
-            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg, arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
+            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
+            container.Instances.Add(arg.GetType(),arg);
             return this;
         }
 		

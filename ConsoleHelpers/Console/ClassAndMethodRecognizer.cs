@@ -33,7 +33,7 @@ namespace Helpers.Console
     public delegate object TypeConverterFunc(Type type, string s, CultureInfo cultureInfo);
     public class ClassAndMethodRecognizer
     {
-        private MethodInfo Accept (IEnumerable<MethodInfo> methods, String methodName, ArgumentLexer lexer)
+        private MethodInfo FindMethod (IEnumerable<MethodInfo> methods, String methodName, ArgumentLexer lexer)
         {
             var methodInfo = methods
                 .Where (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase))
@@ -69,13 +69,12 @@ namespace Helpers.Console
         
         private readonly CultureInfo _culture;
         public Type Type { get; private set; }
-		private readonly object instance;
+		
 		private readonly Transform transform = new Transform();
         /// <summary>
         /// </summary>
-        public ClassAndMethodRecognizer(Object instance=null,Type type=null, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
+        public ClassAndMethodRecognizer(Type type, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
-			this.instance = instance;
             _typeConverter = typeConverter ?? DefaultConvertFrom;
             Type = type;
             _culture = cultureInfo ?? CultureInfo.CurrentCulture;
@@ -94,12 +93,12 @@ namespace Helpers.Console
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1).Value;
-				var methodInfo = Accept(GetMethods(),methodName, arg);
+				var methodInfo = FindMethod(GetMethods(),methodName, arg);
                 return methodInfo;
             }
             return null;
         }
-		private IEnumerable<MethodInfo> GetMethods()
+		public IEnumerable<MethodInfo> GetMethods()
 		{
 			return Type.GetMethods(BindingFlags.Public| BindingFlags.Instance).Where(m=>!m.DeclaringType.Equals(typeof(Object)));
 		}
@@ -134,8 +133,7 @@ namespace Helpers.Console
                        {
                            RecognizedAction = methodInfo,
                            RecognizedActionParameters = recognizedActionParameters,
-                           RecognizedClass = Type,
-						   Instance = instance
+                           RecognizedClass = Type
                        };
         }
 
@@ -156,15 +154,7 @@ namespace Helpers.Console
             return TypeDescriptor.GetConverter(type).ConvertFrom(null, cultureInfo, s);
         }
 
-        public string Help(bool simpleDescription)
-        {
-            if (simpleDescription) return ClassName();
-			
-			return ClassName()
-				+Environment.NewLine
-				+Environment.NewLine
-				+String.Join(Environment.NewLine, GetMethods().Select(m=>"  "+m.Name).ToArray());
-        }
+       
     }
 
     public class ParsedMethod : ParsedArguments
@@ -179,18 +169,11 @@ namespace Helpers.Console
         public MethodInfo RecognizedAction { get; set; }
 
         public IEnumerable<object> RecognizedActionParameters { get; set; }
-		public Object Instance { get; set; }
+		
         public override String Invoke()
         {
-			object instance;
-			if (null==Instance)
-			{
-				var factory = this.Factory ??Activator.CreateInstance;
-				instance = factory(RecognizedClass);
-			}else
-			{
-				instance = Instance;
-			}
+			object instance = Factory(RecognizedClass);
+			
 			var retval = RecognizedAction.Invoke(instance, RecognizedActionParameters.ToArray());
 			if (retval != null)
 			{

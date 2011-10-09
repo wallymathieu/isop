@@ -49,6 +49,7 @@
     <Compile Include="Console\ClassAndMethodRecognizer.cs" />
     <Compile Include="Console\Help.cs" />
     <Compile Include="ListExtensions.cs" />
+    <Compile Include="Console\Container.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

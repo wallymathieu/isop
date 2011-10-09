@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Reflection;
 namespace Helpers.Console
 {
     public class HelpController
     {
         HelpForArgumentWithOptions helpForArgumentWithOptions;
         HelpForClassAndMethod helpForClassAndMethod;
-        public HelpController(HelpForArgumentWithOptions helpForArgumentWithOptions, HelpForClassAndMethod helpForClassAndMethod)
+
+        public HelpController(
+            HelpForArgumentWithOptions helpForArgumentWithOptions, 
+            HelpForClassAndMethod helpForClassAndMethod)
         {
             this.helpForArgumentWithOptions = helpForArgumentWithOptions;
             this.helpForClassAndMethod = helpForClassAndMethod;
@@ -74,14 +77,16 @@ namespace Helpers.Console
     public class HelpForClassAndMethod
     {
         readonly IEnumerable<ClassAndMethodRecognizer> classAndMethodRecognizers;
+        private readonly TypeContainer container;
         public string TheCommandsAre { get; set; }
 		public string TheSubCommandsFor { get; set; }
         public string HelpCommandForMoreInformation { get; set; }
 
         public string HelpSubCommandForMoreInformation { get; set; }
 
-        public HelpForClassAndMethod(IEnumerable<ClassAndMethodRecognizer> classAndMethodRecognizers)
+        public HelpForClassAndMethod(IEnumerable<ClassAndMethodRecognizer> classAndMethodRecognizers, TypeContainer container)
         {
+            this.container=container;
             this.classAndMethodRecognizers = classAndMethodRecognizers;
 
             HelpSubCommandForMoreInformation = "Se 'COMMANDNAME' help <command> <subcommand> for more information";
@@ -90,18 +95,32 @@ namespace Helpers.Console
             TheCommandsAre = "The commands are:";
 			TheSubCommandsFor = "The sub commands for ";
         }
-
+        private string _Description(Type t,MethodInfo command)
+        { 
+            return string.Empty;
+        }
+        private string _Help(ClassAndMethodRecognizer cmr,bool simpleDescription)
+        {
+            if (simpleDescription) return cmr.ClassName();
+            
+            return cmr.ClassName()
+                +Environment.NewLine
+                +Environment.NewLine
+                +String.Join(Environment.NewLine, cmr.GetMethods()
+                        .Select(m=>"  "+m.Name+_Description(cmr.Type,m)).ToArray());
+        }
+        
         public string Help(string val=null)
         {
             if (string.IsNullOrEmpty(val)) return TheCommandsAre + Environment.NewLine +
                    String.Join(Environment.NewLine,
-                               classAndMethodRecognizers.Select(cmr => "  " + cmr.Help(true)).ToArray())
+                               classAndMethodRecognizers.Select(cmr => "  " + _Help(cmr,true)).ToArray())
                    + Environment.NewLine
                    + Environment.NewLine
                    + HelpCommandForMoreInformation;
 			
 			return TheSubCommandsFor+
-				classAndMethodRecognizers.First(cmr=>cmr.ClassName().Equals(val)).Help(false)
+				_Help(classAndMethodRecognizers.First(cmr=>cmr.ClassName().Equals(val)),false)
 					+ Environment.NewLine
 					+ Environment.NewLine
 					+ HelpSubCommandForMoreInformation;
