@@ -9,39 +9,54 @@ namespace Helpers.Console
 {
 	public class Transform
     {
-        public MethodInfo Accept (IEnumerable<MethodInfo> methods, String methodName)
+        // Lexer -> 
+        // Arg(ControllerName),Param(..),.. -> Arg(ControllerName),Arg('Index'),... 
+        public void Rewrite(ArgumentLexer arg)
         {
-            var methodInfo = methods.FirstOrDefault (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase)) ??
-                                 methods.FirstOrDefault (method => method.Name.Equals ("index", StringComparison.OrdinalIgnoreCase));
-            return methodInfo;
-        }
-
-        public IEnumerable<Object> GetParametersForMethod (MethodInfo method, IEnumerable<string> arg, ParsedArguments parsedArguments, Func<RecognizedArgument,ParameterInfo,Object> ConvertFrom1)
-        {
-            var parameterInfos = method.GetParameters ();
-            var parameters = (from paramInfo in parameterInfos
-                   join recognizedArgument in parsedArguments.RecognizedArguments on
-                                                paramInfo.Name.ToLowerInvariant ()
-                                                equals recognizedArgument.Argument.ToLowerInvariant ()
-                   select ConvertFrom1 (recognizedArgument, paramInfo)).ToList ();
-            return parameters;
-        }
-
-        public IEnumerable<ArgumentWithOptions> GetRecognizers (MethodInfo method)
-        {
-            var parameterInfos = method.GetParameters ();
-            var recognizers = parameterInfos
-                .Select (parameterInfo => 
-                    new ArgumentWithOptions (ArgumentParameter.Parse (parameterInfo.Name), required: true))
-                .ToList ();
-            recognizers.Insert(0,new ArgumentWithOptions(ArgumentParameter.Parse("#1"+method.Name), required: true));
-            return recognizers;
+            
         }
     }
 	
     public delegate object TypeConverterFunc(Type type, string s, CultureInfo cultureInfo);
     public class ClassAndMethodRecognizer
     {
+        private MethodInfo Accept (IEnumerable<MethodInfo> methods, String methodName)
+        {
+            var methodInfo = methods.FirstOrDefault (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase)) ;
+            if (methodInfo==null)
+            {
+                methodInfo = methods.Where(method => 
+                    method.Name.Equals ("index", StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(method=>method.GetParameters().Length)
+                    .FirstOrDefault();
+            }
+            return methodInfo;
+        }
+
+        private IEnumerable<Object> GetParametersForMethod (MethodInfo method, ArgumentLexer arg, ParsedArguments parsedArguments, Func<RecognizedArgument,ParameterInfo,Object> ConvertFrom1)
+        {
+            var parameterInfos = method.GetParameters();
+            var parameters = new List<Object>();
+            
+            foreach (var paramInfo in parameterInfos) {
+                var recognizedArgument =  parsedArguments.RecognizedArguments.First(
+                    a=>a.Argument.ToLowerInvariant().Equals(paramInfo.Name.ToLowerInvariant()));
+                parameters.Add( ConvertFrom1 (recognizedArgument, paramInfo));
+            }
+            return parameters;
+        }
+
+        private IEnumerable<ArgumentWithOptions> GetRecognizers(MethodInfo method)
+        {
+            var parameterInfos = method.GetParameters();
+            var recognizers = parameterInfos
+                .Select (parameterInfo => 
+                    new ArgumentWithOptions (ArgumentParameter.Parse (parameterInfo.Name), required: true))
+                .ToList ();
+            recognizers.Insert(0,new ArgumentWithOptions(ArgumentParameter.Parse("#1"+method.Name), required: false));
+            return recognizers;
+        }
+        
         private readonly CultureInfo _culture;
         public Type Type { get; private set; }
 		private readonly object instance;
@@ -67,7 +82,7 @@ namespace Helpers.Console
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1);
-				var methodInfo = transform.Accept(GetMethods(),methodName);
+				var methodInfo = Accept(GetMethods(),methodName);
                 return methodInfo;
             }
             return null;
@@ -90,14 +105,15 @@ namespace Helpers.Console
         /// <returns></returns>
         public ParsedMethod Parse(IEnumerable<string> arg)
         {
+            var lexer = new ArgumentLexer(arg);
+            
             var methodInfo = FindMethodInfo(arg);
 
-            var argumentRecognizers = transform.GetRecognizers(methodInfo);
+            var argumentRecognizers = GetRecognizers(methodInfo);
 
             var parser = new ArgumentParser(argumentRecognizers);
-
-            var parsedArguments = parser.Parse(arg);
-            var recognizedActionParameters = transform.GetParametersForMethod(methodInfo, arg, parsedArguments, ConvertFrom1);
+            var parsedArguments = parser.Parse(lexer, arg);
+            var recognizedActionParameters = GetParametersForMethod(methodInfo, lexer, parsedArguments, ConvertFrom1);
             
 			parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments
 				.Where(unrecognized=>unrecognized.Index>=2); //NOTE: should be different!

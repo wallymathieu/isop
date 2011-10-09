@@ -9,134 +9,93 @@ namespace Helpers.Console
     public class ArgumentLexer : IEnumerable<Token>//TODO: IEnumerator<Token>
     {
         private static readonly Regex ParamPattern = new Regex("(?<paramPrefix>--|/|-)(?<param>[^:=]*)([:=]?)(?<paramValue>.*)");
-        private readonly string[] _arg;
-        private int _currentIndex = 0;
-        private readonly List<Token> _buffer = new List<Token>();
+        private int _currentIndex = -1;
+        private List<Token> _buffer;
         private static readonly Token None = new Token("None", TokenType.None, -1);
 
         public ArgumentLexer(IEnumerable<string> arg)
+            :this(Lex(arg.ToList()))
         {
-            _arg = arg.ToArray();
+        }
+        public ArgumentLexer(IEnumerable<Token> tokens)
+        {
+            _buffer = new List<Token>(tokens);
         }
 
-        public bool HasMore() { return _buffer.Any() || HasMoreToLex(); }
-
-        private bool HasMoreToLex()
-        {
-            return _currentIndex < _arg.Length;
-        }
+        public bool HasMore() { return _currentIndex+1<_buffer.Count(); }
 
         public Token Current()
         {
-            if (_buffer.Any())
+            if (_currentIndex < _buffer.Count())
             {
-                return _buffer.First();
+                return _buffer[_currentIndex];
             }
-            LexMore();
-            return _buffer.First();
+            throw new ArgumentOutOfRangeException("_currentIndex >= ");
         }
 
-        private void LexMore()
+        private static IEnumerable<Token> Lex(IList<string> _arg)
         {
-            if (HasMoreToLex())
+            int _currentIndex = 0;
+            int length = _arg.Count();
+            while (_currentIndex<length) 
             {
-                _buffer.AddRange(Lex());
-            }
-            else
-            {
-                throw new NothingLeftToLexException("nothing more to lex");
-            }
-        }
-
-        private IEnumerable<Token> Lex()
-        {
-            var value = _arg[_currentIndex];
-            var valueIndex = _currentIndex;
-            _currentIndex++;
-            var match = ParamPattern.Match(value);
-            if (match.Success)
-            {
-                yield return new Token(match.Groups["param"].Value, TokenType.Parameter, valueIndex);
-                if (match.Groups["paramValue"].Length > 0)
+                var value = _arg[_currentIndex];
+                var valueIndex = _currentIndex;
+                _currentIndex++;
+                
+                Match match = ParamPattern.Match(value);
+                if (match.Success)
                 {
-                    yield return new Token(match.Groups["paramValue"].Value, TokenType.ParameterValue, valueIndex);
-                }
-                else
-                {
-                    if (HasMoreToLex())
+                    yield return new Token(match.Groups["param"].Value, TokenType.Parameter, valueIndex);
+                    if (match.Groups["paramValue"].Length > 0)
                     {
-                        var possibleParamValue = _arg[_currentIndex];
-                        var possibleParamValueIndex = _currentIndex;
-                        if (!ParamPattern.IsMatch(possibleParamValue))
+                        yield return new Token(match.Groups["paramValue"].Value, TokenType.ParameterValue, valueIndex);
+                    }
+                    else
+                    {
+                        if (_currentIndex < length)
                         {
-                            _currentIndex++;
-                            yield return new Token(possibleParamValue, TokenType.ParameterValue, possibleParamValueIndex);
+                            var possibleParamValue = _arg[_currentIndex];
+                            var possibleParamValueIndex = _currentIndex;
+                            if (!ParamPattern.IsMatch(possibleParamValue))
+                            {
+                                _currentIndex++;
+                                yield return new Token(possibleParamValue, TokenType.ParameterValue, possibleParamValueIndex);
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                yield return new Token(value, TokenType.Argument, valueIndex);
+                else
+                {
+                    yield return new Token(value, TokenType.Argument, valueIndex);
+                }
             }
         }
 
         public Token Next()
         {
-            if (_buffer.Any())
-            {
-                return BufferPop();
-            }
-            LexMore();
-            return BufferPop();
-        }
-
-        private Token BufferPop()
-        {
-            var token = _buffer.First();
-            _buffer.RemoveAt(0);
-            return token;
+            _currentIndex++;
+            return Current();
         }
 
         public Token Peek()
         {
-            try
-            {
-                Token next = None;
-                for (int i = 0; i < 2; i++)
-                {
-                    next = Next();
-                    _buffer.Add(next);
-                }
-                return next;
-            }
-            catch (NothingLeftToLexException)
-            {
-                return None;
-            }
+             var idx = _currentIndex+1; 
+             if (idx<_buffer.Count())
+                 return _buffer[idx];
+             return None;
         }
 
         public IEnumerator<Token> GetEnumerator()
         {
-            while (HasMore())
-            {
-                yield return Next();
-            }
+            return this._buffer.GetEnumerator();
         }
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
     }
-
-    public class NothingLeftToLexException : Exception
-    {
-        public NothingLeftToLexException(string msg)
-            : base(msg)
-        {
-        }
-    }
-
+    
     public enum TokenType
     {
         Argument,

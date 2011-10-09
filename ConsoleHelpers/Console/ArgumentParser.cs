@@ -391,10 +391,14 @@ namespace Helpers.Console
         {
             _argumentWithOptions = argumentWithOptions;
         }
-
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
             var lexer = new ArgumentLexer(arguments);
+            return Parse(lexer, arguments);
+        }
+        
+        public ParsedArguments Parse(ArgumentLexer lexer,IEnumerable<string> arguments)
+        {
             var recognizedIndexes=new List<int>();
             
             IList<RecognizedArgument> recognized=new List<RecognizedArgument>();
