@@ -14,6 +14,11 @@ namespace Isop.Example
             var parserBuilder = ArgumentParser.Build()
                        .Recognize(typeof(MyController))
                        .Recognize(typeof(CustomerController));
+            if (args.Length==0)
+            {
+                System.Console.WriteLine(parserBuilder.Help());
+                return;
+            }
             try
             {
                 var parsedMethod = parserBuilder.Parse(args);
@@ -27,15 +32,15 @@ Did you mean any of these arguments?
       String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Argument.ToString()).ToArray()));
                     System.Console.WriteLine(unRecognizedArgumentsMessage);
                 }
-                parsedMethod.Invoke();
+                System.Console.WriteLine(parsedMethod.Invoke());
             }
-            catch (MissingArgumentException ex)
+            catch (MissingArgumentException)
             {
                 System.Console.WriteLine("Missing argument(s)");
 
                 System.Console.WriteLine(parserBuilder.Help());
             }
-            catch (NoClassOrMethodFoundException ex)
+            catch (NoClassOrMethodFoundException)
             {
                 System.Console.WriteLine("Missing argument(s) or wrong argument(s)");
 
@@ -44,14 +49,14 @@ Did you mean any of these arguments?
         }
     }
 
-    internal class MyController
+    public class MyController
     {
         public void Action(string value)
         {
             System.Console.WriteLine("invoking action on mycontroller with value : " + value);
         }
     }
-    internal class CustomerController
+    public class CustomerController
     {
         public void Add(string name)
         {
