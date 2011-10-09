@@ -8,7 +8,7 @@
     <ProjectGuid>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Isop</RootNamespace>
-    <AssemblyName>ConsoleHelpers</AssemblyName>
+    <AssemblyName>Isop</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
