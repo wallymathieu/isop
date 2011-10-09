@@ -100,7 +100,9 @@ namespace Helpers.Console
         }
 		public IEnumerable<MethodInfo> GetMethods()
 		{
-			return Type.GetMethods(BindingFlags.Public| BindingFlags.Instance).Where(m=>!m.DeclaringType.Equals(typeof(Object)));
+			return Type.GetMethods(BindingFlags.Public| BindingFlags.Instance)
+                .Where(m=>!m.DeclaringType.Equals(typeof(Object)))
+                .Where(m=>!m.Name.Equals("help",StringComparison.OrdinalIgnoreCase));
 		}
 		
         public string ClassName()

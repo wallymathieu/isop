@@ -95,13 +95,20 @@ namespace Helpers.Console
             TheCommandsAre = "The commands are:";
 			TheSubCommandsFor = "The sub commands for ";
         }
-        private string _Description(Type t,MethodInfo command)
+        private string _Description(Type t,MethodInfo method=null)
         { 
-            return string.Empty;
+            var description = t.GetMethods().FirstOrDefault(m=>
+                m.Name.Equals("help",StringComparison.OrdinalIgnoreCase));
+            //TODO: should match parameters to make sure that it can accept 1 param of type string
+            if (null==description) return string.Empty;
+            
+            var obj = container.CreateInstance(t);
+            
+            return "  "+description.Invoke(obj,new[]{(method!=null? method.Name:null)});
         }
         private string _Help(ClassAndMethodRecognizer cmr,bool simpleDescription)
         {
-            if (simpleDescription) return cmr.ClassName();
+            if (simpleDescription) return cmr.ClassName()+ _Description(cmr.Type);
             
             return cmr.ClassName()
                 +Environment.NewLine

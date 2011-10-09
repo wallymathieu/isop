@@ -311,6 +311,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information"));
                                     .Recognize(typeof(DescriptionController))
                                     .Help();
             Assert.That(usage, Is.EqualTo(@"The commands are:
+  Help
   Description  Some description
 
 Se 'COMMANDNAME' help <command> for more information"));
