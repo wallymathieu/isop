@@ -5,15 +5,15 @@ This project is intended to collect some of the helpers for console applications
 h2. Goal
 
 The goal is to be able to write code like:
-someprogram.exe My Action --argument value
+<pre><code>someprogram.exe My Action --argument value</code></pre>
 And hooking it up by writing something like:
-static void Main(string[] args)
+<pre><code>static void Main(string[] args)
 {
   ArgumentParser.Build()
                 .Recognize(typeof(MyController))
                 .Parse(args)
                 .Invoke();
-}
+}</code></pre>
 So that the class with the name My or MyController and the method with the name Action gets invoked.
 
 h2. Example
