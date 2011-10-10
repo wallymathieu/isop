@@ -258,11 +258,12 @@ namespace Isop.Tests
             var usage =ArgumentParser.Build()
                                     .Parameter("beta", arg => { },description:"Some description about beta")
                                     .Parameter("alpha", arg => { })
+                                    .RecognizeHelp()
                                     .Help();
             var tab = '\t';
-            Assert.That(usage, Is.StringContaining(@"The arguments are:
+            Assert.That(LineSplit( usage), Is.EquivalentTo(LineSplit(@"The arguments are:
   --beta"+tab+@"Some description about beta
-  --alpha"));
+  --alpha")));
         }
 
 
@@ -278,15 +279,33 @@ namespace Isop.Tests
             var usage = ArgumentParser.Build()
                                     .Recognize(typeof(MyController))
                                     .Recognize(typeof(AnotherController))
+                                    .RecognizeHelp()
                                     .HelpTextCommandsAre("The commands are:", 
                                         "Se 'COMMANDNAME' help <command> for more information")
                                     .Help();
-            Assert.That(usage, Is.EqualTo(@"The commands are:
-  Help
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The commands are:
   My
   Another
 
-Se 'COMMANDNAME' help <command> for more information"));
+Se 'COMMANDNAME' help <command> for more information")));
+        }
+
+        private static string[] LineSplit(string usage)
+        {
+            return usage.Split(new []{"\r","\n"},StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        [Test]
+        public void It_can_report_usage_when_no_parameters_given()
+        {
+            var usage = ArgumentParser.Build()
+                                    .RecognizeHelp()
+                                    .Recognize(typeof(MyController))
+                                    .Parse(new string[]{}).Invoke();
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The commands are:
+  My
+
+Se 'COMMANDNAME' help <command> for more information")));
         }
 
         [Test]
@@ -295,13 +314,14 @@ Se 'COMMANDNAME' help <command> for more information"));
             var usage = ArgumentParser.Build()
                                     .Recognize(typeof(MyController))
                                     .Recognize(typeof(AnotherController))
+                                    .RecognizeHelp()
                                     .HelpFor("Another");
-            Assert.That(usage, Is.EqualTo(@"The sub commands for Another
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The sub commands for Another
 
   Action1
   Action2
 
-Se 'COMMANDNAME' help <command> <subcommand> for more information"));
+Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 		
 		[Test]
@@ -309,12 +329,12 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information"));
         {
             var usage = ArgumentParser.Build()
                                     .Recognize(typeof(DescriptionController))
+                                    .RecognizeHelp()
                                     .Help();
-            Assert.That(usage, Is.EqualTo(@"The commands are:
-  Help
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The commands are:
   Description  Some description
 
-Se 'COMMANDNAME' help <command> for more information"));
+Se 'COMMANDNAME' help <command> for more information")));
         }
 		
 		[Test]
@@ -322,13 +342,14 @@ Se 'COMMANDNAME' help <command> for more information"));
         {
             var usage = ArgumentParser.Build()
                                     .Recognize(typeof(DescriptionController))
+                                    .RecognizeHelp()
                                     .HelpFor("Description");
-            Assert.That(usage, Is.EqualTo(@"The sub commands for Description
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The sub commands for Description
 
   Action1  Some description 1
   Action2  Some description 2
 
-Se 'COMMANDNAME' help <command> <subcommand> for more information"));
+Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 		
 		

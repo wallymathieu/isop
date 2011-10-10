@@ -13,18 +13,14 @@ namespace Isop
         private CultureInfo _cultureInfo;
         private TypeConverterFunc _typeConverter;
 		private Func<Type,Object> _factory{get{return container.Factory;}set{container.Factory=value;}}
-        private readonly HelpForClassAndMethod _helpForClassAndMethod;
-        private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
+        private HelpForClassAndMethod _helpForClassAndMethod;
+        private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
         private TypeContainer container=new TypeContainer();
         public ArgumentParserBuilder()
         {
             _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
             _argumentRecognizers = new List<ArgumentWithOptions>();
-            _helpForClassAndMethod = new HelpForClassAndMethod(_classAndMethodRecognizers,container);
-            _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
-            _helpController = new HelpController(_helpForArgumentWithOptions, _helpForClassAndMethod);
-			Recognize(_helpController);
         }
 
         public ArgumentParserBuilder Parameter(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null)
@@ -102,6 +98,7 @@ namespace Isop
         /// <returns></returns>
         public ArgumentParserBuilder HelpTextCommandsAre(string theCommandsAre, string helpCommandForMoreInformation)
         {
+            RecognizeHelp();
             _helpForClassAndMethod.TheCommandsAre = theCommandsAre;
             _helpForClassAndMethod.HelpCommandForMoreInformation = helpCommandForMoreInformation;
             return this;
@@ -109,6 +106,7 @@ namespace Isop
         
         public ArgumentParserBuilder HelpTextArgumentsAre(string TheArgumentsAre)
         {
+            RecognizeHelp();
             _helpForArgumentWithOptions.TheArgumentsAre = TheArgumentsAre;
             return this;
         }
@@ -116,6 +114,18 @@ namespace Isop
         public string HelpFor(string command)
         {
             return this.Parse(new []{"Help", command}).Invoke();//_helpController.Index(command);
+        }
+
+        public ArgumentParserBuilder RecognizeHelp()
+        {
+            if (_helpController==null)
+            {
+                _helpForClassAndMethod = new HelpForClassAndMethod(_classAndMethodRecognizers, container);
+                _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
+                _helpController = new HelpController(_helpForArgumentWithOptions, _helpForClassAndMethod);
+                Recognize(_helpController);
+            }
+            return this;
         }
     }
    

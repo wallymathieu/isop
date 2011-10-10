@@ -121,7 +121,9 @@ namespace Isop
         {
             if (string.IsNullOrEmpty(val)) return TheCommandsAre + Environment.NewLine +
                    String.Join(Environment.NewLine,
-                               classAndMethodRecognizers.Select(cmr => "  " + _Help(cmr,true)).ToArray())
+                               classAndMethodRecognizers
+                               .Where(cmr=>cmr.Type!=typeof(HelpController))
+                               .Select(cmr => "  " + _Help(cmr,true)).ToArray())
                    + Environment.NewLine
                    + Environment.NewLine
                    + HelpCommandForMoreInformation;
@@ -135,7 +137,7 @@ namespace Isop
 
         public bool CanHelp(string val=null)
         {
-            if (string.IsNullOrEmpty(val)) return classAndMethodRecognizers.Any();
+            if (string.IsNullOrEmpty(val)) return classAndMethodRecognizers.Any(cmr => cmr.Type != typeof(HelpController));
 			return classAndMethodRecognizers.Any(cmr=>cmr.ClassName().Equals(val));
         }
     }
