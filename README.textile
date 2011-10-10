@@ -18,4 +18,4 @@ So that the class with the name My or MyController and the method with the name 
 
 h2. Example
 
-Look at the Example project for the most resent example of how it is used. 
+Look at the <a href="/wallymathieu/isop/blob/master/Example/Program.cs">Example project</a> for the most resent example of how it is used. 
