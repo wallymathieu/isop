@@ -42,14 +42,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Console\ArgumentParserBuilder.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Console\ArgumentParser.cs" />
-    <Compile Include="Console\ArgumentLexer.cs" />
-    <Compile Include="Console\ClassAndMethodRecognizer.cs" />
-    <Compile Include="Console\Help.cs" />
     <Compile Include="ListExtensions.cs" />
     <Compile Include="TypeContainer.cs" />
+    <Compile Include="ArgumentLexer.cs" />
+    <Compile Include="ArgumentParser.cs" />
+    <Compile Include="ArgumentParserBuilder.cs" />
+    <Compile Include="Help.cs" />
+    <Compile Include="ClassAndMethodRecognizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

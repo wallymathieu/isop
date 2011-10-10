@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Isop.Console
+namespace Isop
 {
     public class PeekEnumerable<T>:IEnumerable<T>
     {

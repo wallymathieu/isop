@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using Isop.Console;
+using Isop;
 using NUnit.Framework;
 
 namespace Isop.Tests

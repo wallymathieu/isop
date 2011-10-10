@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Isop.Console;
+using Isop;
 using NUnit.Framework;
 
 namespace Isop.Tests

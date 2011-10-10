@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Isop.Console;
+using Isop;
 
 namespace Isop.Example
 {
@@ -11,6 +11,7 @@ namespace Isop.Example
     {
         static void Main(string[] args)
         {
+            //TODO: This should be shorter!
             var parserBuilder = ArgumentParser.Build()
                        .Recognize(typeof(MyController))
                        .Recognize(typeof(CustomerController));
