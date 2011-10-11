@@ -305,17 +305,39 @@ Se 'COMMANDNAME' help <command> for more information")));
         public void It_can_report_usage_for_controllers_and_have_a_different_help_text()
         {
             var usage = ArgumentParser.Build()
-                                    .Recognize(typeof(MyController))
-                                    .Recognize(typeof(AnotherController))
-                                    .RecognizeHelp()
-                                    .HelpTextCommandsAre("Det finns följande kommandon:", 
-                                        "Se 'Kommandonamn' help <kommando> för ytterligare information")
-                                    .Help();
+                .Recognize(typeof(MyController))
+                .Recognize(typeof(AnotherController))
+                .RecognizeHelp()
+                .HelpTextCommandsAre(
+                    theCommandsAre:"Det finns följande kommandon:", 
+                    helpCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> för ytterligare information",
+                    theSubCommandsFor:"Det finns föjande sub kommandon:",
+                    helpSubCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> <subkommando> för mer information")
+                .Help();
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Det finns följande kommandon:
   My
   Another
 
 Se 'Kommandonamn' help <kommando> för ytterligare information")));
+        }
+        
+        [Test]
+        public void It_can_report_usage_for_a_specific_controller_and_have_a_different_help_text()
+        {
+            var usage = ArgumentParser.Build()
+                .Recognize(typeof(MyController))
+                .Recognize(typeof(AnotherController))
+                .RecognizeHelp()
+                .HelpTextCommandsAre(
+                    theCommandsAre:"Det finns följande kommandon:", 
+                    helpCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> för ytterligare information",
+                    theSubCommandsFor:"Det finns föjande sub kommandon:",
+                    helpSubCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> <subkommando> för mer information")
+                .HelpFor("My");
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Det finns föjande sub kommandon:My
+  Action
+
+Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
         }
         
         private static string[] LineSplit(string usage)

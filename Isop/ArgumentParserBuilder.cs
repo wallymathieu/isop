@@ -96,11 +96,16 @@ namespace Isop
         /// <param name="theCommandsAre">default: "The commands are:"</param>
         /// <param name="helpCommandForMoreInformation">default: "Se 'COMMANDNAME' help command for more information"</param>
         /// <returns></returns>
-        public ArgumentParserBuilder HelpTextCommandsAre(string theCommandsAre, string helpCommandForMoreInformation)
+        public ArgumentParserBuilder HelpTextCommandsAre(string theCommandsAre,
+            string helpCommandForMoreInformation,
+            string theSubCommandsFor,
+            string helpSubCommandForMoreInformation)
         {
             RecognizeHelp();
             _helpForClassAndMethod.TheCommandsAre = theCommandsAre;
             _helpForClassAndMethod.HelpCommandForMoreInformation = helpCommandForMoreInformation;
+            _helpForClassAndMethod.TheSubCommandsFor = theSubCommandsFor;
+            _helpForClassAndMethod.HelpSubCommandForMoreInformation = helpSubCommandForMoreInformation;
             return this;
         }
         

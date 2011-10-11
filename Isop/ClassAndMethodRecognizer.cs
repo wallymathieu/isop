@@ -117,6 +117,7 @@ namespace Isop
 		{
 			return Type.GetMethods(BindingFlags.Public| BindingFlags.Instance)
                 .Where(m=>!m.DeclaringType.Equals(typeof(Object)))
+                .Where(m=>!m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
                 .Where(m=>!m.Name.Equals("help",StringComparison.OrdinalIgnoreCase));
 		}
 		
