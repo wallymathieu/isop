@@ -265,7 +265,20 @@ namespace Isop.Tests
   --beta"+tab+@"Some description about beta
   --alpha")));
         }
-
+        [Test]
+        public void It_can_report_usage_for_simple_parameters_with_different_texts()
+        {
+            var usage =ArgumentParser.Build()
+                                    .Parameter("beta", arg => { },description:"Beskrivning av beta")
+                                    .Parameter("alpha", arg => { })
+                                    .RecognizeHelp()
+                                    .HelpTextArgumentsAre("Det finns följande argument:")
+                                    .Help();
+            var tab = '\t';
+            Assert.That(LineSplit( usage), Is.EquivalentTo(LineSplit(@"Det finns följande argument:
+  --beta"+tab+@"Beskrivning av beta
+  --alpha")));
+        }
 
         internal class AnotherController
         {
@@ -280,8 +293,6 @@ namespace Isop.Tests
                                     .Recognize(typeof(MyController))
                                     .Recognize(typeof(AnotherController))
                                     .RecognizeHelp()
-                                    .HelpTextCommandsAre("The commands are:", 
-                                        "Se 'COMMANDNAME' help <command> for more information")
                                     .Help();
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The commands are:
   My
@@ -289,7 +300,24 @@ namespace Isop.Tests
 
 Se 'COMMANDNAME' help <command> for more information")));
         }
+  
+        [Test]
+        public void It_can_report_usage_for_controllers_and_have_a_different_help_text()
+        {
+            var usage = ArgumentParser.Build()
+                                    .Recognize(typeof(MyController))
+                                    .Recognize(typeof(AnotherController))
+                                    .RecognizeHelp()
+                                    .HelpTextCommandsAre("Det finns följande kommandon:", 
+                                        "Se 'Kommandonamn' help <kommando> för ytterligare information")
+                                    .Help();
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Det finns följande kommandon:
+  My
+  Another
 
+Se 'Kommandonamn' help <kommando> för ytterligare information")));
+        }
+        
         private static string[] LineSplit(string usage)
         {
             return usage.Split(new []{"\r","\n"},StringSplitOptions.RemoveEmptyEntries);
