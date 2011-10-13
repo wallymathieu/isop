@@ -7,6 +7,26 @@ using System.Reflection;
 
 namespace Isop
 {
+    
+    [Serializable]
+    public class TypeConversionFailedException : Exception
+    {
+        public string Argument;
+        public string Value;
+        public Type TargetType;
+     public TypeConversionFailedException ()
+     {
+     }
+     
+     public TypeConversionFailedException (string message) : base (message)
+     {
+     }
+     
+     public TypeConversionFailedException (string message, Exception inner) : base (message, inner)
+     {
+     }
+     
+    }
 	public class Transform
     {
         // Lexer -> 
@@ -168,7 +188,11 @@ namespace Isop
             }
             catch (Exception e)
             {
-                throw new Exception(string.Format("Could not parse {0} with value: {1}", arg1.WithOptions.Argument, arg1.Value), e);
+                throw new TypeConversionFailedException("Could not convert argument", e){
+                    Argument=arg1.WithOptions.Argument.ToString(),
+                    Value=arg1.Value,
+                    TargetType=parameterInfo.ParameterType 
+                };
             }
         }
         private readonly TypeConverterFunc _typeConverter;

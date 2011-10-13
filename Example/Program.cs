@@ -31,6 +31,17 @@ Did you mean any of these arguments?
                 }
                 Console.WriteLine(parsedMethod.Invoke());
             }
+            catch (TypeConversionFailedException ex)
+            {
+                
+                 Console.WriteLine(String.Format("Could not convert argument {0} with value {1} to type {2}", 
+                    ex.Argument, ex.Value, ex.TargetType));
+                 if (null!=ex.InnerException)
+                {
+                    Console.WriteLine("Inner exception: ");
+                    Console.WriteLine(ex.InnerException.Message);
+                }
+            }
             catch (MissingArgumentException ex)
             {
                 Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray())));

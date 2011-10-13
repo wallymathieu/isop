@@ -172,6 +172,22 @@ namespace Isop.Tests
            
 			Assert.Throws<MissingArgumentException>(()=>builder.Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" }));
         }
+        class SingleIntAction
+        {
+            public void Action(int param){}
+        }
+        
+        [Test]
+        public void It_can_parse_class_and_method_and_fail_because_of_type_conversion()
+        {
+            var builder = ArgumentParser.Build()
+                 .SetCulture(CultureInfo.InvariantCulture)
+                 .Recognize(typeof(SingleIntAction));
+            Assert.Throws<TypeConversionFailedException>(()=>
+                builder.Parse(new[] { "SingleIntAction", "Action", "--param","value" })
+            );
+        }
+        
         [Test]
         public void It_can_parse_class_and_method_and_fail_because_no_arguments_given ()
         {
