@@ -60,6 +60,22 @@ namespace Isop.Tests
 
 Se 'COMMANDNAME' help <command> for more information")));
         }
+        
+        [Test]
+        public void It_can_report_usage_for_controllers_when_having_required_parameters ()
+        {
+            var usage = ArgumentParser.Build ()
+                                    .Parameter("required",required:true)
+                                    .Recognize (typeof(MyController))
+                                    .Recognize (typeof(AnotherController))
+                                    .RecognizeHelp ()
+                                    .Help ();
+            Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The commands are:
+  My
+  Another
+
+Se 'COMMANDNAME' help <command> for more information")));
+        }
   
         [Test]
         public void It_can_report_usage_for_controllers_and_have_a_different_help_text ()
