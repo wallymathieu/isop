@@ -129,7 +129,7 @@ namespace Isop
                    + HelpCommandForMoreInformation;
 			
 			return TheSubCommandsFor+
-				_Help(classAndMethodRecognizers.First(cmr=>cmr.ClassName().Equals(val)),false)
+				_Help(classAndMethodRecognizers.First(cmr=>cmr.ClassName().Equals(val,StringComparison.OrdinalIgnoreCase)),false)
 					+ Environment.NewLine
 					+ Environment.NewLine
 					+ HelpSubCommandForMoreInformation;
@@ -138,7 +138,7 @@ namespace Isop
         public bool CanHelp(string val=null)
         {
             if (string.IsNullOrEmpty(val)) return classAndMethodRecognizers.Any(cmr => cmr.Type != typeof(HelpController));
-			return classAndMethodRecognizers.Any(cmr=>cmr.ClassName().Equals(val));
+			return classAndMethodRecognizers.Any(cmr=>cmr.ClassName().Equals(val,StringComparison.OrdinalIgnoreCase));
         }
     }
 }

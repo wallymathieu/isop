@@ -50,11 +50,16 @@ namespace Isop
     {
         private MethodInfo FindMethod (IEnumerable<MethodInfo> methods, String methodName, ArgumentLexer lexer)
         {
-            var methodInfo = methods
-                .Where (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase))
+            var potential = methods
+                .Where (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase));
+            var methodInfo = potential
                 .Where(method=>method.GetParameters().Length<=lexer.Count(t=>t.TokenType==TokenType.Parameter))
                 .OrderByDescending(method=>method.GetParameters().Length)
                 .FirstOrDefault();
+            if (methodInfo==null)
+            {
+                methodInfo = potential.FirstOrDefault();
+            }
             return methodInfo;
         }
 
@@ -145,7 +150,7 @@ namespace Isop
             var recognizedActionParameters = GetParametersForMethod(methodInfo, lexer, parsedArguments, ConvertFrom1);
             
 			parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments
-				.Where(unrecognized=>unrecognized.Index>=2); //NOTE: should be different!
+				.Where(unrecognized=>unrecognized.Index>=1); //NOTE: should be different!
 			
             return new ParsedMethod(parsedArguments)
                        {

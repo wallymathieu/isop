@@ -31,16 +31,15 @@ Did you mean any of these arguments?
                 }
                 Console.WriteLine(parsedMethod.Invoke());
             }
-            catch (MissingArgumentException)
+            catch (MissingArgumentException ex)
             {
-                Console.WriteLine("Missing argument(s)");
-
+                Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.ToArray())));
+                
                 Console.WriteLine(parserBuilder.Help());
             }
-            catch (NoClassOrMethodFoundException)
+            catch (NoClassOrMethodFoundException ex)
             {
-                Console.WriteLine("Missing argument(s) or wrong argument(s)");
-
+                Console.WriteLine("Missing argument(s) or wrong argument(s)");                
                 Console.WriteLine(parserBuilder.Help());
             }
         }

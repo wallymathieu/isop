@@ -93,7 +93,7 @@ Se 'Kommandonamn' help <kommando> för ytterligare information")));
                     helpCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> för ytterligare information",
                     theSubCommandsFor:"Det finns föjande sub kommandon:",
                     helpSubCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> <subkommando> för mer information")
-                .HelpFor ("My");
+                .HelpFor ("my");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"Det finns föjande sub kommandon:My
   Action
 

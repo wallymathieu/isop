@@ -172,6 +172,15 @@ namespace Isop.Tests
            
 			Assert.Throws<MissingArgumentException>(()=>builder.Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" }));
         }
+        [Test]
+        public void It_can_parse_class_and_method_and_fail_because_no_arguments_given ()
+        {
+            var builder = ArgumentParser.Build ()
+                                               .SetCulture (CultureInfo.InvariantCulture)
+                                               .Recognize (typeof(MyController));
+           
+            Assert.Throws<MissingArgumentException> (() => builder.Parse (new[] { "My", "Action" }));
+        }
 		
 		[Test]
         public void It_can_parse_class_and_method_and_also_arguments_and_execute()
