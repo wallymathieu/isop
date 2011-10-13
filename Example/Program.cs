@@ -33,7 +33,7 @@ Did you mean any of these arguments?
             }
             catch (MissingArgumentException ex)
             {
-                Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.ToArray())));
+                Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray())));
                 
                 Console.WriteLine(parserBuilder.Help());
             }

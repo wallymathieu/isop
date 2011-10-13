@@ -8,7 +8,10 @@ namespace Isop
 {
     public class MissingArgumentException : Exception
     {
-        public List<string> Arguments;
+        /// <summary>
+        /// The arguments. The key are the argument, the value is the description or help.
+        /// </summary>
+        public List<KeyValuePair<string,string>> Arguments;
         public MissingArgumentException() { }
 
         public MissingArgumentException(string message) : base(message) { }
@@ -474,7 +477,8 @@ namespace Isop
                 .Where(argumentWithOptions => !recognized.Any(recogn => recogn.WithOptions.Equals(argumentWithOptions)));
             if (unMatchedRequiredArguments.Any())
             {
-                throw new MissingArgumentException("Missing arguments") { Arguments = unMatchedRequiredArguments.Select(unmatched => unmatched.Argument.ToString()).ToList() };
+                throw new MissingArgumentException("Missing arguments") { Arguments = unMatchedRequiredArguments
+                    .Select(unmatched =>new KeyValuePair<string,string>( unmatched.Argument.ToString(),unmatched.Argument.Help())).ToList() };
             }
             return new ParsedArguments
             {
