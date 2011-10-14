@@ -167,11 +167,22 @@ namespace Isop
 
             var parser = new ArgumentParser(argumentRecognizers);
             var parsedArguments = parser.Parse(lexer, arg);
+            
+            var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
+            if (unMatchedRequiredArguments.Any())
+            {
+                throw new MissingArgumentException("Missing arguments")
+                {
+                    Arguments = unMatchedRequiredArguments
+                        .Select(unmatched => new KeyValuePair<string, string>(unmatched.Argument.ToString(), unmatched.Argument.Help())).ToList()
+                };
+            }
+
             var recognizedActionParameters = GetParametersForMethod(methodInfo, lexer, parsedArguments, ConvertFrom1);
             
 			parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments
 				.Where(unrecognized=>unrecognized.Index>=1); //NOTE: should be different!
-			
+          
             return new ParsedMethod(parsedArguments)
                        {
                            RecognizedAction = methodInfo,

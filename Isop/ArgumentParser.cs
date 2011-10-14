@@ -331,6 +331,15 @@ namespace Isop
 		{
 			return new MergedParsedArguments(first,second);
 		}
+
+        public IEnumerable<ArgumentWithOptions> UnMatchedRequiredArguments()
+        {
+            var unMatchedRequiredArguments = ArgumentWithOptions
+                .Where(argumentWithOptions => argumentWithOptions.Required)
+                .Where(argumentWithOptions => !RecognizedArguments
+                                                   .Any(recogn => recogn.WithOptions.Equals(argumentWithOptions)));
+            return unMatchedRequiredArguments;
+        }
     }
 	public class MergedParsedArguments:ParsedArguments
 	{
@@ -397,9 +406,20 @@ namespace Isop
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
             var lexer = new ArgumentLexer(arguments);
-            return Parse(lexer, arguments);
+            var parsedArguments = Parse(lexer, arguments);
+            var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
+
+            if (unMatchedRequiredArguments.Any())
+            {
+                throw new MissingArgumentException("Missing arguments")
+                {
+                    Arguments = unMatchedRequiredArguments
+                        .Select(unmatched => new KeyValuePair<string, string>(unmatched.Argument.ToString(), unmatched.Argument.Help())).ToList()
+                };
+            }
+            return parsedArguments;
         }
-        
+
         public ParsedArguments Parse(ArgumentLexer lex,IEnumerable<string> arguments)
         {
             var recognizedIndexes=new List<int>();
@@ -473,13 +493,6 @@ namespace Isop
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
                 .Select(v => new UnrecognizedArgument(){ Index=v.i, Value=v.value});
 
-            var unMatchedRequiredArguments = _argumentWithOptions.Where(argumentWithOptions => argumentWithOptions.Required)
-                .Where(argumentWithOptions => !recognized.Any(recogn => recogn.WithOptions.Equals(argumentWithOptions)));
-            if (unMatchedRequiredArguments.Any())
-            {
-                throw new MissingArgumentException("Missing arguments") { Arguments = unMatchedRequiredArguments
-                    .Select(unmatched =>new KeyValuePair<string,string>( unmatched.Argument.ToString(),unmatched.Argument.Help())).ToList() };
-            }
             return new ParsedArguments
             {
                 ArgumentWithOptions = _argumentWithOptions.ToArray(),

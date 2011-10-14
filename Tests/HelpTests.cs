@@ -70,7 +70,9 @@ Se 'COMMANDNAME' help <command> for more information")));
                                     .Recognize (typeof(AnotherController))
                                     .RecognizeHelp ()
                                     .Help ();
-            Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The commands are:
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The arguments are:
+  --required
+The commands are:
   My
   Another
 

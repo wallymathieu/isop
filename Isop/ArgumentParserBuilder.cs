@@ -51,9 +51,9 @@ namespace Isop
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
 			var argumentParser = new ArgumentParser(_argumentRecognizers);
-            
-			var parsedArgs = argumentParser.Parse(arg);
-			
+
+            var lexer = new ArgumentLexer(arg);
+            var parsedArguments = argumentParser.Parse(lexer, arg);
             if (_classAndMethodRecognizers.Any())
             {
                 var methodRecognizer = _classAndMethodRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
@@ -61,10 +61,33 @@ namespace Isop
                 {
 					var parsedMethod = methodRecognizer.Parse(arg);
 					parsedMethod.Factory = this.container.CreateInstance;
-                    return parsedArgs.Merge( parsedMethod);
+                    var merged = parsedArguments.Merge( parsedMethod);
+                    //TODO: This is a hack! Should have some better way of controlling this!
+                    if (parsedMethod.RecognizedAction == null ||
+                        !parsedMethod.RecognizedAction.ReflectedType.Equals(typeof (HelpController)))
+                        FailOnUnMatched(merged);
+                    return merged;
                 }
             }
-            return parsedArgs;
+            FailOnUnMatched(parsedArguments);
+            return parsedArguments;
+        }
+
+        private static void FailOnUnMatched(ParsedArguments parsedArguments)
+        {
+            var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
+
+            if (unMatchedRequiredArguments.Any())
+            {
+                throw new MissingArgumentException("Missing arguments")
+                          {
+                              Arguments = unMatchedRequiredArguments
+                                  .Select(
+                                      unmatched =>
+                                      new KeyValuePair<string, string>(unmatched.Argument.ToString(), unmatched.Argument.Help()))
+                                  .ToList()
+                          };
+            }
         }
 
         public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
@@ -95,6 +118,8 @@ namespace Isop
         /// </summary>
         /// <param name="theCommandsAre">default: "The commands are:"</param>
         /// <param name="helpCommandForMoreInformation">default: "Se 'COMMANDNAME' help command for more information"</param>
+        /// <param name="theSubCommandsFor">default: The sub commands for </param>
+        /// <param name="helpSubCommandForMoreInformation">default: Se 'COMMANDNAME' help 'command' 'subcommand' for more information</param>
         /// <returns></returns>
         public ArgumentParserBuilder HelpTextCommandsAre(string theCommandsAre,
             string helpCommandForMoreInformation,
