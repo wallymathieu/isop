@@ -231,8 +231,10 @@ namespace Isop
 
         public IEnumerable<object> RecognizedActionParameters { get; set; }
 		
-        public override String Invoke(TextWriter cout)
+        public override String Invoke(TextWriter cout=null)
         {
+            bool returnStr = cout==null;
+            if (null==cout) cout = new StringWriter();
 			object instance = Factory(RecognizedClass);
 			
 			var retval = RecognizedAction.Invoke(instance, RecognizedActionParameters.ToArray());
@@ -240,33 +242,20 @@ namespace Isop
 			{
                 if (retval is string)
                 {
-                    if (null!=cout){ cout.Write(retval as string); return string.Empty;}
-				    else{ return retval as string; }
-                }
-                if (retval is IEnumerable)
+                    cout.Write(retval as string);
+                }else if (retval is IEnumerable)
                 {
-                    if (null!=cout)
-                    {
-                        foreach (var item in (retval as IEnumerable)) {
-                            cout.Write(item.ToString());
-                        }
-                        return string.Empty;
-                    }else{
-                        var sb = new StringBuilder();
-                          foreach (var item in (retval as IEnumerable)) {
-                            sb.Append(item.ToString());
-                        }
-                        return sb.ToString();
+                    foreach (var item in (retval as IEnumerable)) {
+                        cout.Write(item.ToString());
                     }
                 }else
                 {
-                    if (null!=cout){ cout.Write(retval.ToString()); return string.Empty;}
-                    else{ return retval.ToString(); }
+                    cout.Write(retval.ToString());
                 }
-			}else
-			{
-				return string.Empty;
 			}
-		}
+            if (returnStr) 
+                return ((StringWriter)cout).ToString();
+            return String.Empty;
+        }
     }
 }

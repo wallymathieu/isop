@@ -354,20 +354,15 @@ namespace Isop
 			this.ArgumentWithOptions = first.ArgumentWithOptions.Union(second.ArgumentWithOptions);
 			this.UnRecognizedArguments = first.UnRecognizedArguments.Intersect(second.UnRecognizedArguments);
 		}
-		public override string Invoke (TextWriter cout)
+		public override string Invoke (TextWriter cout=null)
 		{
-            if (null==cout)
-            {
-			    var sb = new StringBuilder();
-			    sb.AppendLine(first.Invoke(null));
-			    sb.AppendLine(second.Invoke(null));
-			    return sb.ToString().Trim('\n','\r',' ','\t');
-            }else
-            {
-                first.Invoke(cout);
-                second.Invoke(cout);
-                return string.Empty;
-            }
+            bool returnStr = cout==null;
+            if (null==cout) cout = new StringWriter();
+            
+            first.Invoke(cout);
+            second.Invoke(cout);
+            
+            if (returnStr){ return ((StringWriter)cout).ToString();}else{ return string.Empty;}
         }
 	}
 
