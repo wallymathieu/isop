@@ -266,6 +266,43 @@ namespace Isop.Tests
                            .Parse(new[] { "-a", "value", "--beta" }).Invoke();
             Assert.That(count, Is.EqualTo(1));
         }
+        
+        [Test]
+        public void It_understands_method_returning_enumerable()
+        {
+            var count = 0;
+            var createCount = 0;
+            Func<Type, object> factory = (Type t) =>
+            {
+                Assert.That(t, Is.EqualTo(typeof(EnumerableController)));
+                createCount ++;
+                return
+                    (object)
+                    new EnumerableController() {  Length=2, OnEnumerate = () => (count++) };
+            };
+         
+            var arguments = ArgumentParser.Build()
+                   .Recognize(typeof(EnumerableController))
+                   .SetFactory(factory)
+                   .Parse(new[] { "Enumerable", "Return" });
+
+            Assert.That(arguments.UnRecognizedArguments.Count(),Is.EqualTo(0));
+            arguments.Invoke();
+            Assert.That(count, Is.EqualTo(2));
+            Assert.That(createCount, Is.EqualTo(1));
+        }
+        
+        class EnumerableController
+        {
+            public Func<Object> OnEnumerate;
+            public int Length;
+            public System.Collections.IEnumerable Return()
+            {
+                for (int i = 0; i < Length; i++) {
+                    yield return OnEnumerate();
+                }
+            }
+        }
     }
 
   

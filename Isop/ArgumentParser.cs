@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Text;
+using System.IO;
 namespace Isop
 {
     public class MissingArgumentException : Exception
@@ -314,7 +315,7 @@ namespace Isop
 
         public IEnumerable<ArgumentWithOptions> ArgumentWithOptions { get; set; }
 
-        public virtual String Invoke()
+        public virtual String Invoke(TextWriter cout=null)
         {
             foreach (var argument in RecognizedArguments.Where(argument => null != argument.WithOptions.Action))
             {
@@ -353,13 +354,21 @@ namespace Isop
 			this.ArgumentWithOptions = first.ArgumentWithOptions.Union(second.ArgumentWithOptions);
 			this.UnRecognizedArguments = first.UnRecognizedArguments.Intersect(second.UnRecognizedArguments);
 		}
-		public override string Invoke ()
+		public override string Invoke (TextWriter cout)
 		{
-			var sb = new StringBuilder();
-			sb.AppendLine(first.Invoke());
-			sb.AppendLine(second.Invoke());
-			return sb.ToString().Trim('\n','\r',' ','\t');
-		}
+            if (null==cout)
+            {
+			    var sb = new StringBuilder();
+			    sb.AppendLine(first.Invoke(null));
+			    sb.AppendLine(second.Invoke(null));
+			    return sb.ToString().Trim('\n','\r',' ','\t');
+            }else
+            {
+                first.Invoke(cout);
+                second.Invoke(cout);
+                return string.Empty;
+            }
+        }
 	}
 
     public class UnrecognizedArgument

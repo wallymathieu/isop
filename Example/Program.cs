@@ -28,8 +28,10 @@ Did you mean any of these arguments?
 {1}", String.Join(",", parsedMethod.UnRecognizedArguments.Select(unrec => unrec.Value).ToArray()),
       String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Argument.ToString()).ToArray()));
                     Console.WriteLine(unRecognizedArgumentsMessage);
+                }else
+                {
+                    parsedMethod.Invoke(Console.Out);
                 }
-                Console.WriteLine(parsedMethod.Invoke());
             }
             catch (TypeConversionFailedException ex)
             {

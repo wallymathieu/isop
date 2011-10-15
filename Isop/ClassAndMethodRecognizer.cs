@@ -4,6 +4,9 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.IO;
+using System.Collections;
+using System.Text;
 
 namespace Isop
 {
@@ -228,17 +231,41 @@ namespace Isop
 
         public IEnumerable<object> RecognizedActionParameters { get; set; }
 		
-        public override String Invoke()
+        public override String Invoke(TextWriter cout)
         {
 			object instance = Factory(RecognizedClass);
 			
 			var retval = RecognizedAction.Invoke(instance, RecognizedActionParameters.ToArray());
 			if (retval != null)
 			{
-				return retval.ToString();
+                if (retval is string)
+                {
+                    if (null!=cout){ cout.Write(retval as string); return string.Empty;}
+				    else{ return retval as string; }
+                }
+                if (retval is IEnumerable)
+                {
+                    if (null!=cout)
+                    {
+                        foreach (var item in (retval as IEnumerable)) {
+                            cout.Write(item.ToString());
+                        }
+                        return string.Empty;
+                    }else{
+                        var sb = new StringBuilder();
+                          foreach (var item in (retval as IEnumerable)) {
+                            sb.Append(item.ToString());
+                        }
+                        return sb.ToString();
+                    }
+                }else
+                {
+                    if (null!=cout){ cout.Write(retval.ToString()); return string.Empty;}
+                    else{ return retval.ToString(); }
+                }
 			}else
 			{
-				return "";
+				return string.Empty;
 			}
 		}
     }
