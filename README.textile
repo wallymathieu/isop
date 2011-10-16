@@ -9,10 +9,10 @@ The goal is to be able to write code like:
 And hooking it up by writing something like:
 <pre><code>static void Main(string[] args)
 {
-  Console.WriteLine(ArgumentParser.Build()
+  ArgumentParser.Build()
                 .Recognize(typeof(MyController))
                 .Parse(args)
-                .Invoke());
+                .Invoke(Console.Out);
 }</code></pre>
 So that the class with the name My or MyController and the method with the name Action gets invoked.
 
