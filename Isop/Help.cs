@@ -76,7 +76,7 @@ namespace Isop
     }
     public class HelpForClassAndMethod
     {
-        readonly IEnumerable<ClassAndMethodRecognizer> classAndMethodRecognizers;
+        readonly IEnumerable<ControllerRecognizer> classAndMethodRecognizers;
         private readonly TypeContainer container;
         public string TheCommandsAre { get; set; }
 		public string TheSubCommandsFor { get; set; }
@@ -84,7 +84,7 @@ namespace Isop
 
         public string HelpSubCommandForMoreInformation { get; set; }
 
-        public HelpForClassAndMethod(IEnumerable<ClassAndMethodRecognizer> classAndMethodRecognizers, TypeContainer container)
+        public HelpForClassAndMethod(IEnumerable<ControllerRecognizer> classAndMethodRecognizers, TypeContainer container)
         {
             this.container=container;
             this.classAndMethodRecognizers = classAndMethodRecognizers;
@@ -106,7 +106,7 @@ namespace Isop
             
             return "  "+description.Invoke(obj,new[]{(method!=null? method.Name:null)});
         }
-        private string _Help(ClassAndMethodRecognizer cmr,bool simpleDescription)
+        private string _Help(ControllerRecognizer cmr,bool simpleDescription)
         {
             if (simpleDescription) return cmr.ClassName()+ _Description(cmr.Type);
             

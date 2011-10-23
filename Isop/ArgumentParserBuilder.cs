@@ -9,7 +9,7 @@ namespace Isop
     public class ArgumentParserBuilder
     {
         private readonly IList<ArgumentWithOptions> _argumentRecognizers;
-        private readonly IList<ClassAndMethodRecognizer> _classAndMethodRecognizers;
+        private readonly IList<ControllerRecognizer> _classAndMethodRecognizers;
         private CultureInfo _cultureInfo;
         private TypeConverterFunc _typeConverter;
 		private Func<Type,Object> _factory{get{return container.Factory;}set{container.Factory=value;}}
@@ -19,7 +19,7 @@ namespace Isop
         private TypeContainer container=new TypeContainer();
         public ArgumentParserBuilder()
         {
-            _classAndMethodRecognizers = new List<ClassAndMethodRecognizer>();
+            _classAndMethodRecognizers = new List<ControllerRecognizer>();
             _argumentRecognizers = new List<ArgumentWithOptions>();
         }
 
@@ -92,12 +92,12 @@ namespace Isop
 
         public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
-            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
+            _classAndMethodRecognizers.Add(new ControllerRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
             return this;
         }
 		public ArgumentParserBuilder Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
-            _classAndMethodRecognizers.Add(new ClassAndMethodRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
+            _classAndMethodRecognizers.Add(new ControllerRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
             container.Instances.Add(arg.GetType(),arg);
             return this;
         }
@@ -157,6 +157,15 @@ namespace Isop
             }
             return this;
         }
+
+        public IEnumerable<ControllerRecognizer> GetClassAndMethodRecognizers()
+        {
+            return _classAndMethodRecognizers;
+        }
+
+        public IEnumerable<ArgumentWithOptions> GetGlobalParameters()
+        {
+            return _argumentRecognizers;
+        }
     }
-   
 }

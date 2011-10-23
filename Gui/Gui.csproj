@@ -56,13 +56,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Controller.cs" />
-    <Compile Include="Method.cs" />
+    <Compile Include="ViewModels\Controller.cs" />
+    <Compile Include="CustomerController.cs" />
+    <Compile Include="ViewModels\Method.cs" />
     <Compile Include="MethodView.xaml.cs">
       <DependentUpon>MethodView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Param.cs" />
-    <Compile Include="TreeOfControllers.cs" />
+    <Compile Include="MyController.cs" />
+    <Compile Include="ViewModels\Param.cs" />
+    <Compile Include="ViewModels\MethodTreeModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -104,6 +106,12 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Isop\Isop.csproj">
+      <Project>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</Project>
+      <Name>Isop</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

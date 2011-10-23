@@ -69,7 +69,7 @@ namespace Isop
     }
 	
     public delegate object TypeConverterFunc(Type type, string s, CultureInfo cultureInfo);
-    public class ClassAndMethodRecognizer
+    public class ControllerRecognizer
     {
         private MethodInfo FindMethod (IEnumerable<MethodInfo> methods, String methodName, ArgumentLexer lexer)
         {
@@ -116,7 +116,7 @@ namespace Isop
 		private readonly Transform transform = new Transform();
         /// <summary>
         /// </summary>
-        public ClassAndMethodRecognizer(Type type, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
+        public ControllerRecognizer(Type type, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
             _typeConverter = typeConverter ?? DefaultConvertFrom;
             Type = type;
