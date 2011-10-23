@@ -1,17 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace Gui
+namespace Isop.Gui
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -19,12 +9,29 @@ namespace Gui
     public partial class MainWindow : Window
     {
         public TreeOfControllers TreeOfControllers { get; set; }
+        public ObservableCollection<Param> Parameters;
         public MainWindow()
         {
             TreeOfControllers= new TreeOfControllers();
 
             InitializeComponent();
-            treeView1.DataContext = TreeOfControllers.Controllers;
+            controllersAndCommands.DataContext = TreeOfControllers.Controllers;
+            textBlock1.Text = string.Empty;
+        }
+
+        private void SelectedMethodChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (e.NewValue is Method) 
+            {
+                methodview.DataContext = e.NewValue;
+                Parameters = new ObservableCollection<Param>();
+                foreach (var parameter in (e.NewValue as Method).Parameters)
+                {
+                    Parameters.Add(parameter);
+                }
+                methodview.Parameters = Parameters;
+                textBlock1.Text = string.Empty;
+            }
         }
     }
 }
