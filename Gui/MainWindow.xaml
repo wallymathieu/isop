@@ -3,18 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Gui="clr-namespace:Isop.Gui" Title="MainWindow" Height="600" Width="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="36*" />
-            <RowDefinition Height="165*" />
-            <RowDefinition Height="26*" />
-            <RowDefinition Height="84*" />
+            <RowDefinition Height="65*" />
+            <RowDefinition Height="298*" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="178*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="156" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <TreeView Height="311" HorizontalAlignment="Left" Name="controllersAndCommands"
-                  VerticalAlignment="Top" Grid.RowSpan="4" ItemsSource="{Binding}" 
-                  Width="156"
+        <TreeView HorizontalAlignment="Stretch" Name="controllersAndCommands"
+                  VerticalAlignment="Stretch" Grid.RowSpan="4" ItemsSource="{Binding}" 
                   SelectedItemChanged="SelectedMethodChanged">
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type Gui:Controller}" ItemsSource="{Binding Methods}">
@@ -27,10 +26,12 @@
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
         </TreeView>
-        <Gui:MethodView Grid.Column="1" Grid.Row="0" x:Name="paramview"></Gui:MethodView>
-        <TextBlock Grid.Column="1" Height="84" HorizontalAlignment="Left" Name="textBlock1" Text="TextBlock" VerticalAlignment="Top" Width="347" Grid.Row="3" />
-        <Gui:MethodView Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" x:Name="methodview" VerticalAlignment="Top"></Gui:MethodView>
-        <Button Content="Execute method button" Name="executeMethodButton" VerticalAlignment="Top" Width="126" Grid.Column="1" Grid.Row="2" Click="ExecuteMethodButtonClick" />
+        <Gui:MethodView Grid.Column="1" Grid.Row="0" x:Name="paramview">
+        </Gui:MethodView>
+        <Gui:MethodView Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" x:Name="methodview" VerticalAlignment="Stretch">
+        </Gui:MethodView>
+        <TextBlock Grid.Column="1" HorizontalAlignment="Stretch" Name="textBlock1" Text="TextBlock" VerticalAlignment="Stretch" Grid.Row="3" />
+        <Button Content="Execute method button" Name="executeMethodButton" VerticalAlignment="Top" Width="126" Grid.Column="1" Grid.Row="2" Click="ExecuteMethodButtonClick" Height="20" />
 
     </Grid>
 </Window>
