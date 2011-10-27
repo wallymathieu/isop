@@ -28,7 +28,7 @@ namespace Isop.Gui
             // TODO:
             MethodTreeModel = new MethodTreeModel
                                     {
-                                        Controllers = ParserBuilder.GetClassAndMethodRecognizers()
+                                        Controllers = ParserBuilder.GetControllerRecognizers()
                                             .Where(cmr=>! cmr.ClassName().Equals("help",StringComparison.OrdinalIgnoreCase))
                                             .Select(cmr => new Controller()
                                             {

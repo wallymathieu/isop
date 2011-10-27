@@ -9,17 +9,17 @@ namespace Isop
     public class ArgumentParserBuilder
     {
         private readonly IList<ArgumentWithOptions> _argumentRecognizers;
-        private readonly IList<ControllerRecognizer> _classAndMethodRecognizers;
+        private readonly IList<ControllerRecognizer> _controllerRecognizers;
         private CultureInfo _cultureInfo;
         private TypeConverterFunc _typeConverter;
 		private Func<Type,Object> _factory{get{return container.Factory;}set{container.Factory=value;}}
-        private HelpForClassAndMethod _helpForClassAndMethod;
+        private HelpForControllers _helpForControllers;
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
         private TypeContainer container=new TypeContainer();
         public ArgumentParserBuilder()
         {
-            _classAndMethodRecognizers = new List<ControllerRecognizer>();
+            _controllerRecognizers = new List<ControllerRecognizer>();
             _argumentRecognizers = new List<ArgumentWithOptions>();
         }
 
@@ -54,9 +54,9 @@ namespace Isop
 
             var lexer = new ArgumentLexer(arg);
             var parsedArguments = argumentParser.Parse(lexer, arg);
-            if (_classAndMethodRecognizers.Any())
+            if (_controllerRecognizers.Any())
             {
-                var methodRecognizer = _classAndMethodRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
+                var methodRecognizer = _controllerRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
                 if (null != methodRecognizer)
                 {
 					var parsedMethod = methodRecognizer.Parse(arg);
@@ -92,12 +92,12 @@ namespace Isop
 
         public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
-            _classAndMethodRecognizers.Add(new ControllerRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
+            _controllerRecognizers.Add(new ControllerRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
             return this;
         }
 		public ArgumentParserBuilder Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
-            _classAndMethodRecognizers.Add(new ControllerRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
+            _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
             container.Instances.Add(arg.GetType(),arg);
             return this;
         }
@@ -127,10 +127,10 @@ namespace Isop
             string helpSubCommandForMoreInformation)
         {
             RecognizeHelp();
-            _helpForClassAndMethod.TheCommandsAre = theCommandsAre;
-            _helpForClassAndMethod.HelpCommandForMoreInformation = helpCommandForMoreInformation;
-            _helpForClassAndMethod.TheSubCommandsFor = theSubCommandsFor;
-            _helpForClassAndMethod.HelpSubCommandForMoreInformation = helpSubCommandForMoreInformation;
+            _helpForControllers.TheCommandsAre = theCommandsAre;
+            _helpForControllers.HelpCommandForMoreInformation = helpCommandForMoreInformation;
+            _helpForControllers.TheSubCommandsFor = theSubCommandsFor;
+            _helpForControllers.HelpSubCommandForMoreInformation = helpSubCommandForMoreInformation;
             return this;
         }
         
@@ -150,17 +150,17 @@ namespace Isop
         {
             if (_helpController==null)
             {
-                _helpForClassAndMethod = new HelpForClassAndMethod(_classAndMethodRecognizers, container);
+                _helpForControllers = new HelpForControllers(_controllerRecognizers, container);
                 _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
-                _helpController = new HelpController(_helpForArgumentWithOptions, _helpForClassAndMethod);
+                _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
                 Recognize(_helpController);
             }
             return this;
         }
 
-        public IEnumerable<ControllerRecognizer> GetClassAndMethodRecognizers()
+        public IEnumerable<ControllerRecognizer> GetControllerRecognizers()
         {
-            return _classAndMethodRecognizers;
+            return _controllerRecognizers;
         }
 
         public IEnumerable<ArgumentWithOptions> GetGlobalParameters()

@@ -8,11 +8,11 @@ namespace Isop
     public class HelpController
     {
         HelpForArgumentWithOptions helpForArgumentWithOptions;
-        HelpForClassAndMethod helpForClassAndMethod;
+        HelpForControllers helpForClassAndMethod;
 
         public HelpController(
             HelpForArgumentWithOptions helpForArgumentWithOptions, 
-            HelpForClassAndMethod helpForClassAndMethod)
+            HelpForControllers helpForClassAndMethod)
         {
             this.helpForArgumentWithOptions = helpForArgumentWithOptions;
             this.helpForClassAndMethod = helpForClassAndMethod;
@@ -74,7 +74,7 @@ namespace Isop
 			return argumentWithOptionses.Any(ar=>ar.Argument.Prototype.Equals(val));
         }
     }
-    public class HelpForClassAndMethod
+    public class HelpForControllers
     {
         readonly IEnumerable<ControllerRecognizer> classAndMethodRecognizers;
         private readonly TypeContainer container;
@@ -84,7 +84,7 @@ namespace Isop
 
         public string HelpSubCommandForMoreInformation { get; set; }
 
-        public HelpForClassAndMethod(IEnumerable<ControllerRecognizer> classAndMethodRecognizers, TypeContainer container)
+        public HelpForControllers(IEnumerable<ControllerRecognizer> classAndMethodRecognizers, TypeContainer container)
         {
             this.container=container;
             this.classAndMethodRecognizers = classAndMethodRecognizers;
