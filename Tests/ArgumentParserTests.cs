@@ -132,7 +132,7 @@ namespace Isop.Tests
         public void It_can_recognize_arguments()
         {
             var arguments = ArgumentParser.Build()
-                .Argument("alpha")
+                .Parameter("alpha")
                 .Parse(new[] { "alpha" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();

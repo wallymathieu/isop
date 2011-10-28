@@ -28,35 +28,12 @@ namespace Isop
 
         public NoClassOrMethodFoundException(string message, Exception inner) : base(message, inner){}
     }
-    public abstract class ArgumentBase
+
+    public class ArgumentParameter 
     {
         public string Prototype { get; protected set; }
         public int? Ordinal { get; protected set; } 
-        public override string ToString()
-        {
-            return Prototype;
-        }
-
-        public abstract string Help();
-        
-    }
-
-    public class Argument : ArgumentBase
-    {
-        public static implicit operator Argument(string value)
-        {
-            return new Argument { Prototype = value};
-        }
-
-        public override string Help()
-        {
-            return "--" +  Prototype;
-        }
-    }
-
-
-    public class ArgumentParameter : ArgumentBase
-    {
+      
         public static implicit operator ArgumentParameter(string value)
         {
             return Parse(value);
@@ -78,7 +55,7 @@ namespace Isop
 
         public string[] Aliases { get; protected set; }
         public string Delimiter { get; protected set; }
-        public override string Help()
+        public string Help()
         {
             return "--" + string.Join(", or ", Aliases)
                 +(string.IsNullOrEmpty(Delimiter)
@@ -86,36 +63,32 @@ namespace Isop
                     : " "+Delimiter)
                     ;
         }
+        public override string ToString()
+        {
+            return Prototype;
+        }
+
     }
     public class OrdinalParameter: ArgumentParameter
     {
         public OrdinalParameter(string prototype, string[] names, string delimiter, int ordinal)
         {
+            Ordinal = ordinal;
             Prototype = prototype;
             Aliases = names;
             Delimiter = delimiter;
-            Ordinal = ordinal;
         }
         private static Regex pattern=new Regex(@"#(?<ord>\d*)(?<rest>.*)");
         public static bool TryParse(string value, out OrdinalParameter ordinalParameter)
         {
+           
             var match = pattern.Match(value);
             if (match.Success)
             {
                 var prototype = value;
-                var names = match.Groups["rest"].Value.TrimEnd('=', ':').Split('|');
-                string delimiter = null;
-                var last = prototype.Last();
-                switch (last)
-                {
-                    case '=':
-                    case ':':
-                        delimiter = last.ToString();
-                        break;
-                    default:
-                        break;
-                }
-                ordinalParameter = new OrdinalParameter(prototype, names, delimiter, int.Parse(match.Groups["ord"].Value));
+                var rest = match.Groups["rest"].Value;
+                var param = ArgumentParameter.Parse(rest);
+                ordinalParameter = new OrdinalParameter(prototype, param.Aliases, param.Delimiter, int.Parse(match.Groups["ord"].Value));
                 return true;
             }
             ordinalParameter = null;
@@ -224,11 +197,11 @@ namespace Isop
     public class ArgumentWithOptions
     {
         public string Description { get; private set; }
-        public ArgumentBase Argument { get; private set; }
+        public ArgumentParameter Argument { get; private set; }
         public Action<string> Action { get; set; }
         public bool Required { get; set; }
 
-        public ArgumentWithOptions(ArgumentBase argument, Action<string> action = null, bool required = false, string description=null)
+        public ArgumentWithOptions(ArgumentParameter argument, Action<string> action = null, bool required = false, string description=null)
         {
             Description = description;
             Argument = argument;

@@ -102,11 +102,6 @@ namespace Isop
             return this;
         }
 		
-        public ArgumentParserBuilder Argument(Argument argument, Action<string> action = null, bool required = false, string description = null)
-        {
-            _argumentRecognizers.Add(new ArgumentWithOptions(argument, action, required, description));
-            return this;
-        }
 
         public String Help()
         {
