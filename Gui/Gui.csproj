@@ -65,6 +65,7 @@
     <Compile Include="MyController.cs" />
     <Compile Include="ViewModels\Param.cs" />
     <Compile Include="ViewModels\MethodTreeModel.cs" />
+    <Compile Include="ViewModels\ParamExtension.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

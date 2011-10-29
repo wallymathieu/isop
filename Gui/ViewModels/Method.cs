@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace Isop.Gui
 {
@@ -15,5 +14,10 @@ namespace Isop.Gui
         public string ClassName { get; set; }
 
         public ObservableCollection<Param> Parameters { get; set; }
+
+        public ParsedArguments GetParsedArguments()
+        {
+            return Parameters.GetParsedArguments();
+        }
     }
 }

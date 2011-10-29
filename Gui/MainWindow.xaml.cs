@@ -36,10 +36,11 @@ namespace Isop.Gui
                                                 Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
                                                     {
                                                         Parameters = new ObservableCollection<Param>(
-                                                            m.GetParameters().Select(p => new Param(p.ParameterType, p.Name)))
+                                                            m.GetParameters().Select(p => new Param(p.ParameterType, p.Name, null)))
                                                     })
                                             }),
-                                        GlobalParameters = new ObservableCollection<Param>(ParserBuilder.GetGlobalParameters().Select(p => new Param(typeof(string), p.Argument.ToString())))
+                                        GlobalParameters = new ObservableCollection<Param>(ParserBuilder.GetGlobalParameters()
+                                            .Select(p => new Param(typeof(string), p.Argument.ToString(),p)))
                                     };
 
             InitializeComponent();
@@ -61,31 +62,20 @@ namespace Isop.Gui
 
         private void ExecuteMethodButtonClick(object sender, RoutedEventArgs e)
         {
-            //TODO: need to refactor this
-            var consoleIn = new List<string>();
-            consoleIn.AddRange(MethodTreeModel.GlobalParameters
-                .Where(p => !string.IsNullOrWhiteSpace(p.Value))
-                .Select(p => string.Format("--{0}=\"{1}\"", p.Name, p.Value)));
+            textBlock1.Text = MethodTreeModel.GlobalParameters.GetParsedArguments().Invoke();
+            if (null == CurrentMethod) return;
 
-            textBlock1.Text = ParserBuilder.Parse(consoleIn).Invoke();
+            var controllerRecognizer = ParserBuilder.GetControllerRecognizers()
+                .First(c => c.ClassName().Equals(CurrentMethod.ClassName));
 
-            var controllerRecognizer = ParserBuilder.GetControllerRecognizers().First(c => c.ClassName().Equals(CurrentMethod.ClassName));
-            var method = controllerRecognizer
-                .GetMethods().First(m => m.Name.Equals(CurrentMethod.Name));
-            var recognizedArguments = CurrentMethod.Parameters
-                .Select(p => new RecognizedArgument(new ArgumentWithOptions(p.Name), p.Name, p.Value)).ToList();
-            var argumentWithOptions = CurrentMethod.Parameters.Select(p => new ArgumentWithOptions(p.Name)).ToList();
-            var parsedArguments = new ParsedArguments
-                                      {
-                                          RecognizedArguments = recognizedArguments,
-                                          ArgumentWithOptions = argumentWithOptions,
-                                          UnRecognizedArguments = new List<UnrecognizedArgument>().ToList()
-                                      };
+            var method = controllerRecognizer.GetMethods()
+                .First(m => m.Name.Equals(CurrentMethod.Name));
+
+            var parsedArguments = CurrentMethod.GetParsedArguments();
             var parsedMethod = controllerRecognizer.Parse(method, parsedArguments);
             parsedMethod.Factory = ParserBuilder.GetFactory();
 
             textBlock1.Text += Environment.NewLine + parsedMethod.Invoke();
-
         }
     }
 }
