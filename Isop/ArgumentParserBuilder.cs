@@ -56,10 +56,10 @@ namespace Isop
             var parsedArguments = argumentParser.Parse(lexer, arg);
             if (_controllerRecognizers.Any())
             {
-                var methodRecognizer = _controllerRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
-                if (null != methodRecognizer)
+                var controllerRecognizer = _controllerRecognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
+                if (null != controllerRecognizer)
                 {
-					var parsedMethod = methodRecognizer.Parse(arg);
+					var parsedMethod = controllerRecognizer.Parse(arg);
 					parsedMethod.Factory = this.container.CreateInstance;
                     var merged = parsedArguments.Merge( parsedMethod);
                     //TODO: This is a hack! Should have some better way of controlling this!
@@ -161,6 +161,11 @@ namespace Isop
         public IEnumerable<ArgumentWithOptions> GetGlobalParameters()
         {
             return _argumentRecognizers;
+        }
+
+        public Func<Type, object> GetFactory()
+        {
+            return container.CreateInstance;
         }
     }
 }

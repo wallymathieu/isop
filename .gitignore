@@ -11,6 +11,7 @@ _ReSharper.*
 ~$*
 *.swp
 *.*~
+*.orig
 test-results/
 *.userprefs
 ConsoleHelpers/ConsoleHelpers.pidb

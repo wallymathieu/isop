@@ -29,7 +29,7 @@ namespace Isop.Gui
             MethodTreeModel = new MethodTreeModel
                                     {
                                         Controllers = ParserBuilder.GetControllerRecognizers()
-                                            .Where(cmr=>! cmr.ClassName().Equals("help",StringComparison.OrdinalIgnoreCase))
+                                            .Where(cmr => !cmr.ClassName().Equals("help", StringComparison.OrdinalIgnoreCase))
                                             .Select(cmr => new Controller()
                                             {
                                                 Name = cmr.ClassName(),
@@ -39,7 +39,7 @@ namespace Isop.Gui
                                                             m.GetParameters().Select(p => new Param(p.ParameterType, p.Name)))
                                                     })
                                             }),
-                                        GlobalParameters = new ObservableCollection<Param> (ParserBuilder.GetGlobalParameters().Select(p=>new Param(typeof(string),p.Argument.ToString())))
+                                        GlobalParameters = new ObservableCollection<Param>(ParserBuilder.GetGlobalParameters().Select(p => new Param(typeof(string), p.Argument.ToString())))
                                     };
 
             InitializeComponent();
@@ -48,12 +48,11 @@ namespace Isop.Gui
             textBlock1.Text = string.Empty;
         }
 
-
         private void SelectedMethodChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e.NewValue is Method)
             {
-                CurrentMethod = (Method) e.NewValue;
+                CurrentMethod = (Method)e.NewValue;
                 methodview.DataContext = e.NewValue;
                 methodview.Parameters = CurrentMethod.Parameters;
                 textBlock1.Text = string.Empty;
@@ -63,15 +62,30 @@ namespace Isop.Gui
         private void ExecuteMethodButtonClick(object sender, RoutedEventArgs e)
         {
             //TODO: need to refactor this
-            var consoleIn = new List<string>() { CurrentMethod.ClassName, CurrentMethod.Name };
-            consoleIn.AddRange(CurrentMethod.Parameters
-                .Where(p=>!string.IsNullOrWhiteSpace(p.Value))
-                .Select(p => string.Format("--{0}=\"{1}\"", p.Name, p.Value)));
+            var consoleIn = new List<string>();
             consoleIn.AddRange(MethodTreeModel.GlobalParameters
                 .Where(p => !string.IsNullOrWhiteSpace(p.Value))
                 .Select(p => string.Format("--{0}=\"{1}\"", p.Name, p.Value)));
 
             textBlock1.Text = ParserBuilder.Parse(consoleIn).Invoke();
+
+            var controllerRecognizer = ParserBuilder.GetControllerRecognizers().First(c => c.ClassName().Equals(CurrentMethod.ClassName));
+            var method = controllerRecognizer
+                .GetMethods().First(m => m.Name.Equals(CurrentMethod.Name));
+            var recognizedArguments = CurrentMethod.Parameters
+                .Select(p => new RecognizedArgument(new ArgumentWithOptions(p.Name), p.Name, p.Value)).ToList();
+            var argumentWithOptions = CurrentMethod.Parameters.Select(p => new ArgumentWithOptions(p.Name)).ToList();
+            var parsedArguments = new ParsedArguments
+                                      {
+                                          RecognizedArguments = recognizedArguments,
+                                          ArgumentWithOptions = argumentWithOptions,
+                                          UnRecognizedArguments = new List<UnrecognizedArgument>().ToList()
+                                      };
+            var parsedMethod = controllerRecognizer.Parse(method, parsedArguments);
+            parsedMethod.Factory = ParserBuilder.GetFactory();
+
+            textBlock1.Text += Environment.NewLine + parsedMethod.Invoke();
+
         }
     }
 }

@@ -86,7 +86,7 @@ namespace Isop
             return methodInfo;
         }
 
-        private IEnumerable<Object> GetParametersForMethod (MethodInfo method, ArgumentLexer arg, ParsedArguments parsedArguments, Func<RecognizedArgument,ParameterInfo,Object> ConvertFrom1)
+        private IEnumerable<Object> GetParametersForMethod (MethodInfo method, ParsedArguments parsedArguments, Func<RecognizedArgument,ParameterInfo,Object> ConvertFrom1)
         {
             var parameterInfos = method.GetParameters();
             var parameters = new List<Object>();
@@ -171,20 +171,25 @@ namespace Isop
             var parser = new ArgumentParser(argumentRecognizers);
             var parsedArguments = parser.Parse(lexer, arg);
             
+            return Parse(methodInfo, parsedArguments);
+        }
+
+        public ParsedMethod Parse(MethodInfo methodInfo, ParsedArguments parsedArguments)
+        {
             var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
             if (unMatchedRequiredArguments.Any())
             {
                 throw new MissingArgumentException("Missing arguments")
-                {
-                    Arguments = unMatchedRequiredArguments
-                        .Select(unmatched => new KeyValuePair<string, string>(unmatched.Argument.ToString(), unmatched.Argument.Help())).ToList()
-                };
+                          {
+                              Arguments = unMatchedRequiredArguments
+                                  .Select(unmatched => new KeyValuePair<string, string>(unmatched.Argument.ToString(), unmatched.Argument.Help())).ToList()
+                          };
             }
 
-            var recognizedActionParameters = GetParametersForMethod(methodInfo, lexer, parsedArguments, ConvertFrom1);
+            var recognizedActionParameters = GetParametersForMethod(methodInfo, parsedArguments, ConvertFrom1);
             
-			parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments
-				.Where(unrecognized=>unrecognized.Index>=1); //NOTE: should be different!
+            parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments
+                .Where(unrecognized=>unrecognized.Index>=1); //NOTE: should be different!
           
             return new ParsedMethod(parsedArguments)
                        {
