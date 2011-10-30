@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.IO;
 using System.Collections;
-using System.Text;
 
 namespace Isop
 {
@@ -71,7 +70,7 @@ namespace Isop
     public delegate object TypeConverterFunc(Type type, string s, CultureInfo cultureInfo);
     public class ControllerRecognizer
     {
-        private MethodInfo FindMethod (IEnumerable<MethodInfo> methods, String methodName, ArgumentLexer lexer)
+        private static MethodInfo FindMethod (IEnumerable<MethodInfo> methods, String methodName, IEnumerable<Token> lexer)
         {
             var potential = methods
                 .Where (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase));
@@ -86,34 +85,35 @@ namespace Isop
             return methodInfo;
         }
 
-        private IEnumerable<Object> GetParametersForMethod (MethodInfo method, ParsedArguments parsedArguments, Func<RecognizedArgument,ParameterInfo,Object> ConvertFrom1)
+        private static IEnumerable<Object> GetParametersForMethod (MethodInfo method, ParsedArguments parsedArguments, Func<RecognizedArgument,ParameterInfo,Object> convertFrom)
         {
             var parameterInfos = method.GetParameters();
             var parameters = new List<Object>();
             
-            foreach (var paramInfo in parameterInfos) {
+            foreach (var paramInfo in parameterInfos)
+            {
                 var recognizedArgument =  parsedArguments.RecognizedArguments.First(
-                    a=>a.Argument.ToLowerInvariant().Equals(paramInfo.Name.ToLowerInvariant()));
-                parameters.Add( ConvertFrom1 (recognizedArgument, paramInfo));
+                    a => a.Argument.ToUpperInvariant().Equals(paramInfo.Name.ToUpperInvariant()));
+                parameters.Add( convertFrom (recognizedArgument, paramInfo));
             }
             return parameters;
         }
 
-        private IEnumerable<ArgumentWithOptions> GetRecognizers(MethodInfo method)
+        private IEnumerable<ArgumentWithOptions> GetRecognizers(MethodBase method)
         {
             var parameterInfos = method.GetParameters();
             var recognizers = parameterInfos
                 .Select (parameterInfo => 
-                    new ArgumentWithOptions (ArgumentParameter.Parse (parameterInfo.Name), required: true))
+                    new ArgumentWithOptions (ArgumentParameter.Parse (parameterInfo.Name,_culture), required: true))
                 .ToList ();
-            recognizers.Insert(0,new ArgumentWithOptions(ArgumentParameter.Parse("#1"+method.Name), required: false));
+            recognizers.Insert(0, new ArgumentWithOptions(ArgumentParameter.Parse("#1" + method.Name, _culture), required: false));
             return recognizers;
         }
         
         private readonly CultureInfo _culture;
         public Type Type { get; private set; }
 		
-		private readonly Transform transform = new Transform();
+		private readonly Transform _transform = new Transform();
         /// <summary>
         /// </summary>
         public ControllerRecognizer(Type type, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
@@ -126,11 +126,11 @@ namespace Isop
         public bool Recognize(IEnumerable<string> arg)
         {
             //TODO: Inefficient
-            var lexer = transform.Rewrite( new ArgumentLexer(arg));
+            var lexer = _transform.Rewrite( new ArgumentLexer(arg));
             return null != FindMethodInfo(lexer);
         }
 
-        private MethodInfo FindMethodInfo(ArgumentLexer arg)
+        private MethodInfo FindMethodInfo(IEnumerable<Token> arg)
         {
             var foundClassName = ClassName().Equals(arg.ElementAtOrDefault(0).Value, StringComparison.OrdinalIgnoreCase);
             if (foundClassName)
@@ -145,7 +145,7 @@ namespace Isop
 		{
 			return Type.GetMethods(BindingFlags.Public| BindingFlags.Instance)
                 .Where(m=>!m.DeclaringType.Equals(typeof(Object)))
-                .Where(m=>!m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))
+                .Where(m => !m.Name.StartsWith("get_", StringComparison.OrdinalIgnoreCase) && !m.Name.StartsWith("set_", StringComparison.OrdinalIgnoreCase))
                 .Where(m=>!m.Name.Equals("help",StringComparison.OrdinalIgnoreCase));
 		}
 		
@@ -162,7 +162,7 @@ namespace Isop
         /// <returns></returns>
         public ParsedMethod Parse(IEnumerable<string> arg)
         {
-            var lexer = transform.Rewrite( new ArgumentLexer(arg));
+            var lexer = _transform.Rewrite( new ArgumentLexer(arg));
                
             var methodInfo = FindMethodInfo(lexer);
 
@@ -236,31 +236,24 @@ namespace Isop
 
         public IEnumerable<object> RecognizedActionParameters { get; set; }
 		
-        public override String Invoke(TextWriter cout=null)
+        public override void Invoke(TextWriter cout)
         {
-            bool returnStr = cout==null;
-            if (null==cout) cout = new StringWriter();
-			object instance = Factory(RecognizedClass);
+			var instance = Factory(RecognizedClass);
 			
 			var retval = RecognizedAction.Invoke(instance, RecognizedActionParameters.ToArray());
-			if (retval != null)
-			{
-                if (retval is string)
-                {
-                    cout.Write(retval as string);
-                }else if (retval is IEnumerable)
-                {
-                    foreach (var item in (retval as IEnumerable)) {
-                        cout.Write(item.ToString());
-                    }
-                }else
-                {
-                    cout.Write(retval.ToString());
+            if (retval == null) return;
+            if (retval is string)
+            {
+                cout.Write(retval as string);
+            }else if (retval is IEnumerable)
+            {
+                foreach (var item in (retval as IEnumerable)) {
+                    cout.Write(item.ToString());
                 }
-			}
-            if (returnStr) 
-                return ((StringWriter)cout).ToString();
-            return String.Empty;
+            }else
+            {
+                cout.Write(retval.ToString());
+            }
         }
     }
 }

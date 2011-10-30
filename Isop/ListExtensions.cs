@@ -7,7 +7,7 @@ namespace Isop
     {
         public static IEnumerable<KeyValuePair<int, TValue>> FindIndexAndValues<TValue>(this IList<TValue> self, Predicate<TValue> selection)
         {
-            for (int i = 0; i < self.Count; i++)
+            for (var i = 0; i < self.Count; i++)
             {
                 var v = self[i];
                 if (selection(v))

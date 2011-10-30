@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using NUnit.Framework;
 
 namespace Isop.Tests
@@ -126,11 +127,12 @@ Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
         [Test]
         public void It_can_report_usage_when_no_parameters_given ()
         {
-            var usage = ArgumentParser.Build ()
+            var cout = new StringWriter();
+            ArgumentParser.Build ()
                                     .RecognizeHelp ()
                                     .Recognize (typeof(MyController))
-                                    .Parse (new string[]{}).Invoke ();
-            Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The commands are:
+                                    .Parse (new string[]{}).Invoke (cout);
+            Assert.That (LineSplit (cout.ToString()), Is.EquivalentTo (LineSplit (@"The commands are:
   My
 
 Se 'COMMANDNAME' help <command> for more information")));

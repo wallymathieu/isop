@@ -6,24 +6,27 @@ namespace Isop.Gui
     {
         public Type Type { get; set; }
         public string Name { get; set; }
-        private ArgumentWithOptions _ArgWithOptions { get; set; }
+        private readonly ArgumentWithOptions _argWithOptions;
         public string Value { get; set; }
         public Param(Type type, string name, ArgumentWithOptions argWithOptions)
         {
             Type = type;
             Name = name;
-            _ArgWithOptions = argWithOptions;
+            _argWithOptions = argWithOptions;
         }
 
-        public ArgumentWithOptions ArgumentWithOptions()
+        public ArgumentWithOptions ArgumentWithOptions
         {
-            if (null != _ArgWithOptions) return _ArgWithOptions;
-            return new ArgumentWithOptions(Name);
+            get
+            {
+                if (null != _argWithOptions) return _argWithOptions;
+                return new ArgumentWithOptions(Name);
+            }
         }
 
         public RecognizedArgument RecognizedArgument()
         {
-            return new RecognizedArgument(ArgumentWithOptions(), Name, Value);
+            return new RecognizedArgument(ArgumentWithOptions, Name, Value);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using Isop;
 using NUnit.Framework;
@@ -64,7 +65,7 @@ namespace Isop.Tests
         public void It_can_parse_ordinalparameters()
         {
             OrdinalParameter o;
-            Assert.That(OrdinalParameter.TryParse("#1first",out o));
+            Assert.That(OrdinalParameter.TryParse("#1first", CultureInfo.InvariantCulture, out o));
         }
         [Test]
         public void It_can_parse_ordinal_parameter_value()
@@ -140,93 +141,93 @@ namespace Isop.Tests
             Assert.That(arg1.Value, Is.Null);
             Assert.That(arg1.Argument, Is.EqualTo("alpha"));
         }
-      
+
         [Test]
         public void It_can_parse_class_and_method_and_execute()
         {
             var count = 0;
-             Func<Type, object> factory = (Type t) =>
-                                             {
-                                                 Assert.That(t, Is.EqualTo(typeof(MyController)));
-                                                 return
-                                                     (object)
-                                                     new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
-                                             };
-			var arguments = ArgumentParser.Build()
+            Func<Type, object> factory = (Type t) =>
+                                            {
+                                                Assert.That(t, Is.EqualTo(typeof(MyController)));
+                                                return
+                                                    (object)
+                                                    new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
+                                            };
+            var arguments = ArgumentParser.Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(MyController))
-											   .SetFactory(factory)
+                                               .SetFactory(factory)
                                                .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
-           
-			Assert.That(arguments.UnRecognizedArguments.Count(),Is.EqualTo(0));
-			arguments.Invoke();
+
+            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
-		
-		[Test]
+
+        [Test]
         public void It_can_parse_class_and_method_and_fail()
         {
-			var builder = ArgumentParser.Build()
+            var builder = ArgumentParser.Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(MyController));
-           
-			Assert.Throws<MissingArgumentException>(()=>builder.Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" }));
+
+            Assert.Throws<MissingArgumentException>(() => builder.Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" }));
         }
         class SingleIntAction
         {
-            public void Action(int param){}
+            public void Action(int param) { }
         }
-        
+
         [Test]
         public void It_can_parse_class_and_method_and_fail_because_of_type_conversion()
         {
             var builder = ArgumentParser.Build()
                  .SetCulture(CultureInfo.InvariantCulture)
                  .Recognize(typeof(SingleIntAction));
-            Assert.Throws<TypeConversionFailedException>(()=>
-                builder.Parse(new[] { "SingleIntAction", "Action", "--param","value" })
+            Assert.Throws<TypeConversionFailedException>(() =>
+                builder.Parse(new[] { "SingleIntAction", "Action", "--param", "value" })
             );
         }
-        
+
         [Test]
-        public void It_can_parse_class_and_method_and_fail_because_no_arguments_given ()
+        public void It_can_parse_class_and_method_and_fail_because_no_arguments_given()
         {
-            var builder = ArgumentParser.Build ()
-                                               .SetCulture (CultureInfo.InvariantCulture)
-                                               .Recognize (typeof(MyController));
-           
-            Assert.Throws<MissingArgumentException> (() => builder.Parse (new[] { "My", "Action" }));
+            var builder = ArgumentParser.Build()
+                                               .SetCulture(CultureInfo.InvariantCulture)
+                                               .Recognize(typeof(MyController));
+
+            Assert.Throws<MissingArgumentException>(() => builder.Parse(new[] { "My", "Action" }));
         }
-		
-		[Test]
+
+        [Test]
         public void It_can_parse_class_and_method_and_also_arguments_and_execute()
         {
             var count = 0;
-			var countArg = 0;
-             Func<Type, object> factory = (Type t) =>
-                                             {
-                                                 Assert.That(t, Is.EqualTo(typeof(MyController)));
-                                                 return
-                                                     (object)
-                                                     new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
-                                             };
-			var arguments = ArgumentParser.Build()
+            var countArg = 0;
+            Func<Type, object> factory = (Type t) =>
+                                            {
+                                                Assert.That(t, Is.EqualTo(typeof(MyController)));
+                                                return
+                                                    (object)
+                                                    new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
+                                            };
+            var arguments = ArgumentParser.Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(MyController))
-											   .Parameter("beta", arg=>countArg++)
-											   .SetFactory(factory)
-                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4", "--beta"});
-           
-            Assert.That(arguments.UnRecognizedArguments.Count(),Is.EqualTo(0));
-			arguments.Invoke();
+                                               .Parameter("beta", arg => countArg++)
+                                               .SetFactory(factory)
+                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4", "--beta" });
+
+            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
-			Assert.That(countArg, Is.EqualTo(1));
+            Assert.That(countArg, Is.EqualTo(1));
         }
 
         [Test]
         public void It_can_parse_class_and_default_method_and_execute()
         {
-			var count = 0;
+            var count = 0;
             Func<Type, object> factory = (Type t) =>
             {
                 Assert.That(t, Is.EqualTo(typeof(WithIndexController)));
@@ -234,15 +235,15 @@ namespace Isop.Tests
                     (object)
                     new WithIndexController() { OnIndex = (p1, p2, p3, p4) => (count++).ToString() };
             };
-			
+
             var arguments = ArgumentParser.Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(WithIndexController))
-											   .SetFactory(factory)
+                                               .SetFactory(factory)
                                                .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
-            Assert.That(arguments.UnRecognizedArguments.Count(),Is.EqualTo(0));
-			arguments.Invoke();
+            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
 
@@ -263,10 +264,10 @@ namespace Isop.Tests
             ArgumentParser.Build()
                            .Parameter("beta", arg => count++)
                            .Parameter("alpha", arg => Assert.Fail())
-                           .Parse(new[] { "-a", "value", "--beta" }).Invoke();
+                           .Parse(new[] { "-a", "value", "--beta" }).Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
-        
+
         [Test]
         public void It_understands_method_returning_enumerable()
         {
@@ -275,35 +276,36 @@ namespace Isop.Tests
             Func<Type, object> factory = (Type t) =>
             {
                 Assert.That(t, Is.EqualTo(typeof(EnumerableController)));
-                createCount ++;
+                createCount++;
                 return
                     (object)
-                    new EnumerableController() {  Length=2, OnEnumerate = () => (count++) };
+                    new EnumerableController() { Length = 2, OnEnumerate = () => (count++) };
             };
-         
+
             var arguments = ArgumentParser.Build()
                    .Recognize(typeof(EnumerableController))
                    .SetFactory(factory)
                    .Parse(new[] { "Enumerable", "Return" });
 
-            Assert.That(arguments.UnRecognizedArguments.Count(),Is.EqualTo(0));
-            arguments.Invoke();
+            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(2));
             Assert.That(createCount, Is.EqualTo(1));
         }
-        
+
         class EnumerableController
         {
             public Func<Object> OnEnumerate;
             public int Length;
             public System.Collections.IEnumerable Return()
             {
-                for (int i = 0; i < Length; i++) {
+                for (int i = 0; i < Length; i++)
+                {
                     yield return OnEnumerate();
                 }
             }
         }
     }
 
-  
+
 }

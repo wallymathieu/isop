@@ -7,27 +7,27 @@ namespace Isop
 {
     public class HelpController
     {
-        HelpForArgumentWithOptions helpForArgumentWithOptions;
-        HelpForControllers helpForClassAndMethod;
+        readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
+        readonly HelpForControllers _helpForClassAndMethod;
 
         public HelpController(
             HelpForArgumentWithOptions helpForArgumentWithOptions, 
             HelpForControllers helpForClassAndMethod)
         {
-            this.helpForArgumentWithOptions = helpForArgumentWithOptions;
-            this.helpForClassAndMethod = helpForClassAndMethod;
+            _helpForArgumentWithOptions = helpForArgumentWithOptions;
+            _helpForClassAndMethod = helpForClassAndMethod;
         }
 
         public string Index()
         {
             var sb = new StringBuilder();
-            if (helpForArgumentWithOptions.CanHelp())
+            if (_helpForArgumentWithOptions.CanHelp())
             {
-              sb.AppendLine(helpForArgumentWithOptions.Help());
+              sb.AppendLine(_helpForArgumentWithOptions.Help());
             }
-            if (helpForClassAndMethod.CanHelp())
+            if (_helpForClassAndMethod.CanHelp())
             {
-                sb.AppendLine(helpForClassAndMethod.Help());
+                sb.AppendLine(_helpForClassAndMethod.Help());
             }
             return sb.ToString().Trim(' ','\t','\r','\n');
         }
@@ -36,13 +36,13 @@ namespace Isop
 			if (String.IsNullOrEmpty(command))
 				return Index();
             var sb = new StringBuilder();
-            if (helpForArgumentWithOptions.CanHelp(command))
+            if (_helpForArgumentWithOptions.CanHelp(command))
             {
-              sb.AppendLine(helpForArgumentWithOptions.Help(command));
+              sb.AppendLine(_helpForArgumentWithOptions.Help(command));
             }
-            if (helpForClassAndMethod.CanHelp(command))
+            if (_helpForClassAndMethod.CanHelp(command))
             {
-                sb.AppendLine(helpForClassAndMethod.Help(command));
+                sb.AppendLine(_helpForClassAndMethod.Help(command));
             }
             return sb.ToString().Trim(' ','\t','\r','\n');
         }
@@ -50,12 +50,12 @@ namespace Isop
 
     public class HelpForArgumentWithOptions
     {
-        readonly IEnumerable<ArgumentWithOptions> argumentWithOptionses;
+        readonly IEnumerable<ArgumentWithOptions> _argumentWithOptionses;
         public string TheArgumentsAre { get; set; }
 
         public HelpForArgumentWithOptions(IEnumerable<ArgumentWithOptions> argumentWithOptionses)
         {
-            this.argumentWithOptionses = argumentWithOptionses;
+            _argumentWithOptionses = argumentWithOptionses;
             TheArgumentsAre = "The arguments are:";
         }
 
@@ -64,20 +64,21 @@ namespace Isop
 			if (string.IsNullOrEmpty(val))
 	            return TheArgumentsAre + Environment.NewLine +
                    String.Join(Environment.NewLine,
-                               argumentWithOptionses.Select(ar => "  " + ar.Help()).ToArray());
-        	return argumentWithOptionses.First(ar=>ar.Argument.Prototype.Equals(val)).Help();
+                               _argumentWithOptionses.Select(ar => "  " + ar.Help()).ToArray());
+        	return _argumentWithOptionses.First(ar=>ar.Argument.Prototype.Equals(val)).Help();
 		}
 
         public bool CanHelp(string val=null)
         {
-            if (string.IsNullOrEmpty(val)) return argumentWithOptionses.Any();
-			return argumentWithOptionses.Any(ar=>ar.Argument.Prototype.Equals(val));
+            return string.IsNullOrEmpty(val) 
+                ? _argumentWithOptionses.Any() 
+                : _argumentWithOptionses.Any(ar=>ar.Argument.Prototype.Equals(val));
         }
     }
     public class HelpForControllers
     {
-        readonly IEnumerable<ControllerRecognizer> classAndMethodRecognizers;
-        private readonly TypeContainer container;
+        readonly IEnumerable<ControllerRecognizer> _classAndMethodRecognizers;
+        private readonly TypeContainer _container;
         public string TheCommandsAre { get; set; }
 		public string TheSubCommandsFor { get; set; }
         public string HelpCommandForMoreInformation { get; set; }
@@ -86,8 +87,8 @@ namespace Isop
 
         public HelpForControllers(IEnumerable<ControllerRecognizer> classAndMethodRecognizers, TypeContainer container)
         {
-            this.container=container;
-            this.classAndMethodRecognizers = classAndMethodRecognizers;
+            _container=container;
+            _classAndMethodRecognizers = classAndMethodRecognizers;
 
             HelpSubCommandForMoreInformation = "Se 'COMMANDNAME' help <command> <subcommand> for more information";
 
@@ -95,41 +96,41 @@ namespace Isop
             TheCommandsAre = "The commands are:";
 			TheSubCommandsFor = "The sub commands for ";
         }
-        private string _Description(Type t,MethodInfo method=null)
+        private string Description(Type t,MethodInfo method=null)
         { 
             var description = t.GetMethods().FirstOrDefault(m=>
                 m.Name.Equals("help",StringComparison.OrdinalIgnoreCase));
             //TODO: should match parameters to make sure that it can accept 1 param of type string
             if (null==description) return string.Empty;
             
-            var obj = container.CreateInstance(t);
+            var obj = _container.CreateInstance(t);
             
             return "  "+description.Invoke(obj,new[]{(method!=null? method.Name:null)});
         }
-        private string _Help(ControllerRecognizer cmr,bool simpleDescription)
+        private string HelpFor(ControllerRecognizer cmr,bool simpleDescription)
         {
-            if (simpleDescription) return cmr.ClassName()+ _Description(cmr.Type);
+            if (simpleDescription) return cmr.ClassName()+ Description(cmr.Type);
             
             return cmr.ClassName()
                 +Environment.NewLine
                 +Environment.NewLine
                 +String.Join(Environment.NewLine, cmr.GetMethods()
-                        .Select(m=>"  "+m.Name+_Description(cmr.Type,m)).ToArray());
+                        .Select(m=>"  "+m.Name+Description(cmr.Type,m)).ToArray());
         }
         
         public string Help(string val=null)
         {
             if (string.IsNullOrEmpty(val)) return TheCommandsAre + Environment.NewLine +
                    String.Join(Environment.NewLine,
-                               classAndMethodRecognizers
+                               _classAndMethodRecognizers
                                .Where(cmr=>cmr.Type!=typeof(HelpController))
-                               .Select(cmr => "  " + _Help(cmr,true)).ToArray())
+                               .Select(cmr => "  " + HelpFor(cmr,true)).ToArray())
                    + Environment.NewLine
                    + Environment.NewLine
                    + HelpCommandForMoreInformation;
 			
 			return TheSubCommandsFor+
-				_Help(classAndMethodRecognizers.First(cmr=>cmr.ClassName().Equals(val,StringComparison.OrdinalIgnoreCase)),false)
+				HelpFor(_classAndMethodRecognizers.First(cmr=>cmr.ClassName().Equals(val,StringComparison.OrdinalIgnoreCase)),false)
 					+ Environment.NewLine
 					+ Environment.NewLine
 					+ HelpSubCommandForMoreInformation;
@@ -137,8 +138,9 @@ namespace Isop
 
         public bool CanHelp(string val=null)
         {
-            if (string.IsNullOrEmpty(val)) return classAndMethodRecognizers.Any(cmr => cmr.Type != typeof(HelpController));
-			return classAndMethodRecognizers.Any(cmr=>cmr.ClassName().Equals(val,StringComparison.OrdinalIgnoreCase));
+            return string.IsNullOrEmpty(val) 
+                ? _classAndMethodRecognizers.Any(cmr => cmr.Type != typeof(HelpController)) 
+                : _classAndMethodRecognizers.Any(cmr=>cmr.ClassName().Equals(val,StringComparison.OrdinalIgnoreCase));
         }
     }
 }

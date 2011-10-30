@@ -1,9 +1,8 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using System.Text;
 using System.IO;
 namespace Isop
 {
@@ -12,7 +11,7 @@ namespace Isop
         /// <summary>
         /// The arguments. The key are the argument, the value is the description or help.
         /// </summary>
-        public List<KeyValuePair<string,string>> Arguments;
+        public List<KeyValuePair<string, string>> Arguments;
         public MissingArgumentException() { }
 
         public MissingArgumentException(string message) : base(message) { }
@@ -22,27 +21,27 @@ namespace Isop
 
     public class NoClassOrMethodFoundException : Exception
     {
-        public NoClassOrMethodFoundException(){}
+        public NoClassOrMethodFoundException() { }
 
-        public NoClassOrMethodFoundException(string message) : base(message){}
+        public NoClassOrMethodFoundException(string message) : base(message) { }
 
-        public NoClassOrMethodFoundException(string message, Exception inner) : base(message, inner){}
+        public NoClassOrMethodFoundException(string message, Exception inner) : base(message, inner) { }
     }
 
-    public class ArgumentParameter 
+    public class ArgumentParameter
     {
         public string Prototype { get; protected set; }
-        public int? Ordinal { get; protected set; } 
-      
+        public int? Ordinal { get; protected set; }
+
         public static implicit operator ArgumentParameter(string value)
         {
-            return Parse(value);
+            return Parse(value, CultureInfo.CurrentCulture);
         }
 
-        public static ArgumentParameter Parse(string value)
+        public static ArgumentParameter Parse(string value, IFormatProvider formatProvider)
         {
             OrdinalParameter ordinalParameter;
-            if (OrdinalParameter.TryParse(value, out ordinalParameter))
+            if (OrdinalParameter.TryParse(value, formatProvider, out ordinalParameter))
                 return ordinalParameter;
             OptionParameter optionParameter;
             if (OptionParameter.TryParse(value, out optionParameter))
@@ -58,9 +57,9 @@ namespace Isop
         public string Help()
         {
             return "--" + string.Join(", or ", Aliases)
-                +(string.IsNullOrEmpty(Delimiter)
+                + (string.IsNullOrEmpty(Delimiter)
                     ? ""
-                    : " "+Delimiter)
+                    : " " + Delimiter)
                     ;
         }
         public override string ToString()
@@ -69,7 +68,7 @@ namespace Isop
         }
 
     }
-    public class OrdinalParameter: ArgumentParameter
+    public class OrdinalParameter : ArgumentParameter
     {
         public OrdinalParameter(string prototype, string[] names, string delimiter, int ordinal)
         {
@@ -78,24 +77,23 @@ namespace Isop
             Aliases = names;
             Delimiter = delimiter;
         }
-        private static Regex pattern=new Regex(@"#(?<ord>\d*)(?<rest>.*)");
-        public static bool TryParse(string value, out OrdinalParameter ordinalParameter)
+        private static readonly Regex Pattern = new Regex(@"#(?<ord>\d*)(?<rest>.*)");
+        public static bool TryParse(string value, IFormatProvider formatProvider, out OrdinalParameter ordinalParameter)
         {
-           
-            var match = pattern.Match(value);
+            var match = Pattern.Match(value);
             if (match.Success)
             {
                 var prototype = value;
                 var rest = match.Groups["rest"].Value;
-                var param = ArgumentParameter.Parse(rest);
-                ordinalParameter = new OrdinalParameter(prototype, param.Aliases, param.Delimiter, int.Parse(match.Groups["ord"].Value));
+                var param = ArgumentParameter.Parse(rest, formatProvider);
+                ordinalParameter = new OrdinalParameter(prototype, param.Aliases, param.Delimiter, int.Parse(match.Groups["ord"].Value, formatProvider));
                 return true;
             }
             ordinalParameter = null;
             return false;
         }
     }
-    
+
     /// <summary>
     /// Represents the parameter. For instance "file" of the commandline argument --file. 
     /// Usually you might want it to recognize -f as well. For instance using Argument.Parse("file|f"), or the implicit 
@@ -201,7 +199,7 @@ namespace Isop
         public Action<string> Action { get; set; }
         public bool Required { get; set; }
 
-        public ArgumentWithOptions(ArgumentParameter argument, Action<string> action = null, bool required = false, string description=null)
+        public ArgumentWithOptions(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null)
         {
             Description = description;
             Argument = argument;
@@ -215,17 +213,15 @@ namespace Isop
         /// <returns></returns>
         public bool HasAlias(string value)
         {
-            if (Argument is ArgumentParameter)
-                return ((ArgumentParameter)Argument).Aliases.Any(alias => value.Equals(alias, StringComparison.OrdinalIgnoreCase));
-            return false;
+            return Argument.Aliases.Any(alias => value.Equals(alias, StringComparison.OrdinalIgnoreCase));
         }
 
         public string Help()
         {
             return Argument.Help()
-                +(String.IsNullOrEmpty(Description)
-                    ? "" 
-                    : "\t"+Description);
+                + (String.IsNullOrEmpty(Description)
+                    ? ""
+                    : "\t" + Description);
         }
     }
 
@@ -247,25 +243,25 @@ namespace Isop
             WithOptions = argumentWithOptions;
             Argument = parameter;
         }
-		public override int GetHashCode ()
-		{
-			return this.Argument.GetHashCode()+this.WithOptions.GetHashCode()+(this.Value??"").GetHashCode()+1794;
-		}
-		public override bool Equals (object obj)
-		{
-			if (ReferenceEquals(obj,null))
-				return false;
-			if (ReferenceEquals(obj,this))
-				return true;
-			if (obj is RecognizedArgument)
-			{
-				var rec = obj as RecognizedArgument;
-				return this.Argument.Equals(rec.Argument)
-					&& this.WithOptions.Equals(rec.WithOptions)
-				    && string.Equals(this.Value,rec.Value);
-			}
-			return false;
-		}
+        public override int GetHashCode()
+        {
+            return Argument.GetHashCode() + WithOptions.GetHashCode() + (Value ?? "").GetHashCode() + 1794;
+        }
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(obj, null))
+                return false;
+            if (ReferenceEquals(obj, this))
+                return true;
+            if (obj is RecognizedArgument)
+            {
+                var rec = obj as RecognizedArgument;
+                return Argument.Equals(rec.Argument)
+                    && WithOptions.Equals(rec.WithOptions)
+                    && string.Equals(Value, rec.Value);
+            }
+            return false;
+        }
     }
     public class ParsedArguments
     {
@@ -288,23 +284,22 @@ namespace Isop
 
         public IEnumerable<ArgumentWithOptions> ArgumentWithOptions { get; set; }
 
-        public virtual String Invoke(TextWriter cout=null)
+        public virtual void Invoke(TextWriter cout)
         {
             foreach (var argument in RecognizedArguments.Where(argument => null != argument.WithOptions.Action))
             {
                 argument.WithOptions.Action(argument.Value);
             }
-			return String.Empty;
         }
-		
-		public ParsedArguments Merge(ParsedArguments args)
-		{
-			return Merge(this,args);
-		}
-		public static ParsedArguments Merge(ParsedArguments first, ParsedArguments second)
-		{
-			return new MergedParsedArguments(first,second);
-		}
+
+        public ParsedArguments Merge(ParsedArguments args)
+        {
+            return Merge(this, args);
+        }
+        public static ParsedArguments Merge(ParsedArguments first, ParsedArguments second)
+        {
+            return new MergedParsedArguments(first, second);
+        }
 
         public IEnumerable<ArgumentWithOptions> UnMatchedRequiredArguments()
         {
@@ -315,29 +310,24 @@ namespace Isop
             return unMatchedRequiredArguments;
         }
     }
-	public class MergedParsedArguments:ParsedArguments
-	{
-		private ParsedArguments first;
-		private ParsedArguments second;
-		public MergedParsedArguments (ParsedArguments first, ParsedArguments second)
-		{
-			this.first = first;
-			this.second = second;
-			this.RecognizedArguments = first.RecognizedArguments.Union(second.RecognizedArguments);
-			this.ArgumentWithOptions = first.ArgumentWithOptions.Union(second.ArgumentWithOptions);
-			this.UnRecognizedArguments = first.UnRecognizedArguments.Intersect(second.UnRecognizedArguments);
-		}
-		public override string Invoke (TextWriter cout=null)
-		{
-            bool returnStr = cout==null;
-            if (null==cout) cout = new StringWriter();
-            
-            first.Invoke(cout);
-            second.Invoke(cout);
-            
-            if (returnStr){ return ((StringWriter)cout).ToString();}else{ return string.Empty;}
+    public class MergedParsedArguments : ParsedArguments
+    {
+        private readonly ParsedArguments _first;
+        private readonly ParsedArguments _second;
+        public MergedParsedArguments(ParsedArguments first, ParsedArguments second)
+        {
+            _first = first;
+            _second = second;
+            RecognizedArguments = first.RecognizedArguments.Union(second.RecognizedArguments);
+            ArgumentWithOptions = first.ArgumentWithOptions.Union(second.ArgumentWithOptions);
+            UnRecognizedArguments = first.UnRecognizedArguments.Intersect(second.UnRecognizedArguments);
         }
-	}
+        public override void Invoke(TextWriter cout)
+        {
+            _first.Invoke(cout);
+            _second.Invoke(cout);
+        }
+    }
 
     public class UnrecognizedArgument
     {
@@ -351,8 +341,8 @@ namespace Isop
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (UnrecognizedArgument)) return false;
-            return Equals((UnrecognizedArgument) obj);
+            if (obj.GetType() != typeof(UnrecognizedArgument)) return false;
+            return Equals((UnrecognizedArgument)obj);
         }
 
         public bool Equals(UnrecognizedArgument other)
@@ -366,7 +356,7 @@ namespace Isop
         {
             unchecked
             {
-                return (Index*397) ^ (Value != null ? Value.GetHashCode() : 0);
+                return (Index * 397) ^ (Value != null ? Value.GetHashCode() : 0);
             }
         }
     }
@@ -397,11 +387,11 @@ namespace Isop
             return parsedArguments;
         }
 
-        public ParsedArguments Parse(ArgumentLexer lex,IEnumerable<string> arguments)
+        public ParsedArguments Parse(ArgumentLexer lex, IEnumerable<string> arguments)
         {
-            var recognizedIndexes=new List<int>();
+            var recognizedIndexes = new List<int>();
             var lexer = new PeekEnumerable<Token>(lex);
-            IList<RecognizedArgument> recognized=new List<RecognizedArgument>();
+            IList<RecognizedArgument> recognized = new List<RecognizedArgument>();
             while (lexer.HasMore())
             {
                 var current = lexer.Next();
@@ -413,7 +403,7 @@ namespace Isop
                             var argumentWithOptions = _argumentWithOptions
                                .Where(argopt => !argopt.Argument.Ordinal.HasValue)
                                .SingleOrDefault(argopt => argopt.Argument
-                                   .Prototype.Equals(current.Value,StringComparison.OrdinalIgnoreCase));
+                                   .Prototype.Equals(current.Value, StringComparison.OrdinalIgnoreCase));
                             if (null == argumentWithOptions)
                             {
                                 argumentWithOptions = _argumentWithOptions
@@ -468,7 +458,7 @@ namespace Isop
             var unRecognizedArguments = argumentList
                 .Select((value, i) => new { i, value })
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
-                .Select(v => new UnrecognizedArgument(){ Index=v.i, Value=v.value});
+                .Select(v => new UnrecognizedArgument { Index = v.i, Value = v.value });
 
             return new ParsedArguments
             {

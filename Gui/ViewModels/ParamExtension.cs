@@ -9,7 +9,7 @@ namespace Isop.Gui
         {
             var recognizedArguments = parms
                 .Select(p => p.RecognizedArgument()).ToList();
-            var argumentWithOptions = parms.Select(p => p.ArgumentWithOptions()).ToList();
+            var argumentWithOptions = parms.Select(p => p.ArgumentWithOptions).ToList();
             return new ParsedArguments
                        {
                            RecognizedArguments = recognizedArguments,

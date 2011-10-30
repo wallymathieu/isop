@@ -16,12 +16,10 @@ namespace Isop
         {
             if (!Instances.ContainsKey(type))
             {
-                var factory = this.Factory ??Activator.CreateInstance;
+                var factory = Factory ??Activator.CreateInstance;
                 return factory(type);
-            }else
-            {
-                return Instances[type];
             }
+            return Instances[type];
         }
     }
 }

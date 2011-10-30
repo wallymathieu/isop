@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -13,14 +14,14 @@ namespace Isop
             _buffer = enumerable.ToList();
         }
         private int _currentIndex = -1;
-        private List<T> _buffer;
+        private readonly List<T> _buffer;
         public T Current()
         {
             if (_currentIndex < _buffer.Count())
             {
                 return _buffer[_currentIndex];
             }
-            throw new ArgumentOutOfRangeException("_currentIndex >= count");
+            throw new ArgumentOutOfRangeException();
         }
         public bool HasMore() { return _currentIndex+1<_buffer.Count(); }
         public T Next()
@@ -32,13 +33,11 @@ namespace Isop
         public T Peek()
         {
              var idx = _currentIndex+1; 
-             if (idx<_buffer.Count())
-                 return _buffer[idx];
-             return default(T);
+             return idx<_buffer.Count() ? _buffer[idx] : default(T);
         }
         public IEnumerator<T> GetEnumerator()
         {
-            return this._buffer.GetEnumerator();
+            return _buffer.GetEnumerator();
         }
         IEnumerator IEnumerable.GetEnumerator()
         {
@@ -60,17 +59,17 @@ namespace Isop
         {
         }
 
-        public static IEnumerable<Token> Lex(IList<string> _arg)
+        public static IEnumerable<Token> Lex(IList<string> arg)
         {
-            int _currentIndex = 0;
-            int length = _arg.Count();
-            while (_currentIndex<length) 
+            var currentIndex = 0;
+            var length = arg.Count();
+            while (currentIndex<length) 
             {
-                var value = _arg[_currentIndex];
-                var valueIndex = _currentIndex;
-                _currentIndex++;
+                var value = arg[currentIndex];
+                var valueIndex = currentIndex;
+                currentIndex++;
                 
-                Match match = ParamPattern.Match(value);
+                var match = ParamPattern.Match(value);
                 if (match.Success)
                 {
                     yield return new Token(match.Groups["param"].Value, TokenType.Parameter, valueIndex);
@@ -80,13 +79,13 @@ namespace Isop
                     }
                     else
                     {
-                        if (_currentIndex < length)
+                        if (currentIndex < length)
                         {
-                            var possibleParamValue = _arg[_currentIndex];
-                            var possibleParamValueIndex = _currentIndex;
+                            var possibleParamValue = arg[currentIndex];
+                            var possibleParamValueIndex = currentIndex;
                             if (!ParamPattern.IsMatch(possibleParamValue))
                             {
-                                _currentIndex++;
+                                currentIndex++;
                                 yield return new Token(possibleParamValue, TokenType.ParameterValue, possibleParamValueIndex);
                             }
                         }
@@ -118,9 +117,9 @@ namespace Isop
         
         public Token(string value, TokenType tokenType, int index)
         {
-            this.Value = value;
-            this.TokenType = tokenType;
-            this.Index = index;
+            Value = value;
+            TokenType = tokenType;
+            Index = index;
         }
         public override bool Equals(object obj)
         {
@@ -142,7 +141,7 @@ namespace Isop
         }
         public override string ToString()
         {
-            return string.Format("{0}:{1}", TokenType, Value);
+            return string.Format(CultureInfo.InvariantCulture,"{0}:{1}", TokenType, Value);
         }
     }
 }

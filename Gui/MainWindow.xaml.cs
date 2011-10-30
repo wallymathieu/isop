@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows;
 
@@ -62,7 +64,8 @@ namespace Isop.Gui
 
         private void ExecuteMethodButtonClick(object sender, RoutedEventArgs e)
         {
-            textBlock1.Text = MethodTreeModel.GlobalParameters.GetParsedArguments().Invoke();
+            var cout = new StringWriter(CultureInfo.CurrentCulture);
+            MethodTreeModel.GlobalParameters.GetParsedArguments().Invoke(cout);
             if (null == CurrentMethod) return;
 
             var controllerRecognizer = ParserBuilder.GetControllerRecognizers()
@@ -74,8 +77,9 @@ namespace Isop.Gui
             var parsedArguments = CurrentMethod.GetParsedArguments();
             var parsedMethod = controllerRecognizer.Parse(method, parsedArguments);
             parsedMethod.Factory = ParserBuilder.GetFactory();
-
-            textBlock1.Text += Environment.NewLine + parsedMethod.Invoke();
+            cout.WriteLine();
+            parsedMethod.Invoke(cout);
+            textBlock1.Text = cout.ToString();
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace Isop
 {
@@ -12,11 +12,10 @@ namespace Isop
         private readonly IList<ControllerRecognizer> _controllerRecognizers;
         private CultureInfo _cultureInfo;
         private TypeConverterFunc _typeConverter;
-		private Func<Type,Object> _factory{get{return container.Factory;}set{container.Factory=value;}}
         private HelpForControllers _helpForControllers;
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
-        private TypeContainer container=new TypeContainer();
+        private readonly TypeContainer _container=new TypeContainer();
         public ArgumentParserBuilder()
         {
             _controllerRecognizers = new List<ControllerRecognizer>();
@@ -44,8 +43,8 @@ namespace Isop
 		
 		public ArgumentParserBuilder SetFactory(Func<Type,Object> factory)
 		{
-			this._factory = factory;
-			return this;
+		    _container.Factory=factory;
+		    return this;
 		}
 		
         public ParsedArguments Parse(IEnumerable<string> arg)
@@ -60,7 +59,7 @@ namespace Isop
                 if (null != controllerRecognizer)
                 {
 					var parsedMethod = controllerRecognizer.Parse(arg);
-					parsedMethod.Factory = this.container.CreateInstance;
+					parsedMethod.Factory = _container.CreateInstance;
                     var merged = parsedArguments.Merge( parsedMethod);
                     //TODO: This is a hack! Should have some better way of controlling this!
                     if (parsedMethod.RecognizedAction == null ||
@@ -98,14 +97,16 @@ namespace Isop
 		public ArgumentParserBuilder Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
             _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
-            container.Instances.Add(arg.GetType(),arg);
+            _container.Instances.Add(arg.GetType(),arg);
             return this;
         }
 		
 
         public String Help()
         {
-			return this.Parse(new []{"Help"}).Invoke();// return _helpController.Index();
+            var cout = new StringWriter(_cultureInfo);
+            Parse(new []{"Help"}).Invoke(cout);
+			return cout.ToString();// return _helpController.Index();
         }
 
         /// <summary>
@@ -129,23 +130,25 @@ namespace Isop
             return this;
         }
         
-        public ArgumentParserBuilder HelpTextArgumentsAre(string TheArgumentsAre)
+        public ArgumentParserBuilder HelpTextArgumentsAre(string theArgumentsAre)
         {
             RecognizeHelp();
-            _helpForArgumentWithOptions.TheArgumentsAre = TheArgumentsAre;
+            _helpForArgumentWithOptions.TheArgumentsAre = theArgumentsAre;
             return this;
         }
 
         public string HelpFor(string command)
         {
-            return this.Parse(new []{"Help", command}).Invoke();//_helpController.Index(command);
+            var cout = new StringWriter(_cultureInfo);
+            Parse(new[] { "Help", command }).Invoke(cout);
+            return cout.ToString();//_helpController.Index(command);
         }
 
         public ArgumentParserBuilder RecognizeHelp()
         {
             if (_helpController==null)
             {
-                _helpForControllers = new HelpForControllers(_controllerRecognizers, container);
+                _helpForControllers = new HelpForControllers(_controllerRecognizers, _container);
                 _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
                 _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
                 Recognize(_helpController);
@@ -165,7 +168,7 @@ namespace Isop
 
         public Func<Type, object> GetFactory()
         {
-            return container.CreateInstance;
+            return _container.CreateInstance;
         }
     }
 }
