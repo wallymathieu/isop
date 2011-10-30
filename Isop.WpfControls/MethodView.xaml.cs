@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows.Controls;
+using Isop.WpfControls.ViewModels;
 
-namespace Isop.Gui
+namespace Isop.WpfControls
 {
     // http://stackoverflow.com/questions/2814866/programmatically-add-controls-to-wpf-form
     /// <summary>

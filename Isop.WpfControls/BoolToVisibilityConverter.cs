@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace Isop.Gui
+namespace Isop.WpfControls
 {
     /// <summary>
     /// http://thejoyofcode.com/Five_minute_recipe_for_a_decent_BoolToVisibilityConverter.aspx

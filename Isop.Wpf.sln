@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.csproj", "{02596ACA-3C85-4353-8744-5F0A172BA757}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gui", "Gui\Gui.csproj", "{459EEB82-BF2C-452E-9E5F-CC1A8F0DA47A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleWpf", "ExampleWpf\ExampleWpf.csproj", "{459EEB82-BF2C-452E-9E5F-CC1A8F0DA47A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop.WpfControls", "Isop.WpfControls\Isop.WpfControls.csproj", "{CEDD52FA-D33D-4FDA-A92A-A6C11561EC19}"
 EndProject

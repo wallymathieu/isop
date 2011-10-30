@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Isop.Gui
+namespace Isop.WpfControls.ViewModels
 {
     public class Method
     {

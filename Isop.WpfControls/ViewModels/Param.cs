@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Isop.Gui
+namespace Isop.WpfControls.ViewModels
 {
     public class Param
     {

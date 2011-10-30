@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Isop.Gui
+namespace Isop.WpfControls.ViewModels
 {
     public static class ParamExtension
     {
@@ -50,7 +50,7 @@ namespace Isop.Gui
                        {
                            Controllers = argumentParserBuilder.GetControllerRecognizers()
                                .Where(cmr => !cmr.ClassName().Equals("help", StringComparison.OrdinalIgnoreCase))
-                               .Select(cmr => new Controller()
+                               .Select(cmr => new Controller
                                                   {
                                                       Name = cmr.ClassName(),
                                                       Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
