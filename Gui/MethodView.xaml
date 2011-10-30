@@ -5,12 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:Gui="clr-namespace:Isop.Gui" mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
-    <ListBox x:Name="FieldsListBox">
+	<UserControl.Resources>
+        <Gui:BoolToVisibilityConverter x:Key="BoolToVisConverter" />
+	</UserControl.Resources>
+	<ListBox x:Name="FieldsListBox">
         <ListBox.ItemTemplate>
             <DataTemplate>
                 <StackPanel Orientation="Horizontal">
                     <Label Content="{Binding Name}" VerticalAlignment="Center"/>
                     <TextBox Width="50" Text="{Binding Value}" Margin="5,0,0,0"/>
+                    <Label Content="*" Visibility="{Binding Required, Converter={StaticResource BoolToVisConverter}}"/>
                 </StackPanel>
             </DataTemplate>
         </ListBox.ItemTemplate>

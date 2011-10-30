@@ -9,7 +9,7 @@ namespace Isop.Gui
     /// </summary>
     public partial class MethodView
     {
-        public ObservableCollection<Param> Parameters { set { FieldsListBox.ItemsSource = value; } }
+        public ObservableCollection<Param> Source { set { FieldsListBox.ItemsSource = value; } }
         public MethodView()
         {
             InitializeComponent();

@@ -27,26 +27,10 @@ namespace Isop.Gui
                      .Recognize(typeof(MyController))
                      .Recognize(typeof(CustomerController));
 
-            // TODO:
-            MethodTreeModel = new MethodTreeModel
-                                    {
-                                        Controllers = ParserBuilder.GetControllerRecognizers()
-                                            .Where(cmr => !cmr.ClassName().Equals("help", StringComparison.OrdinalIgnoreCase))
-                                            .Select(cmr => new Controller()
-                                            {
-                                                Name = cmr.ClassName(),
-                                                Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
-                                                    {
-                                                        Parameters = new ObservableCollection<Param>(
-                                                            m.GetParameters().Select(p => new Param(p.ParameterType, p.Name, null)))
-                                                    })
-                                            }),
-                                        GlobalParameters = new ObservableCollection<Param>(ParserBuilder.GetGlobalParameters()
-                                            .Select(p => new Param(typeof(string), p.Argument.ToString(),p)))
-                                    };
+            MethodTreeModel = ParserBuilder.GetMethodTreeModel();
 
             InitializeComponent();
-            paramview.Parameters = MethodTreeModel.GlobalParameters;
+            paramview.Source = MethodTreeModel.GlobalParameters;
             controllersAndCommands.DataContext = MethodTreeModel.Controllers;
             textBlock1.Text = string.Empty;
         }
@@ -57,7 +41,7 @@ namespace Isop.Gui
             {
                 CurrentMethod = (Method)e.NewValue;
                 methodview.DataContext = e.NewValue;
-                methodview.Parameters = CurrentMethod.Parameters;
+                methodview.Source = CurrentMethod.Parameters;
                 textBlock1.Text = string.Empty;
             }
         }
@@ -65,20 +49,29 @@ namespace Isop.Gui
         private void ExecuteMethodButtonClick(object sender, RoutedEventArgs e)
         {
             var cout = new StringWriter(CultureInfo.CurrentCulture);
-            MethodTreeModel.GlobalParameters.GetParsedArguments().Invoke(cout);
+            try
+            {
+                MethodTreeModel.GlobalParameters.GetParsedArguments().Invoke(cout);
+            }
+            catch (MissingArgumentException ex)
+            {
+                textBlock1.Text = String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray()));
+                return;
+            }
             if (null == CurrentMethod) return;
 
-            var controllerRecognizer = ParserBuilder.GetControllerRecognizers()
-                .First(c => c.ClassName().Equals(CurrentMethod.ClassName));
-
-            var method = controllerRecognizer.GetMethods()
-                .First(m => m.Name.Equals(CurrentMethod.Name));
-
-            var parsedArguments = CurrentMethod.GetParsedArguments();
-            var parsedMethod = controllerRecognizer.Parse(method, parsedArguments);
-            parsedMethod.Factory = ParserBuilder.GetFactory();
             cout.WriteLine();
-            parsedMethod.Invoke(cout);
+            try
+            {
+                var parsedMethod = ParserBuilder.Parse(CurrentMethod);
+                parsedMethod.Invoke(cout);
+            }
+            catch (MissingArgumentException ex)
+            {
+                textBlock1.Text = String.Format("Missing argument(s): {0}", String.Join(", ", ex.Arguments.Select(a => String.Format("{0}: {1}", a.Key, a.Value)).ToArray()));
+                return;
+            }
+
             textBlock1.Text = cout.ToString();
         }
     }

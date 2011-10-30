@@ -6,6 +6,7 @@ namespace Isop.Gui
     {
         public Type Type { get; set; }
         public string Name { get; set; }
+        public bool Required { get { return _argWithOptions.Required; } }
         private readonly ArgumentWithOptions _argWithOptions;
         public string Value { get; set; }
         public Param(Type type, string name, ArgumentWithOptions argWithOptions)
@@ -19,8 +20,7 @@ namespace Isop.Gui
         {
             get
             {
-                if (null != _argWithOptions) return _argWithOptions;
-                return new ArgumentWithOptions(Name);
+                return _argWithOptions;
             }
         }
 
