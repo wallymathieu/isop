@@ -11,6 +11,7 @@ _ReSharper.*
 ~$*
 *.swp
 *.*~
+*.bak
 *.orig
 test-results/
 *.userprefs

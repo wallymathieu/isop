@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Isop
 {
-    public class ArgumentParserBuilder
+    public class Build
     {
         private readonly IList<ArgumentWithOptions> _argumentRecognizers;
         private readonly IList<ControllerRecognizer> _controllerRecognizers;
@@ -16,13 +16,13 @@ namespace Isop
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
         private readonly TypeContainer _container=new TypeContainer();
-        public ArgumentParserBuilder()
+        public Build()
         {
             _controllerRecognizers = new List<ControllerRecognizer>();
             _argumentRecognizers = new List<ArgumentWithOptions>();
         }
 
-        public ArgumentParserBuilder Parameter(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null)
+        public Build Parameter(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null)
         {
             _argumentRecognizers.Add(new ArgumentWithOptions(argument, action, required, description));
             return this;
@@ -32,16 +32,16 @@ namespace Isop
         /// </summary>
         /// <param name="cultureInfo"></param>
         /// <returns></returns>
-        public ArgumentParserBuilder SetCulture(CultureInfo cultureInfo)
+        public Build SetCulture(CultureInfo cultureInfo)
         {
             _cultureInfo = cultureInfo; return this;
         }
-        public ArgumentParserBuilder SetTypeConverter(TypeConverterFunc typeconverter)
+        public Build SetTypeConverter(TypeConverterFunc typeconverter)
         {
             _typeConverter = typeconverter; return this;
         }
 		
-		public ArgumentParserBuilder SetFactory(Func<Type,Object> factory)
+		public Build SetFactory(Func<Type,Object> factory)
 		{
 		    _container.Factory=factory;
 		    return this;
@@ -89,12 +89,12 @@ namespace Isop
             }
         }
 
-        public ArgumentParserBuilder Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
+        public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
             _controllerRecognizers.Add(new ControllerRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
             return this;
         }
-		public ArgumentParserBuilder Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
+		public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
         {
             _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
             _container.Instances.Add(arg.GetType(),arg);
@@ -117,7 +117,7 @@ namespace Isop
         /// <param name="theSubCommandsFor">default: The sub commands for </param>
         /// <param name="helpSubCommandForMoreInformation">default: Se 'COMMANDNAME' help 'command' 'subcommand' for more information</param>
         /// <returns></returns>
-        public ArgumentParserBuilder HelpTextCommandsAre(string theCommandsAre,
+        public Build HelpTextCommandsAre(string theCommandsAre,
             string helpCommandForMoreInformation,
             string theSubCommandsFor,
             string helpSubCommandForMoreInformation)
@@ -130,7 +130,7 @@ namespace Isop
             return this;
         }
         
-        public ArgumentParserBuilder HelpTextArgumentsAre(string theArgumentsAre)
+        public Build HelpTextArgumentsAre(string theArgumentsAre)
         {
             RecognizeHelp();
             _helpForArgumentWithOptions.TheArgumentsAre = theArgumentsAre;
@@ -144,7 +144,7 @@ namespace Isop
             return cout.ToString();//_helpController.Index(command);
         }
 
-        public ArgumentParserBuilder RecognizeHelp()
+        public Build RecognizeHelp()
         {
             if (_helpController==null)
             {
@@ -169,6 +169,11 @@ namespace Isop
         public Func<Type, object> GetFactory()
         {
             return _container.CreateInstance;
+        }
+
+        public Build Configuration(Type type)
+        {
+            throw new NotImplementedException();
         }
     }
 }

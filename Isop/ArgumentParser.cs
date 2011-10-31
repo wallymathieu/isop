@@ -389,7 +389,8 @@ namespace Isop
 
     public class ArgumentParser
     {
-        public static ArgumentParserBuilder Build() { return new ArgumentParserBuilder(); }
+        [Obsolete("Use new Build()...")]
+        public static Build Build() { return new Build(); }
         private readonly IEnumerable<ArgumentWithOptions> _argumentWithOptions;
 
         public ArgumentParser(IEnumerable<ArgumentWithOptions> argumentWithOptions)
@@ -492,6 +493,11 @@ namespace Isop
                 RecognizedArguments = recognized,
                 UnRecognizedArguments = unRecognizedArguments
             };
+        }
+
+        public static Build BuildFromConfiguration(Type type)
+        {
+            return new Build().Configuration(type);
         }
     }
 }

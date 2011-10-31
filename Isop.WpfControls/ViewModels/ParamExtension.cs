@@ -21,7 +21,7 @@ namespace Isop.WpfControls.ViewModels
                        };
         }
 
-        public static ParsedMethod Parse(this ArgumentParserBuilder argumentParserBuilder, Method currentMethod)
+        public static ParsedMethod Parse(this Build argumentParserBuilder, Method currentMethod)
         {
             var controllerRecognizer = argumentParserBuilder.GetControllerRecognizers()
                 .First(c => c.ClassName().Equals(currentMethod.ClassName));
@@ -44,7 +44,7 @@ namespace Isop.WpfControls.ViewModels
             return parsedMethod;
         }
 
-        public static MethodTreeModel GetMethodTreeModel(this ArgumentParserBuilder argumentParserBuilder)
+        public static MethodTreeModel GetMethodTreeModel(this Build argumentParserBuilder)
         {
             return new MethodTreeModel
                        {

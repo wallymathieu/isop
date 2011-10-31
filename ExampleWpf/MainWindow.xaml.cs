@@ -17,7 +17,7 @@ namespace Isop.Gui
         public MethodTreeModel MethodTreeModel { get; set; }
         public ObservableCollection<Param> Parameters;
         public Method CurrentMethod { get; set; }
-        protected ArgumentParserBuilder ParserBuilder { get; set; }
+        protected Build ParserBuilder { get; set; }
 
         public MainWindow()
         {

@@ -47,7 +47,7 @@
     <Compile Include="TypeContainer.cs" />
     <Compile Include="ArgumentLexer.cs" />
     <Compile Include="ArgumentParser.cs" />
-    <Compile Include="ArgumentParserBuilder.cs" />
+    <Compile Include="Build.cs" />
     <Compile Include="Help.cs" />
     <Compile Include="ControllerRecognizer.cs" />
   </ItemGroup>
