@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Isop
 {
@@ -173,7 +174,50 @@ namespace Isop
 
         public Build Configuration(Type type)
         {
-            throw new NotImplementedException();
+            var instance = Activator.CreateInstance(type);
+            var methods= type.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+            var recognizer = new MethodInfoFinder();
+            var recognizesMethod = recognizer.Match(methods, 
+                name:"Recognizes",
+                returnType: typeof(IEnumerable<Type>),
+                parameters: new Type[0]);
+            var recognizes=(IEnumerable<Type>)recognizesMethod.Invoke(instance, new object[0]);
+            foreach (var recognized in recognizes)
+            {
+                CultureInfo cultureInfo=null;
+                TypeConverterFunc typeconverter=null;
+                Recognize(recognized,cultureInfo,typeconverter);
+            }
+            var objectFactory = recognizer.Match(methods,
+                name: "ObjectFactory",
+                returnType: typeof(object),
+                parameters: new[] { typeof(Type) });
+            SetFactory((Func<Type, object>)Delegate.CreateDelegate(typeof(Func<Type, object>), instance, objectFactory));
+
+            var configure = recognizer.Match(methods,
+                name: "Configure",
+                returnType: typeof(void));
+            foreach (var parameterInfo in configure.GetParameters())
+            {
+                this.Parameter(parameterInfo.Name, required: true);//humz?
+            }
+
+            return this;
+        }
+
+        private class MethodInfoFinder
+        {
+            public MethodInfo Match(IEnumerable<MethodInfo> methods, Type returnType=null, string name=null, IEnumerable<Type> parameters=null)
+            {
+                IEnumerable<MethodInfo> retv=methods;
+                if (null!=returnType)
+                    retv = retv.Where(m => m.ReturnType == returnType);
+                if (null!=parameters)
+                    retv = retv.Where(m => m.GetParameters().Select(p => p.ParameterType).SequenceEqual(parameters));
+                if (null!=name)
+                    retv = retv.Where(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                return retv.First();
+            }
         }
     }
 }
