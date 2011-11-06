@@ -275,5 +275,5 @@ namespace Isop
             }
             return this;
         }
-    } 
+    }
 }

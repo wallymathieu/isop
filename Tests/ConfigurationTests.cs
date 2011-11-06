@@ -75,5 +75,15 @@ namespace Isop.Tests
             var path = System.Reflection.Assembly.GetExecutingAssembly().Location;
             Assert.That(Directory.GetParent(path).FullName,Is.EqualTo(Environment.CurrentDirectory));
         }
+        
+        [Test] public void Can_invoke_configure_method_on_configuration()
+        {
+            var conf = new FullConfiguration();
+            var parserBuilder = new Build().Configuration(conf);
+            var parsed = parserBuilder.Parse(new []{"--global","globalvalue","My","Action","--value","1"});
+            var cout = new StringWriter();
+            parsed.Invoke(cout);
+            Assert.That(conf.Global,Is.EqualTo("1"));
+        }
     }
 }
