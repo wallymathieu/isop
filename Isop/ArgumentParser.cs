@@ -495,6 +495,7 @@ namespace Isop
             };
         }
 
+        [Obsolete("Use new Build()...")] 
         public static Build BuildFromConfiguration(Type type)
         {
             return new Build().Configuration(type);

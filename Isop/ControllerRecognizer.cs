@@ -143,9 +143,7 @@ namespace Isop
         }
 		public IEnumerable<MethodInfo> GetMethods()
 		{
-			return Type.GetMethods(BindingFlags.Public| BindingFlags.Instance)
-                .Where(m=>!m.DeclaringType.Equals(typeof(Object)))
-                .Where(m => !m.Name.StartsWith("get_", StringComparison.OrdinalIgnoreCase) && !m.Name.StartsWith("set_", StringComparison.OrdinalIgnoreCase))
+			return new MethodInfoFinder().GetOwnPublicMethods(Type)
                 .Where(m=>!m.Name.Equals("help",StringComparison.OrdinalIgnoreCase));
 		}
 		

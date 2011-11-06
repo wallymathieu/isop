@@ -5,6 +5,15 @@ using Isop;
 
 namespace Isop.Example
 {
+    class IsopConfiguration
+    {
+        public IEnumerable<Type> Recognizes()
+        {
+            return new[] { typeof(MyController), typeof(CustomerController) };
+        }
+        public bool RecognizeHelp{get{return true;}}
+    }
+    
     /// <summary>
     /// This is a sample usage of console helpers:
     /// </summary>

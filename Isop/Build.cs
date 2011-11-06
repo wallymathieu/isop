@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Isop
 {
-    public class Build
+    public class Build:IDisposable
     {
         private readonly IList<ArgumentWithOptions> _argumentRecognizers;
         private readonly IList<ControllerRecognizer> _controllerRecognizers;
@@ -37,6 +37,12 @@ namespace Isop
         {
             _cultureInfo = cultureInfo; return this;
         }
+
+        public CultureInfo GetCulture ()
+        {
+            return _cultureInfo;
+        }
+     
         public Build SetTypeConverter(TypeConverterFunc typeconverter)
         {
             _typeConverter = typeconverter; return this;
@@ -157,6 +163,11 @@ namespace Isop
             return this;
         }
 
+        public bool RecognizesHelp ()
+        {
+            return _helpController!=null;
+        }
+
         public IEnumerable<ControllerRecognizer> GetControllerRecognizers()
         {
             return _controllerRecognizers;
@@ -171,53 +182,98 @@ namespace Isop
         {
             return _container.CreateInstance;
         }
-
-        public Build Configuration(Type type)
+        private List<IDisposable> disposables = new List<IDisposable>();
+        public void Dispose()
         {
-            var instance = Activator.CreateInstance(type);
-            var methods= type.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+            foreach (var item in disposables) 
+            {
+                item.Dispose();
+            }
+            disposables.Clear();
+        }
+        
+        public Build Configuration<T>(T instance)
+        {
+            return Configuration(typeof(T),instance);
+        }
+        public Build Configuration(Type t,object instance)
+        {
+            var methods= t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
             var recognizer = new MethodInfoFinder();
-            var recognizesMethod = recognizer.Match(methods, 
+
+            var culture = recognizer.MatchGet(methods, 
+                name:"Culture",
+                returnType: typeof(CultureInfo),
+                parameters: new Type[0]);
+            if (null!=culture)
+                _cultureInfo = (CultureInfo)culture.Invoke(instance,new object[0]);
+            
+            var recognizesMethod = recognizer.MatchGet(methods, 
                 name:"Recognizes",
                 returnType: typeof(IEnumerable<Type>),
                 parameters: new Type[0]);
-            var recognizes=(IEnumerable<Type>)recognizesMethod.Invoke(instance, new object[0]);
-            foreach (var recognized in recognizes)
+            if (null!=recognizesMethod)
             {
-                CultureInfo cultureInfo=null;
-                TypeConverterFunc typeconverter=null;
-                Recognize(recognized,cultureInfo,typeconverter);
+                var recognizes=(IEnumerable<Type>)recognizesMethod.Invoke(instance, new object[0]);
+                foreach (var recognized in recognizes)
+                {
+                    Recognize(recognized);
+                }
             }
             var objectFactory = recognizer.Match(methods,
                 name: "ObjectFactory",
                 returnType: typeof(object),
                 parameters: new[] { typeof(Type) });
-            SetFactory((Func<Type, object>)Delegate.CreateDelegate(typeof(Func<Type, object>), instance, objectFactory));
+            if (null!=objectFactory)
+                SetFactory((Func<Type, object>)Delegate.CreateDelegate(typeof(Func<Type, object>), instance, objectFactory));
 
             var configure = recognizer.Match(methods,
                 name: "Configure",
                 returnType: typeof(void));
-            foreach (var parameterInfo in configure.GetParameters())
+            if (null!=configure)
+                foreach (var parameterInfo in configure.GetParameters())
+                {
+                    this.Parameter(parameterInfo.Name, required: true);//humz?
+                }
+            var _recongizeHelp = recognizer.MatchGet(methods,
+                name:"RecognizeHelp",
+                returnType: typeof(bool),
+                parameters: new Type[0]);
+                
+            if (null!=_recongizeHelp && (bool)_recongizeHelp.Invoke(instance,new object[0]))
             {
-                this.Parameter(parameterInfo.Name, required: true);//humz?
+                RecognizeHelp() ;
             }
+            
+            if (instance is IDisposable) 
+                disposables.Add((IDisposable)instance);
+            
+            return this;            
+        }
+        public Build Configuration(Type type)
+        {
+            return Configuration(type,Activator.CreateInstance(type));
+        }
 
+        public Build ConfigurationFrom (string path)
+        {
+            var files = Directory.GetFiles(path)
+                .Where(f=>{
+                    var ext = Path.GetExtension(f);
+                    return ext.Equals(".dll") || ext.Equals(".exe");
+                })
+                .Where(f=>!Path.GetFileNameWithoutExtension(f).StartsWith("Isop"));
+            foreach (var file in files) 
+            {
+                var assembly= Assembly.LoadFile(file);
+                var isopconfigurations = assembly.GetTypes()
+                    .Where(type=>type.Name.Equals("isopconfiguration",StringComparison.OrdinalIgnoreCase));
+                foreach (var config in isopconfigurations) 
+                {
+                   Configuration(config);
+                }
+            }
             return this;
         }
-
-        private class MethodInfoFinder
-        {
-            public MethodInfo Match(IEnumerable<MethodInfo> methods, Type returnType=null, string name=null, IEnumerable<Type> parameters=null)
-            {
-                IEnumerable<MethodInfo> retv=methods;
-                if (null!=returnType)
-                    retv = retv.Where(m => m.ReturnType == returnType);
-                if (null!=parameters)
-                    retv = retv.Where(m => m.GetParameters().Select(p => p.ParameterType).SequenceEqual(parameters));
-                if (null!=name)
-                    retv = retv.Where(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-                return retv.First();
-            }
-        }
-    }
+    } 
 }
