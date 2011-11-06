@@ -17,6 +17,17 @@ namespace Isop
                 retv = retv.Where (m => m.Name.Equals (name, StringComparison.OrdinalIgnoreCase));
             return retv;
         }
+        
+        public IEnumerable<MethodInfo> FindSet(IEnumerable<MethodInfo> methods,Type returnType=null, string name=null, IEnumerable<Type> parameters=null)
+        {
+            var retv = Find (methods,returnType,null,parameters)
+                .Where(m=>m.Name.StartsWith("set", StringComparison.OrdinalIgnoreCase));
+            if (null != name)
+                retv = retv.Where (m => 
+                    m.Name.Equals ("set" + name, StringComparison.OrdinalIgnoreCase)
+                    || m.Name.Equals ("set_" + name, StringComparison.OrdinalIgnoreCase));
+            return retv;
+        }
             
         public MethodInfo Match (IEnumerable<MethodInfo> methods, Type returnType=null, string name=null, IEnumerable<Type> parameters=null)
         {

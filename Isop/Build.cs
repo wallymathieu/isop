@@ -227,14 +227,13 @@ namespace Isop
             if (null!=objectFactory)
                 SetFactory((Func<Type, object>)Delegate.CreateDelegate(typeof(Func<Type, object>), instance, objectFactory));
 
-            var configure = recognizer.Match(methods,
-                name: "Configure",
-                returnType: typeof(void));
-            if (null!=configure)
-                foreach (var parameterInfo in configure.GetParameters())
-                {
-                    this.Parameter(parameterInfo.Name, required: true);//humz?
-                }
+            var configurationSetters = recognizer.FindSet(methods);
+            foreach (var methodInfo in configurationSetters)
+            {
+                var action = (Action<String>)Delegate.CreateDelegate(typeof(Action<String>), 
+                    instance, methodInfo);
+                this.Parameter(RemoveSetFromBeginningOfString(methodInfo.Name),action);//humz?
+            }
             var _recongizeHelp = recognizer.MatchGet(methods,
                 name:"RecognizeHelp",
                 returnType: typeof(bool),
@@ -249,6 +248,14 @@ namespace Isop
                 disposables.Add((IDisposable)instance);
             
             return this;            
+        }
+        private string RemoveSetFromBeginningOfString(string arg)
+        {
+            if (arg.StartsWith("set_",StringComparison.OrdinalIgnoreCase))
+                return arg.Substring(4);
+            if (arg.StartsWith("set",StringComparison.OrdinalIgnoreCase))
+                return arg.Substring(3);
+            return arg;
         }
         public Build Configuration(Type type)
         {

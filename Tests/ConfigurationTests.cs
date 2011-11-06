@@ -12,14 +12,14 @@ namespace Isop.Tests
     class FullConfiguration:IDisposable
     {
         public bool DisposeCalled = false;
-        public string Global;
+        
         public IEnumerable<Type> Recognizes()
         {
             return new[] { typeof(MyController) };
         }
-        public void Configure(string global)
-        {
-            this.Global = global;
+        public string Global {
+         get;
+         set;
         }
         public object ObjectFactory(Type type)
         {
@@ -47,7 +47,8 @@ namespace Isop.Tests
             Assert.That(parserBuilder.GetCulture(),Is.EqualTo(CultureInfo.GetCultureInfo("es-ES")));
             Assert.That(parserBuilder.GetControllerRecognizers().Select(cr => cr.Type).ToArray(), 
                 Is.EquivalentTo(new[] { typeof(MyController), typeof(HelpController) }));
-            Assert.That(parserBuilder.GetGlobalParameters().Select(p => p.Argument.Prototype.ToString()), Is.EquivalentTo(new[] { "global" }));
+            Assert.That(parserBuilder.GetGlobalParameters().Select(p => p.Argument.Prototype.ToString()).ToArray(),
+                Is.EquivalentTo(new[] { "Global" }));
         }
         
         [Test] public void Can_dispose_of_configuration_after_usage()
@@ -83,7 +84,7 @@ namespace Isop.Tests
             var parsed = parserBuilder.Parse(new []{"--global","globalvalue","My","Action","--value","1"});
             var cout = new StringWriter();
             parsed.Invoke(cout);
-            Assert.That(conf.Global,Is.EqualTo("1"));
+            Assert.That(conf.Global,Is.EqualTo("globalvalue"));
         }
     }
 }
