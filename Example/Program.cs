@@ -5,6 +5,9 @@ using Isop;
 
 namespace Isop.Example
 {
+    /// <summary>
+    /// This is a sample usage of Isop when you want to invoke the program using Isop.Cli.exe:
+    /// </summary>
     class IsopConfiguration
     {
         public IEnumerable<Type> Recognizes()
@@ -15,13 +18,12 @@ namespace Isop.Example
     }
     
     /// <summary>
-    /// This is a sample usage of console helpers:
+    /// This is a sample usage of Isop when configuring using ArgumentParser.Build:
     /// </summary>
     class Program
     {
         static void Main(string[] args)
         {
-            //TODO: This should be shorter!
             var parserBuilder = ArgumentParser.Build()
                        .RecognizeHelp()
                        .Recognize(typeof(MyController))

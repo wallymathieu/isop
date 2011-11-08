@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Isop.Auto.Cli</RootNamespace>
-    <AssemblyName>Isop.Auto.Cli</AssemblyName>
+    <AssemblyName>Isop.Cli</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>

@@ -68,7 +68,7 @@ namespace Isop.Tests
 
             Assert.That(parserBuilder.RecognizesHelp());
             Assert.That(parserBuilder.GetControllerRecognizers().Count(), 
-                Is.AtLeast(1));
+                Is.AtLeast(2));
         }
         
         [Test] public void Can_use_file_location_to_get_directory()
