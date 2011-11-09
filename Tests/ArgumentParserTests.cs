@@ -18,7 +18,7 @@ namespace Isop.Tests
         [Test]
         public void Recognizes_shortform()
         {
-            var parser = ArgumentParser.Build()
+            var parser = new Build()
                 .Parameter("&argument")
                 .Parse(new[] { "-a" });
             var arguments = parser.RecognizedArguments;
@@ -30,7 +30,7 @@ namespace Isop.Tests
         [Test]
         public void Given_several_arguments_Then_the_correct_one_is_recognized()
         {
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                 .Parameter("&beta")
                 .Parse(new[] { "-a", "-b" }).RecognizedArguments;
 
@@ -42,7 +42,7 @@ namespace Isop.Tests
         [Test]
         public void Recognizes_longform()
         {
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                 .Parameter("beta")
                 .Parse(new[] { "-a", "--beta" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -53,7 +53,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_parameter_value()
         {
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                 .Parameter("beta")
                 .Parse(new[] { "-a", "--beta", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -70,7 +70,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_ordinal_parameter_value()
         {
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                 .Parameter("#0first")
                 .Parse(new[] { "first" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -80,7 +80,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_parameter_with_equals()
         {
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                 .Parameter("beta=")
                 .Parse(new[] { "-a", "--beta=test", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -91,7 +91,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_parameter_alias()
         {
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                 .Parameter("beta|b=")
                 .Parse(new[] { "-a", "-b=test", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -103,7 +103,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_report_unrecognized_parameters()
         {
-            var unRecognizedArguments = ArgumentParser.Build()
+            var unRecognizedArguments = new Build()
                .Parameter("beta")
                .Parse(new[] { "-a", "value", "--beta" }).UnRecognizedArguments;
 
@@ -115,7 +115,7 @@ namespace Isop.Tests
         [Test]
         public void It_wont_report_matched_parameters()
         {
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                 .Parameter("beta")
                 .Parse(new[] { "--beta", "value" }).UnRecognizedArguments;
 
@@ -124,7 +124,7 @@ namespace Isop.Tests
         [Test]
         public void It_will_fail_if_argument_not_supplied_and_it_is_required()
         {
-            Assert.Throws<MissingArgumentException>(() => ArgumentParser.Build()
+            Assert.Throws<MissingArgumentException>(() => new Build()
                .Parameter("beta", required: true)
                .Parse(new[] { "-a", "value" }));
 
@@ -132,7 +132,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_recognize_arguments()
         {
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                 .Parameter("alpha")
                 .Parse(new[] { "alpha" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -153,7 +153,7 @@ namespace Isop.Tests
                                                     (object)
                                                     new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
                                             };
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(MyController))
                                                .SetFactory(factory)
@@ -167,7 +167,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail()
         {
-            var builder = ArgumentParser.Build()
+            var builder = new Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(MyController));
 
@@ -181,7 +181,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail_because_of_type_conversion()
         {
-            var builder = ArgumentParser.Build()
+            var builder = new Build()
                  .SetCulture(CultureInfo.InvariantCulture)
                  .Recognize(typeof(SingleIntAction));
             Assert.Throws<TypeConversionFailedException>(() =>
@@ -192,7 +192,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail_because_no_arguments_given()
         {
-            var builder = ArgumentParser.Build()
+            var builder = new Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(MyController));
 
@@ -211,7 +211,7 @@ namespace Isop.Tests
                                                     (object)
                                                     new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
                                             };
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(MyController))
                                                .Parameter("beta", arg => countArg++)
@@ -236,7 +236,7 @@ namespace Isop.Tests
                     new WithIndexController() { OnIndex = (p1, p2, p3, p4) => (count++).ToString() };
             };
 
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(WithIndexController))
                                                .SetFactory(factory)
@@ -261,7 +261,7 @@ namespace Isop.Tests
         public void It_can_invoke_recognized()
         {
             var count = 0;
-            ArgumentParser.Build()
+            new Build()
                            .Parameter("beta", arg => count++)
                            .Parameter("alpha", arg => Assert.Fail())
                            .Parse(new[] { "-a", "value", "--beta" }).Invoke(new StringWriter());
@@ -282,7 +282,7 @@ namespace Isop.Tests
                     new EnumerableController() { Length = 2, OnEnumerate = () => (count++) };
             };
 
-            var arguments = ArgumentParser.Build()
+            var arguments = new Build()
                    .Recognize(typeof(EnumerableController))
                    .SetFactory(factory)
                    .Parse(new[] { "Enumerable", "Return" });

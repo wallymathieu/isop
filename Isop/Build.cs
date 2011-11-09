@@ -69,7 +69,7 @@ namespace Isop
 					parsedMethod.Factory = _container.CreateInstance;
                     var merged = parsedArguments.Merge( parsedMethod);
                     //TODO: This is a hack! Should have some better way of controlling this!
-                    if (!controllerRecognizer.IgnoreUnMatchedParameters)
+                    if (!controllerRecognizer.IgnoreGlobalUnMatchedParameters)
                         FailOnUnMatched(merged);
                     return merged;
                 }
@@ -95,14 +95,14 @@ namespace Isop
             }
         }
 
-        public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreUnMatchedParameters=false)
+        public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
         {
-            _controllerRecognizers.Add(new ControllerRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter,ignoreUnMatchedParameters));
+            _controllerRecognizers.Add(new ControllerRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter,ignoreGlobalUnMatchedParameters));
             return this;
         }
-		public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreUnMatchedParameters=false)
+		public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
         {
-            _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter, ignoreUnMatchedParameters));
+            _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter, ignoreGlobalUnMatchedParameters));
             _container.Instances.Add(arg.GetType(),arg);
             return this;
         }
@@ -157,7 +157,7 @@ namespace Isop
                 _helpForControllers = new HelpForControllers(_controllerRecognizers, _container);
                 _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
                 _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
-                Recognize(_helpController,ignoreUnMatchedParameters:true);
+                Recognize(_helpController,ignoreGlobalUnMatchedParameters:true);
             }
             return this;
         }

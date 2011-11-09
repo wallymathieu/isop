@@ -10,7 +10,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_report_usage_for_simple_parameters ()
         {
-            var usage = ArgumentParser.Build ()
+            var usage = new Build()
                                     .Parameter ("beta", arg => { }, description:"Some description about beta")
                                     .Parameter ("alpha", arg => { })
                                     .RecognizeHelp ()
@@ -24,7 +24,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_report_usage_for_simple_parameters_with_different_texts ()
         {
-            var usage = ArgumentParser.Build ()
+            var usage = new Build()
                                     .Parameter ("beta", arg => { }, description:"Beskrivning av beta")
                                     .Parameter ("alpha", arg => { })
                                     .RecognizeHelp ()
@@ -50,7 +50,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_report_usage_for_controllers ()
         {
-            var usage = ArgumentParser.Build ()
+            var usage = new Build()
                                     .Recognize (typeof(MyController))
                                     .Recognize (typeof(AnotherController))
                                     .RecognizeHelp ()
@@ -65,7 +65,7 @@ Se 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_when_having_required_parameters ()
         {
-            var usage = ArgumentParser.Build ()
+            var usage = new Build()
                                     .Parameter("required",required:true)
                                     .Recognize (typeof(MyController))
                                     .Recognize (typeof(AnotherController))
@@ -83,7 +83,7 @@ Se 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_and_have_a_different_help_text ()
         {
-            var usage = ArgumentParser.Build ()
+            var usage = new Build()
                 .Recognize (typeof(MyController))
                 .Recognize (typeof(AnotherController))
                 .RecognizeHelp ()
@@ -103,7 +103,7 @@ Se 'Kommandonamn' help <kommando> för ytterligare information")));
         [Test]
         public void It_can_report_usage_for_a_specific_controller_and_have_a_different_help_text ()
         {
-            var usage = ArgumentParser.Build ()
+            var usage = new Build()
                 .Recognize (typeof(MyController))
                 .Recognize (typeof(AnotherController))
                 .RecognizeHelp ()
@@ -128,7 +128,7 @@ Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
         public void It_can_report_usage_when_no_parameters_given ()
         {
             var cout = new StringWriter();
-            ArgumentParser.Build ()
+            new Build()
                                     .RecognizeHelp ()
                                     .Recognize (typeof(MyController))
                                     .Parse (new string[]{}).Invoke (cout);
@@ -141,7 +141,7 @@ Se 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_and_actions ()
         {
-            var usage = ArgumentParser.Build ()
+            var usage = new Build()
                                     .Recognize (typeof(MyController))
                                     .Recognize (typeof(AnotherController))
                                     .RecognizeHelp ()
@@ -157,7 +157,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_with_description ()
         {
-            var usage = ArgumentParser.Build ()
+            var usage = new Build()
                                     .Recognize (typeof(DescriptionController))
                                     .RecognizeHelp ()
                                     .Help ();
@@ -170,7 +170,7 @@ Se 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_and_actions_with_description ()
         {
-            var usage = ArgumentParser.Build ()
+            var usage = new Build()
                                     .Recognize (typeof(DescriptionController))
                                     .RecognizeHelp ()
                                     .HelpFor ("Description");
