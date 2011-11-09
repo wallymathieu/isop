@@ -62,7 +62,7 @@ namespace Isop.Tests
         [Test] public void Can_read_configuration_from_example_project()
         {
             var path = Path.Combine("..","..","..",
-                Path.Combine("Example","bin","Debug"));
+                Path.Combine("Example.Cli","bin","Debug"));
             
             var parserBuilder = new Build().ConfigurationFrom(path);
 

@@ -69,8 +69,7 @@ namespace Isop
 					parsedMethod.Factory = _container.CreateInstance;
                     var merged = parsedArguments.Merge( parsedMethod);
                     //TODO: This is a hack! Should have some better way of controlling this!
-                    if (parsedMethod.RecognizedAction == null ||
-                        !parsedMethod.RecognizedAction.ReflectedType.Equals(typeof (HelpController)))
+                    if (!controllerRecognizer.IgnoreUnMatchedParameters)
                         FailOnUnMatched(merged);
                     return merged;
                 }
@@ -96,14 +95,14 @@ namespace Isop
             }
         }
 
-        public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
+        public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreUnMatchedParameters=false)
         {
-            _controllerRecognizers.Add(new ControllerRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
+            _controllerRecognizers.Add(new ControllerRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter,ignoreUnMatchedParameters));
             return this;
         }
-		public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
+		public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreUnMatchedParameters=false)
         {
-            _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter));
+            _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter, ignoreUnMatchedParameters));
             _container.Instances.Add(arg.GetType(),arg);
             return this;
         }
@@ -158,7 +157,7 @@ namespace Isop
                 _helpForControllers = new HelpForControllers(_controllerRecognizers, _container);
                 _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
                 _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
-                Recognize(_helpController);
+                Recognize(_helpController,ignoreUnMatchedParameters:true);
             }
             return this;
         }

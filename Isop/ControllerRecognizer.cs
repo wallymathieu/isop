@@ -112,15 +112,19 @@ namespace Isop
         
         private readonly CultureInfo _culture;
         public Type Type { get; private set; }
-		
+		public bool IgnoreUnMatchedParameters{get; private set;}
 		private readonly Transform _transform = new Transform();
         /// <summary>
         /// </summary>
-        public ControllerRecognizer(Type type, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null)
+        public ControllerRecognizer(Type type, 
+            CultureInfo cultureInfo = null, 
+            TypeConverterFunc typeConverter = null,
+            bool ignoreUnMatchedParameters = false)
         {
             _typeConverter = typeConverter ?? DefaultConvertFrom;
             Type = type;
             _culture = cultureInfo ?? CultureInfo.CurrentCulture;
+            IgnoreUnMatchedParameters = ignoreUnMatchedParameters;
         }
 		
         public bool Recognize(IEnumerable<string> arg)

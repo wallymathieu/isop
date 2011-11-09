@@ -6,18 +6,6 @@ using Isop;
 namespace Isop.Example
 {
     /// <summary>
-    /// This is a sample usage of Isop when you want to invoke the program using Isop.Cli.exe:
-    /// </summary>
-    class IsopConfiguration
-    {
-        public IEnumerable<Type> Recognizes()
-        {
-            return new[] { typeof(MyController), typeof(CustomerController) };
-        }
-        public bool RecognizeHelp{get{return true;}}
-    }
-    
-    /// <summary>
     /// This is a sample usage of Isop when configuring using ArgumentParser.Build:
     /// </summary>
     class Program

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop.Cli", "Isop.Auto.Cli\Isop.Cli.csproj", "{C5008846-A54B-46C3-B144-973E50B8620F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Cli", "Example.Cli\Example.Cli.csproj", "{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,24 @@ Global
 		{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}.Release|x86.ActiveCfg = Release|Any CPU
 		{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}.Release|x86.Build.0 = Release|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Debug|x86.Build.0 = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Default|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Default|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Default|x86.ActiveCfg = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Default|x86.Build.0 = Debug|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Release|x86.ActiveCfg = Release|Any CPU
+		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Release|x86.Build.0 = Release|Any CPU
 		{55C48544-BD4E-4101-A42C-CCCEB2F92304}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{55C48544-BD4E-4101-A42C-CCCEB2F92304}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55C48544-BD4E-4101-A42C-CCCEB2F92304}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
