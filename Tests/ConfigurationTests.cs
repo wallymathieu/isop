@@ -61,8 +61,8 @@ namespace Isop.Tests
         
         [Test] public void Can_read_configuration_from_example_project()
         {
-            var path = Path.Combine("..","..","..",
-                Path.Combine("Example.Cli","bin","Debug"));
+            var path = Path.GetFullPath( Path.Combine("..","..","..",
+                Path.Combine("Example.Cli","bin","Debug")));
             
             var parserBuilder = new Build().ConfigurationFrom(path);
 
@@ -71,9 +71,9 @@ namespace Isop.Tests
                 Is.AtLeast(2));
         }
         
-        [Test] public void Can_use_file_location_to_get_directory()
+        [Test,Ignore("Not really correct")] public void Can_use_file_location_to_get_directory()
         {
-            var path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var path = Assembly.GetExecutingAssembly().Location;
             Assert.That(Directory.GetParent(path).FullName,Is.EqualTo(Environment.CurrentDirectory));
         }
         
