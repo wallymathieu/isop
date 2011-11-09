@@ -1,12 +1,14 @@
-h1. Isop
-
-This project is intended to collect some of the helpers for console applications. The hope is that this will simplify the design of such programs.
-
 h2. Goal
 
 The goal is to be able to write code like:
 <pre><code>someprogram.exe My Action --argument value</code></pre>
-And hooking it up by writing something like:
+So that the class with the name My or MyController and the method with the name Action gets invoked.
+
+h2. Example
+
+h3. Having your own Main
+
+You're hooking it up by writing something like:
 <pre><code>static void Main(string[] args)
 {
   ArgumentParser.Build()
@@ -14,8 +16,20 @@ And hooking it up by writing something like:
                 .Parse(args)
                 .Invoke(Console.Out);
 }</code></pre>
-So that the class with the name My or MyController and the method with the name Action gets invoked.
-
-h2. Example
 
 Look at the <a href="/wallymathieu/isop/blob/master/Example/Program.cs">Example project</a> for the most recent example of how it is used. 
+
+h3. Using Isop.cli.exe
+
+You're hooking it up by writing something like:
+<pre><code> class IsopConfiguration
+    {
+        public IEnumerable<Type> Recognizes()
+        {
+            return new[] { typeof(MyController) };
+        }
+        public bool RecognizeHelp{get{return true;}}
+    }
+</code></pre>
+
+Look at the <a href="/wallymathieu/isop/blob/master/Example.Cli/Program.cs">Example Cli project</a> for the most recent example of how it is used. 
