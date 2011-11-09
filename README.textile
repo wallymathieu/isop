@@ -1,7 +1,3 @@
-h1. Isop
-
-This project is intended to collect some of the helpers for console applications. The hope is that this will simplify the design of such programs.
-
 h2. Goal
 
 The goal is to be able to write code like:
@@ -36,5 +32,8 @@ You're hooking it up by writing something like:
     }
 </code></pre>
 
-Look at the <a href="/wallymathieu/isop/blob/master/Example.Cli/Program.cs">Example Cli project</a> for the most recent example of how it is used. 
+Then invoking your program by 
+<pre><code>Isop.Cli.exe My Action --argument value</code></pre>
+After you have put Isop.Cli.exe (and Isop.dll of course) in the same folder as your dll that contains the class IsopConfiguration.
 
+Look at the <a href="/wallymathieu/isop/blob/master/Example.Cli/Program.cs">Example Cli project</a> for the most recent example of how it is used. 
