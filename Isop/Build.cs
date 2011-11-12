@@ -69,7 +69,6 @@ namespace Isop
 					var parsedMethod = controllerRecognizer.Parse(arg);
 					parsedMethod.Factory = _container.CreateInstance;
                     var merged = parsedArguments.Merge( parsedMethod);
-                    //TODO: This is a hack! Should have some better way of controlling this!
                     if (!controllerRecognizer.IgnoreGlobalUnMatchedParameters)
                         FailOnUnMatched(merged);
                     return merged;
