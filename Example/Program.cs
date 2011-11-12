@@ -12,7 +12,7 @@ namespace Isop.Example
     {
         static void Main(string[] args)
         {
-            var parserBuilder = ArgumentParser.Build()
+            var parserBuilder = new Build()
                        .RecognizeHelp()
                        .Recognize(typeof(MyController))
                        .Recognize(typeof(CustomerController));

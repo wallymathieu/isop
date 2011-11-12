@@ -97,12 +97,13 @@ namespace Isop.Tests
             Assert.That(conf.Global,Is.EqualTo("globalvalue"));
         }
         
-        [Test] public void Can_read_xml_doc()
+        [Test] public void Can_read_documentation_for_properties()
         {
-            var doc = Build.GetSummaries ("Tests.xml");
-            Assert.That(doc.ToList(),Is.EquivalentTo(new Dictionary<string,string>(){
-                {"P:Isop.Tests.FullConfiguration.Global","GLOBAL!!"},
-            }.ToList()));
+            var conf = new FullConfiguration();
+            var parserBuilder = new Build().Configuration(conf);
+            var globalDesc = parserBuilder.GetGlobalParameters()
+                .First(gp=>gp.Argument.Prototype.Equals("Global")).Description;
+            Assert.That(globalDesc,Is.EqualTo("GLOBAL!!"));            
         }
     }
 }

@@ -205,6 +205,57 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
                 }
             }
         }
+        
+        [Test]
+        public void It_can_report_usage_for_controllers_and_actions_with_description_in_comments ()
+        {
+            var usage = new Build()
+                                    .Recognize (typeof(DescriptionWithCommentsController))
+                                    .RecognizeHelp ()
+                                    .HelpFor ("DescriptionWithComments");
+            Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The sub commands for DescriptionWithComments
+
+  Action1  Some description 1
+  Action2  Some description 2
+
+Se 'COMMANDNAME' help <command> <subcommand> for more information")));
+        }
+        
+        /// <summary>
+        /// Some description
+        /// </summary>
+        internal class DescriptionWithCommentsController
+        {
+            /// <summary>
+            /// Some description 1
+            /// </summary>
+            public void Action1 ()
+            {
+            }
+            /// <summary>
+            /// Some description 2
+            /// </summary>
+            public void Action2 ()
+            {
+            }
+        }
+        
+        [Test] public void Can_read_xml_doc()
+        {
+            var doc = HelpXmlDocumentation.GetSummariesFromText (File.ReadAllText("Tests.xml"));
+            Assert.That(doc["P:Isop.Tests.FullConfiguration.Global"],Is.EqualTo("GLOBAL!!"));
+        }
+        
+        [Test] public void Can_get_same_key_as_in_xmldoc()
+        {
+            var helpXml = new HelpXmlDocumentation();
+            var finder = new MethodInfoFinder();
+            var _global = finder.MatchGet(typeof(FullConfiguration).GetMethods(),"Global");
+            Assert.That(helpXml.GetKey(_global),Is.EqualTo("P:Isop.Tests.FullConfiguration.Global"));
+            var action1 = finder.Match(typeof(DescriptionWithCommentsController).GetMethods(),name:"Action1");
+            Assert.That(helpXml.GetKey(action1),Is.EqualTo("M:Isop.Tests.HelpTests.DescriptionWithCommentsController.Action1"));
+            
+        }
     }
 }
 

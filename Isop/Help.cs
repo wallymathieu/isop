@@ -3,8 +3,90 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.IO;
 namespace Isop
 {
+    public class HelpXmlDocumentation
+    {
+        public static IDictionary<string, string> GetSummariesFromText (string text)
+        {
+            var xml = new System.Xml.XmlDocument();
+            xml.LoadXml(text);
+            var members = xml.GetElementsByTagName("members");
+            var member = members.Item(0).ChildNodes;
+            Dictionary<string,string> doc = new Dictionary<string, string>();
+            foreach (System.Xml.XmlNode m in member)
+            {
+                var attr = m.Attributes;
+                var name = attr.GetNamedItem("name");
+                var nodes = m.ChildNodes.Cast<System.Xml.XmlNode>();
+                var summary = nodes.FirstOrDefault(x=>x.Name.Equals("summary"));
+                if (null!=summary)
+                    doc.Add(name.InnerText,summary.InnerText.Trim());
+            }
+            return doc;
+        }
+        private static Dictionary<Assembly,IDictionary<string,string>> summaries = new Dictionary<Assembly, IDictionary<string, string>>(); 
+        public static IDictionary<string,string> GetSummariesForAssemblyCached(Assembly a)
+        {
+            if (summaries.ContainsKey(a)) return summaries[a];
+            else {
+                var loc= a.Location;
+                var xmlDocFile = Path.Combine(Path.GetDirectoryName(loc),
+                    Path.GetFileNameWithoutExtension(loc)+".xml");
+                if (File.Exists(xmlDocFile)){
+                    summaries.Add(a,GetSummariesFromText(File.ReadAllText(xmlDocFile)));
+                }else{
+                    summaries.Add(a,new Dictionary<string,string>());// 
+                }
+                return summaries[a];
+            }
+        }
+
+        public virtual IDictionary<string,string> SummariesForAssemblyCached(Assembly a)
+        {
+            // 
+            return GetSummariesForAssemblyCached(a);
+        }
+        public string GetKey(MethodInfo method)
+        {
+           return  GetKey(method.DeclaringType,method);
+        }
+        public string GetKey(Type t,MethodInfo method)
+        {
+            if (method.Name.StartsWith("get_",StringComparison.OrdinalIgnoreCase)
+                || method.Name.StartsWith("set_",StringComparison.OrdinalIgnoreCase))
+                return "P:"+GetFullName(t)+"."+method.Name.Substring(4);
+            return "M:"+GetFullName(t)+"."+method.Name;
+        }
+        public string GetKey(Type t)
+        {
+            return "T:"+GetFullName(t);
+        }
+        private string GetFullName(Type t)
+        {
+             return t.FullName.Replace("+",".");
+        }
+        public string GetDescriptionForMethod(MethodInfo method)
+        {
+            var t = method.DeclaringType;
+            var summaries = SummariesForAssemblyCached(t.Assembly);
+            var key = GetKey(t, method);
+            if (summaries.ContainsKey(key)) 
+                return summaries[key];
+            return string.Empty;
+        }
+        public string GetDescriptionForType(Type t)
+        {
+            var summaries = SummariesForAssemblyCached(t.Assembly);
+            var key = GetKey(t);
+            if (summaries.ContainsKey(key)) 
+                return summaries[key];
+            return string.Empty;
+        }
+
+    }
+    
     public class HelpController
     {
         readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
@@ -79,6 +161,8 @@ namespace Isop
     {
         readonly IEnumerable<ControllerRecognizer> _classAndMethodRecognizers;
         private readonly TypeContainer _container;
+        private readonly MethodInfoFinder methodInfoFinder = new MethodInfoFinder();
+        private readonly HelpXmlDocumentation _helpXmlDocumentation = new HelpXmlDocumentation();
         public string TheCommandsAre { get; set; }
 		public string TheSubCommandsFor { get; set; }
         public string HelpCommandForMoreInformation { get; set; }
@@ -98,15 +182,27 @@ namespace Isop
         }
         private string Description(Type t,MethodInfo method=null)
         { 
-            var description = t.GetMethods().FirstOrDefault(m=>
-                m.Name.Equals("help",StringComparison.OrdinalIgnoreCase));
-            //TODO: should match parameters to make sure that it can accept 1 param of type string
-            if (null==description) return string.Empty;
+            var description = methodInfoFinder.Match(t.GetMethods(),
+                returnType:typeof(string),
+                name:"help",
+                parameters:new []{typeof(string)});
+            var descr = string.Empty;
+            if (null==description) {
+                if (null==method){
+                    descr= _helpXmlDocumentation.GetDescriptionForType(t);
+                }else{
+                    descr= _helpXmlDocumentation.GetDescriptionForMethod(method);
+                }
+            }else{
+                var obj = _container.CreateInstance(t);
             
-            var obj = _container.CreateInstance(t);
-            
-            return "  "+description.Invoke(obj,new[]{(method!=null? method.Name:null)});
+                descr =(string) description.Invoke(obj,new[]{(method!=null? method.Name:null)});
+            }
+            if (string.IsNullOrEmpty(descr))
+                return string.Empty;
+            return "  "+descr;
         }
+        
         private string HelpFor(ControllerRecognizer cmr,bool simpleDescription)
         {
             if (simpleDescription) return cmr.ClassName()+ Description(cmr.Type);

@@ -275,24 +275,7 @@ namespace Isop
         {
             return Configuration(type,Activator.CreateInstance(type));
         }
-        public static IDictionary<string, string> GetSummaries (string file)
-        {
-            var xml = new System.Xml.XmlDocument();
-            xml.Load(file);
-            var members = xml.GetElementsByTagName("members");
-            var member = members.Item(0).ChildNodes;
-            Dictionary<string,string> doc = new Dictionary<string, string>();
-            foreach (System.Xml.XmlNode m in member)
-            {
-                var attr = m.Attributes;
-                var name = attr.GetNamedItem("name");
-                var nodes = m.ChildNodes.Cast<System.Xml.XmlNode>();
-                var summary = nodes.FirstOrDefault(x=>x.Name.Equals("summary"));
-                if (null!=summary)
-                    doc.Add(name.InnerText,summary.InnerText.Trim());
-            }
-            return doc;
-        }
+
         public Build ConfigurationFrom (string path)
         {
             var files = Directory.GetFiles(path)
