@@ -203,6 +203,7 @@ namespace Isop
         }
         public Build Configuration(Type t,object instance)
         {
+            var helpXmlDocumentation = new HelpXmlDocumentation();
             var methods= t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
             var recognizer = new MethodInfoFinder();
 
@@ -237,7 +238,11 @@ namespace Isop
             {
                 var action = (Action<String>)Delegate.CreateDelegate(typeof(Action<String>), 
                     instance, methodInfo);
-                this.Parameter(RemoveSetFromBeginningOfString(methodInfo.Name),action);//humz?
+                var description = helpXmlDocumentation.GetDescriptionForMethod(methodInfo);
+                this.Parameter(RemoveSetFromBeginningOfString(methodInfo.Name),
+                    action:action,
+                    description:description,
+                    required:true);//humz? required?
             }
             var _recongizeHelp = recognizer.MatchGet(methods,
                 name:"RecognizeHelp",
