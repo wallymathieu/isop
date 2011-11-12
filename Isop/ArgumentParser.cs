@@ -108,7 +108,7 @@ namespace Isop
             Delimiter = delimiter;
         }
         /// <summary>
-        /// Note: this is accept invalid patterns.
+        /// Note: this may accept invalid patterns.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="optionParameter"></param>
