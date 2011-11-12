@@ -6,7 +6,7 @@ using NUnit.Framework;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-
+using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
 namespace Isop.Tests
 {
     class FullConfiguration:IDisposable
@@ -17,6 +17,12 @@ namespace Isop.Tests
         {
             return new[] { typeof(MyController) };
         }
+        /// <summary>
+        /// GLOBAL!!
+        /// </summary>
+        /// <value>
+        /// The global.
+        /// </value>
         public string Global {
          get;
          set;
@@ -34,8 +40,11 @@ namespace Isop.Tests
         {
             DisposeCalled = true;
         }
-        // TypeConverterFunc typeconverter=
-
+        public TypeConverterFunc GetTypeconverter()
+        {
+            return TypeConverter;
+        }
+        public static object TypeConverter(Type t, string s, CultureInfo c){ return null; }
     }
     [TestFixture]
     public class ConfigurationTests
@@ -45,6 +54,7 @@ namespace Isop.Tests
             var parserBuilder = new Build().Configuration(typeof(FullConfiguration));
             Assert.That(parserBuilder.RecognizesHelp());
             Assert.That(parserBuilder.GetCulture(),Is.EqualTo(CultureInfo.GetCultureInfo("es-ES")));
+            Assert.That(parserBuilder.GetTypeConverter(),Is.EqualTo((TypeConverterFunc) FullConfiguration.TypeConverter));
             Assert.That(parserBuilder.GetControllerRecognizers().Select(cr => cr.Type).ToArray(), 
                 Is.EquivalentTo(new[] { typeof(MyController), typeof(HelpController) }));
             Assert.That(parserBuilder.GetGlobalParameters().Select(p => p.Argument.Prototype.ToString()).ToArray(),
@@ -85,6 +95,14 @@ namespace Isop.Tests
             var cout = new StringWriter();
             parsed.Invoke(cout);
             Assert.That(conf.Global,Is.EqualTo("globalvalue"));
+        }
+        
+        [Test] public void Can_read_xml_doc()
+        {
+            var doc = Build.GetSummaries ("Tests.xml");
+            Assert.That(doc.ToList(),Is.EquivalentTo(new Dictionary<string,string>(){
+                {"P:Isop.Tests.FullConfiguration.Global","GLOBAL!!"},
+            }.ToList()));
         }
     }
 }

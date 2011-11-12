@@ -15,8 +15,4 @@ _ReSharper.*
 *.orig
 test-results/
 *.userprefs
-ConsoleHelpers/ConsoleHelpers.pidb
-Example/Example.pidb
-Tests/Tests.pidb
-Isop/Isop.pidb
-Isop.Auto.Cli/Isop.Auto.Cli.pidb
+*.pidb

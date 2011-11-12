@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
+using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
 namespace Isop
 {
     public class Build:IDisposable
@@ -97,14 +97,20 @@ namespace Isop
 
         public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
         {
-            _controllerRecognizers.Add(new ControllerRecognizer(arg, _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter,ignoreGlobalUnMatchedParameters));
+            _controllerRecognizers.Add(new ControllerRecognizer(arg, cultureInfo?? _cultureInfo , typeConverter ?? _typeConverter,ignoreGlobalUnMatchedParameters));
             return this;
         }
 		public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
         {
-            _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(), _cultureInfo ?? cultureInfo, _typeConverter ?? typeConverter, ignoreGlobalUnMatchedParameters));
+            _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(),
+               cultureInfo?? _cultureInfo , typeConverter ?? _typeConverter, ignoreGlobalUnMatchedParameters));
             _container.Instances.Add(arg.GetType(),arg);
             return this;
+        }
+
+        public TypeConverterFunc GetTypeConverter ()
+        {
+            return _typeConverter;
         }
 		
 
@@ -242,6 +248,15 @@ namespace Isop
             {
                 RecognizeHelp() ;
             }
+   
+            var _typeconv = recognizer.MatchGet(methods,
+                name:"TypeConverter",
+                returnType: typeof(TypeConverterFunc),
+                parameters: new Type[0]);
+            if (null!=_typeconv)
+            {
+                SetTypeConverter((TypeConverterFunc)_typeconv.Invoke(instance,new object[0]));
+            }
             
             if (instance is IDisposable) 
                 disposables.Add((IDisposable)instance);
@@ -260,7 +275,24 @@ namespace Isop
         {
             return Configuration(type,Activator.CreateInstance(type));
         }
-
+        public static IDictionary<string, string> GetSummaries (string file)
+        {
+            var xml = new System.Xml.XmlDocument();
+            xml.Load(file);
+            var members = xml.GetElementsByTagName("members");
+            var member = members.Item(0).ChildNodes;
+            Dictionary<string,string> doc = new Dictionary<string, string>();
+            foreach (System.Xml.XmlNode m in member)
+            {
+                var attr = m.Attributes;
+                var name = attr.GetNamedItem("name");
+                var nodes = m.ChildNodes.Cast<System.Xml.XmlNode>();
+                var summary = nodes.FirstOrDefault(x=>x.Name.Equals("summary"));
+                if (null!=summary)
+                    doc.Add(name.InnerText,summary.InnerText.Trim());
+            }
+            return doc;
+        }
         public Build ConfigurationFrom (string path)
         {
             var files = Directory.GetFiles(path)

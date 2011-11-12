@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.IO;
 using System.Collections;
-
+using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
 namespace Isop
 {
     
@@ -66,8 +66,6 @@ namespace Isop
             return new ArgumentLexer(tokens);
         }
     }
-	
-    public delegate object TypeConverterFunc(Type type, string s, CultureInfo cultureInfo);
     public class ControllerRecognizer
     {
         private static MethodInfo FindMethod (IEnumerable<MethodInfo> methods, String methodName, IEnumerable<Token> lexer)

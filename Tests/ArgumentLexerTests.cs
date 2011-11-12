@@ -7,9 +7,6 @@ using NUnit.Framework;
 
 namespace Isop.Tests
 {
-    /// <summary>
-    /// argument --parameter parametervalue
-    /// </summary>
     [TestFixture]
     public class ArgumentLexerTests
     {
