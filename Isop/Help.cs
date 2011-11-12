@@ -8,7 +8,7 @@ namespace Isop
 {
     public class HelpXmlDocumentation
     {
-        public static IDictionary<string, string> GetSummariesFromText (string text)
+        public IDictionary<string, string> GetSummariesFromText (string text)
         {
             var xml = new System.Xml.XmlDocument();
             xml.LoadXml(text);
@@ -26,8 +26,8 @@ namespace Isop
             }
             return doc;
         }
-        private static Dictionary<Assembly,IDictionary<string,string>> summaries = new Dictionary<Assembly, IDictionary<string, string>>(); 
-        public static IDictionary<string,string> GetSummariesForAssemblyCached(Assembly a)
+        private Dictionary<Assembly,IDictionary<string,string>> summaries = new Dictionary<Assembly, IDictionary<string, string>>(); 
+        public IDictionary<string,string> GetSummariesForAssemblyCached(Assembly a)
         {
             if (summaries.ContainsKey(a)) return summaries[a];
             else {
@@ -41,12 +41,6 @@ namespace Isop
                 }
                 return summaries[a];
             }
-        }
-
-        public virtual IDictionary<string,string> SummariesForAssemblyCached(Assembly a)
-        {
-            // 
-            return GetSummariesForAssemblyCached(a);
         }
         public string GetKey(MethodInfo method)
         {
@@ -70,7 +64,7 @@ namespace Isop
         public string GetDescriptionForMethod(MethodInfo method)
         {
             var t = method.DeclaringType;
-            var summaries = SummariesForAssemblyCached(t.Assembly);
+            var summaries = GetSummariesForAssemblyCached(t.Assembly);
             var key = GetKey(t, method);
             if (summaries.ContainsKey(key)) 
                 return summaries[key];
@@ -78,7 +72,7 @@ namespace Isop
         }
         public string GetDescriptionForType(Type t)
         {
-            var summaries = SummariesForAssemblyCached(t.Assembly);
+            var summaries = GetSummariesForAssemblyCached(t.Assembly);
             var key = GetKey(t);
             if (summaries.ContainsKey(key)) 
                 return summaries[key];
@@ -162,18 +156,18 @@ namespace Isop
         readonly IEnumerable<ControllerRecognizer> _classAndMethodRecognizers;
         private readonly TypeContainer _container;
         private readonly MethodInfoFinder methodInfoFinder = new MethodInfoFinder();
-        private readonly HelpXmlDocumentation _helpXmlDocumentation = new HelpXmlDocumentation();
+        private readonly HelpXmlDocumentation _helpXmlDocumentation;
         public string TheCommandsAre { get; set; }
 		public string TheSubCommandsFor { get; set; }
         public string HelpCommandForMoreInformation { get; set; }
 
         public string HelpSubCommandForMoreInformation { get; set; }
 
-        public HelpForControllers(IEnumerable<ControllerRecognizer> classAndMethodRecognizers, TypeContainer container)
+        public HelpForControllers(IEnumerable<ControllerRecognizer> classAndMethodRecognizers, TypeContainer container,  HelpXmlDocumentation helpXmlDocumentation)
         {
             _container=container;
             _classAndMethodRecognizers = classAndMethodRecognizers;
-
+            this._helpXmlDocumentation = helpXmlDocumentation;
             HelpSubCommandForMoreInformation = "Se 'COMMANDNAME' help <command> <subcommand> for more information";
 
             HelpCommandForMoreInformation = "Se 'COMMANDNAME' help <command> for more information";

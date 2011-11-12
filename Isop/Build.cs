@@ -17,6 +17,7 @@ namespace Isop
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
         private readonly TypeContainer _container=new TypeContainer();
+        private readonly HelpXmlDocumentation helpXmlDocumentation = new HelpXmlDocumentation();
         public Build()
         {
             _controllerRecognizers = new List<ControllerRecognizer>();
@@ -160,7 +161,7 @@ namespace Isop
         {
             if (_helpController==null)
             {
-                _helpForControllers = new HelpForControllers(_controllerRecognizers, _container);
+                _helpForControllers = new HelpForControllers(_controllerRecognizers, _container, helpXmlDocumentation);
                 _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
                 _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
                 Recognize(_helpController,ignoreGlobalUnMatchedParameters:true);
@@ -203,7 +204,6 @@ namespace Isop
         }
         public Build Configuration(Type t,object instance)
         {
-            var helpXmlDocumentation = new HelpXmlDocumentation();
             var methods= t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
             var recognizer = new MethodInfoFinder();
 

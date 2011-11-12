@@ -242,7 +242,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         
         [Test] public void Can_read_xml_doc()
         {
-            var doc = HelpXmlDocumentation.GetSummariesFromText (File.ReadAllText("Tests.xml"));
+            var doc = new HelpXmlDocumentation().GetSummariesFromText (File.ReadAllText("Tests.xml"));
             Assert.That(doc["P:Isop.Tests.FullConfiguration.Global"],Is.EqualTo("GLOBAL!!"));
         }
         
