@@ -22,7 +22,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <GenerateDocumentation>true</GenerateDocumentation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -36,16 +35,35 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Isop\Isop.csproj">
-      <Project>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</Project>
-      <Name>Isop</Name>
-    </ProjectReference>
+    <Compile Include="..\Isop\ArgumentLexer.cs">
+      <Link>Isop\ArgumentLexer.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\ArgumentParser.cs">
+      <Link>Isop\ArgumentParser.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\Build.cs">
+      <Link>Isop\Build.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\ControllerRecognizer.cs">
+      <Link>Isop\ControllerRecognizer.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\Help.cs">
+      <Link>Isop\Help.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\ListExtensions.cs">
+      <Link>Isop\ListExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\MethodInfoFinder.cs">
+      <Link>Isop\MethodInfoFinder.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\TypeContainer.cs">
+      <Link>Isop\TypeContainer.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
