@@ -1,5 +1,7 @@
 h2. The name
+
 Isop is the swedish name for hyssop. Like any spice it is intended to give flavor to the development of command line apps in .net. 
+
 h2. Goal
 
 The goal is to be able to write code like:
