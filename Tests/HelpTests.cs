@@ -205,8 +205,8 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
                 }
             }
         }
-        
-        [Test]
+
+        [Test, Ignore("need some way of testing this with albacore, resharper ... shadow copy")]
         public void It_can_report_usage_for_controllers_and_actions_with_description_in_comments ()
         {
             var usage = new Build()
