@@ -297,8 +297,35 @@ namespace Isop
                 {
                    Configuration(config);
                 }
+                if (!isopconfigurations.Any())
+                {
+                    new IsopAutoConfiguration(assembly)
+                        .AddToConfiguration(this);
+                }
             }
             return this;
+        }
+    }
+    public class IsopAutoConfiguration
+    {
+        private Assembly _assembly;
+        public IsopAutoConfiguration (Assembly assembly)
+        {
+          _assembly = assembly;
+        }
+        public IEnumerable<Type> Recognizes()
+        {
+            return _assembly.GetTypes().Where(t=>
+                t.IsPublic
+                && t.Name.EndsWith("controller",StringComparison.OrdinalIgnoreCase) 
+                && t.GetConstructors().Any(ctor=>ctor.GetParameters().Length==0)
+                );
+        }
+        public void AddToConfiguration(Build build)
+        {
+            foreach (var item in Recognizes()) {
+                build.Recognize(item);
+            }
         }
     }
 }

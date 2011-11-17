@@ -105,5 +105,10 @@ namespace Isop.Tests
                 .First(gp=>gp.Argument.Prototype.Equals("Global")).Description;
             Assert.That(globalDesc,Is.EqualTo("GLOBAL!!"));            
         }
+        [Test] public void Can_use_autoconfiguration()
+        {
+            var recognizes = new IsopAutoConfiguration(this.GetType().Assembly).Recognizes();
+            Assert.That(recognizes,Is.EquivalentTo(new []{typeof(MyController)}));
+        }
     }
 }
