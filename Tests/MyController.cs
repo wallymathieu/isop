@@ -2,7 +2,7 @@ using System;
 
 namespace Isop.Tests
 {
-    internal class MyController
+    public class MyController
     {
         public MyController()
         {

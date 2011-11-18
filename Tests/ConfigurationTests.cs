@@ -107,7 +107,7 @@ namespace Isop.Tests
         }
         [Test] public void Can_use_autoconfiguration()
         {
-            var recognizes = new IsopAutoConfiguration(this.GetType().Assembly).Recognizes();
+            var recognizes = new IsopAutoConfiguration(this.GetType().Assembly).Recognizes().ToArray();
             Assert.That(recognizes,Is.EquivalentTo(new []{typeof(MyController)}));
         }
     }
