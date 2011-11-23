@@ -23,7 +23,13 @@ namespace Isop.Tests
         /// <value>
         /// The global.
         /// </value>
+        //
+        [System.ComponentModel.DataAnnotations.Required()]
         public string Global {
+         get;
+         set;
+        }
+        public string NonRequiredGlobal {
          get;
          set;
         }
@@ -58,7 +64,11 @@ namespace Isop.Tests
             Assert.That(parserBuilder.GetControllerRecognizers().Select(cr => cr.Type).ToArray(), 
                 Is.EquivalentTo(new[] { typeof(MyController), typeof(HelpController) }));
             Assert.That(parserBuilder.GetGlobalParameters().Select(p => p.Argument.Prototype.ToString()).ToArray(),
-                Is.EquivalentTo(new[] { "Global" }));
+                Is.EquivalentTo(new[] { "Global", "NonRequiredGlobal" }));
+            Assert.That(!parserBuilder.GetGlobalParameters()
+                .Single(p => p.Argument.Prototype.ToString()=="NonRequiredGlobal").Required);
+            Assert.That(parserBuilder.GetGlobalParameters()
+                .Single(p => p.Argument.Prototype.ToString()=="Global").Required);
         }
         
         [Test] public void Can_dispose_of_configuration_after_usage()
@@ -97,7 +107,9 @@ namespace Isop.Tests
             Assert.That(conf.Global,Is.EqualTo("globalvalue"));
         }
 
-        [Test, Ignore("need some way of testing this with albacore, resharper ... shadow copy")] public void Can_read_documentation_for_properties()
+        [Test
+            , Ignore("need some way of testing this with albacore, resharper ... shadow copy")
+            ] public void Can_read_documentation_for_properties()
         {
             var conf = new FullConfiguration();
             var parserBuilder = new Build().Configuration(conf);
