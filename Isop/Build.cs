@@ -241,7 +241,7 @@ namespace Isop
                 this.Parameter(RemoveSetFromBeginningOfString(methodInfo.Name),
                     action:action,
                     description:description,
-                    required:true);//humz? required?
+                    required:false);//humz? required?
             }
             var _recongizeHelp = recognizer.MatchGet(methods,
                 name:"RecognizeHelp",
