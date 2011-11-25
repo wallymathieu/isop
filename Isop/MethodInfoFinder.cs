@@ -2,8 +2,41 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 namespace Isop
 {
+ 	 public class MethodInfoOrProperty
+    {
+        public PropertyInfo Property { get; private set; }
+
+        public string Name
+        {
+            get { return MethodInfo.Name; }
+        }
+
+        public MethodInfoOrProperty(MethodInfo methodInfo, PropertyInfo property=null)
+        {
+            MethodInfo = methodInfo;
+            Property = property;
+        }
+
+        public MethodInfo MethodInfo { get; private set; }
+
+        public object Invoke(object instance, object[] parameters)
+        {
+             return MethodInfo.Invoke(instance,parameters);
+        }
+
+        public bool Required()
+        {
+            if (null!=Property && Property.GetCustomAttributes(typeof(RequiredAttribute), true).Any())
+                return true;
+            if (null != MethodInfo && MethodInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any())
+                return true;
+            return false;
+        }
+    }
     public class MethodInfoFinder
     {
         static IEnumerable<MethodInfo> Find (IEnumerable<MethodInfo> methods, Type returnType, string name, IEnumerable<Type> parameters)
@@ -18,7 +51,7 @@ namespace Isop
             return retv;
         }
         
-        public IEnumerable<MethodInfo> FindSet(IEnumerable<MethodInfo> methods,Type returnType=null, string name=null, IEnumerable<Type> parameters=null)
+        public IEnumerable<MethodInfoOrProperty> FindSet(IEnumerable<MethodInfo> methods,Type returnType=null, string name=null, IEnumerable<Type> parameters=null)
         {
             var retv = Find (methods,returnType,null,parameters)
                 .Where(m=>m.Name.StartsWith("set", StringComparison.OrdinalIgnoreCase));
@@ -26,7 +59,13 @@ namespace Isop
                 retv = retv.Where (m => 
                     m.Name.Equals ("set" + name, StringComparison.OrdinalIgnoreCase)
                     || m.Name.Equals ("set_" + name, StringComparison.OrdinalIgnoreCase));
-            return retv;
+            return retv.Select(m=> {
+                if (m.Name.StartsWith("set_"))
+                {
+                    return new MethodInfoOrProperty(m, m.DeclaringType.GetProperty(m.Name.Replace("set_",""))); // can prob be optimized
+                }
+                return new MethodInfoOrProperty(m); 
+            });
         }
             
         public MethodInfo Match (IEnumerable<MethodInfo> methods, Type returnType=null, string name=null, IEnumerable<Type> parameters=null)
@@ -35,14 +74,22 @@ namespace Isop
             return retv.FirstOrDefault ();
         }
 
-        public MethodInfo MatchGet (IEnumerable<MethodInfo> methods, string name, Type returnType=null, IEnumerable<Type> parameters=null)
+        public MethodInfoOrProperty MatchGet (IEnumerable<MethodInfo> methods, string name, Type returnType=null, IEnumerable<Type> parameters=null)
         {
             var retv = Find (methods, returnType, null, parameters);
                 
             retv = retv.Where (m => m.Name.Equals (name, StringComparison.OrdinalIgnoreCase) 
                         || m.Name.Equals ("get_" + name, StringComparison.OrdinalIgnoreCase)
                         || m.Name.Equals ("get" + name, StringComparison.OrdinalIgnoreCase));
-            return retv.FirstOrDefault ();
+            var methodInfo = retv.FirstOrDefault ();
+            if (null != methodInfo)
+            {
+                PropertyInfo propertyInfo=null;
+                if (methodInfo.Name.StartsWith("get_"))
+                    propertyInfo = methodInfo.DeclaringType.GetProperty(methodInfo.Name.Replace("get_", ""));
+                return new MethodInfoOrProperty(methodInfo, propertyInfo);
+            }
+            else return null;
         }
 
         public IEnumerable<MethodInfo> GetOwnPublicMethods(Type type)

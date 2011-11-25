@@ -236,12 +236,12 @@ namespace Isop
             foreach (var methodInfo in configurationSetters)
             {
                 var action = (Action<String>)Delegate.CreateDelegate(typeof(Action<String>), 
-                    instance, methodInfo);
-                var description = helpXmlDocumentation.GetDescriptionForMethod(methodInfo);
+                    instance, methodInfo.MethodInfo);
+                var description = helpXmlDocumentation.GetDescriptionForMethod(methodInfo.MethodInfo);
                 this.Parameter(RemoveSetFromBeginningOfString(methodInfo.Name),
                     action:action,
                     description:description,
-                    required:false);//humz? required?
+                    required: methodInfo.Required());//humz? required?
             }
             var _recongizeHelp = recognizer.MatchGet(methods,
                 name:"RecognizeHelp",

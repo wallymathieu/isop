@@ -251,7 +251,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
             var helpXml = new HelpXmlDocumentation();
             var finder = new MethodInfoFinder();
             var _global = finder.MatchGet(typeof(FullConfiguration).GetMethods(),"Global");
-            Assert.That(helpXml.GetKey(_global),Is.EqualTo("P:Isop.Tests.FullConfiguration.Global"));
+            Assert.That(helpXml.GetKey(_global.MethodInfo),Is.EqualTo("P:Isop.Tests.FullConfiguration.Global"));
             var action1 = finder.Match(typeof(DescriptionWithCommentsController).GetMethods(),name:"Action1");
             Assert.That(helpXml.GetKey(action1),Is.EqualTo("M:Isop.Tests.HelpTests.DescriptionWithCommentsController.Action1"));
             

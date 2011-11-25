@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
 namespace Isop.Tests
 {
@@ -24,15 +25,16 @@ namespace Isop.Tests
         /// The global.
         /// </value>
         //
-        [System.ComponentModel.DataAnnotations.Required()]
         public string Global {
          get;
          set;
         }
-        public string NonRequiredGlobal {
-         get;
-         set;
-        }
+		 [Required]
+        public string GlobalRequired
+        {
+            get;
+            set;
+		}
         public object ObjectFactory(Type type)
         {
             return null;
@@ -53,24 +55,55 @@ namespace Isop.Tests
         public static object TypeConverter(Type t, string s, CultureInfo c){ return null; }
     }
     [TestFixture]
+    public class ConfigurationCanReadFullConfigurationTests
+    {
+        private Build parserBuilder;
+
+        [SetUp]
+        public void SetUp()
+        {
+            parserBuilder = new Build().Configuration(typeof(FullConfiguration));
+        }
+        [Test]
+        public void RecognizeHelp()
+        {
+            Assert.That(parserBuilder.RecognizesHelp());
+        }
+        [Test]
+        public void RecognizeCulture()
+        {
+            Assert.That(parserBuilder.GetCulture(), Is.EqualTo(CultureInfo.GetCultureInfo("es-ES")));
+        }
+        [Test]
+        public void RecognizeTypeConverter()
+        {
+            Assert.That(parserBuilder.GetTypeConverter(), Is.EqualTo((TypeConverterFunc)FullConfiguration.TypeConverter));
+        }
+        [Test]
+        public void RecognizeRecognizers()
+        {
+            Assert.That(parserBuilder.GetControllerRecognizers().Select(cr => cr.Type).ToArray(),
+                Is.EquivalentTo(new[] { typeof(MyController), typeof(HelpController) }));
+        }
+        [Test]
+        public void RecognizeGlobalParameters()
+        {
+            var argumentWithOptionses = parserBuilder.GetGlobalParameters()
+                .ToArray();
+
+            var requiredPairs = argumentWithOptionses
+                .Select(p => new KeyValuePair<string,bool>( p.Argument.Prototype.ToString(),p.Required))
+                .ToArray();
+            Assert.That(requiredPairs,
+                Is.EquivalentTo(new[] { 
+                    new KeyValuePair<string, bool>("Global", false),
+                    new KeyValuePair<string, bool>("GlobalRequired",true) 
+                }));
+        }
+    }
+    [TestFixture]
     public class ConfigurationTests
     {
-        [Test] public void Can_read_full_configuration()
-        {
-            var parserBuilder = new Build().Configuration(typeof(FullConfiguration));
-            Assert.That(parserBuilder.RecognizesHelp());
-            Assert.That(parserBuilder.GetCulture(),Is.EqualTo(CultureInfo.GetCultureInfo("es-ES")));
-            Assert.That(parserBuilder.GetTypeConverter(),Is.EqualTo((TypeConverterFunc) FullConfiguration.TypeConverter));
-            Assert.That(parserBuilder.GetControllerRecognizers().Select(cr => cr.Type).ToArray(), 
-                Is.EquivalentTo(new[] { typeof(MyController), typeof(HelpController) }));
-            Assert.That(parserBuilder.GetGlobalParameters().Select(p => p.Argument.Prototype.ToString()).ToArray(),
-                Is.EquivalentTo(new[] { "Global", "NonRequiredGlobal" }));
-            Assert.That(!parserBuilder.GetGlobalParameters()
-                .Single(p => p.Argument.Prototype.ToString()=="NonRequiredGlobal").Required);
-            Assert.That(parserBuilder.GetGlobalParameters()
-                .Single(p => p.Argument.Prototype.ToString()=="Global").Required);
-        }
-        
         [Test] public void Can_dispose_of_configuration_after_usage()
         {
             var conf = new FullConfiguration();
@@ -101,15 +134,13 @@ namespace Isop.Tests
         {
             var conf = new FullConfiguration();
             var parserBuilder = new Build().Configuration(conf);
-            var parsed = parserBuilder.Parse(new []{"--global","globalvalue","My","Action","--value","1"});
+            var parsed = parserBuilder.Parse(new []{"--global","globalvalue","--globalrequired","2","My","Action","--value","1"});
             var cout = new StringWriter();
             parsed.Invoke(cout);
             Assert.That(conf.Global,Is.EqualTo("globalvalue"));
         }
 
-        [Test
-            , Ignore("need some way of testing this with albacore, resharper ... shadow copy")
-            ] public void Can_read_documentation_for_properties()
+        [Test, Ignore("need some way of testing this with albacore, resharper ... shadow copy")] public void Can_read_documentation_for_properties()
         {
             var conf = new FullConfiguration();
             var parserBuilder = new Build().Configuration(conf);
