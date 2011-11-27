@@ -27,6 +27,9 @@ namespace Isop
 
         public NoClassOrMethodFoundException(string message, Exception inner) : base(message, inner) { }
     }
+    /// <summary>
+    /// Represents the parameter. For instance "file" of the commandline argument --file. 
+    /// </summary>
     public class ArgumentParameter
     {
         public ArgumentParameter (string prototype, string[] names, string delimiter=null,int? ordinal=null)
@@ -106,12 +109,6 @@ namespace Isop
             return false;
         }
     }
-
-    /// <summary>
-    /// Represents the parameter. For instance "file" of the commandline argument --file. 
-    /// Usually you might want it to recognize -f as well. For instance using Argument.Parse("file|f"), or the implicit 
-    /// string cast operator.
-    /// </summary>
     public class OptionParameter 
     {
         /// <summary>
@@ -144,12 +141,6 @@ namespace Isop
             return false;
         }
     }
-
-    /// <summary>
-    /// Represents the parameter. For instance "file" of the commandline argument --file. 
-    /// Usually you might want it to recognize -f as well. For instance using Argument.Parse("&file"), or the implicit 
-    /// string cast operator.
-    /// </summary>
     public class VisualStudioParameter 
     {
         /// <summary>
