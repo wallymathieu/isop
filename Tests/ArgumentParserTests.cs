@@ -64,7 +64,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_ordinalparameters()
         {
-            OrdinalParameter o;
+            ArgumentParameter o;
             Assert.That(OrdinalParameter.TryParse("#1first", CultureInfo.InvariantCulture, out o));
         }
         [Test]

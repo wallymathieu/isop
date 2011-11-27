@@ -58,7 +58,7 @@ namespace Isop
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
 			var argumentParser = new ArgumentParser(_argumentRecognizers);
-
+            // TODO: Need to figure out where this goes. To Much logic for this layer.
             var lexer = new ArgumentLexer(arg);
             var parsedArguments = argumentParser.Parse(lexer, arg);
             if (_controllerRecognizers.Any())

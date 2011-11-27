@@ -27,9 +27,16 @@ namespace Isop
 
         public NoClassOrMethodFoundException(string message, Exception inner) : base(message, inner) { }
     }
-
     public class ArgumentParameter
     {
+        public ArgumentParameter (string prototype, string[] names, string delimiter=null,int? ordinal=null)
+        {
+            Prototype = prototype;
+            Aliases = names;
+            Delimiter = delimiter;
+            Ordinal = ordinal;
+        }
+
         public string Prototype { get; protected set; }
         public int? Ordinal { get; protected set; }
 
@@ -40,13 +47,13 @@ namespace Isop
 
         public static ArgumentParameter Parse(string value, IFormatProvider formatProvider)
         {
-            OrdinalParameter ordinalParameter;
+            ArgumentParameter ordinalParameter;
             if (OrdinalParameter.TryParse(value, formatProvider, out ordinalParameter))
                 return ordinalParameter;
-            OptionParameter optionParameter;
+            ArgumentParameter optionParameter;
             if (OptionParameter.TryParse(value, out optionParameter))
                 return optionParameter;
-            VisualStudioParameter visualStudioParameter;
+            ArgumentParameter visualStudioParameter;
             if (VisualStudioParameter.TryParse(value, out visualStudioParameter))
                 return visualStudioParameter;
             throw new ArgumentOutOfRangeException(value);
@@ -67,18 +74,24 @@ namespace Isop
             return Prototype;
         }
 
-    }
-    public class OrdinalParameter : ArgumentParameter
-    {
-        public OrdinalParameter(string prototype, string[] names, string delimiter, int ordinal)
+        public bool HasAlias (string value)
         {
-            Ordinal = ordinal;
-            Prototype = prototype;
-            Aliases = names;
-            Delimiter = delimiter;
+             return Aliases.Any(alias => value.Equals(alias, StringComparison.OrdinalIgnoreCase));
         }
+        
+        public bool Accept(int index, string val)
+        {
+            if (!Ordinal.HasValue) 
+              return HasAlias(val);
+            else 
+              return Ordinal.Value.Equals(index) && HasAlias(val);
+            
+        }
+    }
+    public class OrdinalParameter 
+    {
         private static readonly Regex Pattern = new Regex(@"#(?<ord>\d*)(?<rest>.*)");
-        public static bool TryParse(string value, IFormatProvider formatProvider, out OrdinalParameter ordinalParameter)
+        public static bool TryParse(string value, IFormatProvider formatProvider, out ArgumentParameter ordinalParameter)
         {
             var match = Pattern.Match(value);
             if (match.Success)
@@ -86,7 +99,7 @@ namespace Isop
                 var prototype = value;
                 var rest = match.Groups["rest"].Value;
                 var param = ArgumentParameter.Parse(rest, formatProvider);
-                ordinalParameter = new OrdinalParameter(prototype, param.Aliases, param.Delimiter, int.Parse(match.Groups["ord"].Value, formatProvider));
+                ordinalParameter = new ArgumentParameter(prototype, param.Aliases, param.Delimiter, int.Parse(match.Groups["ord"].Value, formatProvider));
                 return true;
             }
             ordinalParameter = null;
@@ -99,21 +112,15 @@ namespace Isop
     /// Usually you might want it to recognize -f as well. For instance using Argument.Parse("file|f"), or the implicit 
     /// string cast operator.
     /// </summary>
-    public class OptionParameter : ArgumentParameter
+    public class OptionParameter 
     {
-        public OptionParameter(string prototype, string[] names, string delimiter)
-        {
-            Prototype = prototype;
-            Aliases = names;
-            Delimiter = delimiter;
-        }
         /// <summary>
         /// Note: this may accept invalid patterns.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="optionParameter"></param>
         /// <returns></returns>
-        public static bool TryParse(string value, out OptionParameter optionParameter)
+        public static bool TryParse(string value, out ArgumentParameter optionParameter)
         {
             if (value.Contains("|"))
             {
@@ -130,7 +137,7 @@ namespace Isop
                     default:
                         break;
                 }
-                optionParameter = new OptionParameter(prototype, names, delimiter);
+                optionParameter = new ArgumentParameter(prototype, names, delimiter);
                 return true;
             }
             optionParameter = null;
@@ -143,14 +150,14 @@ namespace Isop
     /// Usually you might want it to recognize -f as well. For instance using Argument.Parse("&file"), or the implicit 
     /// string cast operator.
     /// </summary>
-    public class VisualStudioParameter : ArgumentParameter
+    public class VisualStudioParameter 
     {
         /// <summary>
         /// same pattern as in visual studio external tools: &amp;tool
         /// </summary>
         public static readonly Regex VisualStudioArgPattern = new Regex(@"(?<prefix>\&?)(?<alias>.)[^=:]*(?<equals>[=:]?)");
 
-        public static bool TryParse(string value, out VisualStudioParameter visualStudioParameter)
+        public static bool TryParse(string value, out ArgumentParameter visualStudioParameter)
         {
             //TODO: need to do some cleaning here
             var match = VisualStudioArgPattern.Match(value);
@@ -177,12 +184,11 @@ namespace Isop
                 else delimiter = null;
                 aliases.Add(val);
 
-                visualStudioParameter = new VisualStudioParameter
-                {
-                    Prototype = value,
-                    Aliases = aliases.ToArray(),
-                    Delimiter = delimiter
-                };
+                visualStudioParameter = new ArgumentParameter(
+                        prototype:value, 
+                        names:aliases.ToArray(), 
+                        delimiter:delimiter);
+                
                 return true;
             }
             visualStudioParameter = null;
@@ -205,15 +211,6 @@ namespace Isop
             Argument = argument;
             Action = action;
             Required = required;
-        }
-        /// <summary>
-        /// todo:move this
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public bool HasAlias(string value)
-        {
-            return Argument.Aliases.Any(alias => value.Equals(alias, StringComparison.OrdinalIgnoreCase));
         }
 
         public string Help()
@@ -426,22 +423,14 @@ namespace Isop
                 {
                     case TokenType.Argument:
                         {
-                            // TODO : move recognize into ArgumentBase
                             var argumentWithOptions = _argumentWithOptions
-                               .Where(argopt => !argopt.Argument.Ordinal.HasValue)
-                               .SingleOrDefault(argopt => argopt.Argument
-                                   .Prototype.Equals(current.Value, StringComparison.OrdinalIgnoreCase));
+                               .SingleOrDefault(argopt => argopt.Argument.Accept(current.Index,current.Value));
+                            
                             if (null == argumentWithOptions)
                             {
-                                argumentWithOptions = _argumentWithOptions
-                                        .Where(argopt => argopt.Argument.Ordinal.HasValue)
-                                        .SingleOrDefault(argopt => argopt.Argument.Ordinal.Value.Equals(current.Index)
-                                          && argopt.HasAlias(current.Value));
-                                if (null == argumentWithOptions)
-                                {
                                     continue;
-                                }
                             }
+                            
                             recognizedIndexes.Add(current.Index);
                             recognized.Add(new RecognizedArgument(
                                         argumentWithOptions,
@@ -451,7 +440,7 @@ namespace Isop
                     case TokenType.Parameter:
                         {
                             var argumentWithOptions = _argumentWithOptions
-                               .SingleOrDefault(argopt => argopt.HasAlias(current.Value));
+                               .SingleOrDefault(argopt => argopt.Argument.Accept(current.Index,current.Value));
                             if (null == argumentWithOptions)
                                 continue;
                             string value;
