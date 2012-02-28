@@ -9,7 +9,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Isop</RootNamespace>
     <AssemblyName>Isop</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
