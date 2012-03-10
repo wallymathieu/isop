@@ -186,7 +186,7 @@ namespace Isop
                           };
             }
 
-            var recognizedActionParameters = GetParametersForMethod(methodInfo, parsedArguments, ConvertFrom1);
+            var recognizedActionParameters = GetParametersForMethod(methodInfo, parsedArguments, ConvertFrom);
             
             parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments
                 .Where(unrecognized=>unrecognized.Index>=1); //NOTE: should be different!
@@ -199,7 +199,7 @@ namespace Isop
                        };
         }
 
-        private object ConvertFrom1(RecognizedArgument arg1, ParameterInfo parameterInfo)
+        private object ConvertFrom(RecognizedArgument arg1, ParameterInfo parameterInfo)
         {
             try
             {
@@ -219,8 +219,6 @@ namespace Isop
         {
             return TypeDescriptor.GetConverter(type).ConvertFrom(null, cultureInfo, s);
         }
-
-       
     }
 
     public class ParsedMethod : ParsedArguments
@@ -229,9 +227,9 @@ namespace Isop
             : base(parsedArguments)
         {
         }
-		public Func<Type,Object> Factory{get;set;}
-		
-        public Type RecognizedClass;
+		public Func<Type,Object> Factory { get; set; }
+
+        public Type RecognizedClass { get; set; }
         public MethodInfo RecognizedAction { get; set; }
 
         public IEnumerable<object> RecognizedActionParameters { get; set; }

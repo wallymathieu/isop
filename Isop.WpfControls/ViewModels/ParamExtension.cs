@@ -23,7 +23,7 @@ namespace Isop.WpfControls.ViewModels
 
         public static ParsedMethod Parse(this Build argumentParserBuilder, Method currentMethod)
         {
-            var controllerRecognizer = argumentParserBuilder.GetControllerRecognizers()
+            var controllerRecognizer = argumentParserBuilder.ControllerRecognizers
                 .First(c => c.ClassName().Equals(currentMethod.ClassName));
 
             var parsedArguments = currentMethod.GetParsedArguments();
@@ -48,7 +48,7 @@ namespace Isop.WpfControls.ViewModels
         {
             return new MethodTreeModel
                        {
-                           Controllers = argumentParserBuilder.GetControllerRecognizers()
+                           Controllers = argumentParserBuilder.ControllerRecognizers
                                .Where(cmr => !cmr.ClassName().Equals("help", StringComparison.OrdinalIgnoreCase))
                                .Select(cmr => new Controller
                                                   {
@@ -61,7 +61,7 @@ namespace Isop.WpfControls.ViewModels
                                                                         new ArgumentWithOptions(p.Name,required:true))))
                                                         })
                                                   }),
-                           GlobalParameters = new ObservableCollection<Param>(argumentParserBuilder.GetGlobalParameters()
+                           GlobalParameters = new ObservableCollection<Param>(argumentParserBuilder.GlobalParameters
                                                                                   .Select(p => new Param(typeof(string), p.Argument.ToString(), p)))
                        };
         }

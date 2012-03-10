@@ -168,19 +168,28 @@ namespace Isop
             return this;
         }
 
-        public bool RecognizesHelp ()
+        public bool RecognizesHelp
         {
+            get
+            {
             return _helpController!=null;
+            }
         }
 
-        public IEnumerable<ControllerRecognizer> GetControllerRecognizers()
+        public IEnumerable<ControllerRecognizer> ControllerRecognizers
         {
-            return _controllerRecognizers;
+            get
+            {
+                return _controllerRecognizers;
+            }
         }
 
-        public IEnumerable<ArgumentWithOptions> GetGlobalParameters()
+        public IEnumerable<ArgumentWithOptions> GlobalParameters
         {
-            return _argumentRecognizers;
+            get
+            {
+                return _argumentRecognizers;
+            }
         }
 
         public Func<Type, object> GetFactory()
@@ -241,7 +250,7 @@ namespace Isop
                 this.Parameter(RemoveSetFromBeginningOfString(methodInfo.Name),
                     action:action,
                     description:description,
-                    required: methodInfo.Required());//humz? required?
+                    required: methodInfo.Required);//humz? required?
             }
             var _recongizeHelp = recognizer.MatchGet(methods,
                 name:"RecognizeHelp",

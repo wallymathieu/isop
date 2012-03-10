@@ -22,7 +22,7 @@ namespace Isop.Gui
         public MainWindow()
         {
             //Console.SetOut
-            ParserBuilder = ArgumentParser.Build()
+            ParserBuilder = new Build()
                      .Parameter("global")
                      .RecognizeHelp()
                      .Recognize(typeof(MyController))

@@ -48,13 +48,13 @@ Did you mean any of these arguments?
                 catch (MissingArgumentException ex)
                 {
                     Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray())));
-                    if (parserBuilder.RecognizesHelp())
+                    if (parserBuilder.RecognizesHelp)
                         Console.WriteLine(parserBuilder.Help());
                 }
                 catch (NoClassOrMethodFoundException ex)
                 {
                     Console.WriteLine("Missing argument(s) or wrong argument(s)");                
-                    if (parserBuilder.RecognizesHelp())
+                    if (parserBuilder.RecognizesHelp)
                         Console.WriteLine(parserBuilder.Help());
                 } 
             }

@@ -67,7 +67,7 @@ namespace Isop.Tests
         [Test]
         public void RecognizeHelp()
         {
-            Assert.That(parserBuilder.RecognizesHelp());
+            Assert.That(parserBuilder.RecognizesHelp);
         }
         [Test]
         public void RecognizeCulture()
@@ -82,13 +82,13 @@ namespace Isop.Tests
         [Test]
         public void RecognizeRecognizers()
         {
-            Assert.That(parserBuilder.GetControllerRecognizers().Select(cr => cr.Type).ToArray(),
+            Assert.That(parserBuilder.ControllerRecognizers.Select(cr => cr.Type).ToArray(),
                 Is.EquivalentTo(new[] { typeof(MyController), typeof(HelpController) }));
         }
         [Test]
         public void RecognizeGlobalParameters()
         {
-            var argumentWithOptionses = parserBuilder.GetGlobalParameters()
+            var argumentWithOptionses = parserBuilder.GlobalParameters
                 .ToArray();
 
             var requiredPairs = argumentWithOptionses
@@ -119,8 +119,8 @@ namespace Isop.Tests
             
             var parserBuilder = new Build().ConfigurationFrom(path);
 
-            Assert.That(parserBuilder.RecognizesHelp());
-            Assert.That(parserBuilder.GetControllerRecognizers().Count(), 
+            Assert.That(parserBuilder.RecognizesHelp);
+            Assert.That(parserBuilder.ControllerRecognizers.Count(), 
                 Is.AtLeast(2));
         }
         
@@ -144,7 +144,7 @@ namespace Isop.Tests
         {
             var conf = new FullConfiguration();
             var parserBuilder = new Build().Configuration(conf);
-            var globalDesc = parserBuilder.GetGlobalParameters()
+            var globalDesc = parserBuilder.GlobalParameters
                 .First(gp=>gp.Argument.Prototype.Equals("Global")).Description;
             Assert.That(globalDesc,Is.EqualTo("GLOBAL!!"));
         }

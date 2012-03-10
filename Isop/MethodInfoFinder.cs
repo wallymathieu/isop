@@ -28,13 +28,16 @@ namespace Isop
              return MethodInfo.Invoke(instance,parameters);
         }
 
-        public bool Required()
+        public bool Required
         {
-            if (null!=Property && Property.GetCustomAttributes(typeof(RequiredAttribute), true).Any())
-                return true;
-            if (null != MethodInfo && MethodInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any())
-                return true;
-            return false;
+            get
+            {
+                if (null != Property && Property.GetCustomAttributes(typeof(RequiredAttribute), true).Any())
+                    return true;
+                if (null != MethodInfo && MethodInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any())
+                    return true;
+                return false;
+            }
         }
     }
     public class MethodInfoFinder

@@ -1,7 +1,7 @@
+syntax: glob
 obj
 bin
 deploy
-deploy/*
 _ReSharper.*
 *.csproj.user
 *.resharper.user
@@ -17,3 +17,6 @@ test-results/
 *.userprefs
 *.pidb
 *.user
+syntax: regexp
+TestResult\.xml
+ 
