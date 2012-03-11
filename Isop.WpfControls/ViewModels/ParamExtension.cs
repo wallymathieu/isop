@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.ComponentModel;
 
 namespace Isop.WpfControls.ViewModels
 {
@@ -26,6 +27,21 @@ namespace Isop.WpfControls.ViewModels
             foreach (var param in that.Where(p => p.Name.Equals(updatedParam.Name, StringComparison.CurrentCultureIgnoreCase)))
             {
                 param.Value = updatedParam.Value;
+            }
+        }
+
+        public static void DeRegisterPropertyChanged(this IEnumerable<Param> that, PropertyChangedEventHandler handler)
+        {
+            foreach (var param in that)
+            {
+                param.PropertyChanged -= handler;
+            }
+        }
+        public static void RegisterPropertyChanged(this IEnumerable<Param> that, PropertyChangedEventHandler handler)
+        {
+            foreach (var param in that)
+            {
+                param.PropertyChanged += handler;
             }
         }
     }
@@ -56,9 +72,10 @@ namespace Isop.WpfControls.ViewModels
 
         public static MethodTreeModel GetMethodTreeModel(this Build that)
         {
-            return new MethodTreeModel(new ObservableCollection<Param>(
+            return new MethodTreeModel(new List<Param>(
                 that.GlobalParameters
-                    .Select(p => new Param(typeof(string), p.Argument.ToString(), p))),
+                    .Select(p => new Param(typeof(string), p.Argument.ToString(), p)))
+                    .ToArray(),
                 that.ControllerRecognizers
                     .Where(cmr => !cmr.ClassName().Equals("help", StringComparison.OrdinalIgnoreCase))
                     .Select(cmr => new Controller
@@ -66,12 +83,12 @@ namespace Isop.WpfControls.ViewModels
                         Name = cmr.ClassName(),
                         Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
                         {
-                            Parameters = new ObservableCollection<Param>(
+                            Parameters = new List<Param>(
                                 m.GetParameters().Select(p =>
                                     new Param(p.ParameterType, p.Name,
-                                        new ArgumentWithOptions(p.Name, required: true))))
-                        })
-                    })
+                                        new ArgumentWithOptions(p.Name, required: true))).ToArray())
+                        }).ToArray()
+                    }).ToArray()
             );
         }
     }

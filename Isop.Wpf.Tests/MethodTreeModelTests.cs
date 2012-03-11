@@ -23,6 +23,7 @@ namespace Isop.Wpf.Tests
         private class MyController
         {
             public string Action(string name) { return null; }
+            public string AnotherAction(string name) { return null; }
         }
         [Test]
         public void Can_generate_tree_model_from_configuration_with_controllers()
@@ -49,6 +50,31 @@ namespace Isop.Wpf.Tests
             Assert.That(treemodel.GlobalParameters.First().Value,
                 Is.EqualTo("new value"));
         }
+        [Test]
+        public void When_selecting_another_action_will_deregister_event_handlers()
+        {
+            var treemodel = TreeModelWithCurrentMethodSelected();
+            var param1 = treemodel.CurrentMethod.Parameters.Single();
+            param1.Value = "new value";
+            treemodel.CurrentMethod = treemodel.Controllers.Single().Methods.Single(m => m.Name == "AnotherAction");
+            treemodel.CurrentMethod.Parameters.Single().Value = "another value";
+            Assert.That(treemodel.GlobalParameters.First().Value,
+                Is.EqualTo("another value"));
+            Assert.That(param1.Value, Is.EqualTo("new value"));
+        }
+        /// <summary>
+        /// The parameters might be regenerated when using Select/Where
+        /// </summary>
+        [Test]
+        public void Parameters_does_not_change()
+        {
+            var treemodel = TreeModelWithCurrentMethodSelected();
+            var param1 = treemodel.CurrentMethod.Parameters.Single();
+            treemodel.CurrentMethod = treemodel.Controllers.Single().Methods.Single(m => m.Name == "AnotherAction");
+            Assert.That(treemodel.Controllers.Single()
+                .Methods.Single(m => m.Name == "Action").Parameters.Single(),
+                Is.EqualTo(param1));
+        }
         private static MethodTreeModel TreeModelWithCurrentMethodSelected()
         {
             var treemodel = new Build()
@@ -56,8 +82,10 @@ namespace Isop.Wpf.Tests
                     new ArgumentParameter("name", new[] { "name" }))
                 .Recognize(new MyController())
                 .GetMethodTreeModel();
-            treemodel.CurrentMethod = treemodel.Controllers.Single().Methods.Single();
+            treemodel.CurrentMethod = treemodel.Controllers.Single()
+                .Methods.Single(m=>m.Name=="Action");
             return treemodel;
         }
+        
     }
 }
