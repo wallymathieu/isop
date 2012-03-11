@@ -107,14 +107,17 @@ namespace Isop
             }
             return sb.ToString().Trim(' ','\t','\r','\n');
         }
-		public string Index(string command)
+		public string Index(string command, string action)
         {
 			if (String.IsNullOrEmpty(command))
 				return Index();
             var sb = new StringBuilder();
-            if (_helpForArgumentWithOptions.CanHelp(command))
+            if (string.IsNullOrEmpty(action))
             {
-              sb.AppendLine(_helpForArgumentWithOptions.Help(command));
+                if (_helpForArgumentWithOptions.CanHelp(command))
+                {
+                    sb.AppendLine(_helpForArgumentWithOptions.Help(command));
+                }
             }
             if (_helpForClassAndMethod.CanHelp(command))
             {

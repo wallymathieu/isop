@@ -141,10 +141,11 @@ namespace Isop
             return this;
         }
 
-        public string HelpFor(string command)
+        public string HelpFor(string controller, string action=null)
         {
             var cout = new StringWriter(Culture);
-            Parse(new[] { "Help", command }).Invoke(cout);
+            Parse( new[] { "Help", controller, action }
+                .Where(s=>!string.IsNullOrEmpty(s))).Invoke(cout);
             return cout.ToString();
         }
 
