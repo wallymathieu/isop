@@ -39,5 +39,9 @@ namespace :mono do
       sh "#{command} #{assemblies}"
     end
   end
+  desc "copy example cli to cli folder"
+  task :copy_cli => :build do
+    cp "Example.Cli/bin/Debug/Example.Cli.dll", "Isop.Auto.Cli/bin/Debug"
+  end
 end
 
