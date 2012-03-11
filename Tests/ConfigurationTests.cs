@@ -77,7 +77,7 @@ namespace Isop.Tests
         [Test]
         public void RecognizeTypeConverter()
         {
-            Assert.That(parserBuilder.GetTypeConverter(), Is.EqualTo((TypeConverterFunc)FullConfiguration.TypeConverter));
+            Assert.That(parserBuilder.TypeConverter, Is.EqualTo((TypeConverterFunc)FullConfiguration.TypeConverter));
         }
         [Test]
         public void RecognizeRecognizers()

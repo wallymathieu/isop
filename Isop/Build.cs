@@ -106,17 +106,11 @@ namespace Isop
             return this;
         }
 
-        public TypeConverterFunc GetTypeConverter ()
-        {
-            return TypeConverter;
-        }
-		
-
         public String Help()
         {
             var cout = new StringWriter(Culture);
             Parse(new []{"Help"}).Invoke(cout);
-			return cout.ToString();// return _helpController.Index();
+			return cout.ToString();
         }
 
         /// <summary>
