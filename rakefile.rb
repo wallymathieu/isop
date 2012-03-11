@@ -14,7 +14,13 @@ namespace :ms do
     nunit.command = "packages/NUnit.2.5.9.10348/Tools/nunit-console.exe"
     nunit.assemblies "Tests/bin/Debug/Tests.dll"
   end
+  desc "copy example cli to wpf and cli folder"
+  task :copy_cli => :build do
+    cp "Example.Cli/bin/Debug/Example.Cli.dll", "Isop.Wpf/bin/Debug"
+    cp "Example.Cli/bin/Debug/Example.Cli.dll", "Isop.Auto.Cli/bin/Debug"
+  end
 end
+
 
 namespace :mono do
   desc "build isop on mono"

@@ -56,7 +56,16 @@ Did you mean any of these arguments?
                     Console.WriteLine("Missing argument(s) or wrong argument(s)");                
                     if (parserBuilder.RecognizesHelp)
                         Console.WriteLine(parserBuilder.Help());
-                } 
+                }
+#if DEBUG
+                catch (Exception ex1)
+                {
+                    Console.WriteLine( string.Join(Environment.NewLine, new object[]{ 
+                        "The invokation failed with exception:",
+                        ex1.Message, ex1.StackTrace}));
+                    return;
+                }
+#endif
             }
         }
     }

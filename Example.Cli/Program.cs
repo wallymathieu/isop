@@ -28,5 +28,9 @@ namespace Example.Cli
         {
             return "invoking action Add on customercontroller with name : " + name;
         }
+        public string Fail()
+        {
+            throw new Exception("Failure!");
+        }
     }
 }

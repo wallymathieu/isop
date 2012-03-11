@@ -56,9 +56,18 @@ namespace Isop.Gui
             }
             catch (MissingArgumentException ex)
             {
-                textBlock1.Text = String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray()));
+                textBlock1.Text = String.Format("Missing argument(s): {0}", String.Join(", ", ex.Arguments.Select(a => String.Format("{0}: {1}", a.Key, a.Value)).ToArray()));
                 return;
             }
+#if DEBUG
+            catch (Exception ex1)
+            {
+                textBlock1.Text =string.Join(Environment.NewLine, new object[]{ 
+                    "The global parameter invokation failed with exception:",
+                    ex1.Message, ex1.StackTrace});
+                return;
+            }
+#endif
             if (null == CurrentMethod) return;
 
             cout.WriteLine();
@@ -72,7 +81,15 @@ namespace Isop.Gui
                 textBlock1.Text = String.Format("Missing argument(s): {0}", String.Join(", ", ex.Arguments.Select(a => String.Format("{0}: {1}", a.Key, a.Value)).ToArray()));
                 return;
             }
-
+#if DEBUG
+            catch (Exception ex1)
+            {
+                textBlock1.Text = string.Join(Environment.NewLine, new object[] { 
+                    "The invokation of the action failed with exception:", 
+                    ex1.Message, ex1.StackTrace });
+                return;
+            }
+#endif
             textBlock1.Text = cout.ToString();
         }
     }
