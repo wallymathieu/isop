@@ -5,10 +5,9 @@ namespace Isop.WpfControls.ViewModels
 {
     public class Param : INotifyPropertyChanged
     {
-        public Type Type { get; set; }
-        public string Name { get; set; }
-        public bool Required { get { return _argWithOptions.Required; } }
-        private readonly ArgumentWithOptions _argWithOptions;
+        public Type Type { get; private set; }
+        public string Name { get; private set; }
+        public bool Required { get { return ArgumentWithOptions.Required; } }
         private string _value;
         public string Value 
         { 
@@ -26,15 +25,13 @@ namespace Isop.WpfControls.ViewModels
         {
             Type = type;
             Name = name;
-            _argWithOptions = argWithOptions;
+            ArgumentWithOptions = argWithOptions;
         }
 
         public ArgumentWithOptions ArgumentWithOptions
         {
-            get
-            {
-                return _argWithOptions;
-            }
+            get;
+            private set;
         }
 
         public RecognizedArgument RecognizedArgument()

@@ -21,6 +21,16 @@ namespace Isop.WpfControls.ViewModels
                        };
         }
 
+        public static void SetParamValueOnMatching(this IEnumerable<Param> that, Param updatedParam)
+        {
+            foreach (var param in that.Where(p => p.Name.Equals(updatedParam.Name, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                param.Value = updatedParam.Value;
+            }
+        }
+    }
+    public static class BuildExtensions
+    {
         public static ParsedMethod Parse(this Build that, Method currentMethod)
         {
             var controllerRecognizer = that.ControllerRecognizers
@@ -52,25 +62,17 @@ namespace Isop.WpfControls.ViewModels
                 that.ControllerRecognizers
                     .Where(cmr => !cmr.ClassName().Equals("help", StringComparison.OrdinalIgnoreCase))
                     .Select(cmr => new Controller
+                    {
+                        Name = cmr.ClassName(),
+                        Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
                         {
-                            Name = cmr.ClassName(),
-                            Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
-                            {
-                                Parameters = new ObservableCollection<Param>(
-                                    m.GetParameters().Select(p =>
-                                        new Param(p.ParameterType, p.Name, 
-                                            new ArgumentWithOptions(p.Name,required:true))))
-                            })
+                            Parameters = new ObservableCollection<Param>(
+                                m.GetParameters().Select(p =>
+                                    new Param(p.ParameterType, p.Name,
+                                        new ArgumentWithOptions(p.Name, required: true))))
                         })
+                    })
             );
-        }
-
-        public static void SetParamValueOnMatching(this IEnumerable<Param> that, Param updatedParam)
-        {
-            foreach (var param in that.Where(p => p.Name.Equals(updatedParam.Name, StringComparison.CurrentCultureIgnoreCase)))
-            {
-                param.Value = updatedParam.Value;
-            }
         }
     }
 }
