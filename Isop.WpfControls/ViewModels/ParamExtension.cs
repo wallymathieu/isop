@@ -46,24 +46,31 @@ namespace Isop.WpfControls.ViewModels
 
         public static MethodTreeModel GetMethodTreeModel(this Build argumentParserBuilder)
         {
-            return new MethodTreeModel
-                       {
-                           Controllers = argumentParserBuilder.ControllerRecognizers
-                               .Where(cmr => !cmr.ClassName().Equals("help", StringComparison.OrdinalIgnoreCase))
-                               .Select(cmr => new Controller
-                                                  {
-                                                      Name = cmr.ClassName(),
-                                                      Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
-                                                        {
-                                                            Parameters = new ObservableCollection<Param>(
-                                                                m.GetParameters().Select(p =>
-                                                                    new Param(p.ParameterType, p.Name, 
-                                                                        new ArgumentWithOptions(p.Name,required:true))))
-                                                        })
-                                                  }),
-                           GlobalParameters = new ObservableCollection<Param>(argumentParserBuilder.GlobalParameters
-                                                                                  .Select(p => new Param(typeof(string), p.Argument.ToString(), p)))
-                       };
+            return new MethodTreeModel(new ObservableCollection<Param>(
+                argumentParserBuilder.GlobalParameters
+                    .Select(p => new Param(typeof(string), p.Argument.ToString(), p))),
+                argumentParserBuilder.ControllerRecognizers
+                    .Where(cmr => !cmr.ClassName().Equals("help", StringComparison.OrdinalIgnoreCase))
+                    .Select(cmr => new Controller
+                        {
+                            Name = cmr.ClassName(),
+                            Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
+                            {
+                                Parameters = new ObservableCollection<Param>(
+                                    m.GetParameters().Select(p =>
+                                        new Param(p.ParameterType, p.Name, 
+                                            new ArgumentWithOptions(p.Name,required:true))))
+                            })
+                        })
+            );
+        }
+
+        public static void SetParamValueOnMatching(this IEnumerable<Param> that, Param updatedParam)
+        {
+            foreach (var param in that.Where(p => p.Name.Equals(updatedParam.Name, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                param.Value = updatedParam.Value;
+            }
         }
     }
 }

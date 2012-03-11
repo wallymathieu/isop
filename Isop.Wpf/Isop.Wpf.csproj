@@ -72,6 +72,9 @@
       <Link>WpfControls\MethodView.xaml.cs</Link>
       <DependentUpon>MethodView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\Isop.WpfControls\SingleScopeOnly.cs">
+      <Link>WpfControls\SingleScopeOnly.cs</Link>
+    </Compile>
     <Compile Include="..\Isop.WpfControls\ViewModels\Controller.cs">
       <Link>WpfControls\ViewModels\Controller.cs</Link>
     </Compile>

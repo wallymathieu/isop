@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoolToVisibilityConverter.cs" />
+    <Compile Include="SingleScopeOnly.cs" />
     <Compile Include="MethodView.xaml.cs">
       <DependentUpon>MethodView.xaml</DependentUpon>
     </Compile>

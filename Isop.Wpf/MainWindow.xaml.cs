@@ -5,6 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using Isop.WpfControls.ViewModels;
+using System.Collections.Generic;
+using System.ComponentModel;
+using Isop.WpfControls;
 
 namespace Isop.Gui
 {
@@ -14,9 +17,8 @@ namespace Isop.Gui
     public partial class MainWindow : Window
     {
         public MethodTreeModel MethodTreeModel { get; set; }
-        public ObservableCollection<Param> Parameters;
-        public Method CurrentMethod { get; set; }
-        protected Build ParserBuilder 
+
+        protected Build ParserBuilder
         {
             get { return ((App)App.Current).ParserBuilder; }
         }
@@ -24,7 +26,6 @@ namespace Isop.Gui
         public MainWindow()
         {
             MethodTreeModel = ParserBuilder.GetMethodTreeModel();
-
             InitializeComponent();
             paramview.Source = MethodTreeModel.GlobalParameters;
             controllersAndCommands.DataContext = MethodTreeModel.Controllers;
@@ -35,9 +36,9 @@ namespace Isop.Gui
         {
             if (e.NewValue is Method)
             {
-                CurrentMethod = (Method)e.NewValue;
+                MethodTreeModel.CurrentMethod = (Method)e.NewValue;
                 methodview.DataContext = e.NewValue;
-                methodview.Source = CurrentMethod.Parameters;
+                methodview.Source = MethodTreeModel.CurrentMethod.Parameters;
                 textBlock1.Text = string.Empty;
             }
         }
@@ -57,18 +58,18 @@ namespace Isop.Gui
 #if DEBUG
             catch (Exception ex1)
             {
-                textBlock1.Text =string.Join(Environment.NewLine, new object[]{ 
+                textBlock1.Text = string.Join(Environment.NewLine, new object[]{ 
                     "The global parameter invokation failed with exception:",
                     ex1.Message, ex1.StackTrace});
                 return;
             }
 #endif
-            if (null == CurrentMethod) return;
+            if (null == MethodTreeModel.CurrentMethod) return;
 
             cout.WriteLine();
             try
             {
-                var parsedMethod = ParserBuilder.Parse(CurrentMethod);
+                var parsedMethod = ParserBuilder.Parse(MethodTreeModel.CurrentMethod);
                 parsedMethod.Invoke(cout);
             }
             catch (MissingArgumentException ex)

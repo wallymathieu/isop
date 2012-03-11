@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 
 namespace Isop.WpfControls.ViewModels
 {
@@ -13,7 +13,7 @@ namespace Isop.WpfControls.ViewModels
         public string Name { get; set; }
         public string ClassName { get; set; }
 
-        public ObservableCollection<Param> Parameters { get; set; }
+        public IEnumerable<Param> Parameters { get; set; }
 
         public ParsedArguments GetParsedArguments()
         {
