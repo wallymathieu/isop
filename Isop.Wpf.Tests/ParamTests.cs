@@ -26,5 +26,26 @@ namespace Isop.Wpf.Tests
             var p = new Param(typeof(string), "name", new ArgumentWithOptions(new ArgumentParameter("name", new[] { "name" })));
             p.Value = "val";
         }
+
+        [Test]
+        public void Get_parsed_arguments() 
+        {
+            var p = new Param(typeof(string), "name", new ArgumentWithOptions(new ArgumentParameter("name", new[] { "name" })));
+            var c = new[]{ p }.GetParsedArguments();
+            Assert.That(c.RecognizedArguments.Count(), Is.EqualTo(0));
+            Assert.That(c.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            Assert.That(c.ArgumentWithOptions.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Get_parsed_arguments_when_value_is_set()
+        {
+            var p = new Param(typeof(string), "name", new ArgumentWithOptions(new ArgumentParameter("name", new[] { "name" })));
+            p.Value = "value";
+            var c = new[] { p }.GetParsedArguments();
+            Assert.That(c.RecognizedArguments.Count(), Is.EqualTo(1));
+            Assert.That(c.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            Assert.That(c.ArgumentWithOptions.Count(), Is.EqualTo(1));
+        }
     }
 }

@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MethodTreeModelTests.cs" />
     <Compile Include="SingleScopeOnlyTests.cs" />
     <Compile Include="ParamTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

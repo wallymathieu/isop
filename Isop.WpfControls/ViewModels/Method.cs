@@ -14,10 +14,5 @@ namespace Isop.WpfControls.ViewModels
         public string ClassName { get; set; }
 
         public IEnumerable<Param> Parameters { get; set; }
-
-        public ParsedArguments GetParsedArguments()
-        {
-            return Parameters.GetParsedArguments();
-        }
     }
 }

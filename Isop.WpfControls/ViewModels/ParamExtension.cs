@@ -21,12 +21,12 @@ namespace Isop.WpfControls.ViewModels
                        };
         }
 
-        public static ParsedMethod Parse(this Build argumentParserBuilder, Method currentMethod)
+        public static ParsedMethod Parse(this Build that, Method currentMethod)
         {
-            var controllerRecognizer = argumentParserBuilder.ControllerRecognizers
+            var controllerRecognizer = that.ControllerRecognizers
                 .First(c => c.ClassName().Equals(currentMethod.ClassName));
 
-            var parsedArguments = currentMethod.GetParsedArguments();
+            var parsedArguments = currentMethod.Parameters.GetParsedArguments();
             var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
             if (unMatchedRequiredArguments.Any())
             {
@@ -40,16 +40,16 @@ namespace Isop.WpfControls.ViewModels
             var method = controllerRecognizer.GetMethods()
                 .First(m => m.Name.Equals(currentMethod.Name));
             var parsedMethod = controllerRecognizer.Parse(method, parsedArguments);
-            parsedMethod.Factory = argumentParserBuilder.GetFactory();
+            parsedMethod.Factory = that.GetFactory();
             return parsedMethod;
         }
 
-        public static MethodTreeModel GetMethodTreeModel(this Build argumentParserBuilder)
+        public static MethodTreeModel GetMethodTreeModel(this Build that)
         {
             return new MethodTreeModel(new ObservableCollection<Param>(
-                argumentParserBuilder.GlobalParameters
+                that.GlobalParameters
                     .Select(p => new Param(typeof(string), p.Argument.ToString(), p))),
-                argumentParserBuilder.ControllerRecognizers
+                that.ControllerRecognizers
                     .Where(cmr => !cmr.ClassName().Equals("help", StringComparison.OrdinalIgnoreCase))
                     .Select(cmr => new Controller
                         {
