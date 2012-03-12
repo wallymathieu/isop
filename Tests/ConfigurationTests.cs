@@ -72,12 +72,12 @@ namespace Isop.Tests
         [Test]
         public void RecognizeCulture()
         {
-            Assert.That(parserBuilder.GetCulture(), Is.EqualTo(CultureInfo.GetCultureInfo("es-ES")));
+            Assert.That(parserBuilder.Culture, Is.EqualTo(CultureInfo.GetCultureInfo("es-ES")));
         }
         [Test]
         public void RecognizeTypeConverter()
         {
-            Assert.That(parserBuilder.GetTypeConverter(), Is.EqualTo((TypeConverterFunc)FullConfiguration.TypeConverter));
+            Assert.That(parserBuilder.TypeConverter, Is.EqualTo((TypeConverterFunc)FullConfiguration.TypeConverter));
         }
         [Test]
         public void RecognizeRecognizers()

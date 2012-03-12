@@ -38,7 +38,7 @@ namespace Isop.Tests
 
         internal class AnotherController
         {
-            public void Action1 ()
+            public void Action1 (string param1)
             {
             }
 
@@ -152,6 +152,20 @@ Se 'COMMANDNAME' help <command> for more information")));
   Action2
 
 Se 'COMMANDNAME' help <command> <subcommand> for more information")));
+        }
+
+        [Test,Ignore("Not implemented")]
+        public void It_can_report_usage_for_controller_and_action()
+        {
+            var usage = new Build()
+                                    .Recognize(typeof(MyController))
+                                    .Recognize(typeof(AnotherController))
+                                    .RecognizeHelp()
+                                    .HelpFor("Another", "Action1");
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The parameters for Action1 are
+
+ param1
+")));
         }
      
         [Test]

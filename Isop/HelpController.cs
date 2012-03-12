@@ -30,7 +30,7 @@ namespace Isop
             return sb.ToString().Trim(' ','\t','\r','\n');
         }
         
-        public string Index(string command)
+        public string Index(string command,string action)
         {
          if (String.IsNullOrEmpty(command))
              return Index();

@@ -7,12 +7,15 @@ using System.Reflection;
 using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
 namespace Isop
 {
+    /// <summary>
+    /// represents a configuration build
+    /// </summary>
     public class Build:IDisposable
     {
         private readonly IList<ArgumentWithOptions> _argumentRecognizers;
         private readonly IList<ControllerRecognizer> _controllerRecognizers;
-        private CultureInfo _cultureInfo;
-        private TypeConverterFunc _typeConverter;
+        public CultureInfo Culture { get; private set; }
+        public TypeConverterFunc TypeConverter { get; private set; }
         private HelpForControllers _helpForControllers;
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
@@ -36,17 +39,12 @@ namespace Isop
         /// <returns></returns>
         public Build SetCulture(CultureInfo cultureInfo)
         {
-            _cultureInfo = cultureInfo; return this;
+            Culture = cultureInfo; return this;
         }
 
-        public CultureInfo GetCulture ()
-        {
-            return _cultureInfo;
-        }
-     
         public Build SetTypeConverter(TypeConverterFunc typeconverter)
         {
-            _typeConverter = typeconverter; return this;
+            TypeConverter = typeconverter; return this;
         }
 		
 		public Build SetFactory(Func<Type,Object> factory)
@@ -97,28 +95,22 @@ namespace Isop
 
         public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
         {
-            _controllerRecognizers.Add(new ControllerRecognizer(arg, cultureInfo?? _cultureInfo , typeConverter ?? _typeConverter,ignoreGlobalUnMatchedParameters));
+            _controllerRecognizers.Add(new ControllerRecognizer(arg, cultureInfo?? Culture , typeConverter ?? TypeConverter,ignoreGlobalUnMatchedParameters));
             return this;
         }
 		public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
         {
             _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(),
-               cultureInfo?? _cultureInfo , typeConverter ?? _typeConverter, ignoreGlobalUnMatchedParameters));
+               cultureInfo?? Culture , typeConverter ?? TypeConverter, ignoreGlobalUnMatchedParameters));
             _container.Instances.Add(arg.GetType(),arg);
             return this;
         }
 
-        public TypeConverterFunc GetTypeConverter ()
-        {
-            return _typeConverter;
-        }
-		
-
         public String Help()
         {
-            var cout = new StringWriter(_cultureInfo);
+            var cout = new StringWriter(Culture);
             Parse(new []{"Help"}).Invoke(cout);
-			return cout.ToString();// return _helpController.Index();
+			return cout.ToString();
         }
 
         /// <summary>
@@ -149,11 +141,12 @@ namespace Isop
             return this;
         }
 
-        public string HelpFor(string command)
+        public string HelpFor(string controller, string action=null)
         {
-            var cout = new StringWriter(_cultureInfo);
-            Parse(new[] { "Help", command }).Invoke(cout);
-            return cout.ToString();//_helpController.Index(command);
+            var cout = new StringWriter(Culture);
+            Parse( new[] { "Help", controller, action }
+                .Where(s=>!string.IsNullOrEmpty(s))).Invoke(cout);
+            return cout.ToString();
         }
 
         public Build RecognizeHelp()
@@ -170,26 +163,17 @@ namespace Isop
 
         public bool RecognizesHelp
         {
-            get
-            {
-            return _helpController!=null;
-            }
+            get { return _helpController!=null; }
         }
 
         public IEnumerable<ControllerRecognizer> ControllerRecognizers
         {
-            get
-            {
-                return _controllerRecognizers;
-            }
+            get { return _controllerRecognizers; }
         }
 
         public IEnumerable<ArgumentWithOptions> GlobalParameters
         {
-            get
-            {
-                return _argumentRecognizers;
-            }
+            get { return _argumentRecognizers; }
         }
 
         public Func<Type, object> GetFactory()
@@ -220,7 +204,7 @@ namespace Isop
                 returnType: typeof(CultureInfo),
                 parameters: new Type[0]);
             if (null!=culture)
-                _cultureInfo = (CultureInfo)culture.Invoke(instance,new object[0]);
+                Culture = (CultureInfo)culture.Invoke(instance,new object[0]);
             
             var recognizesMethod = recognizer.MatchGet(methods, 
                 name:"Recognizes",

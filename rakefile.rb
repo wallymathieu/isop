@@ -12,7 +12,7 @@ namespace :ms do
   desc "test using nunit console"
   nunit :test => :build do |nunit|
     nunit.command = "packages/NUnit.2.5.9.10348/Tools/nunit-console.exe"
-    nunit.assemblies "Tests/bin/Debug/Tests.dll"
+    nunit.assemblies "Tests/bin/Debug/Tests.dll", "Isop.Wpf.Tests/bin/Debug/Isop.Wpf.Tests.dll"
   end
   desc "copy example cli to wpf and cli folder"
   task :copy_cli => :build do

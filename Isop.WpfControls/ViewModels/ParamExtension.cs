@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.ComponentModel;
 
 namespace Isop.WpfControls.ViewModels
 {
@@ -21,12 +22,37 @@ namespace Isop.WpfControls.ViewModels
                        };
         }
 
-        public static ParsedMethod Parse(this Build argumentParserBuilder, Method currentMethod)
+        public static void SetParamValueOnMatching(this IEnumerable<Param> that, Param updatedParam)
         {
-            var controllerRecognizer = argumentParserBuilder.ControllerRecognizers
+            foreach (var param in that.Where(p => p.Name.Equals(updatedParam.Name, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                param.Value = updatedParam.Value;
+            }
+        }
+
+        public static void DeRegisterPropertyChanged(this IEnumerable<Param> that, PropertyChangedEventHandler handler)
+        {
+            foreach (var param in that)
+            {
+                param.PropertyChanged -= handler;
+            }
+        }
+        public static void RegisterPropertyChanged(this IEnumerable<Param> that, PropertyChangedEventHandler handler)
+        {
+            foreach (var param in that)
+            {
+                param.PropertyChanged += handler;
+            }
+        }
+    }
+    public static class BuildExtensions
+    {
+        public static ParsedMethod Parse(this Build that, Method currentMethod)
+        {
+            var controllerRecognizer = that.ControllerRecognizers
                 .First(c => c.ClassName().Equals(currentMethod.ClassName));
 
-            var parsedArguments = currentMethod.GetParsedArguments();
+            var parsedArguments = currentMethod.Parameters.GetParsedArguments();
             var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
             if (unMatchedRequiredArguments.Any())
             {
@@ -40,37 +66,30 @@ namespace Isop.WpfControls.ViewModels
             var method = controllerRecognizer.GetMethods()
                 .First(m => m.Name.Equals(currentMethod.Name));
             var parsedMethod = controllerRecognizer.Parse(method, parsedArguments);
-            parsedMethod.Factory = argumentParserBuilder.GetFactory();
+            parsedMethod.Factory = that.GetFactory();
             return parsedMethod;
         }
 
-        public static MethodTreeModel GetMethodTreeModel(this Build argumentParserBuilder)
+        public static MethodTreeModel GetMethodTreeModel(this Build that)
         {
-            return new MethodTreeModel(new ObservableCollection<Param>(
-                argumentParserBuilder.GlobalParameters
-                    .Select(p => new Param(typeof(string), p.Argument.ToString(), p))),
-                argumentParserBuilder.ControllerRecognizers
+            return new MethodTreeModel(new List<Param>(
+                that.GlobalParameters
+                    .Select(p => new Param(typeof(string), p.Argument.ToString(), p)))
+                    .ToArray(),
+                that.ControllerRecognizers
                     .Where(cmr => !cmr.ClassName().Equals("help", StringComparison.OrdinalIgnoreCase))
                     .Select(cmr => new Controller
+                    {
+                        Name = cmr.ClassName(),
+                        Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
                         {
-                            Name = cmr.ClassName(),
-                            Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
-                            {
-                                Parameters = new ObservableCollection<Param>(
-                                    m.GetParameters().Select(p =>
-                                        new Param(p.ParameterType, p.Name, 
-                                            new ArgumentWithOptions(p.Name,required:true))))
-                            })
-                        })
+                            Parameters = new List<Param>(
+                                m.GetParameters().Select(p =>
+                                    new Param(p.ParameterType, p.Name,
+                                        new ArgumentWithOptions(p.Name, required: true))).ToArray())
+                        }).ToArray()
+                    }).ToArray()
             );
-        }
-
-        public static void SetParamValueOnMatching(this IEnumerable<Param> that, Param updatedParam)
-        {
-            foreach (var param in that.Where(p => p.Name.Equals(updatedParam.Name, StringComparison.CurrentCultureIgnoreCase)))
-            {
-                param.Value = updatedParam.Value;
-            }
         }
     }
 }
