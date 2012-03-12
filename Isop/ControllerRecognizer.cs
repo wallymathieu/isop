@@ -9,63 +9,6 @@ using System.Collections;
 using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
 namespace Isop
 {
-    
-    [Serializable]
-    public class TypeConversionFailedException : Exception
-    {
-        public string Argument;
-        public string Value;
-        public Type TargetType;
-     public TypeConversionFailedException ()
-     {
-     }
-     
-     public TypeConversionFailedException (string message) : base (message)
-     {
-     }
-     
-     public TypeConversionFailedException (string message, Exception inner) : base (message, inner)
-     {
-     }
-     
-    }
-	public class Transform
-    {
-        // Lexer -> 
-        // Arg(ControllerName),Param(..),.. -> Arg(ControllerName),Arg('Index'),... 
-        public ArgumentLexer Rewrite(ArgumentLexer tokens)
-        {
-            //"--command"
-            if (tokens.Count()>=2 
-                && tokens[0].TokenType==TokenType.Argument 
-                && tokens[0].Value.Equals("help",StringComparison.OrdinalIgnoreCase)
-                && tokens[1].TokenType==TokenType.Argument)
-            {
-                tokens[1] = new Token(tokens[1].Value,TokenType.ParameterValue,tokens[1].Index);
-                tokens.Insert(1,new Token("command",TokenType.Parameter,1));
-            }
-            //help maps to index (should have routing here)
-            if (tokens.Count() == 0)
-            {
-                tokens.Add(new Token("help",TokenType.Argument,0));
-            }
-
-            //Index rewrite:
-            var indexToken= new Token("Index", TokenType.Argument,1);
-            if (tokens.Count()>=2 
-                && tokens[1].TokenType!=TokenType.Argument 
-                && tokens[0].TokenType==TokenType.Argument)
-            {
-                tokens.Insert(1,indexToken);
-            }
-            else if (tokens.Count()==1 
-                && tokens[0].TokenType==TokenType.Argument)
-            {
-                tokens.Add(indexToken);
-            }
-            return new ArgumentLexer(tokens);
-        }
-    }
     public class ControllerRecognizer
     {
         private static MethodInfo FindMethod (IEnumerable<MethodInfo> methods, String methodName, IEnumerable<Token> lexer)
@@ -221,37 +164,4 @@ namespace Isop
         }
     }
 
-    public class ParsedMethod : ParsedArguments
-    {
-        public ParsedMethod(ParsedArguments parsedArguments)
-            : base(parsedArguments)
-        {
-        }
-		public Func<Type,Object> Factory { get; set; }
-
-        public Type RecognizedClass { get; set; }
-        public MethodInfo RecognizedAction { get; set; }
-
-        public IEnumerable<object> RecognizedActionParameters { get; set; }
-		
-        public override void Invoke(TextWriter cout)
-        {
-			var instance = Factory(RecognizedClass);
-			
-			var retval = RecognizedAction.Invoke(instance, RecognizedActionParameters.ToArray());
-            if (retval == null) return;
-            if (retval is string)
-            {
-                cout.Write(retval as string);
-            }else if (retval is IEnumerable)
-            {
-                foreach (var item in (retval as IEnumerable)) {
-                    cout.Write(item.ToString());
-                }
-            }else
-            {
-                cout.Write(retval.ToString());
-            }
-        }
-    }
 }

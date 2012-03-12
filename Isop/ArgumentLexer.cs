@@ -7,44 +7,6 @@ using System.Text.RegularExpressions;
 
 namespace Isop
 {
-    public class PeekEnumerable<T>:IEnumerable<T>
-    {
-        public PeekEnumerable(IEnumerable<T> enumerable)
-        {
-            _buffer = enumerable.ToList();
-        }
-        private int _currentIndex = -1;
-        private readonly List<T> _buffer;
-        public T Current()
-        {
-            if (_currentIndex < _buffer.Count())
-            {
-                return _buffer[_currentIndex];
-            }
-            throw new ArgumentOutOfRangeException();
-        }
-        public bool HasMore() { return _currentIndex+1<_buffer.Count(); }
-        public T Next()
-        {
-            _currentIndex++;
-            return Current();
-        }
-
-        public T Peek()
-        {
-             var idx = _currentIndex+1; 
-             return idx<_buffer.Count() ? _buffer[idx] : default(T);
-        }
-        public IEnumerator<T> GetEnumerator()
-        {
-            return _buffer.GetEnumerator();
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-    }
     
     public class ArgumentLexer : List<Token>
     {
@@ -99,49 +61,4 @@ namespace Isop
         }
     }
     
-    public enum TokenType
-    {
-        None,
-        Argument,
-        Parameter,
-        ParameterValue,
-    }
-    public struct Token
-    {
-        public string Value;
-        public TokenType TokenType;
-        /// <summary>
-        /// the index in the argument array
-        /// </summary>
-        public int Index;
-        
-        public Token(string value, TokenType tokenType, int index)
-        {
-            Value = value;
-            TokenType = tokenType;
-            Index = index;
-        }
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is Token && Equals((Token)obj);
-        }
-
-        public bool Equals(Token other)
-        {
-            return Equals(other.Value, Value) && Equals(other.TokenType, TokenType);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return ((Value != null ? Value.GetHashCode() : 0) * 397) ^ TokenType.GetHashCode();
-            }
-        }
-        public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture,"{0}:{1}", TokenType, Value);
-        }
-    }
 }

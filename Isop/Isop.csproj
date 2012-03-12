@@ -50,9 +50,30 @@
     <Compile Include="ArgumentLexer.cs" />
     <Compile Include="ArgumentParser.cs" />
     <Compile Include="Build.cs" />
-    <Compile Include="Help.cs" />
     <Compile Include="ControllerRecognizer.cs" />
     <Compile Include="MethodInfoFinder.cs" />
+    <Compile Include="TokenType.cs" />
+    <Compile Include="Token.cs" />
+    <Compile Include="PeekEnumerable.cs" />
+    <Compile Include="MissingArgumentException.cs" />
+    <Compile Include="NoClassOrMethodFoundException.cs" />
+    <Compile Include="ArgumentParameter.cs" />
+    <Compile Include="OrdinalParameter.cs" />
+    <Compile Include="OptionParameter.cs" />
+    <Compile Include="VisualStudioParameter.cs" />
+    <Compile Include="ArgumentWithOptions.cs" />
+    <Compile Include="RecognizedArgument.cs" />
+    <Compile Include="ParsedArguments.cs" />
+    <Compile Include="MergedParsedArguments.cs" />
+    <Compile Include="UnrecognizedArgument.cs" />
+    <Compile Include="TypeConversionFailedException.cs" />
+    <Compile Include="Transform.cs" />
+    <Compile Include="ParsedMethod.cs" />
+    <Compile Include="MethodInfoOrProperty.cs" />
+    <Compile Include="HelpXmlDocumentation.cs" />
+    <Compile Include="HelpController.cs" />
+    <Compile Include="HelpForArgumentWithOptions.cs" />
+    <Compile Include="HelpForControllers.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

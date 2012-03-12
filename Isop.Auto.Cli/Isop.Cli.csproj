@@ -52,9 +52,6 @@
     <Compile Include="..\Isop\ControllerRecognizer.cs">
       <Link>Isop\ControllerRecognizer.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Help.cs">
-      <Link>Isop\Help.cs</Link>
-    </Compile>
     <Compile Include="..\Isop\ListExtensions.cs">
       <Link>Isop\ListExtensions.cs</Link>
     </Compile>
@@ -63,6 +60,72 @@
     </Compile>
     <Compile Include="..\Isop\TypeContainer.cs">
       <Link>Isop\TypeContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\ArgumentWithOptions.cs">
+      <Link>Isop\ArgumentWithOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\HelpController.cs">
+      <Link>Isop\HelpController.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\HelpForArgumentWithOptions.cs">
+      <Link>Isop\HelpForArgumentWithOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\HelpForControllers.cs">
+      <Link>Isop\HelpForControllers.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\HelpXmlDocumentation.cs">
+      <Link>Isop\HelpXmlDocumentation.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\MergedParsedArguments.cs">
+      <Link>Isop\MergedParsedArguments.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\MethodInfoOrProperty.cs">
+      <Link>Isop\MethodInfoOrProperty.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\MissingArgumentException.cs">
+      <Link>Isop\MissingArgumentException.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\NoClassOrMethodFoundException.cs">
+      <Link>Isop\NoClassOrMethodFoundException.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\OptionParameter.cs">
+      <Link>Isop\OptionParameter.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\OrdinalParameter.cs">
+      <Link>Isop\OrdinalParameter.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\ParsedArguments.cs">
+      <Link>Isop\ParsedArguments.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\ParsedMethod.cs">
+      <Link>Isop\ParsedMethod.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\PeekEnumerable.cs">
+      <Link>Isop\PeekEnumerable.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\RecognizedArgument.cs">
+      <Link>Isop\RecognizedArgument.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\Token.cs">
+      <Link>Isop\Token.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\TokenType.cs">
+      <Link>Isop\TokenType.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\Transform.cs">
+      <Link>Isop\Transform.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\TypeConversionFailedException.cs">
+      <Link>Isop\TypeConversionFailedException.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\UnrecognizedArgument.cs">
+      <Link>Isop\UnrecognizedArgument.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\VisualStudioParameter.cs">
+      <Link>Isop\VisualStudioParameter.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop\ArgumentParameter.cs">
+      <Link>Isop\ArgumentParameter.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
