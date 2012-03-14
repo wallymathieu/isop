@@ -25,17 +25,35 @@ namespace Isop
             }
             return potential.FirstOrDefault();
         }
-
-        private static IEnumerable<Object> GetParametersForMethod (MethodInfo method, ParsedArguments parsedArguments, Func<RecognizedArgument,ParameterInfo,Object> convertFrom)
+        private static bool IsClass(Type t){
+            return t.IsClass && t!=typeof(String);
+        }
+        
+        private static IEnumerable<Object> GetParametersForMethod (MethodInfo method, 
+                      ParsedArguments parsedArguments, 
+                      Func<RecognizedArgument,Type,Object> convertFrom)
         {
             var parameterInfos = method.GetParameters();
             var parameters = new List<Object>();
             
             foreach (var paramInfo in parameterInfos)
             {
-                var recognizedArgument =  parsedArguments.RecognizedArguments.First(
-                    a => a.Argument.ToUpperInvariant().Equals(paramInfo.Name.ToUpperInvariant()));
-                parameters.Add( convertFrom (recognizedArgument, paramInfo));
+                if (IsClass( paramInfo.ParameterType)){
+                    var obj = Activator.CreateInstance(paramInfo.ParameterType);
+                    foreach (PropertyInfo prop in paramInfo.ParameterType.GetProperties(BindingFlags.Instance| BindingFlags.Public)) {
+                        var recognizedArgument =  parsedArguments.RecognizedArguments
+                            .First(a => a.Argument.ToUpperInvariant()
+                                   .Equals(prop.Name.ToUpperInvariant()));
+
+                        prop.SetValue(obj,convertFrom(recognizedArgument,prop.PropertyType), null);
+                        
+                    }
+                    parameters.Add(obj);
+                }else{
+                    var recognizedArgument =  parsedArguments.RecognizedArguments.First(
+                        a => a.Argument.ToUpperInvariant().Equals(paramInfo.Name.ToUpperInvariant()));
+                    parameters.Add( convertFrom (recognizedArgument, paramInfo.ParameterType));
+                }
             }
             return parameters;
         }
@@ -43,10 +61,23 @@ namespace Isop
         private IEnumerable<ArgumentWithOptions> GetRecognizers(MethodBase method)
         {
             var parameterInfos = method.GetParameters();
-            var recognizers = parameterInfos
-                .Select (parameterInfo => 
-                    new ArgumentWithOptions (ArgumentParameter.Parse (parameterInfo.Name,_culture), required: true))
-                .ToList ();
+            var recognizers = new List<ArgumentWithOptions>();
+            foreach (var parameterInfo in parameterInfos) {
+                if (IsClass(parameterInfo.ParameterType)){
+                    Console.WriteLine(parameterInfo.ParameterType.Name);
+                }
+                if (IsClass(parameterInfo.ParameterType)){
+                    foreach (var prop in parameterInfo.ParameterType.GetProperties(BindingFlags.Instance| BindingFlags.Public)) {
+                         var arg = new ArgumentWithOptions (ArgumentParameter.Parse (prop.Name,_culture), 
+                                                           required: true);
+                        recognizers.Add(arg);
+                    }
+                }else{
+                    var arg = new ArgumentWithOptions (ArgumentParameter.Parse (parameterInfo.Name,_culture), required: true);
+                    recognizers.Add(arg);
+                    
+                }
+            }
             recognizers.Insert(0, new ArgumentWithOptions(ArgumentParameter.Parse("#1" + method.Name, _culture), required: false));
             return recognizers;
         }
@@ -129,7 +160,8 @@ namespace Isop
                           };
             }
 
-            var recognizedActionParameters = GetParametersForMethod(methodInfo, parsedArguments, ConvertFrom);
+            var recognizedActionParameters = GetParametersForMethod(methodInfo, 
+                            parsedArguments, ConvertFrom);
             
             parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments
                 .Where(unrecognized=>unrecognized.Index>=1); //NOTE: should be different!
@@ -142,18 +174,18 @@ namespace Isop
                        };
         }
 
-        private object ConvertFrom(RecognizedArgument arg1, ParameterInfo parameterInfo)
+        private object ConvertFrom(RecognizedArgument arg1, Type type)
         {
             try
             {
-                return _typeConverter(parameterInfo.ParameterType, arg1.Value, _culture);
+                return _typeConverter(type, arg1.Value, _culture);
             }
             catch (Exception e)
             {
                 throw new TypeConversionFailedException("Could not convert argument", e){
                     Argument=arg1.WithOptions.Argument.ToString(),
                     Value=arg1.Value,
-                    TargetType=parameterInfo.ParameterType 
+                    TargetType=type 
                 };
             }
         }

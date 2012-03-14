@@ -300,22 +300,22 @@ namespace Isop.Tests
                 }
             }
         }
-        [Test,Ignore("Not implemented")]
+        [Test]
         public void It_can_parse_class_and_method_with_object_and_execute()
         {
             var count = 0;
             Func<Type, object> factory = (Type t) =>
             {
-                Assert.That(t, Is.EqualTo(typeof(MyController)));
+                Assert.That(t, Is.EqualTo(typeof(MyObjectController)));
                 return
                     (object)
-                    new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
+                    new MyObjectController() { OnAction = (p1) => (count++).ToString() };
             };
             var arguments = new Build()
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(MyObjectController))
                                                .SetFactory(factory)
-                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+                                               .Parse(new[] { "MyObject", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
