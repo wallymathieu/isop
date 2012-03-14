@@ -32,7 +32,7 @@ namespace Isop
         private static IEnumerable<Object> GetParametersForMethod (MethodInfo method, 
                       ParsedArguments parsedArguments, 
                       Func<RecognizedArgument,Type,Object> convertFrom)
-        {
+        {//NOTE: Obviously to complicated. Need to refactor.
             var parameterInfos = method.GetParameters();
             var parameters = new List<Object>();
             
@@ -59,7 +59,7 @@ namespace Isop
         }
 
         private IEnumerable<ArgumentWithOptions> GetRecognizers(MethodBase method)
-        {
+        {//NOTE: Obviously to complicated. Need to refactor.
             var parameterInfos = method.GetParameters();
             var recognizers = new List<ArgumentWithOptions>();
             foreach (var parameterInfo in parameterInfos) {

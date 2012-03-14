@@ -124,12 +124,6 @@ namespace Isop.Tests
                 Is.AtLeast(2));
         }
         
-        [Test,Ignore("Not really correct")] public void Can_use_file_location_to_get_directory()
-        {
-            var path = Assembly.GetExecutingAssembly().Location;
-            Assert.That(Directory.GetParent(path).FullName,Is.EqualTo(Environment.CurrentDirectory));
-        }
-        
         [Test] public void Can_invoke_configure_method_on_configuration()
         {
             var conf = new FullConfiguration();
