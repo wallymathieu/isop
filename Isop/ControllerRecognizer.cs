@@ -64,9 +64,6 @@ namespace Isop
             var recognizers = new List<ArgumentWithOptions>();
             foreach (var parameterInfo in parameterInfos) {
                 if (IsClass(parameterInfo.ParameterType)){
-                    Console.WriteLine(parameterInfo.ParameterType.Name);
-                }
-                if (IsClass(parameterInfo.ParameterType)){
                     foreach (var prop in parameterInfo.ParameterType.GetProperties(BindingFlags.Instance| BindingFlags.Public)) {
                          var arg = new ArgumentWithOptions (ArgumentParameter.Parse (prop.Name,_culture), 
                                                            required: true);
