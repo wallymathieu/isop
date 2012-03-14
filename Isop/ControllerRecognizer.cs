@@ -15,15 +15,15 @@ namespace Isop
         {
             var potential = methods
                 .Where (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase));
-            var methodInfo = potential
+            var potentialMethod = potential
                 .Where(method=>method.GetParameters().Length<=lexer.Count(t=>t.TokenType==TokenType.Parameter))
                 .OrderByDescending(method=>method.GetParameters().Length)
                 .FirstOrDefault();
-            if (methodInfo==null)
+            if (potentialMethod!=null)
             {
-                methodInfo = potential.FirstOrDefault();
+                return potentialMethod;
             }
-            return methodInfo;
+            return potential.FirstOrDefault();
         }
 
         private static IEnumerable<Object> GetParametersForMethod (MethodInfo method, ParsedArguments parsedArguments, Func<RecognizedArgument,ParameterInfo,Object> convertFrom)

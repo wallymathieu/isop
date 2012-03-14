@@ -10,11 +10,6 @@ namespace Isop.Tests
     [TestFixture]
     public class ArgumentParserTests
     {
-        [SetUp]
-        public void SetUp() { }
-        [TearDown]
-        public void TearDown() { }
-
         [Test]
         public void Recognizes_shortform()
         {
@@ -304,6 +299,44 @@ namespace Isop.Tests
                     yield return OnEnumerate();
                 }
             }
+        }
+        [Test,Ignore("Not implemented")]
+        public void It_can_parse_class_and_method_with_object_and_execute()
+        {
+            var count = 0;
+            Func<Type, object> factory = (Type t) =>
+            {
+                Assert.That(t, Is.EqualTo(typeof(MyController)));
+                return
+                    (object)
+                    new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
+            };
+            var arguments = new Build()
+                                               .SetCulture(CultureInfo.InvariantCulture)
+                                               .Recognize(typeof(MyObjectController))
+                                               .SetFactory(factory)
+                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+
+            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            arguments.Invoke(new StringWriter());
+            Assert.That(count, Is.EqualTo(1));
+        }
+        class MyObjectController
+        {
+            public class Argument
+            {
+                public string param1 { get; set; }
+                public string param2 { get; set; }
+                public int param3 { get; set; }
+                public decimal param4 { get; set; }
+            }
+
+            public MyObjectController()
+            {
+                OnAction = (a) => string.Empty;
+            }
+            public Func<Argument, string> OnAction { get; set; }
+            public string Action(Argument a) { return OnAction(a); }
         }
     }
 
