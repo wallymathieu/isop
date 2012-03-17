@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Isop.WpfControls.ViewModels;
-
+using System.IO;
 namespace Isop.Wpf.Tests
 {
     [TestFixture]
@@ -86,6 +86,36 @@ namespace Isop.Wpf.Tests
                 .Methods.Single(m=>m.Name=="Action");
             return treemodel;
         }
-        
+        [Test]
+        public void Can_run_selected_method()
+        {
+            var treemodel = TreeModelWithCurrentMethodSelected();
+            var param1 = treemodel.CurrentMethod.Parameters.Single();
+            param1.Value = "new value";
+            treemodel.Build.Parse(treemodel.CurrentMethod);
+        }
+        [Test]
+        public void Can_run_action_with_object_argument()
+        {
+            var treemodel = new Build()
+             .Recognize(new MyObjectController())
+             .GetMethodTreeModel();
+            treemodel.CurrentMethod = treemodel.Controllers.Single()
+                .Methods.Single(m => m.Name == "Action");
+            treemodel.CurrentMethod.Parameters.Single().Value = "123";
+            treemodel.Build.Parse(treemodel.CurrentMethod)
+                .Invoke(new StringWriter());
+            Assert.That(MyObjectController.LastArgument.Value,Is.EqualTo(123)); 
+        }
+        public class MyObjectController
+        {
+          public class Argument { public int Value{get;set;} }
+          public static Argument LastArgument;
+          public string Action(Argument arg)
+          {
+            LastArgument=arg;
+            return "val";
+          }
+        }
     }
 }

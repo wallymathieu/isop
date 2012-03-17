@@ -29,7 +29,7 @@ namespace Isop
 
         public Build Parameter(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null)
         {
-            _argumentRecognizers.Add(new ArgumentWithOptions(argument, action, required, description));
+            _argumentRecognizers.Add(new ArgumentWithOptions(argument, action, required, description, typeof(string)));
             return this;
         }
         /// <summary>

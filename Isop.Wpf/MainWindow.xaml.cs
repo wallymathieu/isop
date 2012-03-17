@@ -18,14 +18,9 @@ namespace Isop.Gui
     {
         public MethodTreeModel MethodTreeModel { get; set; }
 
-        protected Build ParserBuilder
-        {
-            get { return ((App)App.Current).ParserBuilder; }
-        }
-
         public MainWindow()
         {
-            MethodTreeModel = ParserBuilder.GetMethodTreeModel();
+            MethodTreeModel = ((App)App.Current).ParserBuilder.GetMethodTreeModel();
             InitializeComponent();
             paramview.Source = MethodTreeModel.GlobalParameters;
             controllersAndCommands.DataContext = MethodTreeModel.Controllers;
@@ -69,7 +64,7 @@ namespace Isop.Gui
             cout.WriteLine();
             try
             {
-                var parsedMethod = ParserBuilder.Parse(MethodTreeModel.CurrentMethod);
+                var parsedMethod = MethodTreeModel.Build.Parse(MethodTreeModel.CurrentMethod);
                 parsedMethod.Invoke(cout);
             }
             catch (MissingArgumentException ex)

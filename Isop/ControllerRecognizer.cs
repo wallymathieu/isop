@@ -29,9 +29,8 @@ namespace Isop
             return t.IsClass && t!=typeof(String);
         }
         
-        private static IEnumerable<Object> GetParametersForMethod (MethodInfo method, 
-                      ParsedArguments parsedArguments, 
-                      Func<RecognizedArgument,Type,Object> convertFrom)
+        private IEnumerable<Object> GetParametersForMethod (MethodInfo method, 
+                      ParsedArguments parsedArguments)
         {//NOTE: Obviously to complicated. Need to refactor.
             var parameterInfos = method.GetParameters();
             var parameters = new List<Object>();
@@ -45,20 +44,20 @@ namespace Isop
                             .First(a => a.Argument.ToUpperInvariant()
                                    .Equals(prop.Name.ToUpperInvariant()));
 
-                        prop.SetValue(obj,convertFrom(recognizedArgument,prop.PropertyType), null);
+                        prop.SetValue(obj,ConvertFrom(recognizedArgument,prop.PropertyType), null);
                         
                     }
                     parameters.Add(obj);
                 }else{
                     var recognizedArgument =  parsedArguments.RecognizedArguments.First(
                         a => a.Argument.ToUpperInvariant().Equals(paramInfo.Name.ToUpperInvariant()));
-                    parameters.Add( convertFrom (recognizedArgument, paramInfo.ParameterType));
+                    parameters.Add( ConvertFrom (recognizedArgument, paramInfo.ParameterType));
                 }
             }
             return parameters;
         }
 
-        private IEnumerable<ArgumentWithOptions> GetRecognizers(MethodBase method)
+        public IEnumerable<ArgumentWithOptions> GetRecognizers(MethodBase method)
         {//NOTE: Obviously to complicated. Need to refactor.
             var parameterInfos = method.GetParameters();
             var recognizers = new List<ArgumentWithOptions>();
@@ -66,16 +65,18 @@ namespace Isop
                 if (IsClass(parameterInfo.ParameterType)){
                     foreach (var prop in parameterInfo.ParameterType.GetProperties(BindingFlags.Instance| BindingFlags.Public)) {
                          var arg = new ArgumentWithOptions (ArgumentParameter.Parse (prop.Name,_culture), 
-                                                           required: true);
+                              required: true, 
+                              type: prop.PropertyType);
                         recognizers.Add(arg);
                     }
                 }else{
-                    var arg = new ArgumentWithOptions (ArgumentParameter.Parse (parameterInfo.Name,_culture), required: true);
+                    var arg = new ArgumentWithOptions (ArgumentParameter.Parse (parameterInfo.Name,_culture), 
+                        required: true, 
+                        type:parameterInfo.ParameterType);
                     recognizers.Add(arg);
-                    
                 }
             }
-            recognizers.Insert(0, new ArgumentWithOptions(ArgumentParameter.Parse("#1" + method.Name, _culture), required: false));
+            recognizers.Insert(0, new ArgumentWithOptions(ArgumentParameter.Parse("#1" + method.Name, _culture), required: false, type:typeof(string)));
             return recognizers;
         }
         
@@ -94,7 +95,7 @@ namespace Isop
             Type = type;
             _culture = cultureInfo ?? CultureInfo.CurrentCulture;
             IgnoreGlobalUnMatchedParameters = ignoreGlobalUnMatchedParameters;
-        }
+        } 
 		
         public bool Recognize(IEnumerable<string> arg)
         {
@@ -158,7 +159,7 @@ namespace Isop
             }
 
             var recognizedActionParameters = GetParametersForMethod(methodInfo, 
-                            parsedArguments, ConvertFrom);
+                            parsedArguments);
             
             parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments
                 .Where(unrecognized=>unrecognized.Index>=1); //NOTE: should be different!

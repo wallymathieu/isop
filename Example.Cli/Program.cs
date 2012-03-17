@@ -30,6 +30,15 @@ namespace Example.Cli
         {
             return "invoking action with global parameter on mycontroller with value " + global;
         }
+        public class Argument
+	{
+            public string MyProperty { get; set; }
+
+	}
+        public string ActionWithObjectArgument(Argument arg) 
+        {
+            return "Invoking ActionWithObjectArgument " + arg.MyProperty;
+        }
     }
     public class CustomerController
     {

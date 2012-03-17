@@ -12,13 +12,14 @@ namespace Isop
         public ArgumentParameter Argument { get; private set; }
         public Action<string> Action { get; set; }
         public bool Required { get; set; }
-
-        public ArgumentWithOptions(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null)
+        public Type Type { get; set; }
+        public ArgumentWithOptions(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null,Type type=null)
         {
             Description = description;
             Argument = argument;
             Action = action;
             Required = required;
+            Type = type;
         }
 
         public string Help()

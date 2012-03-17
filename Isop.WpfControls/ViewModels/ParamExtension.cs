@@ -84,11 +84,12 @@ namespace Isop.WpfControls.ViewModels
                         Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
                         {
                             Parameters = new List<Param>(
-                                m.GetParameters().Select(p =>
-                                    new Param(p.ParameterType, p.Name,
-                                        new ArgumentWithOptions(p.Name, required: true))).ToArray())
+                                cmr.GetRecognizers(m).Skip(1).Select(p =>
+                                    new Param(p.Type, p.Argument.Prototype, p
+                                        )).ToArray())
                         }).ToArray()
-                    }).ToArray()
+                    }).ToArray(),
+                that
             );
         }
     }

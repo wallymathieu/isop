@@ -6,13 +6,15 @@ namespace Isop.WpfControls.ViewModels
 {
     public class MethodTreeModel
     {
-        public MethodTreeModel(IEnumerable<Param> globalParameters, IEnumerable<Controller> controllers)
+        public MethodTreeModel(IEnumerable<Param> globalParameters, IEnumerable<Controller> controllers, Build build)
         {
             GlobalParameters=globalParameters;
             Controllers=controllers;
             singleEventHandlerScope = new SingleScopeOnly();
             GlobalParameters.RegisterPropertyChanged(globalValueChanged);
+            Build = build;
         }
+        public Build Build { get; private set; }
         public IEnumerable<Param> GlobalParameters { get; private set; }
         public IEnumerable<Controller> Controllers { get; private set; }
         /// <summary>
