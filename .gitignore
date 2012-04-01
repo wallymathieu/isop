@@ -19,4 +19,8 @@ test-results/
 *.user
 syntax: regexp
 TestResult\.xml
- 
+packages/
+nuget/Isop/lib/
+nuget_package/
+
+
