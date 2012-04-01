@@ -1,4 +1,5 @@
 require 'albacore'
+require './nuget/packaging'
 
 task :default => ['ms:build']
 namespace :ms do
