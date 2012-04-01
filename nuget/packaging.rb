@@ -16,7 +16,9 @@ end
 def prepare_lib
   output_directory_lib = "./nuget/Isop/lib/40"
   FileUtils.mkdir_p output_directory_lib
-  cp Dir.glob("./Isop/bin/Debug/*.*"), output_directory_lib
+  ['Isop','Isop.Auto.Cli','Isop.Wpf'].each{ |project|
+    cp Dir.glob("./#{project}/bin/Debug/*.*"), output_directory_lib
+  } 
 end
 
 namespace :nuget do
@@ -31,7 +33,7 @@ namespace :nuget do
      nuspec.version = ISOP_VERSION
      nuspec.authors = "Oskar Gewalli"
      nuspec.owners = "Oskar Gewalli"
-     nuspec.description = "Isop is a library to help simplify and structure command line apps."
+     nuspec.description = "Isop is a library to help simplify and structure command line apps. The Isop dll is used if you want to have your own console application. The Isop.Cli.exe and Isop.Wpf.exe if you dont care about implementing a 'Main' method."
      nuspec.title = "Isop"
      nuspec.language = "en-US"
      nuspec.projectUrl = "https://github.com/wallymathieu/isop"
