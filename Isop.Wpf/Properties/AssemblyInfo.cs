@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("Isop.Wpf")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("LLAB")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Isop.Wpf")]
-[assembly: AssemblyCopyright("Copyright © LLAB 2011")]
+[assembly: AssemblyCopyright("Copyright © Gewalli 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
