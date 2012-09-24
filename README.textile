@@ -43,3 +43,9 @@ Then invoking your program by
 After you have put Isop.Cli.exe (and Isop.dll of course) in the same folder as your dll that contains the class IsopConfiguration.
 
 Look at the <a href="/wallymathieu/isop/blob/master/Example.Cli/Program.cs">Example Cli project</a> for the most recent example of how it is used. 
+
+h2. Alternative
+
+The alternative for this kind of library is <a href="http://lostechies.com/chadmyers/2011/06/06/cool-stuff-in-fubucore-no-6-command-line/">the framework found in fubucore</a>.
+
+If you want to have something simpler for simple command line applications then I would recommend using <a href="https://github.com/wallymathieu/ndesk-options-mirror">ndesc options</a>.
