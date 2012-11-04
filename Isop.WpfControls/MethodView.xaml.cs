@@ -1,4 +1,5 @@
-﻿using Isop.WpfControls.ViewModels;
+﻿using System.Windows;
+using Isop.WpfControls.ViewModels;
 using System.Collections.Generic;
 
 namespace Isop.WpfControls
@@ -9,7 +10,12 @@ namespace Isop.WpfControls
     /// </summary>
     public partial class MethodView
     {
-        public IEnumerable<Param> Source { set { FieldsListBox.ItemsSource = value; } }
+
+        public IEnumerable<Param> Source
+        {
+            set { FieldsListBox.ItemsSource = value; }
+        }
+
         public MethodView()
         {
             InitializeComponent();

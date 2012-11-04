@@ -31,6 +31,7 @@
         <WpfControls:MethodView Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" x:Name="methodview" VerticalAlignment="Stretch">
         </WpfControls:MethodView>
         <TextBlock Grid.Column="1" HorizontalAlignment="Stretch" Name="textBlock1" Text="TextBlock" VerticalAlignment="Stretch" Grid.Row="3" />
+        <TextBlock Grid.Column="1" HorizontalAlignment="Stretch" Name="textBlock2" Text="TextBlock" VerticalAlignment="Stretch" Grid.Row="4" />
         <Button Content="Execute method button" Name="executeMethodButton" VerticalAlignment="Top" Width="126" Grid.Column="1" Grid.Row="2" Click="ExecuteMethodButtonClick" Height="20" />
 
     </Grid>

@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Isop
 {
@@ -35,6 +36,7 @@ namespace Isop
          if (String.IsNullOrEmpty(command))
              return Index();
             var sb = new StringBuilder();
+            command = Regex.Replace(command, "controller$", "", RegexOptions.IgnoreCase);
             if (_helpForArgumentWithOptions.CanHelp(command))
             {
               sb.AppendLine(_helpForArgumentWithOptions.Help(command));

@@ -81,7 +81,7 @@ namespace Isop.WpfControls.ViewModels
                     .Select(cmr => new Controller
                     {
                         Name = cmr.ClassName(),
-                        Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName())
+                        Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName(), that.HelpController())
                         {
                             Parameters = new List<Param>(
                                 cmr.GetRecognizers(m).Skip(1).Select(p =>

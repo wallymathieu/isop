@@ -4,8 +4,11 @@ namespace Isop.WpfControls.ViewModels
 {
     public class Method
     {
-        public Method(string name, string className)
+        private readonly HelpController _helpController;
+
+        public Method(string name, string className, HelpController helpController)
         {
+            _helpController = helpController;
             Name = name;
             ClassName = className;
         }
@@ -14,5 +17,7 @@ namespace Isop.WpfControls.ViewModels
         public string ClassName { get; set; }
 
         public IEnumerable<Param> Parameters { get; set; }
+        public string Help { get { return _helpController.Index(ClassName, Name); } }
+
     }
 }

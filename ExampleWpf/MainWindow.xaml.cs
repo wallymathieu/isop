@@ -33,6 +33,7 @@ namespace Isop.Gui
 
             InitializeComponent();
             paramview.Source = MethodTreeModel.GlobalParameters;
+            textBlock2.Text = string.Empty;
             controllersAndCommands.DataContext = MethodTreeModel.Controllers;
             textBlock1.Text = string.Empty;
 
@@ -45,6 +46,7 @@ namespace Isop.Gui
                 MethodTreeModel.CurrentMethod = (Method)e.NewValue;
                 methodview.DataContext = e.NewValue;
                 methodview.Source = MethodTreeModel.CurrentMethod.Parameters;
+                textBlock2.Text = MethodTreeModel.CurrentMethod.Help;
                 textBlock1.Text = string.Empty;
             }
         }

@@ -195,6 +195,21 @@ Se 'COMMANDNAME' help <command> for more information")));
 
 Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
+
+        [Test]
+        public void It_can_report_usage_for_controllers_and_actions_with_fullname()
+        {
+            var usage = new Build()
+                                    .Recognize(typeof(DescriptionController))
+                                    .RecognizeHelp()
+                                    .HelpFor("DescriptionController");
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The sub commands for Description
+
+  Action1  Some description 1
+  Action2  Some description 2
+
+Se 'COMMANDNAME' help <command> <subcommand> for more information")));
+        }
      
      
         internal class DescriptionController

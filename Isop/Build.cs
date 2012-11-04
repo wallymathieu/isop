@@ -303,6 +303,10 @@ namespace Isop
             return this;
         }
 
+        public HelpController HelpController()
+        {
+            return this._helpController;
+        }
     }
     public class IsopAutoConfiguration
     {
