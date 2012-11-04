@@ -338,6 +338,69 @@ namespace Isop.Tests
             public Func<Argument, string> OnAction { get; set; }
             public string Action(Argument a) { return OnAction(a); }
         }
+
+        class MyFileController
+        {
+            public Func<FileStream, string> OnAction { get; set; }
+            public string Action(FileStream file) { return OnAction(file); } 
+        }
+
+        class FakeFileHandler
+        {
+             
+        }
+
+        [Test]
+        public void It_can_handle_file_argument()
+        {
+            var filename = string.Empty;
+            Func<Type, object> factory = (Type t) =>
+                {
+                    Assert.That(t, Is.EqualTo(typeof (MyFileController)));
+                    return
+                        (object)
+                        new MyFileController()
+                            {
+                                OnAction = (file) => filename = file.Name
+                            };
+                };
+            
+            
+            FileStream fileStream = null;
+            try
+            {
+
+            var arguments = new Build()
+                    .SetCulture(CultureInfo.InvariantCulture)
+                    .SetTypeConverter((t,s,c) =>
+                                          {
+                                              
+                                              fileStream = new FileStream(s, FileMode.Create);
+                                              return fileStream;
+                                          }) 
+                    //Need to set type converter 
+                    .Recognize(typeof(MyFileController))
+                    .SetFactory(factory)
+                    .Parse(new[] { "MyFile", "Action", "--file", "myfile.txt"});
+
+            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            arguments.Invoke(new StringWriter());
+            Assert.That(filename, Is.StringContaining("myfile.txt"));
+            }
+            finally
+            {
+                if (null != fileStream)
+                {
+                    try
+                    {
+                        fileStream.Dispose();
+                    }
+// ReSharper disable EmptyGeneralCatchClause
+                    catch{}
+// ReSharper restore EmptyGeneralCatchClause
+                }
+            }
+        }
     }
 
 

@@ -95,13 +95,16 @@ namespace Isop
 
         public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
         {
-            _controllerRecognizers.Add(new ControllerRecognizer(arg, cultureInfo?? Culture , typeConverter ?? TypeConverter,ignoreGlobalUnMatchedParameters));
+            _controllerRecognizers.Add(new ControllerRecognizer(arg, 
+                cultureInfo?? Culture, 
+                typeConverter ?? TypeConverter,ignoreGlobalUnMatchedParameters));
             return this;
         }
 		public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
         {
             _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(),
-               cultureInfo?? Culture , typeConverter ?? TypeConverter, ignoreGlobalUnMatchedParameters));
+               cultureInfo?? Culture ,
+               typeConverter ?? TypeConverter, ignoreGlobalUnMatchedParameters));
             _container.Instances.Add(arg.GetType(),arg);
             return this;
         }
@@ -181,6 +184,7 @@ namespace Isop
             return _container.CreateInstance;
         }
         private List<IDisposable> disposables = new List<IDisposable>();
+
         public void Dispose()
         {
             foreach (var item in disposables) 
@@ -298,6 +302,7 @@ namespace Isop
             }
             return this;
         }
+
     }
     public class IsopAutoConfiguration
     {

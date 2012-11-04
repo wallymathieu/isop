@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.IO;
-using System.Collections;
 using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
 namespace Isop
 {
@@ -37,21 +36,26 @@ namespace Isop
             
             foreach (var paramInfo in parameterInfos)
             {
-                if (IsClass( paramInfo.ParameterType)){
+                if (IsClass(paramInfo.ParameterType) && !IsFile(paramInfo.ParameterType))
+                {
                     var obj = Activator.CreateInstance(paramInfo.ParameterType);
-                    foreach (PropertyInfo prop in paramInfo.ParameterType.GetProperties(BindingFlags.Instance| BindingFlags.Public)) {
-                        var recognizedArgument =  parsedArguments.RecognizedArguments
+                    foreach (
+                        PropertyInfo prop in
+                            paramInfo.ParameterType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                    {
+                        var recognizedArgument = parsedArguments.RecognizedArguments
                             .First(a => a.Argument.ToUpperInvariant()
-                                   .Equals(prop.Name.ToUpperInvariant()));
+                                            .Equals(prop.Name.ToUpperInvariant()));
 
-                        prop.SetValue(obj,ConvertFrom(recognizedArgument,prop.PropertyType), null);
-                        
+                        prop.SetValue(obj, ConvertFrom(recognizedArgument, prop.PropertyType), null);
                     }
                     parameters.Add(obj);
-                }else{
-                    var recognizedArgument =  parsedArguments.RecognizedArguments.First(
+                }
+                else
+                {
+                    var recognizedArgument = parsedArguments.RecognizedArguments.First(
                         a => a.Argument.ToUpperInvariant().Equals(paramInfo.Name.ToUpperInvariant()));
-                    parameters.Add( ConvertFrom (recognizedArgument, paramInfo.ParameterType));
+                    parameters.Add(ConvertFrom(recognizedArgument, paramInfo.ParameterType));
                 }
             }
             return parameters;
@@ -61,35 +65,44 @@ namespace Isop
         {//NOTE: Obviously to complicated. Need to refactor.
             var parameterInfos = method.GetParameters();
             var recognizers = new List<ArgumentWithOptions>();
-            foreach (var parameterInfo in parameterInfos) {
-                if (IsClass(parameterInfo.ParameterType)){
-                    foreach (var prop in parameterInfo.ParameterType.GetProperties(BindingFlags.Instance| BindingFlags.Public)) {
-                         var arg = new ArgumentWithOptions (ArgumentParameter.Parse (prop.Name,_culture), 
-                              required: true, 
-                              type: prop.PropertyType);
+            foreach (var parameterInfo in parameterInfos)
+            {
+                if (IsClass(parameterInfo.ParameterType) && !IsFile(parameterInfo.ParameterType))
+                {
+                    foreach (
+                        var prop in
+                            parameterInfo.ParameterType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                    {
+                        var arg = new ArgumentWithOptions(ArgumentParameter.Parse(prop.Name, _culture),
+                                                          required: true,
+                                                          type: prop.PropertyType);
                         recognizers.Add(arg);
                     }
-                }else{
-                    var arg = new ArgumentWithOptions (ArgumentParameter.Parse (parameterInfo.Name,_culture), 
-                        required: true, 
-                        type:parameterInfo.ParameterType);
+                }
+                else
+                {
+                    var arg = new ArgumentWithOptions(ArgumentParameter.Parse(parameterInfo.Name, _culture),
+                                                      required: true,
+                                                      type: parameterInfo.ParameterType);
                     recognizers.Add(arg);
                 }
             }
             recognizers.Insert(0, new ArgumentWithOptions(ArgumentParameter.Parse("#1" + method.Name, _culture), required: false, type:typeof(string)));
             return recognizers;
         }
-        
+
+        private static bool IsFile(Type parameterType)
+        {
+            return parameterType == typeof(FileStream);
+        }
+
         private readonly CultureInfo _culture;
         public Type Type { get; private set; }
 		public bool IgnoreGlobalUnMatchedParameters{get; private set;}
 		private readonly Transform _transform = new Transform();
         /// <summary>
         /// </summary>
-        public ControllerRecognizer(Type type, 
-            CultureInfo cultureInfo = null, 
-            TypeConverterFunc typeConverter = null,
-            bool ignoreGlobalUnMatchedParameters = false)
+        public ControllerRecognizer(Type type, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false)
         {
             _typeConverter = typeConverter ?? DefaultConvertFrom;
             Type = type;
@@ -187,9 +200,14 @@ namespace Isop
                 };
             }
         }
+     
         private readonly TypeConverterFunc _typeConverter;
         private static object DefaultConvertFrom(Type type, string s, CultureInfo cultureInfo)
         {
+            if (type == typeof(FileStream))
+            {
+                return new FileStream(s, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            }
             return TypeDescriptor.GetConverter(type).ConvertFrom(null, cultureInfo, s);
         }
     }
