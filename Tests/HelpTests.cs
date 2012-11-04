@@ -197,6 +197,16 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 
         [Test]
+        public void It_can_report_usage_for_actions_with_description()
+        {
+            var usage = new Build()
+                                    .Recognize(typeof(DescriptionController))
+                                    .RecognizeHelp()
+                                    .HelpFor("Description","action1");
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1   Some description 1")));
+        }
+
+        [Test]
         public void It_can_report_usage_for_controllers_and_actions_with_fullname()
         {
             var usage = new Build()

@@ -41,9 +41,9 @@ namespace Isop
             {
               sb.AppendLine(_helpForArgumentWithOptions.Help(command));
             }
-            if (_helpForClassAndMethod.CanHelp(command))
+            if (_helpForClassAndMethod.CanHelp(command, action))
             {
-                sb.AppendLine(_helpForClassAndMethod.Help(command));
+                sb.AppendLine(_helpForClassAndMethod.Help(command, action));
             }
             return sb.ToString().Trim(' ','\t','\r','\n');
         }

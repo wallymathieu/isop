@@ -210,6 +210,11 @@ namespace Isop
             }
             return TypeDescriptor.GetConverter(type).ConvertFrom(null, cultureInfo, s);
         }
+
+        public MethodInfo GetMethod(string action)
+        {
+            return GetMethods().SingleOrDefault(m => m.Name.Equals(action, StringComparison.OrdinalIgnoreCase));
+        }
     }
 
 }

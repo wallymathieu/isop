@@ -62,8 +62,14 @@ namespace Isop
                 +String.Join(Environment.NewLine, cmr.GetMethods()
                         .Select(m=>"  "+m.Name+Description(cmr.Type,m)).ToArray());
         }
-        
-        public string Help(string val=null)
+
+        private string HelpForAction(ControllerRecognizer cmr, string action)
+        {
+            var methodInfo = cmr.GetMethod(action);
+            return string.Format("{0} {1}", methodInfo.Name, Description(cmr.Type, methodInfo));
+        }
+
+        public string Help(string val = null, string action=null)
         {
             if (string.IsNullOrEmpty(val)) return TheCommandsAre + Environment.NewLine +
                    String.Join(Environment.NewLine,
@@ -73,15 +79,21 @@ namespace Isop
                    + Environment.NewLine
                    + Environment.NewLine
                    + HelpCommandForMoreInformation;
-			
-			return TheSubCommandsFor+
-				HelpFor(_classAndMethodRecognizers.First(cmr=>cmr.ClassName().Equals(val,StringComparison.OrdinalIgnoreCase)),false)
-					+ Environment.NewLine
-					+ Environment.NewLine
-					+ HelpSubCommandForMoreInformation;
+
+			var controllerRecognizer = _classAndMethodRecognizers.First(cmr => 
+                cmr.ClassName().Equals(val, StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrEmpty(action))
+            {
+                return TheSubCommandsFor+
+                       HelpFor(controllerRecognizer,false)
+                       + Environment.NewLine
+                       + Environment.NewLine
+                       + HelpSubCommandForMoreInformation;
+            }
+            return HelpForAction(controllerRecognizer, action);
         }
 
-        public bool CanHelp(string val=null)
+        public bool CanHelp(string val = null, string action=null)
         {
             return string.IsNullOrEmpty(val) 
                 ? _classAndMethodRecognizers.Any(cmr => cmr.Type != typeof(HelpController)) 
