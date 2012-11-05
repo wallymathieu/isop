@@ -29,18 +29,31 @@ namespace Isop
         public IDictionary<string,string> GetSummariesForAssemblyCached(Assembly a)
         {
             if (summaries.ContainsKey(a)) return summaries[a];
-            else {
-                var loc= a.Location;
-                var xmlDocFile = Path.Combine(Path.GetDirectoryName(loc),
-                    Path.GetFileNameWithoutExtension(loc)+".xml");
-                if (File.Exists(xmlDocFile)){
-                    summaries.Add(a,GetSummariesFromText(File.ReadAllText(xmlDocFile)));
-                }else{
-                    summaries.Add(a,new Dictionary<string,string>());// 
+            else
+            {
+                var loc = a.Location;
+                string path =new Uri( Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
+                var paths = new[] {HelpAt(loc, loc), HelpAt(path, path), HelpAt(path, loc), HelpAt(loc, path)};
+                var file = paths.FirstOrDefault(f => File.Exists(f));
+                if (null != file)
+                {
+                    summaries.Add(a, GetSummariesFromText(File.ReadAllText(file)));
                 }
+                else
+                {
+                    summaries.Add(a, new Dictionary<string, string>()); // 
+                }
+
                 return summaries[a];
             }
         }
+
+        private static string HelpAt(string path, string filename)
+        {
+            return Path.Combine(Path.GetDirectoryName(path),
+                                Path.GetFileNameWithoutExtension(filename) + ".xml");
+        }
+
         public string GetKey(MethodInfo method)
         {
            return  GetKey(method.DeclaringType,method);

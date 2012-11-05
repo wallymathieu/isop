@@ -28,7 +28,7 @@ namespace Isop
             {
                 sb.AppendLine(_helpForClassAndMethod.Help());
             }
-            return sb.ToString().Trim(' ','\t','\r','\n');
+            return sb.ToString().Trim(' ','\t','\r','\n')+Environment.NewLine;
         }
         
         public string Index(string command,string action)
@@ -45,7 +45,7 @@ namespace Isop
             {
                 sb.AppendLine(_helpForClassAndMethod.Help(command, action));
             }
-            return sb.ToString().Trim(' ','\t','\r','\n');
+            return sb.ToString().Trim(' ', '\t', '\r', '\n') + Environment.NewLine;
         }
     }
 }

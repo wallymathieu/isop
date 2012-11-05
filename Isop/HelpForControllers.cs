@@ -66,7 +66,10 @@ namespace Isop
         private string HelpForAction(ControllerRecognizer cmr, string action)
         {
             var methodInfo = cmr.GetMethod(action);
-            return string.Format("{0} {1}", methodInfo.Name, Description(cmr.Type, methodInfo));
+            return string.Format(@"{0} {1}
+And accept the following parameters:
+{2}", methodInfo.Name, Description(cmr.Type, methodInfo), String.Join(", ",
+    cmr.GetRecognizers(methodInfo).Select(r =>r.Help())));
         }
 
         public string Help(string val = null, string action=null)

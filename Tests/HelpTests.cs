@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 
 namespace Isop.Tests
@@ -121,7 +122,7 @@ Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
         
         private static string[] LineSplit (string usage)
         {
-            return usage.Split (new []{"\r","\n"}, StringSplitOptions.RemoveEmptyEntries);
+            return usage.Split (new []{"\r","\n"}, StringSplitOptions.RemoveEmptyEntries).Select(l=>l.Trim()).ToArray();
         }
 
         [Test]
@@ -154,7 +155,7 @@ Se 'COMMANDNAME' help <command> for more information")));
 Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 
-        [Test,Ignore("Not implemented")]
+        [Test]
         public void It_can_report_usage_for_controller_and_action()
         {
             var usage = new Build()
@@ -162,10 +163,9 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
                                     .Recognize(typeof(AnotherController))
                                     .RecognizeHelp()
                                     .HelpFor("Another", "Action1");
-            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The parameters for Action1 are
-
- param1
-")));
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1
+And accept the following parameters:
+--Action1, --param1")));
         }
      
         [Test]
@@ -203,7 +203,9 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
                                     .Recognize(typeof(DescriptionController))
                                     .RecognizeHelp()
                                     .HelpFor("Description","action1");
-            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1   Some description 1")));
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1   Some description 1 
+And accept the following parameters:
+--Action1")));
         }
 
         [Test]
@@ -245,7 +247,9 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
             }
         }
 
-        [Test, Ignore("need some way of testing this with albacore, resharper ... shadow copy")]
+        [Test
+        //, Ignore("need some way of testing this with albacore, resharper ... shadow copy")
+        ]
         public void It_can_report_usage_for_controllers_and_actions_with_description_in_comments ()
         {
             var usage = new Build()
