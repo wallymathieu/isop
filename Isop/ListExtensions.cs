@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Isop
@@ -12,6 +13,20 @@ namespace Isop
                 var v = self[i];
                 if (selection(v))
                     yield return new KeyValuePair<int, TValue>(i, v);
+            }
+        }
+        public static IEnumerable<T> Yield<T>(this IEnumerator<T> enumerator)
+        {
+            while (enumerator.MoveNext())
+            {
+                yield return enumerator.Current;
+            }
+        }
+        public static IEnumerable<T> Yield<T>(this IEnumerator enumerator)
+        {
+            while (enumerator.MoveNext())
+            {
+                yield return (T) enumerator.Current;
             }
         }
     }

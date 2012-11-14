@@ -54,12 +54,24 @@ namespace Isop
                 }
                 else
                 {
-                    var recognizedArgument = parsedArguments.RecognizedArguments.First(
+                    var recognizedArgument = parsedArguments.RecognizedArguments.FirstOrDefault(
                         a => a.Argument.ToUpperInvariant().Equals(paramInfo.Name.ToUpperInvariant()));
-                    parameters.Add(ConvertFrom(recognizedArgument, paramInfo.ParameterType));
+                    if (null == recognizedArgument )
+                    {
+                        parameters.Add(paramInfo.DefaultValue);
+                    }
+                    else
+                    {
+                        parameters.Add(ConvertFrom(recognizedArgument, paramInfo.ParameterType));
+                    }
                 }
             }
             return parameters;
+        }
+
+        public IEnumerable<ArgumentWithOptions> GetRecognizers(string methodname)
+        {//For tests mostly
+            return GetRecognizers(Type.GetMethod(methodname));
         }
 
         public IEnumerable<ArgumentWithOptions> GetRecognizers(MethodBase method)
@@ -75,7 +87,7 @@ namespace Isop
                             parameterInfo.ParameterType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
                     {
                         var arg = new ArgumentWithOptions(ArgumentParameter.Parse(prop.Name, _culture),
-                                                          required: LooksRequired(parameterInfo.ParameterType, prop),
+                                                          required: LooksRequired(parameterInfo, prop),
                                                           type: prop.PropertyType);
                         recognizers.Add(arg);
                     }
@@ -83,7 +95,7 @@ namespace Isop
                 else
                 {
                     var arg = new ArgumentWithOptions(ArgumentParameter.Parse(parameterInfo.Name, _culture),
-                                                      required: LooksRequired(parameterInfo.ParameterType),
+                                                      required: LooksRequired(parameterInfo),
                                                       type: parameterInfo.ParameterType);
                     recognizers.Add(arg);
                 }
@@ -92,14 +104,15 @@ namespace Isop
             return recognizers;
         }
 
-        private bool LooksRequired(Type parameterType)
+        private bool LooksRequired(ParameterInfo parameterInfo)
         {
-            return true;
+            return !parameterInfo.IsOptional;
         }
 
-        private bool LooksRequired(Type parameterType, PropertyInfo parameterProperty)
+        private bool LooksRequired(ParameterInfo parameterInfo, PropertyInfo parameterProperty)
         {
-            return LooksRequired(parameterType) && true;
+            
+            return LooksRequired(parameterInfo) && parameterProperty.Required();
         }
 
         private static bool IsFile(Type parameterType)

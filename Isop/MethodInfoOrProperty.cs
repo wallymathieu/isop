@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -30,12 +29,25 @@ namespace Isop
         {
             get
             {
-                if (null != Property && Property.GetCustomAttributes(typeof(RequiredAttribute), true).Any())
+                if (null != Property && Property.Required())
                     return true;
-                if (null != MethodInfo && MethodInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any())
+                if (null != MethodInfo && MethodInfo.Required())
                     return true;
                 return false;
             }
+        }
+    }
+
+    public static class ReflectionExtensions
+    {
+        public static bool Required(this PropertyInfo propertyInfo)
+        {
+            return propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();
+        }
+
+        public static bool Required(this MethodInfo methodInfo)
+        {
+            return methodInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();
         }
     }
 }

@@ -57,6 +57,7 @@
     <Compile Include="ArgumentLexerTests.cs" />
     <Compile Include="ConfigurationTests.cs" />
     <Compile Include="ListExtensionTests.cs" />
+    <Compile Include="MyOptionalController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HelpTests.cs" />
     <Compile Include="MyController.cs" />

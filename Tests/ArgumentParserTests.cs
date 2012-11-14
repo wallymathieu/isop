@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Isop;
 using NUnit.Framework;
 
@@ -157,6 +159,79 @@ namespace Isop.Tests
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void It_can_parse_class_and_method_and_knows_whats_required()
+        {
+            Func<Type, object> factory = (Type t) =>
+            {
+                Assert.That(t, Is.EqualTo(typeof(MyController)));
+                return
+                    (object)
+                    new MyController() { OnAction = (p1, p2, p3, p4) => "" };
+            };
+            var build = new Build()
+                            .SetCulture(CultureInfo.InvariantCulture)
+                            .Recognize(typeof(MyController))
+                            .SetFactory(factory);
+            var expected = DictionaryDescriptionToKv("[param1, True], [param2, True], [param3, True], [param4, True]",Boolean.Parse);
+
+            var recognizers = build.ControllerRecognizers.Single().GetRecognizers("Action");
+            Assert.That(recognizers.Skip(1).Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
+                Is.EquivalentTo(expected.ToArray()));
+        }
+
+        private static IEnumerable<KeyValuePair<string, T>> DictionaryDescriptionToKv<T>(string input, Func<string,T> convert)
+        {
+            var expected = Regex.Matches(input,
+                                         @"\[(?<p>#?\w*), (?<v>\w*)\]")
+                .Cast<Match>()
+                .Select(m => new KeyValuePair<string, T>(m.Groups["p"].Value, convert(m.Groups["v"].Value)));
+            return expected;
+        }
+
+        [Test]
+        public void It_can_parse_class_and_method_and_knows_whats_not_required()
+        {
+            Func<Type, object> factory = (Type t) =>
+            {
+                Assert.That(t, Is.EqualTo(typeof(MyOptionalController)));
+                return
+                    (object)
+                    new MyOptionalController() { OnAction = (p1, p2, p3, p4) => "" };
+            };
+            var build = new Build()
+                            .SetCulture(CultureInfo.InvariantCulture)
+                            .Recognize(typeof(MyOptionalController))
+                            .SetFactory(factory);
+            var expected = DictionaryDescriptionToKv("[param1, True], [param2, False], [param3, False], [param4, False]",Boolean.Parse);
+
+            var recognizers = build.ControllerRecognizers.Single().GetRecognizers("Action");
+            Assert.That(recognizers.Skip(1).Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
+                Is.EquivalentTo(expected.ToArray()));
+        }
+
+        [Test]
+        public void It_can_parse_class_and_method_and_executes_default_with_the_default_values()
+        {
+            var parameters = new object[0];
+            Func<Type, object> factory = (Type t) =>
+            {
+                Assert.That(t, Is.EqualTo(typeof(MyOptionalController)));
+                return
+                    (object)
+                    new MyOptionalController() { OnAction = (p1, p2, p3, p4) =>
+                                                                { parameters = new object[] { p1, p2, p3, p4 }; return ""; }
+                                               };
+            };
+            var arguments = new Build()
+                            .SetCulture(CultureInfo.InvariantCulture)
+                            .Recognize(typeof(MyOptionalController))
+                            .SetFactory(factory)
+                            .Parse(new[] { "MyOptional", "Action", "--param1", "value1"});
+            arguments.Invoke(new StringWriter());
+            Assert.That(parameters, Is.EquivalentTo(new object[]{"value1",null,null,1}));
         }
 
         [Test]
