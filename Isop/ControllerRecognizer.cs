@@ -5,35 +5,36 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.IO;
-using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
+using TypeConverterFunc = System.Func<System.Type, string, System.Globalization.CultureInfo, object>;
 namespace Isop
 {
     public class ControllerRecognizer
     {
-        private static MethodInfo FindMethod (IEnumerable<MethodInfo> methods, String methodName, IEnumerable<Token> lexer)
+        private static MethodInfo FindMethod(IEnumerable<MethodInfo> methods, String methodName, IEnumerable<Token> lexer)
         {
             var potential = methods
-                .Where (method => method.Name.Equals (methodName, StringComparison.OrdinalIgnoreCase));
+                .Where(method => method.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase));
             var potentialMethod = potential
-                .Where(method=>method.GetParameters().Length<=lexer.Count(t=>t.TokenType==TokenType.Parameter))
-                .OrderByDescending(method=>method.GetParameters().Length)
+                .Where(method => method.GetParameters().Length <= lexer.Count(t => t.TokenType == TokenType.Parameter))
+                .OrderByDescending(method => method.GetParameters().Length)
                 .FirstOrDefault();
-            if (potentialMethod!=null)
+            if (potentialMethod != null)
             {
                 return potentialMethod;
             }
             return potential.FirstOrDefault();
         }
-        private static bool IsClass(Type t){
-            return t.IsClass && t!=typeof(String);
+        private static bool IsClass(Type t)
+        {
+            return t.IsClass && t != typeof(String);
         }
-        
-        private IEnumerable<Object> GetParametersForMethod (MethodInfo method, 
+
+        private IEnumerable<Object> GetParametersForMethod(MethodInfo method,
                       ParsedArguments parsedArguments)
         {//NOTE: Obviously to complicated. Need to refactor.
             var parameterInfos = method.GetParameters();
             var parameters = new List<Object>();
-            
+
             foreach (var paramInfo in parameterInfos)
             {
                 if (IsClass(paramInfo.ParameterType) && !IsFile(paramInfo.ParameterType))
@@ -74,7 +75,7 @@ namespace Isop
                             parameterInfo.ParameterType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
                     {
                         var arg = new ArgumentWithOptions(ArgumentParameter.Parse(prop.Name, _culture),
-                                                          required: true,
+                                                          required: LooksRequired(parameterInfo.ParameterType, prop),
                                                           type: prop.PropertyType);
                         recognizers.Add(arg);
                     }
@@ -82,13 +83,23 @@ namespace Isop
                 else
                 {
                     var arg = new ArgumentWithOptions(ArgumentParameter.Parse(parameterInfo.Name, _culture),
-                                                      required: true,
+                                                      required: LooksRequired(parameterInfo.ParameterType),
                                                       type: parameterInfo.ParameterType);
                     recognizers.Add(arg);
                 }
             }
-            recognizers.Insert(0, new ArgumentWithOptions(ArgumentParameter.Parse("#1" + method.Name, _culture), required: false, type:typeof(string)));
+            recognizers.Insert(0, new ArgumentWithOptions(ArgumentParameter.Parse("#1" + method.Name, _culture), required: false, type: typeof(string)));
             return recognizers;
+        }
+
+        private bool LooksRequired(Type parameterType)
+        {
+            return true;
+        }
+
+        private bool LooksRequired(Type parameterType, PropertyInfo parameterProperty)
+        {
+            return LooksRequired(parameterType) && true;
         }
 
         private static bool IsFile(Type parameterType)
@@ -98,8 +109,8 @@ namespace Isop
 
         private readonly CultureInfo _culture;
         public Type Type { get; private set; }
-		public bool IgnoreGlobalUnMatchedParameters{get; private set;}
-		private readonly Transform _transform = new Transform();
+        public bool IgnoreGlobalUnMatchedParameters { get; private set; }
+        private readonly Transform _transform = new Transform();
         /// <summary>
         /// </summary>
         public ControllerRecognizer(Type type, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false)
@@ -108,12 +119,12 @@ namespace Isop
             Type = type;
             _culture = cultureInfo ?? CultureInfo.CurrentCulture;
             IgnoreGlobalUnMatchedParameters = ignoreGlobalUnMatchedParameters;
-        } 
-		
+        }
+
         public bool Recognize(IEnumerable<string> arg)
         {
             //TODO: Inefficient
-            var lexer = _transform.Rewrite( new ArgumentLexer(arg));
+            var lexer = _transform.Rewrite(new ArgumentLexer(arg));
             return null != FindMethodInfo(lexer);
         }
 
@@ -123,17 +134,17 @@ namespace Isop
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1).Value;
-				var methodInfo = FindMethod(GetMethods(),methodName, arg);
+                var methodInfo = FindMethod(GetMethods(), methodName, arg);
                 return methodInfo;
             }
             return null;
         }
-		public IEnumerable<MethodInfo> GetMethods()
-		{
-			return new MethodInfoFinder().GetOwnPublicMethods(Type)
-                .Where(m=>!m.Name.Equals("help",StringComparison.OrdinalIgnoreCase));
-		}
-		
+        public IEnumerable<MethodInfo> GetMethods()
+        {
+            return new MethodInfoFinder().GetOwnPublicMethods(Type)
+                .Where(m => !m.Name.Equals("help", StringComparison.OrdinalIgnoreCase));
+        }
+
         public string ClassName()
         {
             return Type.Name.Replace("Controller", "");
@@ -147,15 +158,15 @@ namespace Isop
         /// <returns></returns>
         public ParsedMethod Parse(IEnumerable<string> arg)
         {
-            var lexer = _transform.Rewrite( new ArgumentLexer(arg));
-               
+            var lexer = _transform.Rewrite(new ArgumentLexer(arg));
+
             var methodInfo = FindMethodInfo(lexer);
 
             var argumentRecognizers = GetRecognizers(methodInfo);
 
             var parser = new ArgumentParser(argumentRecognizers);
             var parsedArguments = parser.Parse(lexer, arg);
-            
+
             return Parse(methodInfo, parsedArguments);
         }
 
@@ -171,12 +182,12 @@ namespace Isop
                           };
             }
 
-            var recognizedActionParameters = GetParametersForMethod(methodInfo, 
+            var recognizedActionParameters = GetParametersForMethod(methodInfo,
                             parsedArguments);
-            
+
             parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments
-                .Where(unrecognized=>unrecognized.Index>=1); //NOTE: should be different!
-          
+                .Where(unrecognized => unrecognized.Index >= 1); //NOTE: should be different!
+
             return new ParsedMethod(parsedArguments)
                        {
                            RecognizedAction = methodInfo,
@@ -193,14 +204,15 @@ namespace Isop
             }
             catch (Exception e)
             {
-                throw new TypeConversionFailedException("Could not convert argument", e){
-                    Argument=arg1.WithOptions.Argument.ToString(),
-                    Value=arg1.Value,
-                    TargetType=type 
+                throw new TypeConversionFailedException("Could not convert argument", e)
+                {
+                    Argument = arg1.WithOptions.Argument.ToString(),
+                    Value = arg1.Value,
+                    TargetType = type
                 };
             }
         }
-     
+
         private readonly TypeConverterFunc _typeConverter;
         private static object DefaultConvertFrom(Type type, string s, CultureInfo cultureInfo)
         {

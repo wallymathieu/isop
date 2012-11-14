@@ -321,6 +321,7 @@ namespace Isop.Tests
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
+
         class MyObjectController
         {
             public class Argument
@@ -342,12 +343,12 @@ namespace Isop.Tests
         class MyFileController
         {
             public Func<FileStream, string> OnAction { get; set; }
-            public string Action(FileStream file) { return OnAction(file); } 
+            public string Action(FileStream file) { return OnAction(file); }
         }
 
         class FakeFileHandler
         {
-             
+
         }
 
         [Test]
@@ -356,7 +357,7 @@ namespace Isop.Tests
             var filename = string.Empty;
             Func<Type, object> factory = (Type t) =>
                 {
-                    Assert.That(t, Is.EqualTo(typeof (MyFileController)));
+                    Assert.That(t, Is.EqualTo(typeof(MyFileController)));
                     return
                         (object)
                         new MyFileController()
@@ -364,28 +365,28 @@ namespace Isop.Tests
                                 OnAction = (file) => filename = file.Name
                             };
                 };
-            
-            
+
+
             FileStream fileStream = null;
             try
             {
 
-            var arguments = new Build()
-                    .SetCulture(CultureInfo.InvariantCulture)
-                    .SetTypeConverter((t,s,c) =>
-                                          {
-                                              
-                                              fileStream = new FileStream(s, FileMode.Create);
-                                              return fileStream;
-                                          }) 
-                    //Need to set type converter 
-                    .Recognize(typeof(MyFileController))
-                    .SetFactory(factory)
-                    .Parse(new[] { "MyFile", "Action", "--file", "myfile.txt"});
+                var arguments = new Build()
+                        .SetCulture(CultureInfo.InvariantCulture)
+                        .SetTypeConverter((t, s, c) =>
+                                              {
 
-            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
-            arguments.Invoke(new StringWriter());
-            Assert.That(filename, Is.StringContaining("myfile.txt"));
+                                                  fileStream = new FileStream(s, FileMode.Create);
+                                                  return fileStream;
+                                              })
+                    //Need to set type converter 
+                        .Recognize(typeof(MyFileController))
+                        .SetFactory(factory)
+                        .Parse(new[] { "MyFile", "Action", "--file", "myfile.txt" });
+
+                Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+                arguments.Invoke(new StringWriter());
+                Assert.That(filename, Is.StringContaining("myfile.txt"));
             }
             finally
             {
@@ -395,9 +396,9 @@ namespace Isop.Tests
                     {
                         fileStream.Dispose();
                     }
-// ReSharper disable EmptyGeneralCatchClause
-                    catch{}
-// ReSharper restore EmptyGeneralCatchClause
+                    // ReSharper disable EmptyGeneralCatchClause
+                    catch { }
+                    // ReSharper restore EmptyGeneralCatchClause
                 }
             }
         }
