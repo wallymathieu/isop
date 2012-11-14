@@ -1,7 +1,7 @@
 
 require 'albacore'
 
-task :default => ['isopms:build']
+task :default => ['isop:ms:build']
 namespace :isop do
 namespace :ms do
   dir = File.dirname(__FILE__)
