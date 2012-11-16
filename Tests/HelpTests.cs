@@ -165,7 +165,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
                                     .HelpFor("Another", "Action1");
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1
 And accept the following parameters:
---Action1, --param1")));
+--param1")));
         }
      
         [Test]
@@ -203,9 +203,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
                                     .Recognize(typeof(DescriptionController))
                                     .RecognizeHelp()
                                     .HelpFor("Description","action1");
-            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1   Some description 1 
-And accept the following parameters:
---Action1")));
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1   Some description 1")));
         }
 
         [Test]

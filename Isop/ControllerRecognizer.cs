@@ -74,7 +74,7 @@ namespace Isop
             return GetRecognizers(Type.GetMethod(methodname));
         }
 
-        public IEnumerable<ArgumentWithOptions> GetRecognizers(MethodBase method)
+        private IEnumerable<ArgumentWithOptions> GetRecognizers(MethodBase method)
         {//NOTE: Obviously to complicated. Need to refactor.
             var parameterInfos = method.GetParameters();
             var recognizers = new List<ArgumentWithOptions>();
@@ -236,9 +236,31 @@ namespace Isop
             return TypeDescriptor.GetConverter(type).ConvertFrom(null, cultureInfo, s);
         }
 
-        public MethodInfo GetMethod(string action)
+        private MethodInfo GetMethod(string action)
         {
             return GetMethods().SingleOrDefault(m => m.Name.Equals(action, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public class MethodHelp
+        {
+            public MethodHelp(MethodInfo methodinfo, ControllerRecognizer cr)
+            {
+                this.Method = methodinfo;
+                this.cr = cr;
+            }
+            private ControllerRecognizer cr;
+            public string Name { get { return Method.Name; } }
+
+            public MethodInfo Method { get; private set; }
+            public IEnumerable<ArgumentWithOptions> MethodParameters()
+            {
+                return cr.GetRecognizers(Method).Skip(1);
+            }
+        }
+
+        public MethodHelp GetMethodHelp(string action)
+        {
+            return new MethodHelp(GetMethod(action),this);
         }
     }
 

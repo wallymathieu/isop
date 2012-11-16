@@ -29,7 +29,7 @@ namespace Isop
             TheCommandsAre = "The commands are:";
 			TheSubCommandsFor = "The sub commands for ";
         }
-        private string Description(Type t,MethodInfo method=null)
+        private string Description(Type t, MethodInfo method=null)
         { 
             var description = methodInfoFinder.Match(t.GetMethods(),
                 returnType:typeof(string),
@@ -65,13 +65,22 @@ namespace Isop
 
         private string HelpForAction(ControllerRecognizer cmr, string action)
         {
-            var methodInfo = cmr.GetMethod(action);
-            return string.Format(@"{0} {1}
+            var methodhelp = cmr.GetMethodHelp(action);
+            var parameters = methodhelp.MethodParameters().Select(r => DescriptionAndHelp(cmr.Type, methodhelp, r));
+            if (parameters.Any())
+                return string.Format(@"{0} {1}
 And accept the following parameters:
-{2}", methodInfo.Name, Description(cmr.Type, methodInfo), String.Join(", ",
-    cmr.GetRecognizers(methodInfo).Select(r =>r.Help())));
+{2}", methodhelp.Name, Description(cmr.Type, methodhelp.Method), String.Join(", ",
+    parameters));
+            else
+                return string.Format(@"{0} {1}", methodhelp.Name, Description(cmr.Type, methodhelp.Method));
         }
 
+        private string DescriptionAndHelp(Type t, ControllerRecognizer.MethodHelp m, ArgumentWithOptions r)
+        {
+            return r.Help();
+        }
+        //Description(cmr.Type, methodInfo,
         public string Help(string val = null, string action=null)
         {
             if (string.IsNullOrEmpty(val)) return TheCommandsAre + Environment.NewLine +
