@@ -17,10 +17,10 @@ h3. Having your own Main
 You're hooking it up by writing something like:
 <pre><code>static void Main(string[] args)
 {
-  ArgumentParser.Build()
-                .Recognize(typeof(MyController))
-                .Parse(args)
-                .Invoke(Console.Out);
+  new Build()
+       .Recognize(typeof(MyController))
+       .Parse(args)
+       .Invoke(Console.Out);
 }</code></pre>
 
 Look at the <a href="/wallymathieu/isop/blob/master/Example/Program.cs">Example project</a> for the most recent example of how it is used. 
