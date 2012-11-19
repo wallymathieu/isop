@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -20,8 +18,10 @@ namespace Isop
             : base(tokens)
         {
         }
-
-        private static Token mapParametervaluesBasedOnParameters(Token? previous, Token token)
+        /// <summary>
+        /// The case --parameter parametervalue
+        /// </summary>
+        private static Token ReWriteArgumentsToParameterValue(Token? previous, Token token)
         {
             if (null != previous && previous.Value.TokenType == TokenType.Parameter && token.TokenType == TokenType.Argument)
             {
@@ -29,15 +29,16 @@ namespace Isop
             }
             return token;
         }
-
         private static IEnumerable<Token> MapTokensFromRaw(string arg, int valueIndex)
         {
             var match = ParamPattern.Match(arg);
             if (match.Success)
             {
+                // the case --parameter
                 yield return new Token(match.Groups["param"].Value, TokenType.Parameter, valueIndex);
                 if (match.Groups["paramValue"].Length > 0)
                 {
+                    // the case --parameter=parametervalue
                     yield return new Token(match.Groups["paramValue"].Value, TokenType.ParameterValue, valueIndex);
                 }
             }
@@ -59,8 +60,8 @@ namespace Isop
 
         public static IEnumerable<Token> Lex(IList<string> arg)
         {
-            var firstSweep = arg.SelectMany((value, valueIndex) => MapTokensFromRaw(value, valueIndex));
-            return SelectWithPrevious<Token>(mapParametervaluesBasedOnParameters, firstSweep);
+            return SelectWithPrevious(ReWriteArgumentsToParameterValue, 
+                arg.SelectMany(MapTokensFromRaw));
         }
     }
 }

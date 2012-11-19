@@ -69,6 +69,11 @@ namespace Isop
             return parameters;
         }
 
+        public IEnumerable<ArgumentWithOptions> GetMethodParameterRecognizers(MethodInfo methodInfo)
+        {
+            return GetRecognizers(methodInfo).Skip(1);
+        }
+
         public IEnumerable<ArgumentWithOptions> GetRecognizers(string methodname)
         {//For tests mostly
             return GetRecognizers(Type.GetMethod(methodname));
@@ -262,6 +267,7 @@ namespace Isop
         {
             return new MethodHelp(GetMethod(action),this);
         }
+
     }
 
 }
