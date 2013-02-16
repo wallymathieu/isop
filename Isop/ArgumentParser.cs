@@ -1,9 +1,7 @@
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.IO;
+
 namespace Isop
 {
     public class ArgumentParser

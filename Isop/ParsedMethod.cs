@@ -12,7 +12,7 @@ namespace Isop
             : base(parsedArguments)
         {
         }
-     public Func<Type,Object> Factory { get; set; }
+        public Func<Type,Object> Factory { get; set; }
 
         public Type RecognizedClass { get; set; }
         public MethodInfo RecognizedAction { get; set; }

@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
-using System.IO;
+
 namespace Isop
 {
     public class HelpForControllers
     {
         readonly IEnumerable<ControllerRecognizer> _classAndMethodRecognizers;
         private readonly TypeContainer _container;
-        private readonly MethodInfoFinder methodInfoFinder = new MethodInfoFinder();
+        private readonly MethodInfoFinder _methodInfoFinder = new MethodInfoFinder();
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
         public string TheCommandsAre { get; set; }
 		public string TheSubCommandsFor { get; set; }
@@ -31,7 +30,7 @@ namespace Isop
         }
         private string Description(Type t, MethodInfo method=null)
         { 
-            var description = methodInfoFinder.Match(t.GetMethods(),
+            var description = _methodInfoFinder.Match(t.GetMethods(),
                 returnType:typeof(string),
                 name:"help",
                 parameters:new []{typeof(string)});
