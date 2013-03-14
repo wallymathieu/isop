@@ -3,6 +3,7 @@ require 'albacore'
 
 task :default => ['isop:ms:build']
 namespace :isop do
+
 namespace :ms do
   dir = File.dirname(__FILE__)
   desc "build using msbuild"
@@ -14,13 +15,28 @@ namespace :ms do
   end
   desc "test using nunit console"
   nunit :test => :build do |nunit|
-    nunit.command = File.join(dir,"packages/NUnit.2.5.9.10348/Tools/nunit-console.exe")
+    nunit.command = Dir.glob(File.join(dir,"packages/NUnit.Runners.*/Tools/nunit-console.exe")).first
     nunit.assemblies File.join(dir,"Tests/bin/Debug/Tests.dll"), File.join(dir,"Isop.Wpf.Tests/bin/Debug/Isop.Wpf.Tests.dll")
   end
   desc "copy example cli to wpf and cli folder"
   task :copy_cli => :build do
     cp File.join(dir,"Example.Cli/bin/Debug/Example.Cli.dll"), File.join(dir,"Isop.Wpf/bin/Debug")
     cp File.join(dir,"Example.Cli/bin/Debug/Example.Cli.dll"), File.join(dir,"Isop.Auto.Cli/bin/Debug")
+  end
+
+  task :copy_to_nuspec => [:build] do
+    output_directory_lib = File.join(dir,"nuget/Isop/lib/40/")
+    mkdir_p output_directory_lib
+    ['Isop'].each{ |project|
+      cp Dir.glob("./#{project}/bin/Debug/*.dll"), output_directory_lib
+    } 
+  end
+
+  desc "create the nuget package"
+  task :nugetpack => [:copy_to_nuspec] do |nuget|
+    cd File.join(dir,"nuget/Isop") do
+      sh "..\\..\\.nuget\\NuGet.exe pack Isop.nuspec"
+    end
   end
 end
 
