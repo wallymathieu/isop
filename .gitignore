@@ -21,6 +21,8 @@ syntax: regexp
 TestResult\.xml
 packages/
 nuget/Isop/lib/
+nuget/Isop/*.nupkg
 nuget_package/
-
+nuget/Isop.Runners/*.nupkg
+nuget/Isop.Runners/tools/
 
