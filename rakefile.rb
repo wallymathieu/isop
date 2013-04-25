@@ -24,18 +24,34 @@ namespace :ms do
     cp File.join(dir,"Example.Cli/bin/Debug/Example.Cli.dll"), File.join(dir,"Isop.Auto.Cli/bin/Debug")
   end
 
-  task :copy_to_nuspec => [:build] do
+  task :core_copy_to_nuspec => [:build] do
     output_directory_lib = File.join(dir,"nuget/Isop/lib/40/")
     mkdir_p output_directory_lib
     ['Isop'].each{ |project|
       cp Dir.glob("./#{project}/bin/Debug/*.dll"), output_directory_lib
-    } 
+    }
+    
+  end
+  task :runners_copy_to_nuspec => [:build] do
+    output_directory_lib = File.join(dir,"nuget/Isop.Runners/tools/")
+    mkdir_p output_directory_lib
+    ['Isop.Wpf', 'Isop.Auto.Cli'].each{ |project|
+      cp Dir.glob("./#{project}/bin/Debug/*.exe"), output_directory_lib
+    }
   end
 
   desc "create the nuget package"
-  task :nugetpack => [:copy_to_nuspec] do |nuget|
+  task :nugetpack => [:core_nugetpack, :runners_nugetpack]
+
+  task :core_nugetpack => [:core_copy_to_nuspec] do |nuget|
     cd File.join(dir,"nuget/Isop") do
       sh "..\\..\\.nuget\\NuGet.exe pack Isop.nuspec"
+    end
+  end
+
+  task :runners_nugetpack => [:runners_copy_to_nuspec] do |nuget|
+    cd File.join(dir,"nuget/Isop.Runners") do
+      sh "..\\..\\.nuget\\NuGet.exe pack Isop.Runners.nuspec"
     end
   end
 end
