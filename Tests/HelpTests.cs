@@ -246,7 +246,9 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 
         [Test
-        //, Ignore("need some way of testing this with albacore, resharper ... shadow copy")
+#if !APPHARBOR
+        ,Ignore("APPHARBOR")
+#endif
         ]
         public void It_can_report_usage_for_controllers_and_actions_with_description_in_comments ()
         {
@@ -281,7 +283,11 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
             }
         }
         
-        [Test] public void Can_read_xml_doc()
+        [Test
+#if !APPHARBOR
+        ,Ignore("APPHARBOR")
+#endif
+        ] public void Can_read_xml_doc()
         {
             var doc = new HelpXmlDocumentation().GetSummariesFromText (File.ReadAllText("Tests.xml"));
             Assert.That(doc["P:Isop.Tests.FullConfiguration.Global"],Is.EqualTo("GLOBAL!!"));

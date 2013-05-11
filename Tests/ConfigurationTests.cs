@@ -112,7 +112,11 @@ namespace Isop.Tests
             Assert.That(conf.DisposeCalled);
         }
         
-        [Test] public void Can_read_configuration_from_example_project()
+        [Test
+#if !APPHARBOR
+        ,Ignore("APPHARBOR")
+#endif
+        ] public void Can_read_configuration_from_example_project()
         {
             var path = Path.GetFullPath( Path.Combine("..","..","..",
                 Path.Combine("Example.Cli","bin","Debug")));
@@ -134,7 +138,11 @@ namespace Isop.Tests
             Assert.That(conf.Global,Is.EqualTo("globalvalue"));
         }
 
-        [Test] public void Can_read_documentation_for_properties()
+        [Test
+#if !APPHARBOR
+        ,Ignore("APPHARBOR")
+#endif
+        ] public void Can_read_documentation_for_properties()
         {
             var conf = new FullConfiguration();
             var parserBuilder = new Build().Configuration(conf);
