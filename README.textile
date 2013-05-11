@@ -10,6 +10,11 @@ So that the class with the name My or MyController and the method with the name 
 
 This library is intended to be like chocolate pudding mix. Not something that will replace your dinner, but rather something easy to make for dessert. A way of helping you build for instance the essential administrative apps. It's not a replacement for baking cake (building a full blown administrative interface in html, silverlight, wpf ... ). 
 
+h2. Nuget packages
+
+<a href="http://nuget.org/packages/Isop/">Isop</a>
+<a href="http://nuget.org/packages/Isop.Runners/">Isop.Runners</a>
+
 h2. Example
 
 h3. Having your own Main
