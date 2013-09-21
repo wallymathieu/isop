@@ -7,11 +7,14 @@ namespace Isop
     public class ArgumentParser
     {
         private readonly IEnumerable<ArgumentWithOptions> _argumentWithOptions;
+        private readonly bool _allowInferParameter;
 
-        public ArgumentParser(IEnumerable<ArgumentWithOptions> argumentWithOptions)
+        public ArgumentParser(IEnumerable<ArgumentWithOptions> argumentWithOptions, bool allowInferParameter)
         {
             _argumentWithOptions = argumentWithOptions;
+            _allowInferParameter = allowInferParameter;
         }
+
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
             var lexer = new ArgumentLexer(arguments);
@@ -33,6 +36,7 @@ namespace Isop
         {
             var recognizedIndexes = new List<int>();
             var lexer = new PeekEnumerable<Token>(lex);
+            var encounteredParameter = false;
             IList<RecognizedArgument> recognized = new List<RecognizedArgument>();
             while (lexer.HasMore())
             {
@@ -42,23 +46,31 @@ namespace Isop
                     case TokenType.Argument:
                         {
                             var argumentWithOptions = _argumentWithOptions
-                               .SingleOrDefault(argopt => argopt.Argument.Accept(current.Index,current.Value));
-                            
+                               .SingleOrDefault(argopt => argopt.Argument.Accept(current.Index, current.Value));
+
+                            if (null == argumentWithOptions && !encounteredParameter && _allowInferParameter)
+                            {
+                                InferParameter(recognizedIndexes, recognized, current);
+                                continue;
+                            }
+
                             if (null == argumentWithOptions)
                             {
-                                    continue;
+                                continue;
                             }
-                            
+
                             recognizedIndexes.Add(current.Index);
                             recognized.Add(new RecognizedArgument(
                                         argumentWithOptions,
+                                        current.Index,
                                         current.Value));
                         }
                         break;
                     case TokenType.Parameter:
                         {
+                            encounteredParameter = true;
                             var argumentWithOptions = _argumentWithOptions
-                               .SingleOrDefault(argopt => argopt.Argument.Accept(current.Index,current.Value));
+                               .SingleOrDefault(argopt => argopt.Argument.Accept(current.Index, current.Value));
                             if (null == argumentWithOptions)
                                 continue;
                             string value;
@@ -76,6 +88,7 @@ namespace Isop
 
                             recognized.Add(new RecognizedArgument(
                                         argumentWithOptions,
+                                        current.Index,
                                         current.Value,
                                         value));
                         }
@@ -100,6 +113,22 @@ namespace Isop
                 RecognizedArguments = recognized,
                 UnRecognizedArguments = unRecognizedArguments
             };
+        }
+
+        private void InferParameter(List<int> recognizedIndexes, IList<RecognizedArgument> recognized, Token current)
+        {
+            ArgumentWithOptions argumentWithOptions;
+            argumentWithOptions = _argumentWithOptions
+                .Where((argopt, i) => i == current.Index).SingleOrDefault();
+            if (null != argumentWithOptions)
+            {
+                recognizedIndexes.Add(current.Index);
+                recognized.Add(new RecognizedArgument(
+                                   argumentWithOptions,
+                                   current.Index,
+                                   current.Value,
+                                   current.Value) {InferredOrdinal = true});
+            }
         }
     }
 }

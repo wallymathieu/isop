@@ -4,6 +4,8 @@ namespace Isop
 {
     public class RecognizedArgument
     {
+        public int Index { get; private set; }
+
         /// <summary>
         /// the matched value if any, for instance the "value" of the expression "--argument value"
         /// </summary>
@@ -14,8 +16,11 @@ namespace Isop
         /// </summary>
         public string Argument { get; private set; }
 
-        public RecognizedArgument(ArgumentWithOptions argumentWithOptions, string parameter, string value = null)
+        public bool InferredOrdinal { get; set; }
+
+        public RecognizedArgument(ArgumentWithOptions argumentWithOptions, int index, string parameter, string value = null)
         {
+            Index = index;
             Value = value;
             WithOptions = argumentWithOptions;
             Argument = parameter;

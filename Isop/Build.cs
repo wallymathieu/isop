@@ -55,7 +55,7 @@ namespace Isop
 		
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
-			var argumentParser = new ArgumentParser(_argumentRecognizers);
+			var argumentParser = new ArgumentParser(_argumentRecognizers, _allowInferParameter);
             // TODO: Need to figure out where this goes. To Much logic for this layer.
             var lexer = new ArgumentLexer(arg);
             var parsedArguments = argumentParser.Parse(lexer, arg);
@@ -66,6 +66,9 @@ namespace Isop
                 {
 					var parsedMethod = controllerRecognizer.Parse(arg);
 					parsedMethod.Factory = _container.CreateInstance;
+                    // Inferred ordinal arguments should not be recognized twice
+                    parsedArguments.RecognizedArguments = parsedArguments.RecognizedArguments
+                        .Where(argopts=>!parsedMethod.RecognizedArguments.Any(pargopt=>pargopt.Index == argopts.Index && argopts.InferredOrdinal));
                     var merged = parsedArguments.Merge( parsedMethod);
                     if (!controllerRecognizer.IgnoreGlobalUnMatchedParameters)
                         FailOnUnMatched(merged);
@@ -97,15 +100,25 @@ namespace Isop
         {
             _controllerRecognizers.Add(new ControllerRecognizer(arg, 
                 cultureInfo?? Culture, 
-                typeConverter ?? TypeConverter,ignoreGlobalUnMatchedParameters));
+                () => typeConverter ?? TypeConverter,
+                ignoreGlobalUnMatchedParameters,
+                () => _allowInferParameter));
             return this;
         }
 		public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
         {
             _controllerRecognizers.Add(new ControllerRecognizer(arg.GetType(),
                cultureInfo?? Culture ,
-               typeConverter ?? TypeConverter, ignoreGlobalUnMatchedParameters));
+               () => typeConverter ?? TypeConverter, 
+               ignoreGlobalUnMatchedParameters, 
+               ()=>_allowInferParameter));
             _container.Instances.Add(arg.GetType(),arg);
+            return this;
+        }
+
+        public Build DisallowInferParameter()
+        {
+            _allowInferParameter = false;
             return this;
         }
 
@@ -184,6 +197,7 @@ namespace Isop
             return _container.CreateInstance;
         }
         private List<IDisposable> disposables = new List<IDisposable>();
+        private bool _allowInferParameter = true;
 
         public void Dispose()
         {

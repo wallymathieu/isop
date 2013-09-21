@@ -110,6 +110,21 @@ namespace Isop.Tests
             }));
         }
         [Test]
+        public void It_can_infer_ordinal_usage_of_named_parameters()
+        {
+            var arguments = new Build()
+                .Parameter("beta|b=")
+                .Parameter("alpha|a=")
+                .Parse(new[] { "test", "value" }).RecognizedArguments;
+            Assert.That(arguments.Count(), Is.EqualTo(2));
+            var arg1 = arguments.First();
+            Assert.That(arg1.WithOptions.Argument.ToString(), Is.EqualTo("beta|b="));
+            Assert.That(arg1.Value, Is.EqualTo("test"));
+            var arg2 = arguments.Last();
+            Assert.That(arg2.WithOptions.Argument.ToString(), Is.EqualTo("alpha|a="));
+            Assert.That(arg2.Value, Is.EqualTo("value"));
+        }
+        [Test]
         public void It_wont_report_matched_parameters()
         {
             var arguments = new Build()

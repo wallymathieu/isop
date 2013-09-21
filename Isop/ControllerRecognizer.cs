@@ -131,12 +131,13 @@ namespace Isop
         private readonly Transform _transform = new Transform();
         /// <summary>
         /// </summary>
-        public ControllerRecognizer(Type type, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false)
+        public ControllerRecognizer(Type type, CultureInfo cultureInfo=null, Func<TypeConverterFunc> typeConverter = null, bool ignoreGlobalUnMatchedParameters = false, Func<bool> allowInferParameter=null)
         {
-            _typeConverter = typeConverter ?? DefaultConvertFrom;
+            _typeConverter = typeConverter;
             Type = type;
             _culture = cultureInfo ?? CultureInfo.CurrentCulture;
             IgnoreGlobalUnMatchedParameters = ignoreGlobalUnMatchedParameters;
+            _allowInferParameter = allowInferParameter;
         }
 
         public bool Recognize(IEnumerable<string> arg)
@@ -182,7 +183,7 @@ namespace Isop
 
             var argumentRecognizers = GetRecognizers(methodInfo);
 
-            var parser = new ArgumentParser(argumentRecognizers);
+            var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter());
             var parsedArguments = parser.Parse(lexer, arg);
 
             return Parse(methodInfo, parsedArguments);
@@ -218,7 +219,8 @@ namespace Isop
         {
             try
             {
-                return _typeConverter(type, arg1.Value, _culture);
+                var typeConverter = _typeConverter() ?? DefaultConvertFrom;
+                return typeConverter(type, arg1.Value, _culture);
             }
             catch (Exception e)
             {
@@ -231,7 +233,9 @@ namespace Isop
             }
         }
 
-        private readonly TypeConverterFunc _typeConverter;
+        private readonly Func<TypeConverterFunc> _typeConverter;
+        private Func<bool> _allowInferParameter;
+
         private static object DefaultConvertFrom(Type type, string s, CultureInfo cultureInfo)
         {
             if (type == typeof(FileStream))
