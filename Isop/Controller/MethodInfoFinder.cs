@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Isop
+namespace Isop.Controller
 {
     public class MethodInfoFinder
     {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Isop.Parse;
 using NUnit.Framework;
 using Isop.WpfControls.ViewModels;
 using System.IO;

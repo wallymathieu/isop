@@ -1,6 +1,4 @@
-using System;
-
-namespace Isop
+namespace Isop.Parse
 {
     public class RecognizedArgument
     {

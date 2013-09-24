@@ -5,6 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Isop;
+using Isop.Controller;
+using Isop.Parse;
+using Isop.Parse.Parameters;
 using NUnit.Framework;
 
 namespace Isop.Tests

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Isop;
+using Isop.Infrastructure;
+using Isop.Lex;
 using NUnit.Framework;
 
 namespace Isop.Tests

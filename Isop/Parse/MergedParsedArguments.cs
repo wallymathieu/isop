@@ -1,7 +1,7 @@
-using System;
 using System.IO;
 using System.Linq;
-namespace Isop
+
+namespace Isop.Parse
 {
     public class MergedParsedArguments : ParsedArguments
     {

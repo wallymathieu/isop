@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-namespace Isop
+
+namespace Isop.Controller
 {
     public class TypeContainer
     {

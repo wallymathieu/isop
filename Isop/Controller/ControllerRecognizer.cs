@@ -5,8 +5,10 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.IO;
-using TypeConverterFunc = System.Func<System.Type, string, System.Globalization.CultureInfo, object>;
-namespace Isop
+using Isop.Lex;
+using Isop.Parse;
+
+namespace Isop.Controller
 {
     public class ControllerRecognizer
     {
@@ -131,7 +133,7 @@ namespace Isop
         private readonly Transform _transform = new Transform();
         /// <summary>
         /// </summary>
-        public ControllerRecognizer(Type type, CultureInfo cultureInfo=null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false, bool allowInferParameter=false)
+        public ControllerRecognizer(Type type, CultureInfo cultureInfo=null, Func<Type, string, CultureInfo, object> typeConverter = null, bool ignoreGlobalUnMatchedParameters = false, bool allowInferParameter=false)
         {
             _typeConverter = typeConverter;
             Type = type;
@@ -233,7 +235,7 @@ namespace Isop
             }
         }
 
-        private readonly TypeConverterFunc _typeConverter;
+        private readonly Func<Type, string, CultureInfo, object> _typeConverter;
         private bool _allowInferParameter;
 
         private static object DefaultConvertFrom(Type type, string s, CultureInfo cultureInfo)

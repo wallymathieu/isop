@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Isop.Infrastructure;
+using Isop.Lex;
 
-namespace Isop
+namespace Isop.Parse
 {
     public class ArgumentParser
     {

@@ -1,6 +1,8 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
+using Isop.Controller;
+using Isop.Help;
 using NUnit.Framework;
 
 namespace Isop.Tests

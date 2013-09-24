@@ -1,7 +1,9 @@
 using System;
 using System.Linq;
 using System.Globalization;
-namespace Isop
+using Isop.Parse.Parameters;
+
+namespace Isop.Parse
 {
         /// <summary>
     /// Represents the parameter. For instance "file" of the commandline argument --file. 

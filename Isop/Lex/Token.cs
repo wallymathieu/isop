@@ -1,7 +1,6 @@
-using System;
 using System.Globalization;
 
-namespace Isop
+namespace Isop.Lex
 {
     public struct Token
     {

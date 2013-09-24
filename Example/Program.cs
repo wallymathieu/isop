@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Isop;
+using Isop.Controller;
+using Isop.Parse;
 
 namespace Isop.Example
 {

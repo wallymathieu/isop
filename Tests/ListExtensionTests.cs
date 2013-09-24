@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Isop.Infrastructure;
 using NUnit.Framework;
 
 namespace Isop.Tests

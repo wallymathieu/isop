@@ -1,7 +1,8 @@
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-namespace Isop
+
+namespace Isop.Controller
 {
     public class MethodInfoOrProperty
     {

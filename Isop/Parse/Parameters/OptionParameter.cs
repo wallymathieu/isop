@@ -1,5 +1,6 @@
 using System.Linq;
-namespace Isop
+
+namespace Isop.Parse.Parameters
 {
     public class OptionParameter 
     {

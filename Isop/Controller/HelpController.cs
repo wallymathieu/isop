@@ -1,8 +1,9 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using Isop.Help;
 
-namespace Isop
+namespace Isop.Controller
 {
     public class HelpController
     {

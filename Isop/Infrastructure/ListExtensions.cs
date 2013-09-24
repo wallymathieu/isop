@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Isop
+namespace Isop.Infrastructure
 {
     public static class ListExtensions
     {

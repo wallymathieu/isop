@@ -1,6 +1,6 @@
 using System;
 
-namespace Isop
+namespace Isop.Controller
 {
    
     [Serializable]

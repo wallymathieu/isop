@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace Isop
+namespace Isop.Parse.Parameters
 {
     public class OrdinalParameter 
     {

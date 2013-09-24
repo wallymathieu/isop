@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-namespace Isop
+using Isop.Parse;
+
+namespace Isop.Help
 {
     public class HelpForArgumentWithOptions
     {

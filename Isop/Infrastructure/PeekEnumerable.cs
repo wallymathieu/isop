@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
-namespace Isop
+
+namespace Isop.Infrastructure
 {
     public class PeekEnumerable<T>:IEnumerable<T>
     {

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Isop.Help;
+using Isop.Parse;
 
-namespace Isop
+namespace Isop.Controller
 {
     public class HelpForControllers
     {

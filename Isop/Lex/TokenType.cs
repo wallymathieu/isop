@@ -1,4 +1,4 @@
-namespace Isop
+namespace Isop.Lex
 {
     public enum TokenType
     {

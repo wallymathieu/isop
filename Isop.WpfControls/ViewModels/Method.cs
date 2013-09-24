@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Isop.Controller;
 
 namespace Isop.WpfControls.ViewModels
 {

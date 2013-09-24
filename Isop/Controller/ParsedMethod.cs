@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Collections;
-namespace Isop
+using Isop.Parse;
+
+namespace Isop.Controller
 {
     public class ParsedMethod : ParsedArguments
     {

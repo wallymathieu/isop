@@ -4,6 +4,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Isop.Controller;
+using Isop.Help;
+using Isop.Lex;
+using Isop.Parse;
 using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
 namespace Isop
 {
