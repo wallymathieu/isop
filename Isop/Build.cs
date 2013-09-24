@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using Isop.Controller;
 using Isop.Help;
+using Isop.Infrastructure;
 using Isop.Lex;
 using Isop.Parse;
 using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
@@ -221,19 +222,16 @@ namespace Isop
         public Build Configuration(Type t,object instance)
         {
             var methods= t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
-            var recognizer = new MethodInfoFinder();
 
-            var culture = recognizer.MatchGet(methods, 
-                name:"Culture",
-                returnType: typeof(CultureInfo),
-                parameters: new Type[0]);
+            var culture = methods.MatchGet(name:"Culture",
+                                    returnType: typeof(CultureInfo),
+                                    parameters: new Type[0]);
             if (null!=culture)
                 Culture = (CultureInfo)culture.Invoke(instance,new object[0]);
             
-            var recognizesMethod = recognizer.MatchGet(methods, 
-                name:"Recognizes",
-                returnType: typeof(IEnumerable<Type>),
-                parameters: new Type[0]);
+            var recognizesMethod = methods.MatchGet(name:"Recognizes",
+                                             returnType: typeof(IEnumerable<Type>),
+                                             parameters: new Type[0]);
             if (null!=recognizesMethod)
             {
                 var recognizes=(IEnumerable<Type>)recognizesMethod.Invoke(instance, new object[0]);
@@ -242,14 +240,13 @@ namespace Isop
                     Recognize(recognized);
                 }
             }
-            var objectFactory = recognizer.Match(methods,
-                name: "ObjectFactory",
-                returnType: typeof(object),
-                parameters: new[] { typeof(Type) });
+            var objectFactory = methods.Match(name: "ObjectFactory",
+                                          returnType: typeof(object),
+                                          parameters: new[] { typeof(Type) });
             if (null!=objectFactory)
                 SetFactory((Func<Type, object>)Delegate.CreateDelegate(typeof(Func<Type, object>), instance, objectFactory));
 
-            var configurationSetters = recognizer.FindSet(methods);
+            var configurationSetters = methods.FindSet();
             foreach (var methodInfo in configurationSetters)
             {
                 var action = (Action<String>)Delegate.CreateDelegate(typeof(Action<String>), 
@@ -260,20 +257,18 @@ namespace Isop
                     description:description,
                     required: methodInfo.Required);//humz? required?
             }
-            var _recongizeHelp = recognizer.MatchGet(methods,
-                name:"RecognizeHelp",
-                returnType: typeof(bool),
-                parameters: new Type[0]);
+            var _recongizeHelp = methods.MatchGet(name:"RecognizeHelp",
+                                           returnType: typeof(bool),
+                                           parameters: new Type[0]);
                 
             if (null!=_recongizeHelp && (bool)_recongizeHelp.Invoke(instance,new object[0]))
             {
                 RecognizeHelp() ;
             }
    
-            var _typeconv = recognizer.MatchGet(methods,
-                name:"TypeConverter",
-                returnType: typeof(TypeConverterFunc),
-                parameters: new Type[0]);
+            var _typeconv = methods.MatchGet(name:"TypeConverter",
+                                      returnType: typeof(TypeConverterFunc),
+                                      parameters: new Type[0]);
             if (null!=_typeconv)
             {
                 SetTypeConverter((TypeConverterFunc)_typeconv.Invoke(instance,new object[0]));

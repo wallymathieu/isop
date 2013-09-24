@@ -49,11 +49,11 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Infrastructure\ListExtensions.cs" />
     <Compile Include="Controller\TypeContainer.cs" />
+    <Compile Include="Infrastructure\ReflectionExtensions.cs" />
     <Compile Include="Lex\ArgumentLexer.cs" />
     <Compile Include="Parse\ArgumentParser.cs" />
     <Compile Include="Build.cs" />
     <Compile Include="Controller\ControllerRecognizer.cs" />
-    <Compile Include="Controller\MethodInfoFinder.cs" />
     <Compile Include="Lex\TokenType.cs" />
     <Compile Include="Lex\Token.cs" />
     <Compile Include="Infrastructure\PeekEnumerable.cs" />
@@ -70,7 +70,7 @@
     <Compile Include="Controller\TypeConversionFailedException.cs" />
     <Compile Include="Controller\Transform.cs" />
     <Compile Include="Controller\ParsedMethod.cs" />
-    <Compile Include="Controller\MethodInfoOrProperty.cs" />
+    <Compile Include="Infrastructure\MethodInfoOrProperty.cs" />
     <Compile Include="Help\HelpXmlDocumentation.cs" />
     <Compile Include="Controller\HelpController.cs" />
     <Compile Include="Help\HelpForArgumentWithOptions.cs" />

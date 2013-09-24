@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.IO;
+using Isop.Infrastructure;
 using Isop.Lex;
 using Isop.Parse;
 
@@ -162,7 +163,7 @@ namespace Isop.Controller
         }
         public IEnumerable<MethodInfo> GetMethods()
         {
-            return new MethodInfoFinder().GetOwnPublicMethods(Type)
+            return ReflectionExtensions.GetOwnPublicMethods(Type)
                 .Where(m => !m.Name.Equals("help", StringComparison.OrdinalIgnoreCase));
         }
 

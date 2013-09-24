@@ -48,6 +48,9 @@
     <Compile Include='..\Isop\Controller\TypeContainer.cs'>
       <Link>Isop\Controller\TypeContainer.cs</Link>
     </Compile>
+    <Compile Include='..\Isop\Infrastructure\ReflectionExtensions.cs'>
+      <Link>Isop\Infrastructure\ReflectionExtensions.cs</Link>
+    </Compile>
     <Compile Include='..\Isop\Lex\ArgumentLexer.cs'>
       <Link>Isop\Lex\ArgumentLexer.cs</Link>
     </Compile>
@@ -59,9 +62,6 @@
     </Compile>
     <Compile Include='..\Isop\Controller\ControllerRecognizer.cs'>
       <Link>Isop\Controller\ControllerRecognizer.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controller\MethodInfoFinder.cs'>
-      <Link>Isop\Controller\MethodInfoFinder.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Lex\TokenType.cs'>
       <Link>Isop\Lex\TokenType.cs</Link>
@@ -111,8 +111,8 @@
     <Compile Include='..\Isop\Controller\ParsedMethod.cs'>
       <Link>Isop\Controller\ParsedMethod.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Controller\MethodInfoOrProperty.cs'>
-      <Link>Isop\Controller\MethodInfoOrProperty.cs</Link>
+    <Compile Include='..\Isop\Infrastructure\MethodInfoOrProperty.cs'>
+      <Link>Isop\Infrastructure\MethodInfoOrProperty.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Help\HelpXmlDocumentation.cs'>
       <Link>Isop\Help\HelpXmlDocumentation.cs</Link>

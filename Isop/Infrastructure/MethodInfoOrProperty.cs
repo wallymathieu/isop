@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Isop.Infrastructure;
 
 namespace Isop.Controller
 {
@@ -39,17 +40,5 @@ namespace Isop.Controller
         }
     }
 
-    public static class ReflectionExtensions
-    {
-        public static bool Required(this PropertyInfo propertyInfo)
-        {
-            return propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();
-        }
-
-        public static bool Required(this MethodInfo methodInfo)
-        {
-            return methodInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();
-        }
-    }
 }
 

@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Isop.Help;
+using Isop.Infrastructure;
 using Isop.Parse;
 
 namespace Isop.Controller
 {
     public class HelpForControllers
     {
-        private readonly IEnumerable<Func<ControllerRecognizer>> __classAndMethodRecognizers;
-        private IEnumerable<ControllerRecognizer> _classAndMethodRecognizers
+        private readonly IEnumerable<Func<ControllerRecognizer>> _classAndMethodRecognizers;
+        private IEnumerable<ControllerRecognizer> ClassAndMethodRecognizers
         {
-            get { return __classAndMethodRecognizers.Select(cmr => cmr()); }
+            get { return _classAndMethodRecognizers.Select(cmr => cmr()); }
         }
         private readonly TypeContainer _container;
-        private readonly MethodInfoFinder _methodInfoFinder = new MethodInfoFinder();
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
         public string TheCommandsAre { get; set; }
         public string TheSubCommandsFor { get; set; }
@@ -26,8 +26,8 @@ namespace Isop.Controller
         public HelpForControllers(IEnumerable<Func<ControllerRecognizer>> classAndMethodRecognizers, TypeContainer container, HelpXmlDocumentation helpXmlDocumentation)
         {
             _container = container;
-            __classAndMethodRecognizers = classAndMethodRecognizers;
-            this._helpXmlDocumentation = helpXmlDocumentation;
+            _classAndMethodRecognizers = classAndMethodRecognizers;
+            _helpXmlDocumentation = helpXmlDocumentation;
             HelpSubCommandForMoreInformation = "Se 'COMMANDNAME' help <command> <subcommand> for more information";
 
             HelpCommandForMoreInformation = "Se 'COMMANDNAME' help <command> for more information";
@@ -36,10 +36,9 @@ namespace Isop.Controller
         }
         private string Description(Type t, MethodInfo method = null)
         {
-            var description = _methodInfoFinder.Match(t.GetMethods(),
-                returnType: typeof(string),
-                name: "help",
-                parameters: new[] { typeof(string) });
+            var description = t.GetMethods().Match(returnType: typeof(string),
+                                               name: "help",
+                                               parameters: new[] { typeof(string) });
             var descr = string.Empty;
             if (null == description)
             {
@@ -96,14 +95,14 @@ And accept the following parameters:
         {
             if (string.IsNullOrEmpty(val)) return TheCommandsAre + Environment.NewLine +
                    String.Join(Environment.NewLine,
-                               _classAndMethodRecognizers
+                               ClassAndMethodRecognizers
                                .Where(cmr => cmr.Type != typeof(HelpController))
                                .Select(cmr => "  " + HelpFor(cmr, true)).ToArray())
                    + Environment.NewLine
                    + Environment.NewLine
                    + HelpCommandForMoreInformation;
 
-            var controllerRecognizer = _classAndMethodRecognizers.First(cmr =>
+            var controllerRecognizer = ClassAndMethodRecognizers.First(cmr =>
                 cmr.ClassName().Equals(val, StringComparison.OrdinalIgnoreCase));
             if (string.IsNullOrEmpty(action))
             {
@@ -119,8 +118,8 @@ And accept the following parameters:
         public bool CanHelp(string val = null, string action = null)
         {
             return string.IsNullOrEmpty(val)
-                ? _classAndMethodRecognizers.Any(cmr => cmr.Type != typeof(HelpController))
-                : _classAndMethodRecognizers.Any(cmr => cmr.ClassName().Equals(val, StringComparison.OrdinalIgnoreCase));
+                ? ClassAndMethodRecognizers.Any(cmr => cmr.Type != typeof(HelpController))
+                : ClassAndMethodRecognizers.Any(cmr => cmr.ClassName().Equals(val, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

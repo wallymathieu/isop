@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Isop.Controller;
 using Isop.Help;
+using Isop.Infrastructure;
 using NUnit.Framework;
 
 namespace Isop.Tests
@@ -298,10 +299,9 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test] public void Can_get_same_key_as_in_xmldoc()
         {
             var helpXml = new HelpXmlDocumentation();
-            var finder = new MethodInfoFinder();
-            var _global = finder.MatchGet(typeof(FullConfiguration).GetMethods(),"Global");
+            var _global = typeof(FullConfiguration).GetMethods().MatchGet("Global");
             Assert.That(helpXml.GetKey(_global.MethodInfo),Is.EqualTo("P:Isop.Tests.FullConfiguration.Global"));
-            var action1 = finder.Match(typeof(DescriptionWithCommentsController).GetMethods(),name:"Action1");
+            var action1 = typeof(DescriptionWithCommentsController).GetMethods().Match(name:"Action1");
             Assert.That(helpXml.GetKey(action1),Is.EqualTo("M:Isop.Tests.HelpTests.DescriptionWithCommentsController.Action1"));
             
         }
