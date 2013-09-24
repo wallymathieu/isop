@@ -10,9 +10,12 @@ module VisualStudio
       @xmlns = {"x"=>"http://schemas.microsoft.com/developer/msbuild/2003"};
     end
 
+    def element_types
+      ['Compile','Content','EmbeddedResource','None', 'Page']
+    end
     def files()
       files=[]
-      ['Compile','Content','EmbeddedResource','None', 'Page'].each { |elementType|
+      element_types.each { |elementType|
           REXML::XPath.each(@xmldoc,"/x:Project/x:ItemGroup/x:#{elementType}", @xmlns) { |file|
             links = file.elements.select{ |el| el.name == 'Link' }
             depend_upon = file.elements.select { |el| el.name == 'DependentUpon'  }
@@ -47,7 +50,7 @@ module VisualStudio
       end
     end
     def clear_links()
-      ['Compile','Content','EmbeddedResource','None'].each { |elementType|
+      element_types.each { |elementType|
           REXML::XPath.each(@xmldoc,"/x:Project/x:ItemGroup/x:#{elementType}", @xmlns) { |file|
             links = file.elements.select{ |el| el.name == 'Link' }
             if (links.any?)

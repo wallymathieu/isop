@@ -16,9 +16,9 @@ namespace Isop
         private readonly IList<Func<ControllerRecognizer>> _controllerRecognizers;
         public CultureInfo Culture { get; private set; }
         public TypeConverterFunc TypeConverter { get; private set; }
-        private Func<HelpForControllers> _helpForControllers;
+        private HelpForControllers _helpForControllers;
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
-        private Func<HelpController> _helpController;
+        private HelpController _helpController;
         private readonly TypeContainer _container=new TypeContainer();
         private readonly HelpXmlDocumentation helpXmlDocumentation = new HelpXmlDocumentation();
         public Build()
@@ -144,7 +144,7 @@ namespace Isop
             string helpSubCommandForMoreInformation)
         {
             RecognizeHelp();
-            var helpForControllers = _helpForControllers();
+            var helpForControllers = _helpForControllers;
             helpForControllers.TheCommandsAre = theCommandsAre;
             helpForControllers.HelpCommandForMoreInformation = helpCommandForMoreInformation;
             helpForControllers.TheSubCommandsFor = theSubCommandsFor;
@@ -171,10 +171,10 @@ namespace Isop
         {
             if (_helpController==null)
             {
-                _helpForControllers = ()=>new HelpForControllers(ControllerRecognizers, _container, helpXmlDocumentation);
+                _helpForControllers = new HelpForControllers(_controllerRecognizers, _container, helpXmlDocumentation);
                 _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
-                _helpController = ()=>new HelpController(_helpForArgumentWithOptions, _helpForControllers());
-                Recognize(_helpController,ignoreGlobalUnMatchedParameters:true);
+                _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
+                Recognize(_helpController, ignoreGlobalUnMatchedParameters:true);
             }
             return this;
         }
@@ -321,7 +321,7 @@ namespace Isop
 
         public HelpController HelpController()
         {
-            if (_helpController != null) return _helpController();
+            if (_helpController != null) return _helpController;
             return null;
         }
     }

@@ -74,15 +74,6 @@
       <SubType>Code</SubType>
     </Compile>
     <AppDesigner Include='Properties\'/>
-    <Page Include='..\Isop.WpfControls\MethodView.xaml'>
-      <Link>WpfControls\MethodView.xaml</Link>
-      <Generator>
-        <Generator>MSBuild:Compile</Generator>
-      </Generator>
-      <SubType>
-        <SubType>Designer</SubType>
-      </SubType>
-    </Page>
     <Compile Include='..\Isop\Infrastructure\ListExtensions.cs'>
       <Link>Isop\Infrastructure\ListExtensions.cs</Link>
     </Compile>
