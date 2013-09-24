@@ -60,7 +60,9 @@ module VisualStudio
       return @xmldoc.to_s
     end
     def write output
-      @xmldoc.write output
+      formatter = REXML::Formatters::Pretty.new(2)
+      formatter.compact = true # This is the magic line that does what you need!
+      formatter.write(@xmldoc, output)
     end
   end
 

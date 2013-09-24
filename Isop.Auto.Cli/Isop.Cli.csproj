@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version='1.0' encoding='UTF-8'?> 
+<Project DefaultTargets='Build' ToolsVersion='4.0' xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Configuration Condition=' &apos;$(Configuration)&apos; == &apos;&apos; '>Debug</Configuration>
+    <Platform Condition=' &apos;$(Platform)&apos; == &apos;&apos; '>x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C5008846-A54B-46C3-B144-973E50B8620F}</ProjectGuid>
@@ -11,10 +11,10 @@
     <RootNamespace>Isop.Auto.Cli</RootNamespace>
     <AssemblyName>Isop.Cli</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\isop\</SolutionDir>
+    <SolutionDir Condition='$(SolutionDir) == &apos;&apos; Or $(SolutionDir) == &apos;*Undefined*&apos;'>..\..\isop\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+  <PropertyGroup Condition=' &apos;$(Configuration)|$(Platform)&apos; == &apos;Debug|x86&apos; '>
     <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -24,7 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+  <PropertyGroup Condition=' &apos;$(Configuration)|$(Platform)&apos; == &apos;Release|x86&apos; '>
     <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -34,101 +34,101 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include='System'/>
+    <Reference Include='System.Core'/>
+    <Reference Include='System.Xml'/>
+    <Reference Include='System.ComponentModel.DataAnnotations'/>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\Isop\Build.cs">
-      <Link>Isop\Build.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\Infrastructure\ListExtensions.cs">
+    <Compile Include='Program.cs'/>
+    <Compile Include='Properties\AssemblyInfo.cs'/>
+    <Compile Include='..\Isop\Infrastructure\ListExtensions.cs'>
       <Link>Isop\Infrastructure\ListExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Controller\TypeContainer.cs">
+    <Compile Include='..\Isop\Controller\TypeContainer.cs'>
       <Link>Isop\Controller\TypeContainer.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Lex\ArgumentLexer.cs">
+    <Compile Include='..\Isop\Lex\ArgumentLexer.cs'>
       <Link>Isop\Lex\ArgumentLexer.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Parse\ArgumentParser.cs">
+    <Compile Include='..\Isop\Parse\ArgumentParser.cs'>
       <Link>Isop\Parse\ArgumentParser.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Controller\ControllerRecognizer.cs">
+    <Compile Include='..\Isop\Build.cs'>
+      <Link>Isop\Build.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Controller\ControllerRecognizer.cs'>
       <Link>Isop\Controller\ControllerRecognizer.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Controller\MethodInfoFinder.cs">
+    <Compile Include='..\Isop\Controller\MethodInfoFinder.cs'>
       <Link>Isop\Controller\MethodInfoFinder.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Lex\TokenType.cs">
+    <Compile Include='..\Isop\Lex\TokenType.cs'>
       <Link>Isop\Lex\TokenType.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Lex\Token.cs">
+    <Compile Include='..\Isop\Lex\Token.cs'>
       <Link>Isop\Lex\Token.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Infrastructure\PeekEnumerable.cs">
+    <Compile Include='..\Isop\Infrastructure\PeekEnumerable.cs'>
       <Link>Isop\Infrastructure\PeekEnumerable.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Parse\MissingArgumentException.cs">
+    <Compile Include='..\Isop\Parse\MissingArgumentException.cs'>
       <Link>Isop\Parse\MissingArgumentException.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Parse\ArgumentParameter.cs">
+    <Compile Include='..\Isop\Parse\ArgumentParameter.cs'>
       <Link>Isop\Parse\ArgumentParameter.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Parse\Parameters\OrdinalParameter.cs">
+    <Compile Include='..\Isop\Parse\Parameters\OrdinalParameter.cs'>
       <Link>Isop\Parse\Parameters\OrdinalParameter.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Parse\Parameters\OptionParameter.cs">
+    <Compile Include='..\Isop\Parse\Parameters\OptionParameter.cs'>
       <Link>Isop\Parse\Parameters\OptionParameter.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Parse\Parameters\VisualStudioParameter.cs">
+    <Compile Include='..\Isop\Parse\Parameters\VisualStudioParameter.cs'>
       <Link>Isop\Parse\Parameters\VisualStudioParameter.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Parse\ArgumentWithOptions.cs">
+    <Compile Include='..\Isop\Parse\ArgumentWithOptions.cs'>
       <Link>Isop\Parse\ArgumentWithOptions.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Parse\RecognizedArgument.cs">
+    <Compile Include='..\Isop\Parse\RecognizedArgument.cs'>
       <Link>Isop\Parse\RecognizedArgument.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Parse\ParsedArguments.cs">
+    <Compile Include='..\Isop\Parse\ParsedArguments.cs'>
       <Link>Isop\Parse\ParsedArguments.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Parse\MergedParsedArguments.cs">
+    <Compile Include='..\Isop\Parse\MergedParsedArguments.cs'>
       <Link>Isop\Parse\MergedParsedArguments.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Parse\UnrecognizedArgument.cs">
+    <Compile Include='..\Isop\Parse\UnrecognizedArgument.cs'>
       <Link>Isop\Parse\UnrecognizedArgument.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Controller\TypeConversionFailedException.cs">
+    <Compile Include='..\Isop\Controller\TypeConversionFailedException.cs'>
       <Link>Isop\Controller\TypeConversionFailedException.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Controller\Transform.cs">
+    <Compile Include='..\Isop\Controller\Transform.cs'>
       <Link>Isop\Controller\Transform.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Controller\ParsedMethod.cs">
+    <Compile Include='..\Isop\Controller\ParsedMethod.cs'>
       <Link>Isop\Controller\ParsedMethod.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Controller\MethodInfoOrProperty.cs">
+    <Compile Include='..\Isop\Controller\MethodInfoOrProperty.cs'>
       <Link>Isop\Controller\MethodInfoOrProperty.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Help\HelpXmlDocumentation.cs">
+    <Compile Include='..\Isop\Help\HelpXmlDocumentation.cs'>
       <Link>Isop\Help\HelpXmlDocumentation.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Controller\HelpController.cs">
+    <Compile Include='..\Isop\Controller\HelpController.cs'>
       <Link>Isop\Controller\HelpController.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Help\HelpForArgumentWithOptions.cs">
+    <Compile Include='..\Isop\Help\HelpForArgumentWithOptions.cs'>
       <Link>Isop\Help\HelpForArgumentWithOptions.cs</Link>
     </Compile>
-    <Compile Include="..\Isop\Controller\HelpForControllers.cs">
+    <Compile Include='..\Isop\Controller\HelpForControllers.cs'>
       <Link>Isop\Controller\HelpForControllers.cs</Link>
     </Compile>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets'/>
+  <Import Project='$(SolutionDir)\.nuget\nuget.targets'/>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

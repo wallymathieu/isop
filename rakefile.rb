@@ -66,7 +66,10 @@ task :regen_cli do
   cli = VisualStudio::CsProj.new(File.open(File.join('Isop.Auto.Cli','Isop.Cli.csproj'), "r").read)
   cli.clear_links
   isop_files.each do |file|
-    cli.add(VisualStudio::FileReference.new("..\\Isop\\#{file.file}",file.type,"Isop\\#{file.file}"))
+    opts = file.to_opts
+    opts[:file] = "..\\Isop\\#{file.file}"
+    opts[:link] = "Isop\\#{file.file}"
+    cli.add(VisualStudio::FileReference.new(opts))
   end
   File.open(File.join('Isop.Auto.Cli','Isop.Cli.csproj'), "w") do |f|
     cli.write f
