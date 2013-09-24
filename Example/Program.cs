@@ -50,11 +50,6 @@ Did you mean any of these arguments?
                 
                 Console.WriteLine(parserBuilder.Help());
             }
-            catch (NoClassOrMethodFoundException ex)
-            {
-                Console.WriteLine("Missing argument(s) or wrong argument(s)");                
-                Console.WriteLine(parserBuilder.Help());
-            }
         }
     }
 

@@ -51,12 +51,6 @@ Did you mean any of these arguments?
                     if (parserBuilder.RecognizesHelp)
                         Console.WriteLine(parserBuilder.Help());
                 }
-                catch (NoClassOrMethodFoundException ex)
-                {
-                    Console.WriteLine("Missing argument(s) or wrong argument(s)");                
-                    if (parserBuilder.RecognizesHelp)
-                        Console.WriteLine(parserBuilder.Help());
-                }
 #if DEBUG
                 catch (Exception ex1)
                 {

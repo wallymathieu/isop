@@ -131,7 +131,7 @@ namespace Isop
         private readonly Transform _transform = new Transform();
         /// <summary>
         /// </summary>
-        public ControllerRecognizer(Type type, CultureInfo cultureInfo=null, Func<TypeConverterFunc> typeConverter = null, bool ignoreGlobalUnMatchedParameters = false, Func<bool> allowInferParameter=null)
+        public ControllerRecognizer(Type type, CultureInfo cultureInfo=null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false, bool allowInferParameter=false)
         {
             _typeConverter = typeConverter;
             Type = type;
@@ -183,7 +183,7 @@ namespace Isop
 
             var argumentRecognizers = GetRecognizers(methodInfo);
 
-            var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter());
+            var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter);
             var parsedArguments = parser.Parse(lexer, arg);
 
             return Parse(methodInfo, parsedArguments);
@@ -219,7 +219,7 @@ namespace Isop
         {
             try
             {
-                var typeConverter = _typeConverter() ?? DefaultConvertFrom;
+                var typeConverter = _typeConverter ?? DefaultConvertFrom;
                 return typeConverter(type, arg1.Value, _culture);
             }
             catch (Exception e)
@@ -233,8 +233,8 @@ namespace Isop
             }
         }
 
-        private readonly Func<TypeConverterFunc> _typeConverter;
-        private Func<bool> _allowInferParameter;
+        private readonly TypeConverterFunc _typeConverter;
+        private bool _allowInferParameter;
 
         private static object DefaultConvertFrom(Type type, string s, CultureInfo cultureInfo)
         {

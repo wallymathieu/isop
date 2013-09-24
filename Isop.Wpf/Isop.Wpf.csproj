@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version='1.0' encoding='UTF-8'?>
+<Project DefaultTargets='Build' ToolsVersion='4.0' xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Configuration Condition=' &apos;$(Configuration)&apos; == &apos;&apos; '>Debug</Configuration>
+    <Platform Condition=' &apos;$(Platform)&apos; == &apos;&apos; '>x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{47DA4A1C-3FB5-4FEE-99B3-CE102BCD349C}</ProjectGuid>
@@ -16,7 +16,7 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+  <PropertyGroup Condition=' &apos;$(Configuration)|$(Platform)&apos; == &apos;Debug|x86&apos; '>
     <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -26,7 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+  <PropertyGroup Condition=' &apos;$(Configuration)|$(Platform)&apos; == &apos;Release|x86&apos; '>
     <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -36,163 +36,47 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xaml">
+    <Reference Include='System'/>
+    <Reference Include='System.ComponentModel.DataAnnotations'/>
+    <Reference Include='System.Data'/>
+    <Reference Include='System.Xml'/>
+    <Reference Include='Microsoft.CSharp'/>
+    <Reference Include='System.Core'/>
+    <Reference Include='System.Xml.Linq'/>
+    <Reference Include='System.Data.DataSetExtensions'/>
+    <Reference Include='System.Xaml'>
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
+    <Reference Include='WindowsBase'/>
+    <Reference Include='PresentationCore'/>
+    <Reference Include='PresentationFramework'/>
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <ApplicationDefinition Include='App.xaml'>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="..\Isop.WpfControls\MethodView.xaml">
-      <Link>WpfControls\MethodView.xaml</Link>
+    <Page Include='MainWindow.xaml'>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="..\Isop.WpfControls\BoolToVisibilityConverter.cs">
-      <Link>WpfControls\BoolToVisibilityConverter.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop.WpfControls\MethodView.xaml.cs">
-      <Link>WpfControls\MethodView.xaml.cs</Link>
-      <DependentUpon>MethodView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\Isop.WpfControls\SingleScopeOnly.cs">
-      <Link>WpfControls\SingleScopeOnly.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop.WpfControls\ViewModels\Controller.cs">
-      <Link>WpfControls\ViewModels\Controller.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop.WpfControls\ViewModels\Method.cs">
-      <Link>WpfControls\ViewModels\Method.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop.WpfControls\ViewModels\MethodTreeModel.cs">
-      <Link>WpfControls\ViewModels\MethodTreeModel.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop.WpfControls\ViewModels\Param.cs">
-      <Link>WpfControls\ViewModels\Param.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop.WpfControls\ViewModels\ParamExtension.cs">
-      <Link>WpfControls\ViewModels\ParamExtension.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\ArgumentLexer.cs">
-      <Link>Isop\ArgumentLexer.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\ArgumentParameter.cs">
-      <Link>Isop\ArgumentParameter.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\ArgumentParser.cs">
-      <Link>Isop\ArgumentParser.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\ArgumentWithOptions.cs">
-      <Link>Isop\ArgumentWithOptions.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\Build.cs">
-      <Link>Isop\Build.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\ControllerRecognizer.cs">
-      <Link>Isop\ControllerRecognizer.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\HelpController.cs">
-      <Link>Isop\HelpController.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\HelpForArgumentWithOptions.cs">
-      <Link>Isop\HelpForArgumentWithOptions.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\HelpForControllers.cs">
-      <Link>Isop\HelpForControllers.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\HelpXmlDocumentation.cs">
-      <Link>Isop\HelpXmlDocumentation.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\ListExtensions.cs">
-      <Link>Isop\ListExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\MergedParsedArguments.cs">
-      <Link>Isop\MergedParsedArguments.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\MethodInfoFinder.cs">
-      <Link>Isop\MethodInfoFinder.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\MethodInfoOrProperty.cs">
-      <Link>Isop\MethodInfoOrProperty.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\MissingArgumentException.cs">
-      <Link>Isop\MissingArgumentException.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\NoClassOrMethodFoundException.cs">
-      <Link>Isop\NoClassOrMethodFoundException.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\OptionParameter.cs">
-      <Link>Isop\OptionParameter.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\OrdinalParameter.cs">
-      <Link>Isop\OrdinalParameter.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\ParsedArguments.cs">
-      <Link>Isop\ParsedArguments.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\ParsedMethod.cs">
-      <Link>Isop\ParsedMethod.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\PeekEnumerable.cs">
-      <Link>Isop\PeekEnumerable.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\RecognizedArgument.cs">
-      <Link>Isop\RecognizedArgument.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\Token.cs">
-      <Link>Isop\Token.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\TokenType.cs">
-      <Link>Isop\TokenType.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\Transform.cs">
-      <Link>Isop\Transform.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\TypeContainer.cs">
-      <Link>Isop\TypeContainer.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\TypeConversionFailedException.cs">
-      <Link>Isop\TypeConversionFailedException.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\UnrecognizedArgument.cs">
-      <Link>Isop\UnrecognizedArgument.cs</Link>
-    </Compile>
-    <Compile Include="..\Isop\VisualStudioParameter.cs">
-      <Link>Isop\VisualStudioParameter.cs</Link>
-    </Compile>
-    <Compile Include="App.xaml.cs">
+    <Compile Include='App.xaml.cs'>
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include='MainWindow.xaml.cs'>
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
+    <Compile Include='Properties\AssemblyInfo.cs'>
       <SubType>Code</SubType>
     </Compile>
-    <AppDesigner Include="Properties\" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <AppDesigner Include='Properties\'/>
+    
+  <Compile Include='..\Isop\Infrastructure\ListExtensions.cs'><Link>Isop\Infrastructure\ListExtensions.cs</Link></Compile><Compile Include='..\Isop\Controller\TypeContainer.cs'><Link>Isop\Controller\TypeContainer.cs</Link></Compile><Compile Include='..\Isop\Lex\ArgumentLexer.cs'><Link>Isop\Lex\ArgumentLexer.cs</Link></Compile><Compile Include='..\Isop\Parse\ArgumentParser.cs'><Link>Isop\Parse\ArgumentParser.cs</Link></Compile><Compile Include='..\Isop\Build.cs'><Link>Isop\Build.cs</Link></Compile><Compile Include='..\Isop\Controller\ControllerRecognizer.cs'><Link>Isop\Controller\ControllerRecognizer.cs</Link></Compile><Compile Include='..\Isop\Controller\MethodInfoFinder.cs'><Link>Isop\Controller\MethodInfoFinder.cs</Link></Compile><Compile Include='..\Isop\Lex\TokenType.cs'><Link>Isop\Lex\TokenType.cs</Link></Compile><Compile Include='..\Isop\Lex\Token.cs'><Link>Isop\Lex\Token.cs</Link></Compile><Compile Include='..\Isop\Infrastructure\PeekEnumerable.cs'><Link>Isop\Infrastructure\PeekEnumerable.cs</Link></Compile><Compile Include='..\Isop\Parse\MissingArgumentException.cs'><Link>Isop\Parse\MissingArgumentException.cs</Link></Compile><Compile Include='..\Isop\Parse\ArgumentParameter.cs'><Link>Isop\Parse\ArgumentParameter.cs</Link></Compile><Compile Include='..\Isop\Parse\Parameters\OrdinalParameter.cs'><Link>Isop\Parse\Parameters\OrdinalParameter.cs</Link></Compile><Compile Include='..\Isop\Parse\Parameters\OptionParameter.cs'><Link>Isop\Parse\Parameters\OptionParameter.cs</Link></Compile><Compile Include='..\Isop\Parse\Parameters\VisualStudioParameter.cs'><Link>Isop\Parse\Parameters\VisualStudioParameter.cs</Link></Compile><Compile Include='..\Isop\Parse\ArgumentWithOptions.cs'><Link>Isop\Parse\ArgumentWithOptions.cs</Link></Compile><Compile Include='..\Isop\Parse\RecognizedArgument.cs'><Link>Isop\Parse\RecognizedArgument.cs</Link></Compile><Compile Include='..\Isop\Parse\ParsedArguments.cs'><Link>Isop\Parse\ParsedArguments.cs</Link></Compile><Compile Include='..\Isop\Parse\MergedParsedArguments.cs'><Link>Isop\Parse\MergedParsedArguments.cs</Link></Compile><Compile Include='..\Isop\Parse\UnrecognizedArgument.cs'><Link>Isop\Parse\UnrecognizedArgument.cs</Link></Compile><Compile Include='..\Isop\Controller\TypeConversionFailedException.cs'><Link>Isop\Controller\TypeConversionFailedException.cs</Link></Compile><Compile Include='..\Isop\Controller\Transform.cs'><Link>Isop\Controller\Transform.cs</Link></Compile><Compile Include='..\Isop\Controller\ParsedMethod.cs'><Link>Isop\Controller\ParsedMethod.cs</Link></Compile><Compile Include='..\Isop\Controller\MethodInfoOrProperty.cs'><Link>Isop\Controller\MethodInfoOrProperty.cs</Link></Compile><Compile Include='..\Isop\Help\HelpXmlDocumentation.cs'><Link>Isop\Help\HelpXmlDocumentation.cs</Link></Compile><Compile Include='..\Isop\Controller\HelpController.cs'><Link>Isop\Controller\HelpController.cs</Link></Compile><Compile Include='..\Isop\Help\HelpForArgumentWithOptions.cs'><Link>Isop\Help\HelpForArgumentWithOptions.cs</Link></Compile><Compile Include='..\Isop\Controller\HelpForControllers.cs'><Link>Isop\Controller\HelpForControllers.cs</Link></Compile><Compile Include='..\Isop.WpfControls\BoolToVisibilityConverter.cs'><Link>WpfControls\BoolToVisibilityConverter.cs</Link></Compile><Compile Include='..\Isop.WpfControls\SingleScopeOnly.cs'><Link>WpfControls\SingleScopeOnly.cs</Link></Compile><Compile Include='..\Isop.WpfControls\MethodView.xaml.cs'><Link>WpfControls\MethodView.xaml.cs</Link><DependentUpon><DependentUpon>MethodView.xaml</DependentUpon></DependentUpon></Compile><Compile Include='..\Isop.WpfControls\ViewModels\Controller.cs'><Link>WpfControls\ViewModels\Controller.cs</Link></Compile><Compile Include='..\Isop.WpfControls\ViewModels\Method.cs'><Link>WpfControls\ViewModels\Method.cs</Link></Compile><Compile Include='..\Isop.WpfControls\ViewModels\MethodTreeModel.cs'><Link>WpfControls\ViewModels\MethodTreeModel.cs</Link></Compile><Compile Include='..\Isop.WpfControls\ViewModels\Param.cs'><Link>WpfControls\ViewModels\Param.cs</Link></Compile><Compile Include='..\Isop.WpfControls\ViewModels\ParamExtension.cs'><Link>WpfControls\ViewModels\ParamExtension.cs</Link></Compile><Page Include='..\Isop.WpfControls\MethodView.xaml'><Link>WpfControls\MethodView.xaml</Link><Generator><Generator>MSBuild:Compile</Generator></Generator><SubType><SubType>Designer</SubType></SubType></Page></ItemGroup>
+  <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets'/>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
