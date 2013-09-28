@@ -8,7 +8,7 @@ namespace Isop.Controller
     public class RewriteLexedTokensToSupportHelpAndIndex
     {
         // Arg(ControllerName),Param(..),.. -> Arg(ControllerName),Arg('Index'),... 
-        public IList<Token> Rewrite(IList<Token> tokens)
+        public static IList<Token> Rewrite(IList<Token> tokens)
         {
             //"--command"
             if (tokens.Count() >= 2 

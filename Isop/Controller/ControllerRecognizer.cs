@@ -11,21 +11,18 @@ namespace Isop.Controller
 {
     public class ControllerRecognizer
     {
-        private static MethodInfo FindMethod(IEnumerable<MethodInfo> methods, String methodName, IEnumerable<Token> lexed)
+        private readonly bool _allowInferParameter;
+        private readonly TurnParametersToArgumentWithOptions _turnParametersToArgumentWithOptions;
+        /// <summary>
+        /// </summary>
+        public ControllerRecognizer(Type type, CultureInfo cultureInfo = null, Func<Type, string, CultureInfo, object> typeConverter = null, bool ignoreGlobalUnMatchedParameters = false, bool allowInferParameter = false)
         {
-            var potential = methods
-                .Where(method => method.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase));
-            var potentialMethod = potential
-                .Where(method => method.GetParameters().Length <= lexed.Count(t => t.TokenType == TokenType.Parameter))
-                .OrderByDescending(method => method.GetParameters().Length)
-                .FirstOrDefault();
-            if (potentialMethod != null)
-            {
-                return potentialMethod;
-            }
-            return potential.FirstOrDefault();
+            Type = type;
+            _culture = cultureInfo ?? CultureInfo.CurrentCulture;
+            IgnoreGlobalUnMatchedParameters = ignoreGlobalUnMatchedParameters;
+            _allowInferParameter = allowInferParameter;
+            _turnParametersToArgumentWithOptions = new TurnParametersToArgumentWithOptions(_culture, typeConverter);
         }
-
 
         public IEnumerable<ArgumentWithOptions> GetMethodParameterRecognizers(MethodInfo methodInfo)
         {
@@ -40,21 +37,10 @@ namespace Isop.Controller
         private readonly CultureInfo _culture;
         public Type Type { get; private set; }
         public bool IgnoreGlobalUnMatchedParameters { get; private set; }
-        private readonly RewriteLexedTokensToSupportHelpAndIndex _rewriteLexedTokensToSupportHelpAndIndex = new RewriteLexedTokensToSupportHelpAndIndex();
-        /// <summary>
-        /// </summary>
-        public ControllerRecognizer(Type type, CultureInfo cultureInfo=null, Func<Type, string, CultureInfo, object> typeConverter = null, bool ignoreGlobalUnMatchedParameters = false, bool allowInferParameter=false)
-        {
-            Type = type;
-            _culture = cultureInfo ?? CultureInfo.CurrentCulture;
-            IgnoreGlobalUnMatchedParameters = ignoreGlobalUnMatchedParameters;
-            _allowInferParameter = allowInferParameter;
-            _turnParametersToArgumentWithOptions = new TurnParametersToArgumentWithOptions(_culture, typeConverter);
-        }
-
+        
         public bool Recognize(IEnumerable<string> arg)
         {
-            var lexed = _rewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
+            var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
             return null != FindMethodInfo(lexed);
         }
 
@@ -64,7 +50,7 @@ namespace Isop.Controller
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1).Value;
-                var methodInfo = FindMethod(GetMethods(), methodName, arg);
+                var methodInfo = FindMethodAmongLexedTokens.FindMethod(GetMethods(), methodName, arg);
                 return methodInfo;
             }
             return null;
@@ -88,7 +74,7 @@ namespace Isop.Controller
         /// <returns></returns>
         public ParsedMethod Parse(IEnumerable<string> arg)
         {
-            var lexed = _rewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
+            var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
 
             var methodInfo = FindMethodInfo(lexed);
 
@@ -128,34 +114,14 @@ namespace Isop.Controller
                        };
         }
 
-        private bool _allowInferParameter;
-        private TurnParametersToArgumentWithOptions _turnParametersToArgumentWithOptions;
-
         private MethodInfo GetMethod(string action)
         {
             return GetMethods().SingleOrDefault(m => m.WithName(action));
         }
 
-        public class MethodHelp
+        public MethodAndArguments GetMethodAndArguments(string action)
         {
-            public MethodHelp(MethodInfo methodinfo, ControllerRecognizer cr)
-            {
-                this.Method = methodinfo;
-                this._cr = cr;
-            }
-            private readonly ControllerRecognizer _cr;
-            public string Name { get { return Method.Name; } }
-
-            public MethodInfo Method { get; private set; }
-            public IEnumerable<ArgumentWithOptions> MethodParameters()
-            {
-                return _cr.GetRecognizers(Method);
-            }
-        }
-
-        public MethodHelp GetMethodHelp(string action)
-        {
-            return new MethodHelp(GetMethod(action),this);
+            return new MethodAndArguments(GetMethod(action),this);
         }
 
         internal IEnumerable<ArgumentWithOptions> GetRecognizers(MethodInfo method)

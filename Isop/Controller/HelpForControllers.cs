@@ -75,18 +75,18 @@ namespace Isop.Controller
 
         private string HelpForAction(ControllerRecognizer cmr, string action)
         {
-            var methodhelp = cmr.GetMethodHelp(action);
-            var parameters = methodhelp.MethodParameters().Select(r => DescriptionAndHelp(cmr.Type, methodhelp, r));
-            if (parameters.Any())
+            var methodAndArguments = cmr.GetMethodAndArguments(action);
+            var arguments = methodAndArguments.GetMethodArguments().Select(r => DescriptionAndHelp(r));
+            if (arguments.Any())
                 return string.Format(@"{0} {1}
 And accept the following parameters:
-{2}", methodhelp.Name, Description(cmr.Type, methodhelp.Method), String.Join(", ",
-    parameters));
+{2}", methodAndArguments.Name, Description(cmr.Type, methodAndArguments.Method), String.Join(", ",
+    arguments));
             else
-                return string.Format(@"{0} {1}", methodhelp.Name, Description(cmr.Type, methodhelp.Method));
+                return string.Format(@"{0} {1}", methodAndArguments.Name, Description(cmr.Type, methodAndArguments.Method));
         }
 
-        private string DescriptionAndHelp(Type t, ControllerRecognizer.MethodHelp m, ArgumentWithOptions r)
+        private string DescriptionAndHelp(ArgumentWithOptions r)
         {
             return r.Help();
         }

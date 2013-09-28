@@ -74,6 +74,12 @@
       <SubType>Code</SubType>
     </Compile>
     <AppDesigner Include='Properties\'/>
+    <Compile Include='..\Isop\Controller\FindMethodAmongLexedTokens.cs'>
+      <Link>Isop\Controller\FindMethodAmongLexedTokens.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Controller\MethodAndArguments.cs'>
+      <Link>Isop\Controller\MethodAndArguments.cs</Link>
+    </Compile>
     <Compile Include='..\Isop\Controller\TurnParametersToArgumentWithOptions.cs'>
       <Link>Isop\Controller\TurnParametersToArgumentWithOptions.cs</Link>
     </Compile>
