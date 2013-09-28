@@ -54,8 +54,8 @@ namespace Isop.Controller
 
         public bool Recognize(IEnumerable<string> arg)
         {
-            var lexer = _rewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
-            return null != FindMethodInfo(lexer);
+            var lexed = _rewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
+            return null != FindMethodInfo(lexed);
         }
 
         private MethodInfo FindMethodInfo(IEnumerable<Token> arg)

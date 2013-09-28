@@ -7,7 +7,6 @@ namespace Isop.Controller
 {
     public class RewriteLexedTokensToSupportHelpAndIndex
     {
-        // Lexer -> 
         // Arg(ControllerName),Param(..),.. -> Arg(ControllerName),Arg('Index'),... 
         public IList<Token> Rewrite(IList<Token> tokens)
         {
