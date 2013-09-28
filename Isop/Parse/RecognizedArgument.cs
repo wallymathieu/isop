@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Isop.Parse
 {
     public class RecognizedArgument
@@ -16,12 +18,12 @@ namespace Isop.Parse
 
         public bool InferredOrdinal { get; set; }
 
-        public RecognizedArgument(ArgumentWithOptions argumentWithOptions, int index, string parameter, string value = null)
+        public RecognizedArgument(ArgumentWithOptions argumentWithOptions, int index, string argument, string value = null)
         {
             Index = index;
             Value = value;
             WithOptions = argumentWithOptions;
-            Argument = parameter;
+            Argument = argument;
         }
         public override int GetHashCode()
         {
@@ -41,6 +43,17 @@ namespace Isop.Parse
                     && string.Equals(Value, rec.Value);
             }
             return false;
+        }
+
+        public bool Matches(ParameterInfo paramInfo)
+        {
+            return Argument.ToUpperInvariant().Equals(paramInfo.Name.ToUpperInvariant());
+        }
+
+        public bool Matches(PropertyInfo prop)
+        {
+            return Argument.ToUpperInvariant()
+                .Equals(prop.Name.ToUpperInvariant());
         }
     }
 }

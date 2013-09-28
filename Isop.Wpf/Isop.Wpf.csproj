@@ -74,6 +74,9 @@
       <SubType>Code</SubType>
     </Compile>
     <AppDesigner Include='Properties\'/>
+    <Compile Include='..\Isop\Controller\TurnParametersToArgumentWithOptions.cs'>
+      <Link>Isop\Controller\TurnParametersToArgumentWithOptions.cs</Link>
+    </Compile>
     <Compile Include='..\Isop\Infrastructure\ListExtensions.cs'>
       <Link>Isop\Infrastructure\ListExtensions.cs</Link>
     </Compile>

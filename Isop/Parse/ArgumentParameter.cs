@@ -5,12 +5,12 @@ using Isop.Parse.Parameters;
 
 namespace Isop.Parse
 {
-        /// <summary>
+    /// <summary>
     /// Represents the parameter. For instance "file" of the commandline argument --file. 
     /// </summary>
     public class ArgumentParameter
     {
-        public ArgumentParameter (string prototype, string[] names, string delimiter=null,int? ordinal=null)
+        public ArgumentParameter(string prototype, string[] names, string delimiter = null, int? ordinal = null)
         {
             Prototype = prototype;
             Aliases = names;
@@ -55,18 +55,24 @@ namespace Isop.Parse
             return Prototype;
         }
 
-        public bool HasAlias (string value)
+        public bool HasAlias(string value)
         {
-             return Aliases.Any(alias => value.Equals(alias, StringComparison.OrdinalIgnoreCase));
+            return Aliases.Any(alias => value.Equals(alias, StringComparison.OrdinalIgnoreCase));
         }
-        
+
         public bool Accept(int index, string val)
         {
-            if (!Ordinal.HasValue) 
-              return HasAlias(val);
-            else 
-              return Ordinal.Value.Equals(index) && HasAlias(val);
-            
+            if (!Ordinal.HasValue)
+                return HasAlias(val);
+            else
+                return Ordinal.Value.Equals(index) && HasAlias(val);
+
+        }
+
+        public string LongAlias()
+        {
+            var maxLength = Aliases.Max(a => a.Length);
+            return Aliases.SingleOrDefault(a => a.Length == maxLength);
         }
     }
 }

@@ -180,6 +180,28 @@ namespace Isop.Tests
         }
 
         [Test]
+        public void It_can_parse_class_and_method_and_execute_with_ordinal_syntax()
+        {
+            var count = 0;
+            Func<Type, object> factory = (Type t) =>
+            {
+                Assert.That(t, Is.EqualTo(typeof(MyController)));
+                return
+                    (object)
+                    new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
+            };
+            var arguments = new Build()
+                                               .SetCulture(CultureInfo.InvariantCulture)
+                                               .Recognize(typeof(MyController))
+                                               .SetFactory(factory)
+                                               .Parse(new[] { "My", "Action",  "value1","value2", "3", "3.4" });
+
+            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            arguments.Invoke(new StringWriter());
+            Assert.That(count, Is.EqualTo(1));
+        }
+
+        [Test]
         public void It_can_parse_class_and_method_and_knows_whats_required()
         {
             Func<Type, object> factory = (Type t) =>
@@ -196,7 +218,7 @@ namespace Isop.Tests
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, True], [param3, True], [param4, True]",Boolean.Parse);
 
             var recognizers = build.ControllerRecognizers.Single().GetRecognizers("Action");
-            Assert.That(recognizers.Skip(1).Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
+            Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
 
@@ -226,7 +248,7 @@ namespace Isop.Tests
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, False], [param3, False], [param4, False]",Boolean.Parse);
 
             var recognizers = build.ControllerRecognizers.Single().GetRecognizers("Action");
-            Assert.That(recognizers.Skip(1).Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
+            Assert.That (recognizers.Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
 
@@ -244,20 +266,45 @@ namespace Isop.Tests
                                                };
             };
             var arguments = new Build()
-                            .SetCulture(CultureInfo.InvariantCulture)
-                            .Recognize(typeof(MyOptionalController))
-                            .SetFactory(factory)
-                            .Parse(new[] { "MyOptional", "Action", "--param1", "value1"});
+                    .SetCulture(CultureInfo.InvariantCulture)
+                    .Recognize(typeof(MyOptionalController))
+                    .SetFactory(factory)
+                    .Parse(new[] { "MyOptional", "Action", "--param1", "value1"});
             arguments.Invoke(new StringWriter());
             Assert.That(parameters, Is.EquivalentTo(new object[]{"value1",null,null,1}));
         }
 
         [Test]
+        public void It_can_parse_class_and_method_and_executes_default_with_the_default_values_when_using_ordinal_syntax()
+        {
+            var parameters = new object[0];
+            Func<Type, object> factory = (Type t) =>
+            {
+                Assert.That(t, Is.EqualTo(typeof(MyOptionalController)));
+                return
+                    (object)
+                    new MyOptionalController()
+                    {
+                        OnAction = (p1, p2, p3, p4) =>
+                        { parameters = new object[] { p1, p2, p3, p4 }; return ""; }
+                    };
+            };
+            var arguments = new Build()
+                    .SetCulture(CultureInfo.InvariantCulture)
+                    .Recognize(typeof(MyOptionalController))
+                    .SetFactory(factory)
+                    .Parse(new[] { "MyOptional", "Action", "value1" });
+            arguments.Invoke(new StringWriter());
+            Assert.That(parameters, Is.EquivalentTo(new object[] { "value1", null, null, 1 }));
+        }
+
+
+        [Test]
         public void It_can_parse_class_and_method_and_fail()
         {
             var builder = new Build()
-                                               .SetCulture(CultureInfo.InvariantCulture)
-                                               .Recognize(typeof(MyController));
+                .SetCulture(CultureInfo.InvariantCulture)
+                .Recognize(typeof(MyController));
 
             Assert.Throws<MissingArgumentException>(() => builder.Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" }));
         }
@@ -281,8 +328,8 @@ namespace Isop.Tests
         public void It_can_parse_class_and_method_and_fail_because_no_arguments_given()
         {
             var builder = new Build()
-                                               .SetCulture(CultureInfo.InvariantCulture)
-                                               .Recognize(typeof(MyController));
+                .SetCulture(CultureInfo.InvariantCulture)
+                .Recognize(typeof(MyController));
 
             Assert.Throws<MissingArgumentException>(() => builder.Parse(new[] { "My", "Action" }));
         }

@@ -128,7 +128,7 @@ namespace Isop.Parse
                 recognized.Add(new RecognizedArgument(
                                    argumentWithOptions,
                                    current.Index,
-                                   current.Value,
+                                   argumentWithOptions.Argument.LongAlias(),
                                    current.Value) {InferredOrdinal = true});
             }
         }

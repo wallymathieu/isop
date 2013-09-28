@@ -42,6 +42,9 @@
   <ItemGroup>
     <Compile Include='Program.cs'/>
     <Compile Include='Properties\AssemblyInfo.cs'/>
+    <Compile Include='..\Isop\Controller\TurnParametersToArgumentWithOptions.cs'>
+      <Link>Isop\Controller\TurnParametersToArgumentWithOptions.cs</Link>
+    </Compile>
     <Compile Include='..\Isop\Infrastructure\ListExtensions.cs'>
       <Link>Isop\Infrastructure\ListExtensions.cs</Link>
     </Compile>

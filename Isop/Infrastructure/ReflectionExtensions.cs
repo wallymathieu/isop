@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -79,6 +80,31 @@ namespace Isop.Infrastructure
                 .Where(m => !m.Name.StartsWith("get_", StringComparison.OrdinalIgnoreCase)
                             && !m.Name.StartsWith("set_", StringComparison.OrdinalIgnoreCase))
                 ;
+        }
+
+        public static bool IsClass(this Type t)
+        {
+            return t.IsClass && t != typeof(String);
+        }
+
+        public static bool IsFile(this Type parameterType)
+        {
+            return parameterType == typeof(FileStream);
+        }
+
+        public static bool LooksRequired(this ParameterInfo parameterInfo)
+        {
+            return !parameterInfo.IsOptional;
+        }
+
+        public static IEnumerable<PropertyInfo> GetPublicInstanceProperties(this ParameterInfo parameterInfo)
+        {
+            return parameterInfo.ParameterType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        public static bool WithName(this MethodInfo m, string action)
+        {
+            return m.Name.Equals(action, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

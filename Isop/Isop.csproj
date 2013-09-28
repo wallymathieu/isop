@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Controller\TurnParametersToArgumentWithOptions.cs" />
     <Compile Include="Infrastructure\ListExtensions.cs" />
     <Compile Include="Controller\TypeContainer.cs" />
     <Compile Include="Infrastructure\ReflectionExtensions.cs" />

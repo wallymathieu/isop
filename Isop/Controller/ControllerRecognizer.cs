@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.IO;
 using Isop.Infrastructure;
 using Isop.Lex;
 using Isop.Parse;
@@ -27,105 +25,16 @@ namespace Isop.Controller
             }
             return potential.FirstOrDefault();
         }
-        private static bool IsClass(Type t)
-        {
-            return t.IsClass && t != typeof(String);
-        }
 
-        private IEnumerable<Object> GetParametersForMethod(MethodInfo method,
-                      ParsedArguments parsedArguments)
-        {//NOTE: Obviously to complicated. Need to refactor.
-            var parameterInfos = method.GetParameters();
-            var parameters = new List<Object>();
-
-            foreach (var paramInfo in parameterInfos)
-            {
-                if (IsClass(paramInfo.ParameterType) && !IsFile(paramInfo.ParameterType))
-                {
-                    var obj = Activator.CreateInstance(paramInfo.ParameterType);
-                    foreach (
-                        PropertyInfo prop in
-                            paramInfo.ParameterType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
-                    {
-                        var recognizedArgument = parsedArguments.RecognizedArguments
-                            .First(a => a.Argument.ToUpperInvariant()
-                                            .Equals(prop.Name.ToUpperInvariant()));
-
-                        prop.SetValue(obj, ConvertFrom(recognizedArgument, prop.PropertyType), null);
-                    }
-                    parameters.Add(obj);
-                }
-                else
-                {
-                    var recognizedArgument = parsedArguments.RecognizedArguments.FirstOrDefault(
-                        a => a.Argument.ToUpperInvariant().Equals(paramInfo.Name.ToUpperInvariant()));
-                    if (null == recognizedArgument )
-                    {
-                        parameters.Add(paramInfo.DefaultValue);
-                    }
-                    else
-                    {
-                        parameters.Add(ConvertFrom(recognizedArgument, paramInfo.ParameterType));
-                    }
-                }
-            }
-            return parameters;
-        }
 
         public IEnumerable<ArgumentWithOptions> GetMethodParameterRecognizers(MethodInfo methodInfo)
         {
-            return GetRecognizers(methodInfo).Skip(1);
+            return _turnParametersToArgumentWithOptions.GetRecognizers(methodInfo);
         }
 
         public IEnumerable<ArgumentWithOptions> GetRecognizers(string methodname)
         {//For tests mostly
-            return GetRecognizers(Type.GetMethod(methodname));
-        }
-
-        private IEnumerable<ArgumentWithOptions> GetRecognizers(MethodBase method)
-        {//NOTE: Obviously to complicated. Need to refactor.
-            var parameterInfos = method.GetParameters();
-            var recognizers = new List<ArgumentWithOptions>();
-            foreach (var parameterInfo in parameterInfos)
-            {
-                if (IsClass(parameterInfo.ParameterType) && !IsFile(parameterInfo.ParameterType))
-                {
-                    foreach (
-                        var prop in
-                            parameterInfo.ParameterType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
-                    {
-                        var arg = new ArgumentWithOptions(ArgumentParameter.Parse(prop.Name, _culture),
-                                                          required: LooksRequired(parameterInfo, prop),
-                                                          type: prop.PropertyType);
-                        recognizers.Add(arg);
-                    }
-                }
-                else
-                {
-                    var arg = new ArgumentWithOptions(ArgumentParameter.Parse(parameterInfo.Name, _culture),
-                                                      required: LooksRequired(parameterInfo),
-                                                      type: parameterInfo.ParameterType);
-                    recognizers.Add(arg);
-                }
-            }
-            recognizers.Insert(0, new ArgumentWithOptions(ArgumentParameter.Parse("#1" + method.Name, _culture), required: false, type: typeof(string)));
-            return recognizers;
-        }
-
-        private bool LooksRequired(ParameterInfo parameterInfo)
-        {
-            return !parameterInfo.IsOptional;
-        }
-
-        private bool LooksRequired(ParameterInfo parameterInfo, PropertyInfo parameterProperty)
-        {
-            
-            return LooksRequired(parameterInfo) && parameterProperty.Required();
-        }
-
-        private static bool IsFile(Type parameterType)
-        {
-            return parameterType == typeof(FileStream);
+            return _turnParametersToArgumentWithOptions.GetRecognizers(Type.GetMethod(methodname));
         }
 
         private readonly CultureInfo _culture;
@@ -136,16 +45,15 @@ namespace Isop.Controller
         /// </summary>
         public ControllerRecognizer(Type type, CultureInfo cultureInfo=null, Func<Type, string, CultureInfo, object> typeConverter = null, bool ignoreGlobalUnMatchedParameters = false, bool allowInferParameter=false)
         {
-            _typeConverter = typeConverter;
             Type = type;
             _culture = cultureInfo ?? CultureInfo.CurrentCulture;
             IgnoreGlobalUnMatchedParameters = ignoreGlobalUnMatchedParameters;
             _allowInferParameter = allowInferParameter;
+            _turnParametersToArgumentWithOptions = new TurnParametersToArgumentWithOptions(_culture, typeConverter);
         }
 
         public bool Recognize(IEnumerable<string> arg)
         {
-            //TODO: Inefficient
             var lexer = _transform.Rewrite(new ArgumentLexer(arg));
             return null != FindMethodInfo(lexer);
         }
@@ -184,7 +92,12 @@ namespace Isop.Controller
 
             var methodInfo = FindMethodInfo(lexer);
 
-            var argumentRecognizers = GetRecognizers(methodInfo);
+            var argumentRecognizers = _turnParametersToArgumentWithOptions.GetRecognizers(methodInfo)
+                .ToList();
+            argumentRecognizers.InsertRange(0, new[] { 
+                new ArgumentWithOptions(ArgumentParameter.Parse("#0" + ClassName(), _culture), required: true, type: typeof(string)),
+                new ArgumentWithOptions(ArgumentParameter.Parse("#1" + methodInfo.Name, _culture), required: false, type: typeof(string))
+            });
 
             var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter);
             var parsedArguments = parser.Parse(lexer, arg);
@@ -204,11 +117,8 @@ namespace Isop.Controller
                           };
             }
 
-            var recognizedActionParameters = GetParametersForMethod(methodInfo,
+            var recognizedActionParameters = _turnParametersToArgumentWithOptions.GetParametersForMethod(methodInfo,
                             parsedArguments);
-
-            parsedArguments.UnRecognizedArguments = parsedArguments.UnRecognizedArguments
-                .Where(unrecognized => unrecognized.Index >= 1); //NOTE: should be different!
 
             return new ParsedMethod(parsedArguments)
                        {
@@ -218,39 +128,12 @@ namespace Isop.Controller
                        };
         }
 
-        private object ConvertFrom(RecognizedArgument arg1, Type type)
-        {
-            try
-            {
-                var typeConverter = _typeConverter ?? DefaultConvertFrom;
-                return typeConverter(type, arg1.Value, _culture);
-            }
-            catch (Exception e)
-            {
-                throw new TypeConversionFailedException("Could not convert argument", e)
-                {
-                    Argument = arg1.WithOptions.Argument.ToString(),
-                    Value = arg1.Value,
-                    TargetType = type
-                };
-            }
-        }
-
-        private readonly Func<Type, string, CultureInfo, object> _typeConverter;
         private bool _allowInferParameter;
-
-        private static object DefaultConvertFrom(Type type, string s, CultureInfo cultureInfo)
-        {
-            if (type == typeof(FileStream))
-            {
-                return new FileStream(s, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            }
-            return TypeDescriptor.GetConverter(type).ConvertFrom(null, cultureInfo, s);
-        }
+        private TurnParametersToArgumentWithOptions _turnParametersToArgumentWithOptions;
 
         private MethodInfo GetMethod(string action)
         {
-            return GetMethods().SingleOrDefault(m => m.Name.Equals(action, StringComparison.OrdinalIgnoreCase));
+            return GetMethods().SingleOrDefault(m => m.WithName(action));
         }
 
         public class MethodHelp
@@ -258,15 +141,15 @@ namespace Isop.Controller
             public MethodHelp(MethodInfo methodinfo, ControllerRecognizer cr)
             {
                 this.Method = methodinfo;
-                this.cr = cr;
+                this._cr = cr;
             }
-            private ControllerRecognizer cr;
+            private readonly ControllerRecognizer _cr;
             public string Name { get { return Method.Name; } }
 
             public MethodInfo Method { get; private set; }
             public IEnumerable<ArgumentWithOptions> MethodParameters()
             {
-                return cr.GetRecognizers(Method).Skip(1);
+                return _cr.GetRecognizers(Method).Skip(1);
             }
         }
 
@@ -275,6 +158,9 @@ namespace Isop.Controller
             return new MethodHelp(GetMethod(action),this);
         }
 
+        internal IEnumerable<ArgumentWithOptions> GetRecognizers(MethodInfo method)
+        {
+            return _turnParametersToArgumentWithOptions.GetRecognizers(method);
+        }
     }
-
 }
