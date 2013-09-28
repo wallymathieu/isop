@@ -63,6 +63,9 @@
     <Compile Include='..\Isop\Infrastructure\StringExtensions.cs'>
       <Link>Isop\Infrastructure\StringExtensions.cs</Link>
     </Compile>
+    <Compile Include='..\Isop\IsopAutoConfiguration.cs'>
+      <Link>Isop\IsopAutoConfiguration.cs</Link>
+    </Compile>
     <Compile Include='..\Isop\Lex\ArgumentLexer.cs'>
       <Link>Isop\Lex\ArgumentLexer.cs</Link>
     </Compile>

@@ -29,5 +29,13 @@ namespace Isop.Infrastructure
             return self.EndsWith(other, StringComparison.OrdinalIgnoreCase);
         }
 
+        public static string RemoveSetFromBeginningOfString(this string arg)
+        {
+            if (arg.StartsWithIC("set_"))
+                return arg.Substring(4);
+            if (arg.StartsWithIC("set"))
+                return arg.Substring(3);
+            return arg;
+        }
     }
 }

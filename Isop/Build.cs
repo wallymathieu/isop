@@ -232,26 +232,26 @@ namespace Isop
                 var action = (Action<String>)Delegate.CreateDelegate(typeof(Action<String>), 
                     instance, methodInfo.MethodInfo);
                 var description = _helpXmlDocumentation.GetDescriptionForMethod(methodInfo.MethodInfo);
-                this.Parameter(RemoveSetFromBeginningOfString(methodInfo.Name),
+                this.Parameter(methodInfo.Name.RemoveSetFromBeginningOfString(),
                     action:action,
                     description:description,
                     required: methodInfo.Required);//humz? required?
             }
-            var _recongizeHelp = methods.MatchGet(name:"RecognizeHelp",
+            var recongizeHelp = methods.MatchGet(name:"RecognizeHelp",
                                            returnType: typeof(bool),
                                            parameters: new Type[0]);
                 
-            if (null!=_recongizeHelp && (bool)_recongizeHelp.Invoke(instance,new object[0]))
+            if (null!=recongizeHelp && (bool)recongizeHelp.Invoke(instance,new object[0]))
             {
                 RecognizeHelp() ;
             }
    
-            var _typeconv = methods.MatchGet(name:"TypeConverter",
+            var typeconv = methods.MatchGet(name:"TypeConverter",
                                       returnType: typeof(TypeConverterFunc),
                                       parameters: new Type[0]);
-            if (null!=_typeconv)
+            if (null!=typeconv)
             {
-                SetTypeConverter((TypeConverterFunc)_typeconv.Invoke(instance,new object[0]));
+                SetTypeConverter((TypeConverterFunc)typeconv.Invoke(instance,new object[0]));
             }
             
             if (instance is IDisposable) 
@@ -259,14 +259,7 @@ namespace Isop
             
             return this;            
         }
-        private string RemoveSetFromBeginningOfString(string arg)
-        {
-            if (arg.StartsWithIC("set_"))
-                return arg.Substring(4);
-            if (arg.StartsWithIC("set"))
-                return arg.Substring(3);
-            return arg;
-        }
+
         public Build Configuration(Type type)
         {
             return Configuration(type,Activator.CreateInstance(type));
@@ -277,9 +270,9 @@ namespace Isop
             var files = Directory.GetFiles(path)
                 .Where(f=>{
                     var ext = Path.GetExtension(f);
-                    return ext.Equals(".dll") || ext.Equals(".exe");
+                    return ext.EqualsIC(".dll") || ext.EqualsIC(".exe");
                 })
-                .Where(f=>!Path.GetFileNameWithoutExtension(f).StartsWith("Isop"));
+                .Where(f=>!Path.GetFileNameWithoutExtension(f).StartsWithIC("Isop"));
             foreach (var file in files) 
             {
                 var assembly= Assembly.LoadFile(file);
@@ -302,28 +295,6 @@ namespace Isop
         {
             if (_helpController != null) return _helpController;
             return null;
-        }
-    }
-    public class IsopAutoConfiguration
-    {
-        private Assembly _assembly;
-        public IsopAutoConfiguration (Assembly assembly)
-        {
-          _assembly = assembly;
-        }
-        public IEnumerable<Type> Recognizes()
-        {
-            return _assembly.GetTypes().Where(t=>
-                t.IsPublic
-                && t.Name.EndsWithIC("controller") 
-                && t.GetConstructors().Any(ctor=>ctor.GetParameters().Length==0)
-                );
-        }
-        public void AddToConfiguration(Build build)
-        {
-            foreach (var item in Recognizes()) {
-                build.Recognize(item);
-            }
         }
     }
 }
