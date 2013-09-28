@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using Isop;
 using Isop.Controller;
 using Isop.Parse;
 
@@ -52,21 +50,6 @@ Did you mean any of these arguments?
                 
                 Console.WriteLine(parserBuilder.Help());
             }
-        }
-    }
-
-    public class MyController
-    {
-        public string Action(string value)
-        {
-            return "invoking action on mycontroller with value : " + value;
-        }
-    }
-    public class CustomerController
-    {
-        public string Add(string name)
-        {
-            return "invoking action Add on customercontroller with name : " + name;
         }
     }
 }

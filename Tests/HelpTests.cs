@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Isop.Controller;
 using Isop.Help;
 using Isop.Infrastructure;
 using NUnit.Framework;

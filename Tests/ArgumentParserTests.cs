@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Isop;
 using Isop.Controller;
 using Isop.Parse;
 using Isop.Parse.Parameters;
@@ -308,10 +307,6 @@ namespace Isop.Tests
 
             Assert.Throws<MissingArgumentException>(() => builder.Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" }));
         }
-        class SingleIntAction
-        {
-            public void Action(int param) { }
-        }
 
         [Test]
         public void It_can_parse_class_and_method_and_fail_because_of_type_conversion()
@@ -382,16 +377,6 @@ namespace Isop.Tests
             Assert.That(count, Is.EqualTo(1));
         }
 
-        private class WithIndexController
-        {
-            public WithIndexController()
-            {
-                OnIndex = (p1, p2, p3, p4) => string.Empty;
-            }
-            public Func<string, string, int, decimal, string> OnIndex { get; set; }
-            public string Index(string param1, string param2, int param3, decimal param4) { return OnIndex(param1, param2, param3, param4); }
-        }
-
         [Test]
         public void It_can_invoke_recognized()
         {
@@ -428,18 +413,6 @@ namespace Isop.Tests
             Assert.That(createCount, Is.EqualTo(1));
         }
 
-        class EnumerableController
-        {
-            public Func<Object> OnEnumerate;
-            public int Length;
-            public System.Collections.IEnumerable Return()
-            {
-                for (int i = 0; i < Length; i++)
-                {
-                    yield return OnEnumerate();
-                }
-            }
-        }
         [Test]
         public void It_can_parse_class_and_method_with_object_and_execute()
         {
@@ -460,35 +433,6 @@ namespace Isop.Tests
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
-        }
-
-        class MyObjectController
-        {
-            public class Argument
-            {
-                public string param1 { get; set; }
-                public string param2 { get; set; }
-                public int param3 { get; set; }
-                public decimal param4 { get; set; }
-            }
-
-            public MyObjectController()
-            {
-                OnAction = (a) => string.Empty;
-            }
-            public Func<Argument, string> OnAction { get; set; }
-            public string Action(Argument a) { return OnAction(a); }
-        }
-
-        class MyFileController
-        {
-            public Func<FileStream, string> OnAction { get; set; }
-            public string Action(FileStream file) { return OnAction(file); }
-        }
-
-        class FakeFileHandler
-        {
-
         }
 
         [Test]
@@ -543,6 +487,4 @@ namespace Isop.Tests
             }
         }
     }
-
-
 }

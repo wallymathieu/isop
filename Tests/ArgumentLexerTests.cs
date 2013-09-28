@@ -54,7 +54,7 @@ namespace Isop.Tests
             lexed.Next();
             var first = lexed.Peek();
             Assert.That(first, Is.EqualTo(new Token("parametervalue", TokenType.ParameterValue, 1)));
-            Assert.That(lexed.Next(),Is.EqualTo(first));
+            Assert.That(lexed.Next(), Is.EqualTo(first));
             Assert.That(lexed.Peek(), Is.EqualTo(new Token("argument", TokenType.Argument, 2)));
         }
     }

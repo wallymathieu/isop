@@ -1,95 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Isop.Controller;
 using NUnit.Framework;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations;
 using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
 namespace Isop.Tests
 {
-    class FullConfiguration:IDisposable
-    {
-        public bool DisposeCalled = false;
-        
-        public IEnumerable<Type> Recognizes()
-        {
-            return new[] { typeof(MyController) };
-        }
-        /// <summary>
-        /// GLOBAL!!
-        /// </summary>
-        /// <value>
-        /// The global.
-        /// </value>
-        //
-        public string Global {
-         get;
-         set;
-        }
-		 [Required]
-        public string GlobalRequired
-        {
-            get;
-            set;
-		}
-        public object ObjectFactory(Type type)
-        {
-            return null;
-        }
-        public CultureInfo Culture
-        {
-            get{ return CultureInfo.GetCultureInfo("es-ES"); }
-        }
-        public bool RecognizeHelp{get{return true;}}
-        public void Dispose()
-        {
-            DisposeCalled = true;
-        }
-        public TypeConverterFunc GetTypeconverter()
-        {
-            return TypeConverter;
-        }
-        public static object TypeConverter(Type t, string s, CultureInfo c){ return null; }
-    }
     [TestFixture]
     public class ConfigurationCanReadFullConfigurationTests
     {
-        private Build parserBuilder;
+        private Build _parserBuilder;
 
         [SetUp]
         public void SetUp()
         {
-            parserBuilder = new Build().Configuration(typeof(FullConfiguration));
+            _parserBuilder = new Build().Configuration(typeof(FullConfiguration));
         }
         [Test]
         public void RecognizeHelp()
         {
-            Assert.That(parserBuilder.RecognizesHelp);
+            Assert.That(_parserBuilder.RecognizesHelp);
         }
         [Test]
         public void RecognizeCulture()
         {
-            Assert.That(parserBuilder.Culture, Is.EqualTo(CultureInfo.GetCultureInfo("es-ES")));
+            Assert.That(_parserBuilder.Culture, Is.EqualTo(CultureInfo.GetCultureInfo("es-ES")));
         }
         [Test]
         public void RecognizeTypeConverter()
         {
-            Assert.That(parserBuilder.TypeConverter, Is.EqualTo((TypeConverterFunc)FullConfiguration.TypeConverter));
+            Assert.That(_parserBuilder.TypeConverter, Is.EqualTo((TypeConverterFunc)FullConfiguration.TypeConverter));
         }
         [Test]
         public void RecognizeRecognizers()
         {
-            Assert.That(parserBuilder.ControllerRecognizers.Select(cr => cr.Type).ToArray(),
+            Assert.That(_parserBuilder.ControllerRecognizers.Select(cr => cr.Type).ToArray(),
                 Is.EquivalentTo(new[] { typeof(MyController), typeof(HelpController) }));
         }
         [Test]
         public void RecognizeGlobalParameters()
         {
-            var argumentWithOptionses = parserBuilder.GlobalParameters
+            var argumentWithOptionses = _parserBuilder.GlobalParameters
                 .ToArray();
 
             var requiredPairs = argumentWithOptionses

@@ -2,6 +2,9 @@
 
 namespace Isop.Gui
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class CustomerController
     {
         /// <summary>

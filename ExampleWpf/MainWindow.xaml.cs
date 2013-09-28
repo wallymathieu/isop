@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using Isop.Parse;
 using Isop.WpfControls.ViewModels;
-using System.Collections.Generic;
-using System.ComponentModel;
-using Isop.WpfControls;
 
 namespace Isop.Gui
 {
@@ -17,10 +13,18 @@ namespace Isop.Gui
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public MethodTreeModel MethodTreeModel { get; set; }
-        
+        /// <summary>
+        /// 
+        /// </summary>
         protected Build ParserBuilder { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public MainWindow()
         {
             //Console.SetOut

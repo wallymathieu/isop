@@ -51,11 +51,17 @@
     <Compile Include="ArgumentParserTests.cs" />
     <Compile Include="ArgumentLexerTests.cs" />
     <Compile Include="ConfigurationTests.cs" />
+    <Compile Include="FakeControllers\EnumerableController.cs" />
+    <Compile Include="FakeConfigurations\FullConfiguration.cs" />
     <Compile Include="ListExtensionTests.cs" />
-    <Compile Include="MyOptionalController.cs" />
+    <Compile Include="FakeControllers\MyFileController.cs" />
+    <Compile Include="FakeControllers\MyObjectController.cs" />
+    <Compile Include="FakeControllers\MyOptionalController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HelpTests.cs" />
-    <Compile Include="MyController.cs" />
+    <Compile Include="FakeControllers\MyController.cs" />
+    <Compile Include="FakeControllers\SingleIntAction.cs" />
+    <Compile Include="FakeControllers\WithIndexController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Isop\Isop.csproj">

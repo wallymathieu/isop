@@ -11,8 +11,8 @@ namespace Isop.Tests
         [Test]
         public void FindIndexAndValues_Can_return_correct_index()
         {
-            Assert.That(new[] { "1", "2", "3" }.ToList().FindIndexAndValues(value => value == "1"), 
-                        Is.EquivalentTo(new[] { new KeyValuePair<int,string>(0,"1") }));
+            Assert.That(new[] { "1", "2", "3" }.ToList().FindIndexAndValues(value => value == "1"),
+                        Is.EquivalentTo(new[] { new KeyValuePair<int, string>(0, "1") }));
         }
         [Test]
         public void FindIndexAndValues_Can_find_all()
