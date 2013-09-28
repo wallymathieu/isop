@@ -11,12 +11,12 @@ namespace Isop.Controller
 {
     public class ControllerRecognizer
     {
-        private static MethodInfo FindMethod(IEnumerable<MethodInfo> methods, String methodName, IEnumerable<Token> lexer)
+        private static MethodInfo FindMethod(IEnumerable<MethodInfo> methods, String methodName, IEnumerable<Token> lexed)
         {
             var potential = methods
                 .Where(method => method.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase));
             var potentialMethod = potential
-                .Where(method => method.GetParameters().Length <= lexer.Count(t => t.TokenType == TokenType.Parameter))
+                .Where(method => method.GetParameters().Length <= lexed.Count(t => t.TokenType == TokenType.Parameter))
                 .OrderByDescending(method => method.GetParameters().Length)
                 .FirstOrDefault();
             if (potentialMethod != null)
@@ -88,9 +88,9 @@ namespace Isop.Controller
         /// <returns></returns>
         public ParsedMethod Parse(IEnumerable<string> arg)
         {
-            var lexer = _rewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
+            var lexed = _rewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
 
-            var methodInfo = FindMethodInfo(lexer);
+            var methodInfo = FindMethodInfo(lexed);
 
             var argumentRecognizers = _turnParametersToArgumentWithOptions.GetRecognizers(methodInfo)
                 .ToList();
@@ -100,7 +100,7 @@ namespace Isop.Controller
             });
 
             var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter);
-            var parsedArguments = parser.Parse(lexer, arg);
+            var parsedArguments = parser.Parse(lexed, arg);
 
             return Parse(methodInfo, parsedArguments);
         }

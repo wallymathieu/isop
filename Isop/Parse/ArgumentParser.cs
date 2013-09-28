@@ -19,8 +19,8 @@ namespace Isop.Parse
 
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
-            var lexer = ArgumentLexer.Lex(arguments).ToList();
-            var parsedArguments = Parse(lexer, arguments);
+            var lexed = ArgumentLexer.Lex(arguments).ToList();
+            var parsedArguments = Parse(lexed, arguments);
             var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
 
             if (unMatchedRequiredArguments.Any())
@@ -34,15 +34,15 @@ namespace Isop.Parse
             return parsedArguments;
         }
 
-        public ParsedArguments Parse(IList<Token> lex, IEnumerable<string> arguments)
+        public ParsedArguments Parse(IList<Token> lexed, IEnumerable<string> arguments)
         {
             var recognizedIndexes = new List<int>();
-            var lexer = new PeekEnumerable<Token>(lex);
+            var peekTokens = new PeekEnumerable<Token>(lexed);
             var encounteredParameter = false;
             IList<RecognizedArgument> recognized = new List<RecognizedArgument>();
-            while (lexer.HasMore())
+            while (peekTokens.HasMore())
             {
-                var current = lexer.Next();
+                var current = peekTokens.Next();
                 switch (current.TokenType)
                 {
                     case TokenType.Argument:
@@ -77,9 +77,9 @@ namespace Isop.Parse
                                 continue;
                             string value;
                             recognizedIndexes.Add(current.Index);
-                            if (lexer.Peek().TokenType == TokenType.ParameterValue)
+                            if (peekTokens.Peek().TokenType == TokenType.ParameterValue)
                             {
-                                var paramValue = lexer.Next();
+                                var paramValue = peekTokens.Next();
                                 recognizedIndexes.Add(paramValue.Index);
                                 value = paramValue.Value;
                             }
