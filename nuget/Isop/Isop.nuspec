@@ -3,7 +3,7 @@
   <metadata>
     <id>Isop</id>
     <title>Isop</title>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <authors>Oskar Gewalli</authors>
     <owners>Oskar Gewalli</owners>
     <licenseUrl>http://www.opensource.org/licenses/MIT</licenseUrl>
@@ -11,6 +11,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Isop is a library to help simplify and structure command line apps. The Isop dll is used if you want to have your own console application. The Isop.Cli.exe and Isop.Wpf.exe (from the Isop.Runners package) if you dont care about implementing a &apos;Main&apos; method.</description>
     <copyright>Copyright 2013</copyright>
+    <releaseNotes>Fixed bug with infer parameters for controller action parameters.
+    </releaseNotes>
     <references>
       <reference file="Isop.dll" />
     </references>
