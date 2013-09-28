@@ -1,4 +1,4 @@
-namespace Isop.Tests
+namespace Isop.Tests.FakeControllers
 {
     public class SingleIntAction
     {

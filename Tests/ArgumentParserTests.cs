@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Isop.Controller;
 using Isop.Parse;
 using Isop.Parse.Parameters;
+using Isop.Tests.FakeControllers;
 using NUnit.Framework;
 
 namespace Isop.Tests

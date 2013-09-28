@@ -1,6 +1,6 @@
 using System;
 
-namespace Isop.Tests
+namespace Isop.Tests.FakeControllers
 {
     class MyObjectController
     {

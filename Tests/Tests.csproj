@@ -48,6 +48,9 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FakeControllers\DescriptionController.cs" />
+    <Compile Include="FakeControllers\DescriptionWithCommentsController.cs" />
+    <Compile Include="FakeControllers\AnotherController.cs" />
     <Compile Include="ArgumentParserTests.cs" />
     <Compile Include="ArgumentLexerTests.cs" />
     <Compile Include="ConfigurationTests.cs" />

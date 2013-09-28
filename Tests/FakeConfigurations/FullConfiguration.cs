@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using Isop.Tests.FakeControllers;
 
-namespace Isop.Tests
+namespace Isop.Tests.FakeConfigurations
 {
     class FullConfiguration:IDisposable
     {

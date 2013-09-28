@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Isop.Controller;
+using Isop.Tests.FakeConfigurations;
+using Isop.Tests.FakeControllers;
 using NUnit.Framework;
 using System.Globalization;
 using System.IO;

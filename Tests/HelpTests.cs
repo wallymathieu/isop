@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using Isop.Help;
 using Isop.Infrastructure;
+using Isop.Tests.FakeConfigurations;
+using Isop.Tests.FakeControllers;
 using NUnit.Framework;
 
 namespace Isop.Tests
@@ -37,17 +39,6 @@ namespace Isop.Tests
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"Det finns följande argument:
   --beta" + tab + @"Beskrivning av beta
   --alpha")));
-        }
-
-        internal class AnotherController
-        {
-            public void Action1 (string param1)
-            {
-            }
-
-            public void Action2 ()
-            {
-            }
         }
 
         [Test]
@@ -222,30 +213,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
 
 Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
-     
-     
-        internal class DescriptionController
-        {
-            public void Action1 ()
-            {
-            }
 
-            public void Action2 ()
-            {
-            }
-
-            public string Help (string command)
-            {
-                switch (command) {
-                case "Action1":
-                    return "Some description 1";
-                case "Action2":
-                    return "Some description 2";
-                default:
-                    return "Some description";
-                }
-            }
-        }
 
         [Test
 #if !APPHARBOR
@@ -265,26 +233,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
 
 Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
-        
-        /// <summary>
-        /// Some description
-        /// </summary>
-        internal class DescriptionWithCommentsController
-        {
-            /// <summary>
-            /// Some description 1
-            /// </summary>
-            public void Action1 ()
-            {
-            }
-            /// <summary>
-            /// Some description 2
-            /// </summary>
-            public void Action2 ()
-            {
-            }
-        }
-        
+
         [Test
 #if !APPHARBOR
         ,Ignore("APPHARBOR")
@@ -299,9 +248,9 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         {
             var helpXml = new HelpXmlDocumentation();
             var _global = typeof(FullConfiguration).GetMethods().MatchGet("Global");
-            Assert.That(helpXml.GetKey(_global.MethodInfo),Is.EqualTo("P:Isop.Tests.FullConfiguration.Global"));
+            Assert.That(helpXml.GetKey(_global.MethodInfo), Is.EqualTo("P:Isop.Tests.FakeConfigurations.FullConfiguration.Global"));
             var action1 = typeof(DescriptionWithCommentsController).GetMethods().Match(name:"Action1");
-            Assert.That(helpXml.GetKey(action1),Is.EqualTo("M:Isop.Tests.HelpTests.DescriptionWithCommentsController.Action1"));
+            Assert.That(helpXml.GetKey(action1), Is.EqualTo("M:Isop.Tests.FakeControllers.DescriptionWithCommentsController.Action1"));
             
         }
     }
