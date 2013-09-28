@@ -44,9 +44,9 @@ namespace Isop.Controller
             return null != FindMethodInfo(lexed);
         }
 
-        private MethodInfo FindMethodInfo(IEnumerable<Token> arg)
+        private MethodInfo FindMethodInfo(IList<Token> arg)
         {
-            var foundClassName = ClassName().Equals(arg.ElementAtOrDefault(0).Value, StringComparison.OrdinalIgnoreCase);
+            var foundClassName = ClassName().EqualsIC(arg.ElementAtOrDefault(0).Value);
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1).Value;
@@ -58,7 +58,7 @@ namespace Isop.Controller
         public IEnumerable<MethodInfo> GetMethods()
         {
             return ReflectionExtensions.GetOwnPublicMethods(Type)
-                .Where(m => !m.Name.Equals("help", StringComparison.OrdinalIgnoreCase));
+                .Where(m => !m.Name.EqualsIC("help"));
         }
 
         public string ClassName()
@@ -118,6 +118,20 @@ namespace Isop.Controller
         {
             return new MethodAndArguments(GetMethods().SingleOrDefault(m => m.WithName(action)),
                 _turnParametersToArgumentWithOptions);
+        }
+
+        public ParsedArguments ParseArgumentsAndMerge(ParsedArguments parsedArguments, Action<ParsedMethod> action=null)
+        {
+            var parsedMethod = Parse(parsedArguments.Args);
+            if (action != null) action(parsedMethod);
+            // Inferred ordinal arguments should not be recognized twice
+            parsedArguments.RecognizedArguments = parsedArguments.RecognizedArguments
+                .Where(argopts =>
+                    !parsedMethod.RecognizedArguments.Any(pargopt => pargopt.Index == argopts.Index && argopts.InferredOrdinal));
+            var merged = parsedArguments.Merge(parsedMethod);
+            if (!IgnoreGlobalUnMatchedParameters)
+                merged.AssertFailOnUnMatched();
+            return merged;
         }
     }
 }

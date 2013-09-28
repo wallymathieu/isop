@@ -109,7 +109,7 @@ namespace Isop.Parse
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
                 .Select(v => new UnrecognizedArgument { Index = v.i, Value = v.value });
 
-            return new ParsedArguments
+            return new ParsedArguments(argumentList)
             {
                 ArgumentWithOptions = _argumentWithOptions.ToArray(),
                 RecognizedArguments = recognized,

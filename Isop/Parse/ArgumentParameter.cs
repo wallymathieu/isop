@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Globalization;
+using Isop.Infrastructure;
 using Isop.Parse.Parameters;
 
 namespace Isop.Parse
@@ -57,7 +58,7 @@ namespace Isop.Parse
 
         public bool HasAlias(string value)
         {
-            return Aliases.Any(alias => value.Equals(alias, StringComparison.OrdinalIgnoreCase));
+            return Aliases.Any(alias => value.EqualsIC(alias));
         }
 
         public bool Accept(int index, string val)

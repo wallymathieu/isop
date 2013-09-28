@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using System.IO;
+using Isop.Infrastructure;
 
 namespace Isop.Help
 {
@@ -61,8 +62,8 @@ namespace Isop.Help
         }
         public string GetKey(Type t,MethodInfo method)
         {
-            if (method.Name.StartsWith("get_",StringComparison.OrdinalIgnoreCase)
-                || method.Name.StartsWith("set_",StringComparison.OrdinalIgnoreCase))
+            if (method.Name.StartsWithIC("get_")
+                || method.Name.StartsWithIC("set_"))
                 return "P:"+GetFullName(t)+"."+method.Name.Substring(4);
             return "M:"+GetFullName(t)+"."+method.Name;
         }

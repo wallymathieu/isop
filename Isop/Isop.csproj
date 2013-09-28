@@ -53,6 +53,7 @@
     <Compile Include="Infrastructure\ListExtensions.cs" />
     <Compile Include="Controller\TypeContainer.cs" />
     <Compile Include="Infrastructure\ReflectionExtensions.cs" />
+    <Compile Include="Infrastructure\StringExtensions.cs" />
     <Compile Include="Lex\ArgumentLexer.cs" />
     <Compile Include="Parse\ArgumentParser.cs" />
     <Compile Include="Build.cs" />

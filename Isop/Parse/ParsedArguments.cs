@@ -6,14 +6,19 @@ namespace Isop.Parse
 {
     public class ParsedArguments
     {
-        public ParsedArguments()
+        public IList<string> Args { get; set; }
+
+        public ParsedArguments(IList<string> args)
         {
+            Args = args;
         }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="parsedArguments"></param>
         public ParsedArguments(ParsedArguments parsedArguments)
+            :this(parsedArguments.Args)
         {
             RecognizedArguments = parsedArguments.RecognizedArguments;
             ArgumentWithOptions = parsedArguments.ArgumentWithOptions;
@@ -49,6 +54,23 @@ namespace Isop.Parse
                 .Where(argumentWithOptions => !RecognizedArguments
                                                    .Any(recogn => recogn.WithOptions.Equals(argumentWithOptions)));
             return unMatchedRequiredArguments;
+        }
+
+        public void AssertFailOnUnMatched()
+        {
+            var unMatchedRequiredArguments = UnMatchedRequiredArguments();
+
+            if (unMatchedRequiredArguments.Any())
+            {
+                throw new MissingArgumentException("Missing arguments")
+                          {
+                              Arguments = unMatchedRequiredArguments
+                                  .Select(
+                                      unmatched =>
+                                      new KeyValuePair<string, string>(unmatched.Argument.ToString(), unmatched.Argument.Help()))
+                                  .ToList()
+                          };
+            }
         }
     }
 }

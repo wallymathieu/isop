@@ -58,6 +58,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ViewModels\BuildExtensions.cs" />
     <Compile Include="ViewModels\Controller.cs" />
     <Compile Include="ViewModels\Method.cs" />
     <Compile Include="ViewModels\MethodTreeModel.cs" />

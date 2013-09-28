@@ -7,7 +7,8 @@ namespace Isop.Parse
     {
         private readonly ParsedArguments _first;
         private readonly ParsedArguments _second;
-        public MergedParsedArguments(ParsedArguments first, ParsedArguments second)
+        public MergedParsedArguments(ParsedArguments first, ParsedArguments second) 
+            : base(first.Args)
         {
             _first = first;
             _second = second;

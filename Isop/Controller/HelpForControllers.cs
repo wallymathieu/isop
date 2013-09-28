@@ -109,7 +109,7 @@ namespace Isop.Controller
                    + HelpCommandForMoreInformation;
 
             var controllerRecognizer = ClassAndMethodRecognizers.First(cmr =>
-                cmr.ClassName().Equals(val, StringComparison.OrdinalIgnoreCase));
+                cmr.ClassName().EqualsIC(val));
             if (string.IsNullOrEmpty(action))
             {
                 return TheSubCommandsFor +
@@ -125,7 +125,7 @@ namespace Isop.Controller
         {
             return string.IsNullOrEmpty(val)
                 ? ClassAndMethodRecognizers.Any(cmr => cmr.Type != typeof(HelpController))
-                : ClassAndMethodRecognizers.Any(cmr => cmr.ClassName().Equals(val, StringComparison.OrdinalIgnoreCase));
+                : ClassAndMethodRecognizers.Any(cmr => cmr.ClassName().EqualsIC(val));
         }
     }
 }

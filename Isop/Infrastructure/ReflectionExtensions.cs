@@ -27,18 +27,18 @@ namespace Isop.Infrastructure
             if (null != parameters)
                 retv = retv.Where(m => m.GetParameters().Select(p => p.ParameterType).SequenceEqual(parameters));
             if (null != name)
-                retv = retv.Where(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                retv = retv.Where(m => m.Name.EqualsIC(name));
             return retv;
         }
 
         public static IEnumerable<MethodInfoOrProperty> FindSet(this IEnumerable<MethodInfo> methods,Type returnType=null, string name=null, IEnumerable<Type> parameters=null)
         {
             var retv = methods.Matches(returnType,null,parameters)
-                .Where(m=>m.Name.StartsWith("set", StringComparison.OrdinalIgnoreCase));
+                .Where(m=>m.Name.StartsWithIC("set"));
             if (null != name)
                 retv = retv.Where (m => 
-                                   m.Name.Equals ("set" + name, StringComparison.OrdinalIgnoreCase)
-                                   || m.Name.Equals ("set_" + name, StringComparison.OrdinalIgnoreCase));
+                                   m.Name.EqualsIC ("set" + name)
+                                   || m.Name.EqualsIC ("set_" + name));
             return retv.Select(m=> {
                 if (m.Name.StartsWith("set_"))
                 {
@@ -58,9 +58,9 @@ namespace Isop.Infrastructure
         {
             var retv = methods.Matches(returnType,null,parameters);
                 
-            retv = retv.Where (m => m.Name.Equals (name, StringComparison.OrdinalIgnoreCase) 
-                                    || m.Name.Equals ("get_" + name, StringComparison.OrdinalIgnoreCase)
-                                    || m.Name.Equals ("get" + name, StringComparison.OrdinalIgnoreCase));
+            retv = retv.Where (m => m.Name.EqualsIC (name) 
+                                    || m.Name.EqualsIC ("get_" + name)
+                                    || m.Name.EqualsIC ("get" + name));
             var methodInfo = retv.FirstOrDefault ();
             if (null != methodInfo)
             {
@@ -76,8 +76,8 @@ namespace Isop.Infrastructure
         {
             return type.GetMethods(BindingFlags.Public| BindingFlags.Instance)
                 .Where(m=>!m.DeclaringType.Equals(typeof(Object)))
-                .Where(m => !m.Name.StartsWith("get_", StringComparison.OrdinalIgnoreCase)
-                            && !m.Name.StartsWith("set_", StringComparison.OrdinalIgnoreCase))
+                .Where(m => !m.Name.StartsWithIC("get_")
+                            && !m.Name.StartsWithIC("set_"))
                 ;
         }
 
@@ -103,7 +103,7 @@ namespace Isop.Infrastructure
 
         public static bool WithName(this MethodInfo m, string action)
         {
-            return m.Name.Equals(action, StringComparison.OrdinalIgnoreCase);
+            return m.Name.EqualsIC(action);
         }
     }
 }

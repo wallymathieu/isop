@@ -25,7 +25,7 @@ namespace Isop
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
         private readonly TypeContainer _container=new TypeContainer();
-        private readonly HelpXmlDocumentation helpXmlDocumentation = new HelpXmlDocumentation();
+        private readonly HelpXmlDocumentation _helpXmlDocumentation = new HelpXmlDocumentation();
         public Build()
         {
             _controllerRecognizers = new List<Func<ControllerRecognizer>>();
@@ -60,46 +60,26 @@ namespace Isop
 		
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
-			var argumentParser = new ArgumentParser(_argumentRecognizers, _allowInferParameter);
-            // TODO: Need to figure out where this goes. To Much logic for this layer.
+            return Parse(arg.ToList());
+        }
+
+        public ParsedArguments Parse(List<string> arg)
+        {
+            var argumentParser = new ArgumentParser(_argumentRecognizers, _allowInferParameter);
             var lexed = ArgumentLexer.Lex(arg).ToList();
             var parsedArguments = argumentParser.Parse(lexed, arg);
             if (_controllerRecognizers.Any())
             {
-                var recognizers = _controllerRecognizers.Select(cr=>cr());
+                var recognizers = _controllerRecognizers.Select(cr => cr());
                 var controllerRecognizer = recognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
                 if (null != controllerRecognizer)
                 {
-					var parsedMethod = controllerRecognizer.Parse(arg);
-					parsedMethod.Factory = _container.CreateInstance;
-                    // Inferred ordinal arguments should not be recognized twice
-                    parsedArguments.RecognizedArguments = parsedArguments.RecognizedArguments
-                        .Where(argopts=>!parsedMethod.RecognizedArguments.Any(pargopt=>pargopt.Index == argopts.Index && argopts.InferredOrdinal));
-                    var merged = parsedArguments.Merge( parsedMethod);
-                    if (!controllerRecognizer.IgnoreGlobalUnMatchedParameters)
-                        FailOnUnMatched(merged);
-                    return merged;
+                    return controllerRecognizer.ParseArgumentsAndMerge(parsedArguments,
+                                                                       parsedMethod => parsedMethod.Factory = _container.CreateInstance);
                 }
             }
-            FailOnUnMatched(parsedArguments);
+            parsedArguments.AssertFailOnUnMatched();
             return parsedArguments;
-        }
-
-        private static void FailOnUnMatched(ParsedArguments parsedArguments)
-        { // This does not belong here. This is just supposed to be a fluent layer.
-            var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
-
-            if (unMatchedRequiredArguments.Any())
-            {
-                throw new MissingArgumentException("Missing arguments")
-                          {
-                              Arguments = unMatchedRequiredArguments
-                                  .Select(
-                                      unmatched =>
-                                      new KeyValuePair<string, string>(unmatched.Argument.ToString(), unmatched.Argument.Help()))
-                                  .ToList()
-                          };
-            }
         }
 
         public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
@@ -176,7 +156,7 @@ namespace Isop
         {
             if (_helpController==null)
             {
-                _helpForControllers = new HelpForControllers(_controllerRecognizers, _container, helpXmlDocumentation);
+                _helpForControllers = new HelpForControllers(_controllerRecognizers, _container, _helpXmlDocumentation);
                 _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
                 _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
                 Recognize(_helpController, ignoreGlobalUnMatchedParameters:true);
@@ -251,7 +231,7 @@ namespace Isop
             {
                 var action = (Action<String>)Delegate.CreateDelegate(typeof(Action<String>), 
                     instance, methodInfo.MethodInfo);
-                var description = helpXmlDocumentation.GetDescriptionForMethod(methodInfo.MethodInfo);
+                var description = _helpXmlDocumentation.GetDescriptionForMethod(methodInfo.MethodInfo);
                 this.Parameter(RemoveSetFromBeginningOfString(methodInfo.Name),
                     action:action,
                     description:description,
@@ -281,9 +261,9 @@ namespace Isop
         }
         private string RemoveSetFromBeginningOfString(string arg)
         {
-            if (arg.StartsWith("set_",StringComparison.OrdinalIgnoreCase))
+            if (arg.StartsWithIC("set_"))
                 return arg.Substring(4);
-            if (arg.StartsWith("set",StringComparison.OrdinalIgnoreCase))
+            if (arg.StartsWithIC("set"))
                 return arg.Substring(3);
             return arg;
         }
@@ -304,7 +284,7 @@ namespace Isop
             {
                 var assembly= Assembly.LoadFile(file);
                 var isopconfigurations = assembly.GetTypes()
-                    .Where(type=>type.Name.Equals("isopconfiguration",StringComparison.OrdinalIgnoreCase));
+                    .Where(type=>type.Name.EqualsIC("isopconfiguration"));
                 foreach (var config in isopconfigurations) 
                 {
                    Configuration(config);
@@ -335,7 +315,7 @@ namespace Isop
         {
             return _assembly.GetTypes().Where(t=>
                 t.IsPublic
-                && t.Name.EndsWith("controller",StringComparison.OrdinalIgnoreCase) 
+                && t.Name.EndsWithIC("controller") 
                 && t.GetConstructors().Any(ctor=>ctor.GetParameters().Length==0)
                 );
         }

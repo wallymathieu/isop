@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Isop.Infrastructure;
 using Isop.Lex;
 
 namespace Isop.Controller
@@ -13,7 +14,7 @@ namespace Isop.Controller
             //"--command"
             if (tokens.Count() >= 2 
                 && tokens[0].TokenType==TokenType.Argument 
-                && tokens[0].Value.Equals("help",StringComparison.OrdinalIgnoreCase)
+                && tokens[0].Value.EqualsIC("help")
                 && tokens[1].TokenType==TokenType.Argument)
             {
                 tokens[1] = new Token(tokens[1].Value,TokenType.ParameterValue,tokens[1].Index);

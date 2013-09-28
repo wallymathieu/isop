@@ -92,6 +92,9 @@
     <Compile Include='..\Isop\Infrastructure\ReflectionExtensions.cs'>
       <Link>Isop\Infrastructure\ReflectionExtensions.cs</Link>
     </Compile>
+    <Compile Include='..\Isop\Infrastructure\StringExtensions.cs'>
+      <Link>Isop\Infrastructure\StringExtensions.cs</Link>
+    </Compile>
     <Compile Include='..\Isop\Lex\ArgumentLexer.cs'>
       <Link>Isop\Lex\ArgumentLexer.cs</Link>
     </Compile>
@@ -178,6 +181,9 @@
       <DependentUpon>
         <DependentUpon>MethodView.xaml</DependentUpon>
       </DependentUpon>
+    </Compile>
+    <Compile Include='..\Isop.WpfControls\ViewModels\BuildExtensions.cs'>
+      <Link>WpfControls\ViewModels\BuildExtensions.cs</Link>
     </Compile>
     <Compile Include='..\Isop.WpfControls\ViewModels\Controller.cs'>
       <Link>WpfControls\ViewModels\Controller.cs</Link>

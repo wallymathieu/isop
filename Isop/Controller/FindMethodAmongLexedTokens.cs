@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Isop.Infrastructure;
 using Isop.Lex;
 
 namespace Isop.Controller
@@ -11,7 +12,7 @@ namespace Isop.Controller
         public static MethodInfo FindMethod(IEnumerable<MethodInfo> methods, String methodName, IEnumerable<Token> lexed)
         {
             var potential = methods
-                .Where(method => method.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase));
+                .Where(method => method.Name.EqualsIC(methodName));
             var potentialMethod = potential
                 .Where(method => method.GetParameters().Length <= lexed.Count(t => t.TokenType == TokenType.Parameter))
                 .OrderByDescending(method => method.GetParameters().Length)
