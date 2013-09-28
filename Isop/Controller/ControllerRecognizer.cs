@@ -149,7 +149,7 @@ namespace Isop.Controller
             public MethodInfo Method { get; private set; }
             public IEnumerable<ArgumentWithOptions> MethodParameters()
             {
-                return _cr.GetRecognizers(Method).Skip(1);
+                return _cr.GetRecognizers(Method);
             }
         }
 

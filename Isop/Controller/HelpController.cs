@@ -11,7 +11,7 @@ namespace Isop.Controller
         readonly HelpForControllers _helpForClassAndMethod;
 
         public HelpController(
-            HelpForArgumentWithOptions helpForArgumentWithOptions, 
+            HelpForArgumentWithOptions helpForArgumentWithOptions,
             HelpForControllers helpForClassAndMethod)
         {
             _helpForArgumentWithOptions = helpForArgumentWithOptions;
@@ -23,24 +23,24 @@ namespace Isop.Controller
             var sb = new StringBuilder();
             if (_helpForArgumentWithOptions.CanHelp())
             {
-              sb.AppendLine(_helpForArgumentWithOptions.Help());
+                sb.AppendLine(_helpForArgumentWithOptions.Help());
             }
             if (_helpForClassAndMethod.CanHelp())
             {
                 sb.AppendLine(_helpForClassAndMethod.Help());
             }
-            return sb.ToString().Trim(' ','\t','\r','\n')+Environment.NewLine;
+            return sb.ToString().Trim(' ', '\t', '\r', '\n') + Environment.NewLine;
         }
-        
-        public string Index(string command,string action)
+
+        public string Index(string command, string action)
         {
-         if (String.IsNullOrEmpty(command))
-             return Index();
+            if (String.IsNullOrEmpty(command))
+                return Index();
             var sb = new StringBuilder();
             command = Regex.Replace(command, "controller$", "", RegexOptions.IgnoreCase);
             if (_helpForArgumentWithOptions.CanHelp(command))
             {
-              sb.AppendLine(_helpForArgumentWithOptions.Help(command));
+                sb.AppendLine(_helpForArgumentWithOptions.Help(command));
             }
             if (_helpForClassAndMethod.CanHelp(command, action))
             {
