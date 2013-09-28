@@ -8,7 +8,7 @@
     <ProjectGuid>{02596ACA-3C85-4353-8744-5F0A172BA757}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Isop.Example</RootNamespace>
+    <RootNamespace>Example</RootNamespace>
     <AssemblyName>Console</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\isop\</SolutionDir>

@@ -18,7 +18,7 @@ namespace Isop.Tests
             var usage = new Build()
                                     .Parameter ("beta", arg => { }, description:"Some description about beta")
                                     .Parameter ("alpha", arg => { })
-                                    .RecognizeHelp ()
+                                    .ShouldRecognizeHelp ()
                                     .Help ();
             var tab = '\t';
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The arguments are:
@@ -32,7 +32,7 @@ namespace Isop.Tests
             var usage = new Build()
                                     .Parameter ("beta", arg => { }, description:"Beskrivning av beta")
                                     .Parameter ("alpha", arg => { })
-                                    .RecognizeHelp ()
+                                    .ShouldRecognizeHelp ()
                                     .HelpTextArgumentsAre ("Det finns följande argument:")
                                     .Help ();
             var tab = '\t';
@@ -47,7 +47,7 @@ namespace Isop.Tests
             var usage = new Build()
                                     .Recognize (typeof(MyController))
                                     .Recognize (typeof(AnotherController))
-                                    .RecognizeHelp ()
+                                    .ShouldRecognizeHelp ()
                                     .Help ();
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The commands are:
   My
@@ -63,7 +63,7 @@ Se 'COMMANDNAME' help <command> for more information")));
                                     .Parameter("required",required:true)
                                     .Recognize (typeof(MyController))
                                     .Recognize (typeof(AnotherController))
-                                    .RecognizeHelp ()
+                                    .ShouldRecognizeHelp ()
                                     .Help ();
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The arguments are:
   --required
@@ -80,7 +80,7 @@ Se 'COMMANDNAME' help <command> for more information")));
             var usage = new Build()
                 .Recognize (typeof(MyController))
                 .Recognize (typeof(AnotherController))
-                .RecognizeHelp ()
+                .ShouldRecognizeHelp ()
                 .HelpTextCommandsAre (
                     theCommandsAre:"Det finns följande kommandon:", 
                     helpCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> för ytterligare information",
@@ -100,7 +100,7 @@ Se 'Kommandonamn' help <kommando> för ytterligare information")));
             var usage = new Build()
                 .Recognize (typeof(MyController))
                 .Recognize (typeof(AnotherController))
-                .RecognizeHelp ()
+                .ShouldRecognizeHelp ()
                 .HelpTextCommandsAre (
                     theCommandsAre:"Det finns följande kommandon:", 
                     helpCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> för ytterligare information",
@@ -123,7 +123,7 @@ Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
         {
             var cout = new StringWriter();
             new Build()
-                                    .RecognizeHelp ()
+                                    .ShouldRecognizeHelp ()
                                     .Recognize (typeof(MyController))
                                     .Parse (new string[]{}).Invoke (cout);
             Assert.That (LineSplit (cout.ToString()), Is.EquivalentTo (LineSplit (@"The commands are:
@@ -138,7 +138,7 @@ Se 'COMMANDNAME' help <command> for more information")));
             var usage = new Build()
                                     .Recognize (typeof(MyController))
                                     .Recognize (typeof(AnotherController))
-                                    .RecognizeHelp ()
+                                    .ShouldRecognizeHelp ()
                                     .HelpFor ("Another");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The sub commands for Another
 
@@ -154,7 +154,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
             var usage = new Build()
                                     .Recognize(typeof(MyController))
                                     .Recognize(typeof(AnotherController))
-                                    .RecognizeHelp()
+                                    .ShouldRecognizeHelp()
                                     .HelpFor("Another", "Action1");
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1
 And accept the following parameters:
@@ -166,7 +166,7 @@ And accept the following parameters:
         {
             var usage = new Build()
                                     .Recognize (typeof(DescriptionController))
-                                    .RecognizeHelp ()
+                                    .ShouldRecognizeHelp ()
                                     .Help ();
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The commands are:
   Description  Some description
@@ -179,7 +179,7 @@ Se 'COMMANDNAME' help <command> for more information")));
         {
             var usage = new Build()
                                     .Recognize (typeof(DescriptionController))
-                                    .RecognizeHelp ()
+                                    .ShouldRecognizeHelp ()
                                     .HelpFor ("Description");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The sub commands for Description
 
@@ -194,7 +194,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         {
             var usage = new Build()
                                     .Recognize(typeof(DescriptionController))
-                                    .RecognizeHelp()
+                                    .ShouldRecognizeHelp()
                                     .HelpFor("Description","action1");
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1   Some description 1")));
         }
@@ -204,7 +204,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         {
             var usage = new Build()
                                     .Recognize(typeof(DescriptionController))
-                                    .RecognizeHelp()
+                                    .ShouldRecognizeHelp()
                                     .HelpFor("DescriptionController");
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The sub commands for Description
 
@@ -224,7 +224,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         {
             var usage = new Build()
                                     .Recognize (typeof(DescriptionWithCommentsController))
-                                    .RecognizeHelp ()
+                                    .ShouldRecognizeHelp ()
                                     .HelpFor ("DescriptionWithComments");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The sub commands for DescriptionWithComments
 

@@ -1,4 +1,4 @@
-namespace Isop.Example
+namespace Example
 {
     public class CustomerController
     {

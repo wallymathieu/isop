@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Isop.Parse
+namespace Isop
 {
     public class MissingArgumentException : Exception
     {

@@ -24,11 +24,11 @@ namespace Isop.Controller
 
         public string HelpSubCommandForMoreInformation { get; set; }
 
-        public HelpForControllers(IEnumerable<Func<ControllerRecognizer>> classAndMethodRecognizers, TypeContainer container, HelpXmlDocumentation helpXmlDocumentation)
+        public HelpForControllers(IEnumerable<Func<ControllerRecognizer>> classAndMethodRecognizers, TypeContainer container, HelpXmlDocumentation helpXmlDocumentation = null)
         {
             _container = container;
             _classAndMethodRecognizers = classAndMethodRecognizers;
-            _helpXmlDocumentation = helpXmlDocumentation;
+            _helpXmlDocumentation = helpXmlDocumentation ?? new HelpXmlDocumentation();
             HelpSubCommandForMoreInformation = "Se 'COMMANDNAME' help <command> <subcommand> for more information";
 
             HelpCommandForMoreInformation = "Se 'COMMANDNAME' help <command> for more information";

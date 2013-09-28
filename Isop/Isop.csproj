@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Configuration\ConfigureUsingInstance.cs" />
     <Compile Include="Controller\FindMethodAmongLexedTokens.cs" />
     <Compile Include="Controller\MethodAndArguments.cs" />
     <Compile Include="Controller\TurnParametersToArgumentWithOptions.cs" />
@@ -54,7 +55,7 @@
     <Compile Include="Controller\TypeContainer.cs" />
     <Compile Include="Infrastructure\ReflectionExtensions.cs" />
     <Compile Include="Infrastructure\StringExtensions.cs" />
-    <Compile Include="IsopAutoConfiguration.cs" />
+    <Compile Include="Configuration\IsopAutoConfiguration.cs" />
     <Compile Include="Lex\ArgumentLexer.cs" />
     <Compile Include="Parse\ArgumentParser.cs" />
     <Compile Include="Build.cs" />
@@ -62,7 +63,7 @@
     <Compile Include="Lex\TokenType.cs" />
     <Compile Include="Lex\Token.cs" />
     <Compile Include="Infrastructure\PeekEnumerable.cs" />
-    <Compile Include="Parse\MissingArgumentException.cs" />
+    <Compile Include="MissingArgumentException.cs" />
     <Compile Include="Parse\ArgumentParameter.cs" />
     <Compile Include="Parse\Parameters\OrdinalParameter.cs" />
     <Compile Include="Parse\Parameters\OptionParameter.cs" />
@@ -72,7 +73,7 @@
     <Compile Include="Parse\ParsedArguments.cs" />
     <Compile Include="Parse\MergedParsedArguments.cs" />
     <Compile Include="Parse\UnrecognizedArgument.cs" />
-    <Compile Include="Controller\TypeConversionFailedException.cs" />
+    <Compile Include="TypeConversionFailedException.cs" />
     <Compile Include="Controller\RewriteLexedTokensToSupportHelpAndIndex.cs" />
     <Compile Include="Controller\ParsedMethod.cs" />
     <Compile Include="Infrastructure\MethodInfoOrProperty.cs" />

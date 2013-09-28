@@ -74,6 +74,9 @@
       <SubType>Code</SubType>
     </Compile>
     <AppDesigner Include='Properties\'/>
+    <Compile Include='..\Isop\Configuration\ConfigureUsingInstance.cs'>
+      <Link>Isop\Configuration\ConfigureUsingInstance.cs</Link>
+    </Compile>
     <Compile Include='..\Isop\Controller\FindMethodAmongLexedTokens.cs'>
       <Link>Isop\Controller\FindMethodAmongLexedTokens.cs</Link>
     </Compile>
@@ -95,8 +98,8 @@
     <Compile Include='..\Isop\Infrastructure\StringExtensions.cs'>
       <Link>Isop\Infrastructure\StringExtensions.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\IsopAutoConfiguration.cs'>
-      <Link>Isop\IsopAutoConfiguration.cs</Link>
+    <Compile Include='..\Isop\Configuration\IsopAutoConfiguration.cs'>
+      <Link>Isop\Configuration\IsopAutoConfiguration.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Lex\ArgumentLexer.cs'>
       <Link>Isop\Lex\ArgumentLexer.cs</Link>
@@ -119,8 +122,8 @@
     <Compile Include='..\Isop\Infrastructure\PeekEnumerable.cs'>
       <Link>Isop\Infrastructure\PeekEnumerable.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Parse\MissingArgumentException.cs'>
-      <Link>Isop\Parse\MissingArgumentException.cs</Link>
+    <Compile Include='..\Isop\MissingArgumentException.cs'>
+      <Link>Isop\MissingArgumentException.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Parse\ArgumentParameter.cs'>
       <Link>Isop\Parse\ArgumentParameter.cs</Link>
@@ -149,8 +152,8 @@
     <Compile Include='..\Isop\Parse\UnrecognizedArgument.cs'>
       <Link>Isop\Parse\UnrecognizedArgument.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Controller\TypeConversionFailedException.cs'>
-      <Link>Isop\Controller\TypeConversionFailedException.cs</Link>
+    <Compile Include='..\Isop\TypeConversionFailedException.cs'>
+      <Link>Isop\TypeConversionFailedException.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Controller\RewriteLexedTokensToSupportHelpAndIndex.cs'>
       <Link>Isop\Controller\RewriteLexedTokensToSupportHelpAndIndex.cs</Link>

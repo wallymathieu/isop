@@ -30,7 +30,7 @@ namespace Isop.Gui
             //Console.SetOut
             ParserBuilder = new Build()
                      .Parameter("global")
-                     .RecognizeHelp()
+                     .ShouldRecognizeHelp()
                      .Recognize(typeof(MyController))
                      .Recognize(typeof(CustomerController));
 

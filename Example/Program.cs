@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Isop.Controller;
-using Isop.Parse;
+using Isop;
 
-namespace Isop.Example
+namespace Example
 {
     /// <summary>
     /// This is a sample usage of Isop when configuring using ArgumentParser.Build:
@@ -13,7 +12,7 @@ namespace Isop.Example
         static void Main(string[] args)
         {
             var parserBuilder = new Build()
-                       .RecognizeHelp()
+                       .ShouldRecognizeHelp()
                        .Recognize(typeof(MyController))
                        .Recognize(typeof(CustomerController));
             try

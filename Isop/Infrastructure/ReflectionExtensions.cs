@@ -105,5 +105,10 @@ namespace Isop.Infrastructure
         {
             return m.Name.EqualsIC(action);
         }
+
+        public static MethodInfo[] GetPublicInstanceMethods(this Type t)
+        {
+            return t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+        }
     }
 }

@@ -1,31 +1,136 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Isop.Configuration;
 using Isop.Controller;
 using Isop.Help;
 using Isop.Infrastructure;
 using Isop.Lex;
 using Isop.Parse;
-using TypeConverterFunc=System.Func<System.Type,string,System.Globalization.CultureInfo,object>;
+using TypeConverterFunc = System.Func<System.Type, string, System.Globalization.CultureInfo, object>;
 namespace Isop
 {
     /// <summary>
     /// represents a configuration build
     /// </summary>
-    public class Build:IDisposable
+    public class Build : ConfigureUsingInstance, IDisposable
     {
         private readonly IList<ArgumentWithOptions> _argumentRecognizers;
         private readonly IList<Func<ControllerRecognizer>> _controllerRecognizers;
-        public CultureInfo Culture { get; private set; }
-        public TypeConverterFunc TypeConverter { get; private set; }
         private HelpForControllers _helpForControllers;
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
-        private readonly TypeContainer _container=new TypeContainer();
-        private readonly HelpXmlDocumentation _helpXmlDocumentation = new HelpXmlDocumentation();
+        private readonly TypeContainer _container = new TypeContainer();
+        public override Func<Type, object> Factory
+        {
+            get
+            {
+                return _container.Factory;
+            }
+            set
+            {
+                _container.Factory = value;
+            }
+        }
+
+        public override TypeConverterFunc TypeConverter
+        {
+            get;
+            set;
+        }
+
+        public override bool RecognizeHelp
+        {
+            get { return RecognizesHelp; }
+            set
+            {
+                if (value)
+                {
+                    ShouldRecognizeHelp();
+                }
+                else if (RecognizesHelp)
+                {
+                    throw new NotImplementedException("! Deregister help controller etc");
+                }
+            }
+        }
+
+        public override IList<ArgumentWithOptions> ArgumentRecognizers
+        {
+            get { return _argumentRecognizers; }
+        }
+
+        HelpXmlDocumentation _HelpXmlDocumentation = new HelpXmlDocumentation();
+
+        private class RecognizeTypeList : ICollection<Type>
+        {
+            private readonly Build _build;
+
+            public RecognizeTypeList(Build build)
+            {
+                this._build = build;
+            }
+
+            public IEnumerator<Type> GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            public void Add(Type item)
+            {
+                _build.Recognize(item);
+            }
+
+            public void Clear()
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Contains(Type item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void CopyTo(Type[] array, int arrayIndex)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Remove(Type item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public int Count
+            {
+                get { return _build._controllerRecognizers.Count; }
+            }
+
+            public bool IsReadOnly
+            {
+                get { return false; }
+            }
+        }
+
+        public override ICollection<Type> Recognizes
+        {
+            get { return new RecognizeTypeList(this); }
+        }
+
+        public override HelpXmlDocumentation HelpXmlDocumentation
+        {
+            get { return _HelpXmlDocumentation; }
+        }
+
         public Build()
         {
             _controllerRecognizers = new List<Func<ControllerRecognizer>>();
@@ -44,20 +149,20 @@ namespace Isop
         /// <returns></returns>
         public Build SetCulture(CultureInfo cultureInfo)
         {
-            Culture = cultureInfo; return this;
+            CultureInfo = cultureInfo; return this;
         }
 
         public Build SetTypeConverter(TypeConverterFunc typeconverter)
         {
             TypeConverter = typeconverter; return this;
         }
-		
-		public Build SetFactory(Func<Type,Object> factory)
-		{
-		    _container.Factory=factory;
-		    return this;
-		}
-		
+
+        public Build SetFactory(Func<Type, Object> factory)
+        {
+            _container.Factory = factory;
+            return this;
+        }
+
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
             return Parse(arg.ToList());
@@ -82,23 +187,23 @@ namespace Isop
             return parsedArguments;
         }
 
-        public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
+        public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false)
         {
-            _controllerRecognizers.Add(()=>new ControllerRecognizer(arg, 
-                cultureInfo?? Culture, 
+            _controllerRecognizers.Add(() => new ControllerRecognizer(arg,
+                cultureInfo ?? CultureInfo,
                 typeConverter ?? TypeConverter,
                 ignoreGlobalUnMatchedParameters,
                 _allowInferParameter));
             return this;
         }
-		public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters=false)
+        public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false)
         {
             _controllerRecognizers.Add(() => new ControllerRecognizer(arg.GetType(),
-               cultureInfo?? Culture ,
-               typeConverter ?? TypeConverter, 
-               ignoreGlobalUnMatchedParameters, 
+               cultureInfo ?? CultureInfo,
+               typeConverter ?? TypeConverter,
+               ignoreGlobalUnMatchedParameters,
                _allowInferParameter));
-            _container.Instances.Add(arg.GetType(),arg);
+            _container.Instances.Add(arg.GetType(), arg);
             return this;
         }
 
@@ -110,9 +215,9 @@ namespace Isop
 
         public String Help()
         {
-            var cout = new StringWriter(Culture);
-            Parse(new []{"Help"}).Invoke(cout);
-			return cout.ToString();
+            var cout = new StringWriter(CultureInfo);
+            Parse(new[] { "Help" }).Invoke(cout);
+            return cout.ToString();
         }
 
         /// <summary>
@@ -128,7 +233,7 @@ namespace Isop
             string theSubCommandsFor,
             string helpSubCommandForMoreInformation)
         {
-            RecognizeHelp();
+            ShouldRecognizeHelp();
             var helpForControllers = _helpForControllers;
             helpForControllers.TheCommandsAre = theCommandsAre;
             helpForControllers.HelpCommandForMoreInformation = helpCommandForMoreInformation;
@@ -136,42 +241,42 @@ namespace Isop
             helpForControllers.HelpSubCommandForMoreInformation = helpSubCommandForMoreInformation;
             return this;
         }
-        
+
         public Build HelpTextArgumentsAre(string theArgumentsAre)
         {
-            RecognizeHelp();
+            ShouldRecognizeHelp();
             _helpForArgumentWithOptions.TheArgumentsAre = theArgumentsAre;
             return this;
         }
 
-        public string HelpFor(string controller, string action=null)
+        public string HelpFor(string controller, string action = null)
         {
-            var cout = new StringWriter(Culture);
-            Parse( new[] { "Help", controller, action }
-                .Where(s=>!string.IsNullOrEmpty(s))).Invoke(cout);
+            var cout = new StringWriter(CultureInfo);
+            Parse(new[] { "Help", controller, action }
+                .Where(s => !string.IsNullOrEmpty(s))).Invoke(cout);
             return cout.ToString();
         }
 
-        public Build RecognizeHelp()
+        public Build ShouldRecognizeHelp()
         {
-            if (_helpController==null)
+            if (_helpController == null)
             {
-                _helpForControllers = new HelpForControllers(_controllerRecognizers, _container, _helpXmlDocumentation);
+                _helpForControllers = new HelpForControllers(_controllerRecognizers, _container, HelpXmlDocumentation);
                 _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
                 _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
-                Recognize(_helpController, ignoreGlobalUnMatchedParameters:true);
+                Recognize(_helpController, ignoreGlobalUnMatchedParameters: true);
             }
             return this;
         }
 
         public bool RecognizesHelp
         {
-            get { return _helpController!=null; }
+            get { return _helpController != null; }
         }
 
         public IEnumerable<ControllerRecognizer> ControllerRecognizers
         {
-            get { return _controllerRecognizers.Select(cr=>cr()); }
+            get { return _controllerRecognizers.Select(cr => cr()); }
         }
 
         public IEnumerable<ArgumentWithOptions> GlobalParameters
@@ -188,99 +293,49 @@ namespace Isop
 
         public void Dispose()
         {
-            foreach (var item in disposables) 
+            foreach (var item in disposables)
             {
                 item.Dispose();
             }
             disposables.Clear();
         }
-        
+
         public Build Configuration<T>(T instance)
         {
-            return Configuration(typeof(T),instance);
+            return Configuration(typeof(T), instance);
         }
-        public Build Configuration(Type t,object instance)
+        public Build Configuration(Type t, object instance)
         {
-            var methods= t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+            Configure(t, instance);
 
-            var culture = methods.MatchGet(name:"Culture",
-                                    returnType: typeof(CultureInfo),
-                                    parameters: new Type[0]);
-            if (null!=culture)
-                Culture = (CultureInfo)culture.Invoke(instance,new object[0]);
-            
-            var recognizesMethod = methods.MatchGet(name:"Recognizes",
-                                             returnType: typeof(IEnumerable<Type>),
-                                             parameters: new Type[0]);
-            if (null!=recognizesMethod)
-            {
-                var recognizes=(IEnumerable<Type>)recognizesMethod.Invoke(instance, new object[0]);
-                foreach (var recognized in recognizes)
-                {
-                    Recognize(recognized);
-                }
-            }
-            var objectFactory = methods.Match(name: "ObjectFactory",
-                                          returnType: typeof(object),
-                                          parameters: new[] { typeof(Type) });
-            if (null!=objectFactory)
-                SetFactory((Func<Type, object>)Delegate.CreateDelegate(typeof(Func<Type, object>), instance, objectFactory));
-
-            var configurationSetters = methods.FindSet();
-            foreach (var methodInfo in configurationSetters)
-            {
-                var action = (Action<String>)Delegate.CreateDelegate(typeof(Action<String>), 
-                    instance, methodInfo.MethodInfo);
-                var description = _helpXmlDocumentation.GetDescriptionForMethod(methodInfo.MethodInfo);
-                this.Parameter(methodInfo.Name.RemoveSetFromBeginningOfString(),
-                    action:action,
-                    description:description,
-                    required: methodInfo.Required);//humz? required?
-            }
-            var recongizeHelp = methods.MatchGet(name:"RecognizeHelp",
-                                           returnType: typeof(bool),
-                                           parameters: new Type[0]);
-                
-            if (null!=recongizeHelp && (bool)recongizeHelp.Invoke(instance,new object[0]))
-            {
-                RecognizeHelp() ;
-            }
-   
-            var typeconv = methods.MatchGet(name:"TypeConverter",
-                                      returnType: typeof(TypeConverterFunc),
-                                      parameters: new Type[0]);
-            if (null!=typeconv)
-            {
-                SetTypeConverter((TypeConverterFunc)typeconv.Invoke(instance,new object[0]));
-            }
-            
-            if (instance is IDisposable) 
+            if (instance is IDisposable)
                 disposables.Add((IDisposable)instance);
-            
-            return this;            
+
+            return this;
         }
 
         public Build Configuration(Type type)
         {
-            return Configuration(type,Activator.CreateInstance(type));
+            return Configuration(type, Activator.CreateInstance(type));
         }
 
-        public Build ConfigurationFrom (string path)
+        public Build ConfigurationFrom(string path)
         {
             var files = Directory.GetFiles(path)
-                .Where(f=>{
+                .Where(f =>
+                {
                     var ext = Path.GetExtension(f);
                     return ext.EqualsIC(".dll") || ext.EqualsIC(".exe");
                 })
-                .Where(f=>!Path.GetFileNameWithoutExtension(f).StartsWithIC("Isop"));
-            foreach (var file in files) 
+                .Where(f => !Path.GetFileNameWithoutExtension(f).StartsWithIC("Isop"));
+            foreach (var file in files)
             {
-                var assembly= Assembly.LoadFile(file);
+                var assembly = Assembly.LoadFile(file);
                 var isopconfigurations = assembly.GetTypes()
-                    .Where(type=>type.Name.EqualsIC("isopconfiguration"));
-                foreach (var config in isopconfigurations) 
+                    .Where(type => type.Name.EqualsIC("isopconfiguration"));
+                foreach (var config in isopconfigurations)
                 {
-                   Configuration(config);
+                    Configuration(config);
                 }
                 if (!isopconfigurations.Any())
                 {
