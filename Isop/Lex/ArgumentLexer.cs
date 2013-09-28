@@ -5,19 +5,10 @@ using System.Text.RegularExpressions;
 
 namespace Isop.Lex
 {
-    public class ArgumentLexer : List<Token>
+    public class ArgumentLexer
     {
         private static readonly Regex ParamPattern = new Regex("(?<paramPrefix>--|/|-)(?<param>[^:=]*)([:=]?)(?<paramValue>.*)");
 
-        public ArgumentLexer(IEnumerable<string> arg)
-            : this(Lex(arg.ToList()))
-        {
-        }
-
-        public ArgumentLexer(IEnumerable<Token> tokens)
-            : base(tokens)
-        {
-        }
         /// <summary>
         /// The case --parameter parametervalue
         /// </summary>
@@ -58,7 +49,7 @@ namespace Isop.Lex
             }
         }
 
-        public static IEnumerable<Token> Lex(IList<string> arg)
+        public static IEnumerable<Token> Lex(IEnumerable<string> arg)
         {
             return SelectWithPrevious(ReWriteArgumentsToParameterValue, 
                 arg.SelectMany(MapTokensFromRaw));

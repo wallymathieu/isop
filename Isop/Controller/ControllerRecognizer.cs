@@ -40,7 +40,7 @@ namespace Isop.Controller
         private readonly CultureInfo _culture;
         public Type Type { get; private set; }
         public bool IgnoreGlobalUnMatchedParameters { get; private set; }
-        private readonly Transform _transform = new Transform();
+        private readonly RewriteLexedTokensToSupportHelpAndIndex _rewriteLexedTokensToSupportHelpAndIndex = new RewriteLexedTokensToSupportHelpAndIndex();
         /// <summary>
         /// </summary>
         public ControllerRecognizer(Type type, CultureInfo cultureInfo=null, Func<Type, string, CultureInfo, object> typeConverter = null, bool ignoreGlobalUnMatchedParameters = false, bool allowInferParameter=false)
@@ -54,7 +54,7 @@ namespace Isop.Controller
 
         public bool Recognize(IEnumerable<string> arg)
         {
-            var lexer = _transform.Rewrite(new ArgumentLexer(arg));
+            var lexer = _rewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
             return null != FindMethodInfo(lexer);
         }
 
@@ -88,7 +88,7 @@ namespace Isop.Controller
         /// <returns></returns>
         public ParsedMethod Parse(IEnumerable<string> arg)
         {
-            var lexer = _transform.Rewrite(new ArgumentLexer(arg));
+            var lexer = _rewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
 
             var methodInfo = FindMethodInfo(lexer);
 

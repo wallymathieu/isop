@@ -69,7 +69,7 @@
     <Compile Include="Parse\MergedParsedArguments.cs" />
     <Compile Include="Parse\UnrecognizedArgument.cs" />
     <Compile Include="Controller\TypeConversionFailedException.cs" />
-    <Compile Include="Controller\Transform.cs" />
+    <Compile Include="Controller\RewriteLexedTokensToSupportHelpAndIndex.cs" />
     <Compile Include="Controller\ParsedMethod.cs" />
     <Compile Include="Infrastructure\MethodInfoOrProperty.cs" />
     <Compile Include="Help\HelpXmlDocumentation.cs" />

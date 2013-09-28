@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Isop.Lex;
 
 namespace Isop.Controller
 {
-    public class Transform
+    public class RewriteLexedTokensToSupportHelpAndIndex
     {
         // Lexer -> 
         // Arg(ControllerName),Param(..),.. -> Arg(ControllerName),Arg('Index'),... 
-        public ArgumentLexer Rewrite(ArgumentLexer tokens)
+        public IList<Token> Rewrite(IList<Token> tokens)
         {
             //"--command"
             if (tokens.Count() >= 2 
@@ -41,7 +42,7 @@ namespace Isop.Controller
             {
                 tokens.Add(indexToken);
             }
-            return new ArgumentLexer(tokens);
+            return tokens;
         }
     }
 }

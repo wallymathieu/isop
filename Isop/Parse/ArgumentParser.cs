@@ -19,7 +19,7 @@ namespace Isop.Parse
 
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
-            var lexer = new ArgumentLexer(arguments);
+            var lexer = ArgumentLexer.Lex(arguments).ToList();
             var parsedArguments = Parse(lexer, arguments);
             var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
 
@@ -34,7 +34,7 @@ namespace Isop.Parse
             return parsedArguments;
         }
 
-        public ParsedArguments Parse(ArgumentLexer lex, IEnumerable<string> arguments)
+        public ParsedArguments Parse(IList<Token> lex, IEnumerable<string> arguments)
         {
             var recognizedIndexes = new List<int>();
             var lexer = new PeekEnumerable<Token>(lex);

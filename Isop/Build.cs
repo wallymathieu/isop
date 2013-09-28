@@ -62,8 +62,8 @@ namespace Isop
         {
 			var argumentParser = new ArgumentParser(_argumentRecognizers, _allowInferParameter);
             // TODO: Need to figure out where this goes. To Much logic for this layer.
-            var lexer = new ArgumentLexer(arg);
-            var parsedArguments = argumentParser.Parse(lexer, arg);
+            var lexed = ArgumentLexer.Lex(arg).ToList();
+            var parsedArguments = argumentParser.Parse(lexed, arg);
             if (_controllerRecognizers.Any())
             {
                 var recognizers = _controllerRecognizers.Select(cr=>cr());

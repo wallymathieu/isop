@@ -108,8 +108,8 @@
     <Compile Include='..\Isop\Controller\TypeConversionFailedException.cs'>
       <Link>Isop\Controller\TypeConversionFailedException.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Controller\Transform.cs'>
-      <Link>Isop\Controller\Transform.cs</Link>
+    <Compile Include='..\Isop\Controller\RewriteLexedTokensToSupportHelpAndIndex.cs'>
+      <Link>Isop\Controller\RewriteLexedTokensToSupportHelpAndIndex.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Controller\ParsedMethod.cs'>
       <Link>Isop\Controller\ParsedMethod.cs</Link>

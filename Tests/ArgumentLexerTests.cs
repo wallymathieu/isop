@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Isop;
+﻿using System.Linq;
 using Isop.Infrastructure;
 using Isop.Lex;
 using NUnit.Framework;
@@ -16,7 +12,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_tokenize_simple_argument()
         {
-            var lexer = new ArgumentLexer(new[] { "argument" });
+            var lexer = ArgumentLexer.Lex(new[] { "argument" });
             var tokens = lexer.ToArray();
             Assert.That(tokens, Is.EquivalentTo(new[] { new Token("argument", TokenType.Argument, 0) }));
         }
@@ -24,7 +20,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_tokenize_parameter()
         {
-            var lexer = new ArgumentLexer(new[] { "--parameter" });
+            var lexer = ArgumentLexer.Lex(new[] { "--parameter" });
             var tokens = lexer.ToArray();
             Assert.That(tokens, Is.EquivalentTo(new[] { new Token("parameter", TokenType.Parameter, 0) }));
         }
@@ -32,7 +28,7 @@ namespace Isop.Tests
         [Test]
         public void It_can_tokenize_parameter2()
         {
-            var lexer = new ArgumentLexer(new[] { "/parameter" });
+            var lexer = ArgumentLexer.Lex(new[] { "/parameter" });
             var tokens = lexer.ToArray();
             Assert.That(tokens, Is.EquivalentTo(new[] { new Token("parameter", TokenType.Parameter, 0) }));
         }
@@ -40,21 +36,21 @@ namespace Isop.Tests
         [Test]
         public void It_can_tokenize_parametervalue()
         {
-            var lexer = new ArgumentLexer(new[] { "--parameter","parametervalue" });
+            var lexer = ArgumentLexer.Lex(new[] { "--parameter", "parametervalue" });
             var tokens = lexer.ToArray();
             Assert.That(tokens, Is.EquivalentTo(new[] { new Token("parameter", TokenType.Parameter, 0), new Token("parametervalue", TokenType.ParameterValue, 1) }));
         }
         [Test]
         public void It_can_tokenize_parametervalue2()
         {
-            var lexer = new ArgumentLexer(new[] { "--parameter=parametervalue" });
+            var lexer = ArgumentLexer.Lex(new[] { "--parameter=parametervalue" });
             var tokens = lexer.ToArray();
             Assert.That(tokens, Is.EquivalentTo(new[] { new Token("parameter", TokenType.Parameter, 0), new Token("parametervalue", TokenType.ParameterValue, 1) }));
         }
         [Test]
         public void It_can_peek_tokenized_value()
         {
-            var lexer = new PeekEnumerable<Token>( new ArgumentLexer(new[] { "--parameter=parametervalue" , "argument"}));
+            var lexer = new PeekEnumerable<Token>(ArgumentLexer.Lex(new[] { "--parameter=parametervalue", "argument" }));
             lexer.Next();
             var first = lexer.Peek();
             Assert.That(first, Is.EqualTo(new Token("parametervalue", TokenType.ParameterValue, 1)));
