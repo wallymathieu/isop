@@ -17,6 +17,7 @@ namespace Isop.Controller
         }
         private readonly TypeContainer _container;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
+        private string _andAcceptTheFollowingParameters;
         public string TheCommandsAre { get; set; }
         public string TheSubCommandsFor { get; set; }
         public string HelpCommandForMoreInformation { get; set; }
@@ -33,6 +34,7 @@ namespace Isop.Controller
             HelpCommandForMoreInformation = "Se 'COMMANDNAME' help <command> for more information";
             TheCommandsAre = "The commands are:";
             TheSubCommandsFor = "The sub commands for ";
+            _andAcceptTheFollowingParameters = "And accept the following parameters";
         }
         private string Description(Type t, MethodInfo method = null)
         {
@@ -75,15 +77,19 @@ namespace Isop.Controller
 
         private string HelpForAction(ControllerRecognizer cmr, string action)
         {
-            var methodAndArguments = cmr.GetMethodAndArguments(action);
-            var arguments = methodAndArguments.GetMethodArguments().Select(r => DescriptionAndHelp(r));
+            var methodAndArguments = cmr.FindMethod(action);
+            var arguments = methodAndArguments.GetMethodArgumentsRecognizers().Select(DescriptionAndHelp);
             if (arguments.Any())
+            {
                 return string.Format(@"{0} {1}
-And accept the following parameters:
+{3}:
 {2}", methodAndArguments.Name, Description(cmr.Type, methodAndArguments.Method), String.Join(", ",
-    arguments));
+    arguments), _andAcceptTheFollowingParameters);
+            }
             else
+            {
                 return string.Format(@"{0} {1}", methodAndArguments.Name, Description(cmr.Type, methodAndArguments.Method));
+            }
         }
 
         private string DescriptionAndHelp(ArgumentWithOptions r)

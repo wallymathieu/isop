@@ -114,19 +114,10 @@ namespace Isop.Controller
                        };
         }
 
-        private MethodInfo GetMethod(string action)
+        public MethodAndArguments FindMethod(string action)
         {
-            return GetMethods().SingleOrDefault(m => m.WithName(action));
-        }
-
-        public MethodAndArguments GetMethodAndArguments(string action)
-        {
-            return new MethodAndArguments(GetMethod(action),this);
-        }
-
-        internal IEnumerable<ArgumentWithOptions> GetRecognizers(MethodInfo method)
-        {
-            return _turnParametersToArgumentWithOptions.GetRecognizers(method);
+            return new MethodAndArguments(GetMethods().SingleOrDefault(m => m.WithName(action)),
+                _turnParametersToArgumentWithOptions);
         }
     }
 }

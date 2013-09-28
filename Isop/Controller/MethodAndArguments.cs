@@ -6,18 +6,20 @@ namespace Isop.Controller
 {
     public class MethodAndArguments
     {
-        public MethodAndArguments(MethodInfo methodinfo, ControllerRecognizer cr)
+        private readonly TurnParametersToArgumentWithOptions _turnParametersToArgumentWithOptions;
+        
+        public MethodAndArguments(MethodInfo methodinfo, TurnParametersToArgumentWithOptions turnParametersToArgumentWithOptions)
         {
             Method = methodinfo;
-            _cr = cr;
+            _turnParametersToArgumentWithOptions = turnParametersToArgumentWithOptions;
         }
-        private readonly ControllerRecognizer _cr;
+
         public string Name { get { return Method.Name; } }
 
         public MethodInfo Method { get; private set; }
-        public IEnumerable<ArgumentWithOptions> GetMethodArguments()
+        public IEnumerable<ArgumentWithOptions> GetMethodArgumentsRecognizers()
         {
-            return _cr.GetRecognizers(Method);
+            return _turnParametersToArgumentWithOptions.GetRecognizers(Method);
         }
     }
 }
