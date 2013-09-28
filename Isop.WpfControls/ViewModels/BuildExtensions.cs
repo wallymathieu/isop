@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Isop.Controller;
 using Isop.Infrastructure;
-using Isop.Parse;
 
 namespace Isop.WpfControls.ViewModels
 {
@@ -11,7 +12,7 @@ namespace Isop.WpfControls.ViewModels
         public static ParsedMethod Parse(this Build that, Method currentMethod)
         {
             var controllerRecognizer = that.ControllerRecognizers
-                .First(c => c.ClassName().Equals(currentMethod.ClassName));
+                .First(c => c.Key.ControllerName().Equals(currentMethod.ClassName));
 
             var parsedArguments = currentMethod.Parameters.GetParsedArguments();
             var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
@@ -24,34 +25,42 @@ namespace Isop.WpfControls.ViewModels
                           };
             }
 
-            var method = controllerRecognizer.GetMethods()
+            var method = controllerRecognizer.Key.GetControllerActionMethods()
                 .First(m => m.Name.Equals(currentMethod.Name));
-            var parsedMethod = controllerRecognizer.Parse(method, parsedArguments);
+            var parsedMethod = controllerRecognizer.Value().Parse(method, parsedArguments);
             parsedMethod.Factory = that.GetFactory();
             return parsedMethod;
         }
 
         public static MethodTreeModel GetMethodTreeModel(this Build that)
         {
-            return new MethodTreeModel(new List<Param>(
+            return new MethodTreeModel(globalParameters:new List<Param>(
                                            that.GlobalParameters
                                                .Select(p => new Param(typeof(string), p.Argument.ToString(), p)))
                                            .ToArray(),
-                                       that.ControllerRecognizers
-                                           .Where(cmr => !cmr.ClassName().EqualsIC("help"))
-                                           .Select(cmr => new Controller
-                                                              {
-                                                                  Name = cmr.ClassName(),
-                                                                  Methods = cmr.GetMethods().Select(m => new Method(m.Name, cmr.ClassName(), that.HelpController())
-                                                                                                             {
-                                                                                                                 Parameters = new List<Param>(
-                                                                                                                     cmr.GetMethodParameterRecognizers(m).Select(p =>
-                                                                                                                                                                 new Param(p.Type, p.Argument.Prototype, p
-                                                                                                                                                                     )).ToArray())
-                                                                                                             }).ToArray()
-                                                              }).ToArray(),
-                                       that
-                );
+                                       controllers:that.Recognizes
+                                           .Where(cmr => !cmr.ControllerName().EqualsIC("help"))
+                                           .Select(cmr => Controller(that, cmr)).ToArray(),
+                                       build:that);
+        }
+
+        private static Controller Controller(Build that, Type type)
+        {
+            return new Controller
+                       {
+                           Name = type.ControllerName(),
+                           Methods = type.GetControllerActionMethods().Select(m => Method(that, type, m)).ToArray()
+                       };
+        }
+
+        private static Method Method(Build that, Type type, MethodInfo m)
+        {
+            var t = new TurnParametersToArgumentWithOptions(that.CultureInfo, that.TypeConverter);
+            var @params = t.GetRecognizers(m).Select(p => new Param(p.Type, p.Argument.Prototype, p));
+            return new Method(m.Name, type.ControllerName(), that.HelpController())
+                       {
+                           Parameters = new List<Param>(@params.ToArray())
+                       };
         }
     }
 }

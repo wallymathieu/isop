@@ -49,7 +49,6 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Configuration\ConfigureUsingInstance.cs" />
     <Compile Include="Controller\FindMethodAmongLexedTokens.cs" />
-    <Compile Include="Controller\MethodAndArguments.cs" />
     <Compile Include="Controller\TurnParametersToArgumentWithOptions.cs" />
     <Compile Include="Infrastructure\ListExtensions.cs" />
     <Compile Include="Controller\TypeContainer.cs" />

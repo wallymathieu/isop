@@ -72,7 +72,7 @@ namespace Isop.Infrastructure
             else return null;
         }
 
-        public static IEnumerable<MethodInfo> GetOwnPublicMethods(Type type)
+        public static IEnumerable<MethodInfo> GetOwnPublicMethods(this Type type)
         {
             return type.GetMethods(BindingFlags.Public| BindingFlags.Instance)
                 .Where(m=>!m.DeclaringType.Equals(typeof(Object)))
@@ -109,6 +109,17 @@ namespace Isop.Infrastructure
         public static MethodInfo[] GetPublicInstanceMethods(this Type t)
         {
             return t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        public static IEnumerable<MethodInfo> GetControllerActionMethods(this Type type)
+        {
+            return type.GetOwnPublicMethods()
+                .Where(m => !m.Name.EqualsIC("help"));
+        }
+
+        public static string ControllerName(this Type type)
+        {
+            return type.Name.Replace("Controller", "");
         }
     }
 }

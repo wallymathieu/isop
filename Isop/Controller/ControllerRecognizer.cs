@@ -15,18 +15,17 @@ namespace Isop.Controller
         private readonly TurnParametersToArgumentWithOptions _turnParametersToArgumentWithOptions;
         /// <summary>
         /// </summary>
-        public ControllerRecognizer(Type type, CultureInfo cultureInfo = null, Func<Type, string, CultureInfo, object> typeConverter = null, bool ignoreGlobalUnMatchedParameters = false, bool allowInferParameter = false)
+        public ControllerRecognizer(Type type, 
+            CultureInfo cultureInfo = null, 
+            Func<Type, string, CultureInfo, object> typeConverter = null, 
+            bool ignoreGlobalUnMatchedParameters = false, 
+            bool allowInferParameter = false)
         {
             Type = type;
             _culture = cultureInfo ?? CultureInfo.CurrentCulture;
             IgnoreGlobalUnMatchedParameters = ignoreGlobalUnMatchedParameters;
             _allowInferParameter = allowInferParameter;
             _turnParametersToArgumentWithOptions = new TurnParametersToArgumentWithOptions(_culture, typeConverter);
-        }
-
-        public IEnumerable<ArgumentWithOptions> GetMethodParameterRecognizers(MethodInfo methodInfo)
-        {
-            return _turnParametersToArgumentWithOptions.GetRecognizers(methodInfo);
         }
 
         public IEnumerable<ArgumentWithOptions> GetRecognizers(string methodname)
@@ -46,24 +45,14 @@ namespace Isop.Controller
 
         private MethodInfo FindMethodInfo(IList<Token> arg)
         {
-            var foundClassName = ClassName().EqualsIC(arg.ElementAtOrDefault(0).Value);
+            var foundClassName = Type.ControllerName().EqualsIC(arg.ElementAtOrDefault(0).Value);
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1).Value;
-                var methodInfo = FindMethodAmongLexedTokens.FindMethod(GetMethods(), methodName, arg);
+                var methodInfo = FindMethodAmongLexedTokens.FindMethod(Type.GetControllerActionMethods(), methodName, arg);
                 return methodInfo;
             }
             return null;
-        }
-        public IEnumerable<MethodInfo> GetMethods()
-        {
-            return ReflectionExtensions.GetOwnPublicMethods(Type)
-                .Where(m => !m.Name.EqualsIC("help"));
-        }
-
-        public string ClassName()
-        {
-            return Type.Name.Replace("Controller", "");
         }
 
         /// <summary>
@@ -81,7 +70,7 @@ namespace Isop.Controller
             var argumentRecognizers = _turnParametersToArgumentWithOptions.GetRecognizers(methodInfo)
                 .ToList();
             argumentRecognizers.InsertRange(0, new[] { 
-                new ArgumentWithOptions(ArgumentParameter.Parse("#0" + ClassName(), _culture), required: true, type: typeof(string)),
+                new ArgumentWithOptions(ArgumentParameter.Parse("#0" + Type.ControllerName(), _culture), required: true, type: typeof(string)),
                 new ArgumentWithOptions(ArgumentParameter.Parse("#1" + methodInfo.Name, _culture), required: false, type: typeof(string))
             });
 
@@ -112,12 +101,6 @@ namespace Isop.Controller
                            RecognizedActionParameters = recognizedActionParameters,
                            RecognizedClass = Type
                        };
-        }
-
-        public MethodAndArguments FindMethod(string action)
-        {
-            return new MethodAndArguments(GetMethods().SingleOrDefault(m => m.WithName(action)),
-                _turnParametersToArgumentWithOptions);
         }
 
         public ParsedArguments ParseArgumentsAndMerge(ParsedArguments parsedArguments, Action<ParsedMethod> action=null)

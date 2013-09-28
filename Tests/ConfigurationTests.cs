@@ -37,7 +37,7 @@ namespace Isop.Tests
         [Test]
         public void RecognizeRecognizers()
         {
-            Assert.That(_parserBuilder.ControllerRecognizers.Select(cr => cr.Type).ToArray(),
+            Assert.That(_parserBuilder.ControllerRecognizers.Select(cr => cr.Key).ToArray(),
                 Is.EquivalentTo(new[] { typeof(MyController), typeof(HelpController) }));
         }
         [Test]

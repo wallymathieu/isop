@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Isop.Controller;
 using Isop.Parse;
 using Isop.Parse.Parameters;
 using Isop.Tests.FakeControllers;
@@ -217,7 +216,7 @@ namespace Isop.Tests
                             .SetFactory(factory);
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, True], [param3, True], [param4, True]",Boolean.Parse);
 
-            var recognizers = build.ControllerRecognizers.Single().GetRecognizers("Action");
+            var recognizers = build.ControllerRecognizers.Single().Value().GetRecognizers("Action");
             Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
@@ -247,7 +246,7 @@ namespace Isop.Tests
                             .SetFactory(factory);
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, False], [param3, False], [param4, False]",Boolean.Parse);
 
-            var recognizers = build.ControllerRecognizers.Single().GetRecognizers("Action");
+            var recognizers = build.ControllerRecognizers.Single().Value().GetRecognizers("Action");
             Assert.That (recognizers.Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
