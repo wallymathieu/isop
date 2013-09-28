@@ -167,11 +167,10 @@ namespace Isop.Tests
                                                     (object)
                                                     new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
                                             };
-            var arguments = new Build()
-                                               .SetCulture(CultureInfo.InvariantCulture)
-                                               .Recognize(typeof(MyController))
-                                               .SetFactory(factory)
-                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+            var arguments = new Build { typeof(MyController) }
+                                .SetCulture(CultureInfo.InvariantCulture)
+                                .SetFactory(factory)
+                                .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
@@ -189,11 +188,10 @@ namespace Isop.Tests
                     (object)
                     new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
             };
-            var arguments = new Build()
-                                               .SetCulture(CultureInfo.InvariantCulture)
-                                               .Recognize(typeof(MyController))
-                                               .SetFactory(factory)
-                                               .Parse(new[] { "My", "Action",  "value1","value2", "3", "3.4" });
+            var arguments = new Build { typeof(MyController) }
+                            .SetCulture(CultureInfo.InvariantCulture)
+                            .SetFactory(factory)
+                            .Parse(new[] { "My", "Action",  "value1","value2", "3", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
@@ -210,9 +208,8 @@ namespace Isop.Tests
                     (object)
                     new MyController() { OnAction = (p1, p2, p3, p4) => "" };
             };
-            var build = new Build()
+            var build = new Build { typeof(MyController) }
                             .SetCulture(CultureInfo.InvariantCulture)
-                            .Recognize(typeof(MyController))
                             .SetFactory(factory);
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, True], [param3, True], [param4, True]",Boolean.Parse);
 
@@ -264,9 +261,8 @@ namespace Isop.Tests
                                                                 { parameters = new object[] { p1, p2, p3, p4 }; return ""; }
                                                };
             };
-            var arguments = new Build()
+            var arguments = new Build { typeof(MyOptionalController) }
                     .SetCulture(CultureInfo.InvariantCulture)
-                    .Recognize(typeof(MyOptionalController))
                     .SetFactory(factory)
                     .Parse(new[] { "MyOptional", "Action", "--param1", "value1"});
             arguments.Invoke(new StringWriter());
@@ -288,9 +284,8 @@ namespace Isop.Tests
                         { parameters = new object[] { p1, p2, p3, p4 }; return ""; }
                     };
             };
-            var arguments = new Build()
+            var arguments = new Build { typeof(MyOptionalController) }
                     .SetCulture(CultureInfo.InvariantCulture)
-                    .Recognize(typeof(MyOptionalController))
                     .SetFactory(factory)
                     .Parse(new[] { "MyOptional", "Action", "value1" });
             arguments.Invoke(new StringWriter());
@@ -301,9 +296,8 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail()
         {
-            var builder = new Build()
-                .SetCulture(CultureInfo.InvariantCulture)
-                .Recognize(typeof(MyController));
+            var builder = new Build { typeof(MyController) }
+                .SetCulture(CultureInfo.InvariantCulture);
 
             Assert.Throws<MissingArgumentException>(() => builder.Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" }));
         }
@@ -311,9 +305,8 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail_because_of_type_conversion()
         {
-            var builder = new Build()
-                 .SetCulture(CultureInfo.InvariantCulture)
-                 .Recognize(typeof(SingleIntAction));
+            var builder = new Build { typeof(SingleIntAction) }
+                 .SetCulture(CultureInfo.InvariantCulture);
             Assert.Throws<TypeConversionFailedException>(() =>
                 builder.Parse(new[] { "SingleIntAction", "Action", "--param", "value" })
             );
@@ -322,9 +315,8 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail_because_no_arguments_given()
         {
-            var builder = new Build()
-                .SetCulture(CultureInfo.InvariantCulture)
-                .Recognize(typeof(MyController));
+            var builder = new Build { typeof(MyController) }
+                .SetCulture(CultureInfo.InvariantCulture);
 
             Assert.Throws<MissingArgumentException>(() => builder.Parse(new[] { "My", "Action" }));
         }
@@ -342,11 +334,11 @@ namespace Isop.Tests
                                                     new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
                                             };
             var arguments = new Build()
-                                               .SetCulture(CultureInfo.InvariantCulture)
-                                               .Recognize(typeof(MyController))
-                                               .Parameter("beta", arg => countArg++)
-                                               .SetFactory(factory)
-                                               .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4", "--beta" });
+                        .SetCulture(CultureInfo.InvariantCulture)
+                        .Recognize(typeof(MyController))
+                        .Parameter("beta", arg => countArg++)
+                        .SetFactory(factory)
+                        .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4", "--beta" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());

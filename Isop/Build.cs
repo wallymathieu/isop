@@ -17,7 +17,7 @@ namespace Isop
     /// <summary>
     /// represents a configuration build
     /// </summary>
-    public class Build : ConfigureUsingInstance, IDisposable
+    public class Build : ConfigureUsingInstance,ICollection<Type>, IDisposable
     {
         private readonly IList<ArgumentWithOptions> _argumentRecognizers;
         private readonly IList<KeyValuePair<Type,Func<ControllerRecognizer>>> _controllerRecognizers;
@@ -64,66 +64,56 @@ namespace Isop
             get { return _argumentRecognizers; }
         }
 
-        HelpXmlDocumentation _HelpXmlDocumentation = new HelpXmlDocumentation();
+        readonly HelpXmlDocumentation _HelpXmlDocumentation = new HelpXmlDocumentation();
 
-        private class RecognizeTypeList : ICollection<Type>
+        public IEnumerator<Type> GetEnumerator()
         {
-            private readonly Build _build;
+            return _controllerRecognizers.Select(cmr => cmr.Key).GetEnumerator();
+        }
 
-            public RecognizeTypeList(Build build)
-            {
-                _build = build;
-            }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
-            public IEnumerator<Type> GetEnumerator()
-            {
-                return _build._controllerRecognizers.Select(cmr => cmr.Key).GetEnumerator();
-            }
+        public void Add(Type item)
+        {
+            Recognize(item);
+        }
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+        public void Clear()
+        {
+            throw new NotImplementedException();
+        }
 
-            public void Add(Type item)
-            {
-                _build.Recognize(item);
-            }
+        public bool Contains(Type item)
+        {
+            return _controllerRecognizers.Any(kv => kv.Key == item);
+        }
 
-            public void Clear()
-            {
-                throw new NotImplementedException();
-            }
+        public void CopyTo(Type[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
 
-            public bool Contains(Type item)
-            {
-                return _build._controllerRecognizers.Any(kv => kv.Key == item);
-            }
+        public bool Remove(Type item)
+        {
+            throw new NotImplementedException();
+        }
 
-            public void CopyTo(Type[] array, int arrayIndex)
-            {
-                throw new NotImplementedException();
-            }
+        public int Count
+        {
+            get { return _controllerRecognizers.Count; }
+        }
 
-            public bool Remove(Type item)
-            {
-                throw new NotImplementedException();
-            }
-
-            public int Count
-            {
-                get { return _build._controllerRecognizers.Count; }
-            }
-
-            public bool IsReadOnly
-            {
-                get { return false; }
-            }
+        public bool IsReadOnly
+        {
+            get { return false; }
         }
 
         public override ICollection<Type> Recognizes
         {
-            get { return new RecognizeTypeList(this); }
+            get { return this; }
         }
 
         public override HelpXmlDocumentation HelpXmlDocumentation
