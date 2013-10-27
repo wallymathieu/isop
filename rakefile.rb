@@ -2,10 +2,13 @@ require './visual_studio.rb'
 require 'albacore'
 
 task :default => ['isop:ms:build']
+task :nugetpack => ['isop:ms:nugetpack']
+
 namespace :isop do
 
 namespace :ms do
-  dir = File.dirname(__FILE__)
+  dir = File.join(File.dirname(__FILE__),'src')
+  nugetfolder = File.join(File.dirname(__FILE__),'nuget')
   desc "build using msbuild"
   msbuild :build do |msb|
     msb.properties :configuration => :Debug
@@ -25,7 +28,7 @@ namespace :ms do
   end
 
   task :core_copy_to_nuspec => [:build] do
-    output_directory_lib = File.join(dir,"nuget/Isop/lib/40/")
+    output_directory_lib = File.join(nugetfolder,"Isop/lib/40/")
     mkdir_p output_directory_lib
     ['Isop'].each{ |project|
       cp Dir.glob("./#{project}/bin/Debug/*.dll"), output_directory_lib
@@ -33,7 +36,7 @@ namespace :ms do
     
   end
   task :runners_copy_to_nuspec => [:build] do
-    output_directory_lib = File.join(dir,"nuget/Isop.Runners/tools/")
+    output_directory_lib = File.join(nugetfolder,"Isop.Runners/tools/")
     mkdir_p output_directory_lib
     ['Isop.Wpf', 'Isop.Auto.Cli'].each{ |project|
       cp Dir.glob("./#{project}/bin/Debug/*.exe"), output_directory_lib
@@ -44,14 +47,14 @@ namespace :ms do
   task :nugetpack => [:core_nugetpack, :runners_nugetpack]
 
   task :core_nugetpack => [:core_copy_to_nuspec] do |nuget|
-    cd File.join(dir,"nuget/Isop") do
-      sh "..\\..\\.nuget\\NuGet.exe pack Isop.nuspec"
+    cd File.join(nugetfolder,"Isop") do
+      sh "..\\..\\src\\.nuget\\NuGet.exe pack Isop.nuspec"
     end
   end
 
   task :runners_nugetpack => [:runners_copy_to_nuspec] do |nuget|
-    cd File.join(dir,"nuget/Isop.Runners") do
-      sh "..\\..\\.nuget\\NuGet.exe pack Isop.Runners.nuspec"
+    cd File.join(nugetfolder,"Isop.Runners") do
+      sh "..\\..\\src\\.nuget\\NuGet.exe pack Isop.Runners.nuspec"
     end
   end
 end
