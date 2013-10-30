@@ -30,125 +30,125 @@ You're hooking it up by writing something like:
 
 Where your controller looks something like this:
 <pre><code>
-    public class MyController
+public class MyController
+{
+    private readonly CustomerRepository _repository;
+    public MyController()
     {
-        private readonly CustomerRepository _repository;
-        public MyController()
-        {
-            _repository = new CustomerRepository();
-        }
-
-        public IEnumerable&lt;string&gt; Add(string name)
-        { 
-            yield return "Starting to insert customer";
-            _repository.Insert( new Customer{ Name = name } );
-            yield return "Customer inserted";  
-        }
-    }</code></pre>
+        _repository = new CustomerRepository();
+    }
+    public IEnumerable&lt;string&gt; Add(string name)
+    { 
+        yield return "Starting to insert customer";
+        _repository.Insert( new Customer{ Name = name } );
+        yield return "Customer inserted";  
+    }
+}
+</code></pre>
 When invoked it will output two lines to the command prompt, the yielded lines above.
 
 h3. Using a configuration class for isop
 
 <pre><code>
-    class IsopConfiguration:IDisposable
+class IsopConfiguration:IDisposable
+{
+...
+    public IEnumerable<Type> Recognizes()
     {
-    ...
-        public IEnumerable<Type> Recognizes()
-        {
-            return new[] { typeof(CustomerController) };
-        }
-        public object ObjectFactory(Type type)
-        {
-            return _myIOC.Resolve(type);
-        }
-        public CultureInfo Culture
-        {
-            get{ return CultureInfo.GetCultureInfo("sv-SE"); }
-        }
-        public bool RecognizeHelp{get{return true;}}
-        public void Dispose()
-        {
-            _myIOC.Dispose();
-        }
+        return new[] { typeof(CustomerController) };
     }
-    class Program
+    public object ObjectFactory(Type type)
     {
-        static void Main(string[] args)
-        {
-            var configuration = new IsopConfiguration();
-            new Build()
-              .Configuration(configuration)
-              .Parse(args)
-              .Invoke(Console.Out);
-        }
-    }</code></pre>
+        return _myIOC.Resolve(type);
+    }
+    public CultureInfo Culture
+    {
+        get{ return CultureInfo.GetCultureInfo("sv-SE"); }
+    }
+    public bool RecognizeHelp{get{return true;}}
+    public void Dispose()
+    {
+        _myIOC.Dispose();
+    }
+}
+class Program
+{
+    static void Main(string[] args)
+    {
+        var configuration = new IsopConfiguration();
+        new Build()
+          .Configuration(configuration)
+          .Parse(args)
+          .Invoke(Console.Out);
+    }
+}</code></pre>
 
 This is equivalent to the following fluent configuration of isop:
 
 <pre><code>
-    class Program
+class Program
+{
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            new Build()
-              .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
-              .Recognize(typeof(CustomerController))
-              .SetFactory(_myIOC.Resolve);
-              .ShouldRecognizeHelp()
-              .Parse(args)
-              .Invoke(Console.Out);
-        }
-    }</code></pre>
+        new Build()
+          .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
+          .Recognize(typeof(CustomerController))
+          .SetFactory(_myIOC.Resolve);
+          .ShouldRecognizeHelp()
+          .Parse(args)
+          .Invoke(Console.Out);
+    }
+}</code></pre>
 
 h3. Handling errors and unrecognized parameters
 
 <pre><code>
-    class Program
+class Program
+{
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        var parserBuilder = new Build()
+                  .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
+                  .Recognize(typeof(CustomerController))
+                  .SetFactory(_myIOC.Resolve);
+                  .ShouldRecognizeHelp();
+        try
         {
-            var parserBuilder = new Build()
-                      .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
-                      .Recognize(typeof(CustomerController))
-                      .SetFactory(_myIOC.Resolve);
-                      .ShouldRecognizeHelp();
-            try
+            var parsedMethod = parserBuilder.Parse(args);
+            if (parsedMethod.UnRecognizedArguments.Any())//Warning:
             {
-                var parsedMethod = parserBuilder.Parse(args);
-                if (parsedMethod.UnRecognizedArguments.Any())//Warning:
-                {
-                    var unRecognizedArgumentsMessage = string.Format(
-  @"Unrecognized arguments: 
-  {0}
-  Did you mean any of these arguments?
-  {1}", String.Join(",", parsedMethod.UnRecognizedArguments.Select(unrec => unrec.Value).ToArray()),
-      String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Argument.ToString()).ToArray()));
-                    Console.WriteLine(unRecognizedArgumentsMessage);
-                }else
-                {
-                    parsedMethod.Invoke(Console.Out);
-                }
-            }
-            catch (TypeConversionFailedException ex)
+                var unRecognizedArgumentsMessage = string.Format(
+@"Unrecognized arguments: 
+{0}
+Did you mean any of these arguments?
+{1}", String.Join(",", parsedMethod.UnRecognizedArguments.Select(unrec => unrec.Value).ToArray()),
+  String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Argument.ToString()).ToArray()));
+                Console.WriteLine(unRecognizedArgumentsMessage);
+            }else
             {
-                
-                 Console.WriteLine(String.Format("Could not convert argument {0} with value {1} to type {2}", 
-                    ex.Argument, ex.Value, ex.TargetType));
-                 if (null!=ex.InnerException)
-                {
-                    Console.WriteLine("Inner exception: ");
-                    Console.WriteLine(ex.InnerException.Message);
-                }
+                parsedMethod.Invoke(Console.Out);
             }
-            catch (MissingArgumentException ex)
-            {
-                Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray())));
-                
-                Console.WriteLine(parserBuilder.Help());
-            }
-
         }
-    }</code></pre>
+        catch (TypeConversionFailedException ex)
+        {
+            
+             Console.WriteLine(String.Format("Could not convert argument {0} with value {1} to type {2}", 
+                ex.Argument, ex.Value, ex.TargetType));
+             if (null!=ex.InnerException)
+            {
+                Console.WriteLine("Inner exception: ");
+                Console.WriteLine(ex.InnerException.Message);
+            }
+        }
+        catch (MissingArgumentException ex)
+        {
+            Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray())));
+            
+            Console.WriteLine(parserBuilder.Help());
+        }
+
+    }
+}</code></pre>
 
 Why all this code? Mostly it's because I want the programmer to be able to have as much freedom as possible to handle errors and show error messages as he/she sees fit.
 
@@ -156,36 +156,36 @@ h3. Using Isop.cli.exe
 
 You're hooking it up by writing something like:
 <pre><code> class IsopConfiguration
+{
+    public IEnumerable<Type> Recognizes()
     {
-        public IEnumerable<Type> Recognizes()
-        {
-            return new[] { typeof(CustomerController) };
-        }
-        public string Global {
-            get;
-            set;
-        }
-        [Required]
-        public string GlobalRequired
-        {
-            get;
-            set;
-        }
-        public object ObjectFactory(Type type)
-        {
-            return _myIOC.Resolve(type);
-        }
-        public CultureInfo Culture
-        {
-            get{ return CultureInfo.GetCultureInfo("es-ES"); }
-        }
-        public bool RecognizeHelp{get{return true;}}
-        
-        public Func<Type, string, CultureInfo, object> GetTypeconverter()
-        {
-            return TypeConverter;
-        }
+        return new[] { typeof(CustomerController) };
     }
+    public string Global {
+        get;
+        set;
+    }
+    [Required]
+    public string GlobalRequired
+    {
+        get;
+        set;
+    }
+    public object ObjectFactory(Type type)
+    {
+        return _myIOC.Resolve(type);
+    }
+    public CultureInfo Culture
+    {
+        get{ return CultureInfo.GetCultureInfo("es-ES"); }
+    }
+    public bool RecognizeHelp{get{return true;}}
+    
+    public Func<Type, string, CultureInfo, object> GetTypeconverter()
+    {
+        return TypeConverter;
+    }
+}
 </code></pre>
 
 This configuration will have a Global variable (that is, a parameter that can be set for any action). It will have a required global parameter (you must set that parameter in order to run any action). Note that you can insert your own type converter (how the strings will be converted to different values in the controller action parameters).
@@ -197,14 +197,14 @@ Since Isop does not know your IOC it provides a hook (ObjectFactory) in order to
 The same configuration class can be consumed by the fluent api: 
 
 <pre><code>
-      static void Main(string[] args)
-      {
-          var configuration = new IsopConfiguration();
-          new Build()
-            .Configuration(configuration)
-            .Parse(args)
-            .Invoke(Console.Out);
-      }
+static void Main(string[] args)
+{
+    var configuration = new IsopConfiguration();
+    new Build()
+      .Configuration(configuration)
+      .Parse(args)
+      .Invoke(Console.Out);
+}
 </code></pre>
 
 You can invoke your program by (where you have Isop.Cli.exe in the same folder as your dll or exe containing the above class)
