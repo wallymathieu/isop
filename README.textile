@@ -29,25 +29,25 @@ You're hooking it up by writing something like:
 }</code></pre>
 
 Where your controller looks something like this:
-<pre><code>public class MyController
-{
-  private readonly CustomerRepository _repository;
-  public MyController()
-  {
-    _repository = new CustomerRepository();
-  }
+<pre><code>
+    public class MyController
+    {
+        private readonly CustomerRepository _repository;
+        public MyController()
+        {
+            _repository = new CustomerRepository();
+        }
 
-  /// <summary>
-  /// add a new customer with name
-  /// </summary>
-  public IEnumerable&lt;string&gt; Add(string name)
-  { 
-    yield return "Starting to insert customer";
-    _repository.Insert( new Customer{ Name = name } );
-    yield return "Customer inserted";  
-  }
-
-}</code></pre>
+        /// <summary>
+        /// add a new customer with name
+        /// </summary>
+        public IEnumerable&lt;string&gt; Add(string name)
+        { 
+            yield return "Starting to insert customer";
+            _repository.Insert( new Customer{ Name = name } );
+            yield return "Customer inserted";  
+        }
+    }</code></pre>
 When invoked it will output two lines to the command prompt, the yielded lines above.
 
 h3. Using a configuration class for isop
@@ -76,14 +76,14 @@ h3. Using a configuration class for isop
     }
     class Program
     {
-      static void Main(string[] args)
-      {
-          var configuration = new IsopConfiguration();
-          new Build()
-            .Configuration(configuration)
-            .Parse(args)
-            .Invoke(Console.Out);
-      }
+        static void Main(string[] args)
+        {
+            var configuration = new IsopConfiguration();
+            new Build()
+              .Configuration(configuration)
+              .Parse(args)
+              .Invoke(Console.Out);
+        }
     }</code></pre>
 
 This is equivalent to the following fluent configuration of isop:
@@ -91,16 +91,16 @@ This is equivalent to the following fluent configuration of isop:
 <pre><code>
     class Program
     {
-      static void Main(string[] args)
-      {
-          new Build()
-            .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
-            .Recognize(typeof(CustomerController))
-            .SetFactory(_myIOC.Resolve);
-            .ShouldRecognizeHelp()
-            .Parse(args)
-            .Invoke(Console.Out);
-      }
+        static void Main(string[] args)
+        {
+            new Build()
+              .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
+              .Recognize(typeof(CustomerController))
+              .SetFactory(_myIOC.Resolve);
+              .ShouldRecognizeHelp()
+              .Parse(args)
+              .Invoke(Console.Out);
+        }
     }</code></pre>
 
 h3. Handling errors and unrecognized parameters
@@ -108,49 +108,49 @@ h3. Handling errors and unrecognized parameters
 <pre><code>
     class Program
     {
-      static void Main(string[] args)
-      {
-          var parserBuilder = new Build()
-                    .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
-                    .Recognize(typeof(CustomerController))
-                    .SetFactory(_myIOC.Resolve);
-                    .ShouldRecognizeHelp();
-          try
-          {
-              var parsedMethod = parserBuilder.Parse(args);
-              if (parsedMethod.UnRecognizedArguments.Any())//Warning:
-              {
-                  var unRecognizedArgumentsMessage = string.Format(
-@"Unrecognized arguments: 
-{0}
-Did you mean any of these arguments?
-{1}", String.Join(",", parsedMethod.UnRecognizedArguments.Select(unrec => unrec.Value).ToArray()),
-    String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Argument.ToString()).ToArray()));
-                  Console.WriteLine(unRecognizedArgumentsMessage);
-              }else
-              {
-                  parsedMethod.Invoke(Console.Out);
-              }
-          }
-          catch (TypeConversionFailedException ex)
-          {
-              
-               Console.WriteLine(String.Format("Could not convert argument {0} with value {1} to type {2}", 
-                  ex.Argument, ex.Value, ex.TargetType));
-               if (null!=ex.InnerException)
-              {
-                  Console.WriteLine("Inner exception: ");
-                  Console.WriteLine(ex.InnerException.Message);
-              }
-          }
-          catch (MissingArgumentException ex)
-          {
-              Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray())));
-              
-              Console.WriteLine(parserBuilder.Help());
-          }
+        static void Main(string[] args)
+        {
+            var parserBuilder = new Build()
+                      .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
+                      .Recognize(typeof(CustomerController))
+                      .SetFactory(_myIOC.Resolve);
+                      .ShouldRecognizeHelp();
+            try
+            {
+                var parsedMethod = parserBuilder.Parse(args);
+                if (parsedMethod.UnRecognizedArguments.Any())//Warning:
+                {
+                    var unRecognizedArgumentsMessage = string.Format(
+  @"Unrecognized arguments: 
+  {0}
+  Did you mean any of these arguments?
+  {1}", String.Join(",", parsedMethod.UnRecognizedArguments.Select(unrec => unrec.Value).ToArray()),
+      String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Argument.ToString()).ToArray()));
+                    Console.WriteLine(unRecognizedArgumentsMessage);
+                }else
+                {
+                    parsedMethod.Invoke(Console.Out);
+                }
+            }
+            catch (TypeConversionFailedException ex)
+            {
+                
+                 Console.WriteLine(String.Format("Could not convert argument {0} with value {1} to type {2}", 
+                    ex.Argument, ex.Value, ex.TargetType));
+                 if (null!=ex.InnerException)
+                {
+                    Console.WriteLine("Inner exception: ");
+                    Console.WriteLine(ex.InnerException.Message);
+                }
+            }
+            catch (MissingArgumentException ex)
+            {
+                Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray())));
+                
+                Console.WriteLine(parserBuilder.Help());
+            }
 
-      }
+        }
     }</code></pre>
 
 Why all this code? Mostly it's because I want the programmer to be able to have as much freedom as possible to handle errors and show error messages as he/she sees fit.
