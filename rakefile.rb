@@ -1,4 +1,4 @@
-require './visual_studio.rb'
+require 'visual_studio_files.rb'
 require 'albacore'
 
 task :default => ['isop:ms:build']
@@ -62,18 +62,17 @@ end
 
 desc "regenerate links in isop cli"
 task :regen_cli do
-  isop = VisualStudio::CsProj.new(File.open(File.join($dir,'Isop','Isop.csproj'), "r").read)
+  isop = VisualStudioFiles::CsProj.new(File.open(File.join($dir,'Isop','Isop.csproj'), "r").read)
   isop_files = isop.files.select do |file|
     file.type=='Compile' && !file.file.end_with?('AssemblyInfo.cs')
   end
     
-  cli = VisualStudio::CsProj.new(File.open(File.join($dir,'Isop.Auto.Cli','Isop.Cli.csproj'), "r").read)
+  cli = VisualStudioFiles::CsProj.new(File.open(File.join($dir,'Isop.Auto.Cli','Isop.Cli.csproj'), "r").read)
   cli.clear_links
   isop_files.each do |file|
-    opts = file.to_opts
-    opts[:file] = "..\\Isop\\#{file.file}"
-    opts[:link] = "Isop\\#{file.file}"
-    cli.add(VisualStudio::FileReference.new(opts))
+    file[:file] = "..\\Isop\\#{file.file}"
+    file[:link] = "Isop\\#{file.file}"
+    cli.add(file)
   end
   File.open(File.join($dir,'Isop.Auto.Cli','Isop.Cli.csproj'), "w") do |f|
     cli.write f
@@ -82,28 +81,26 @@ end
 
 desc "regenerate links in isop wpf"
 task :regen_wpf do
-  isop = VisualStudio::CsProj.new(File.open(File.join($dir,'Isop','Isop.csproj'), "r").read)
+  isop = VisualStudioFiles::CsProj.new(File.open(File.join($dir,'Isop','Isop.csproj'), "r").read)
   isop_files = isop.files.select do |file|
     file.type=='Compile' && !file.file.end_with?('AssemblyInfo.cs')
   end
-  wpfcontrols = VisualStudio::CsProj.new(File.open(File.join($dir,'Isop.WpfControls','Isop.WpfControls.csproj'), "r").read)
+  wpfcontrols = VisualStudioFiles::CsProj.new(File.open(File.join($dir,'Isop.WpfControls','Isop.WpfControls.csproj'), "r").read)
   wpfcontrol_files = wpfcontrols.files.select do |file|
     !file.file.end_with?('AssemblyInfo.cs')
   end
   
-  wpf = VisualStudio::CsProj.new(File.open(File.join($dir,'Isop.Wpf','Isop.Wpf.csproj'), "r").read)
+  wpf = VisualStudioFiles::CsProj.new(File.open(File.join($dir,'Isop.Wpf','Isop.Wpf.csproj'), "r").read)
   wpf.clear_links
   isop_files.each do |file|
-    opts = file.to_opts
-    opts[:file] = "..\\Isop\\#{file.file}"
-    opts[:link] = "Isop\\#{file.file}"
-    wpf.add(VisualStudio::FileReference.new(opts))
+    file[:file] = "..\\Isop\\#{file.file}"
+    file[:link] = "Isop\\#{file.file}"
+    wpf.add(file)
   end
   wpfcontrol_files.each do |file|
-    opts = file.to_opts
-    opts[:file] = "..\\Isop.WpfControls\\#{file.file}"
-    opts[:link] = "WpfControls\\#{file.file}"
-    wpf.add(VisualStudio::FileReference.new(opts))
+    file[:file] = "..\\Isop.WpfControls\\#{file.file}"
+    file[:link] = "WpfControls\\#{file.file}"
+    wpf.add(file)
   end
 
   File.open(File.join($dir,'Isop.Wpf','Isop.Wpf.csproj'), "w") do |f|
