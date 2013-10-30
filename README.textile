@@ -23,12 +23,137 @@ You're hooking it up by writing something like:
 <pre><code>static void Main(string[] args)
 {
   new Build()
-       .Recognize(typeof(MyController))
+       .Recognize(typeof(CustomerController))
        .Parse(args)
        .Invoke(Console.Out);
 }</code></pre>
 
-Look at the <a href="/wallymathieu/isop/blob/master/Example/Program.cs">Example project</a> for the most recent example of how it is used. 
+Where your controller looks something like this:
+<pre><code>public class MyController
+{
+  private readonly CustomerRepository _repository;
+  public MyController()
+  {
+    _repository = new CustomerRepository();
+  }
+
+  /// <summary>
+  /// add a new customer with name
+  /// </summary>
+  public IEnumerable&lt;string&gt; Add(string name)
+  { 
+    yield return "Starting to insert customer";
+    _repository.Insert( new Customer{ Name = name } );
+    yield return "Customer inserted";  
+  }
+
+}</code></pre>
+When invoked it will output two lines to the command prompt, the yielded lines above.
+
+h3. Using a configuration class for isop
+
+<pre><code>
+    class IsopConfiguration:IDisposable
+    {
+    ...
+        public IEnumerable<Type> Recognizes()
+        {
+            return new[] { typeof(CustomerController) };
+        }
+        public object ObjectFactory(Type type)
+        {
+            return _myIOC.Resolve(type);
+        }
+        public CultureInfo Culture
+        {
+            get{ return CultureInfo.GetCultureInfo("sv-SE"); }
+        }
+        public bool RecognizeHelp{get{return true;}}
+        public void Dispose()
+        {
+            _myIOC.Dispose();
+        }
+    }
+    class Program
+    {
+      static void Main(string[] args)
+      {
+          var configuration = new IsopConfiguration();
+          new Build()
+            .Configuration(configuration)
+            .Parse(args)
+            .Invoke(Console.Out);
+      }
+    }</code></pre>
+
+This is equivalent to the following fluent configuration of isop:
+
+<pre><code>
+    class Program
+    {
+      static void Main(string[] args)
+      {
+          new Build()
+            .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
+            .Recognize(typeof(CustomerController))
+            .SetFactory(_myIOC.Resolve);
+            .ShouldRecognizeHelp()
+            .Parse(args)
+            .Invoke(Console.Out);
+      }
+    }</code></pre>
+
+h3. Handling errors and unrecognized parameters
+
+<pre><code>
+    class Program
+    {
+      static void Main(string[] args)
+      {
+          var parserBuilder = new Build()
+                    .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
+                    .Recognize(typeof(CustomerController))
+                    .SetFactory(_myIOC.Resolve);
+                    .ShouldRecognizeHelp();
+          try
+          {
+              var parsedMethod = parserBuilder.Parse(args);
+              if (parsedMethod.UnRecognizedArguments.Any())//Warning:
+              {
+                  var unRecognizedArgumentsMessage = string.Format(
+@"Unrecognized arguments: 
+{0}
+Did you mean any of these arguments?
+{1}", String.Join(",", parsedMethod.UnRecognizedArguments.Select(unrec => unrec.Value).ToArray()),
+    String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Argument.ToString()).ToArray()));
+                  Console.WriteLine(unRecognizedArgumentsMessage);
+              }else
+              {
+                  parsedMethod.Invoke(Console.Out);
+              }
+          }
+          catch (TypeConversionFailedException ex)
+          {
+              
+               Console.WriteLine(String.Format("Could not convert argument {0} with value {1} to type {2}", 
+                  ex.Argument, ex.Value, ex.TargetType));
+               if (null!=ex.InnerException)
+              {
+                  Console.WriteLine("Inner exception: ");
+                  Console.WriteLine(ex.InnerException.Message);
+              }
+          }
+          catch (MissingArgumentException ex)
+          {
+              Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray())));
+              
+              Console.WriteLine(parserBuilder.Help());
+          }
+
+      }
+    }</code></pre>
+
+Why all this code? Mostly it's because I want the programmer to be able to have as much freedom as possible to handle errors and show error messages as he/she sees fit.
 
 h3. Using Isop.cli.exe
 
@@ -37,15 +162,56 @@ You're hooking it up by writing something like:
     {
         public IEnumerable<Type> Recognizes()
         {
-            return new[] { typeof(MyController) };
+            return new[] { typeof(CustomerController) };
+        }
+        public string Global {
+            get;
+            set;
+        }
+        [Required]
+        public string GlobalRequired
+        {
+            get;
+            set;
+        }
+        public object ObjectFactory(Type type)
+        {
+            return _myIOC.Resolve(type);
+        }
+        public CultureInfo Culture
+        {
+            get{ return CultureInfo.GetCultureInfo("es-ES"); }
         }
         public bool RecognizeHelp{get{return true;}}
+        
+        public Func<Type, string, CultureInfo, object> GetTypeconverter()
+        {
+            return TypeConverter;
+        }
     }
 </code></pre>
 
-Then invoking your program by 
-<pre><code>Isop.Cli.exe My Action --argument value</code></pre>
-After you have put Isop.Cli.exe (and Isop.dll of course) in the same folder as your dll that contains the class IsopConfiguration.
+This configuration will have a Global variable (that is, a parameter that can be set for any action). It will have a required global parameter (you must set that parameter in order to run any action). Note that you can insert your own type converter (how the strings will be converted to different values in the controller action parameters).
+
+Why enter culture code? Isop tries as much as possible to adhere to the user specified culturecode. This have some implications for people using sv-SE or any other culture where the standard date formatting does not fit.
+
+Since Isop does not know your IOC it provides a hook (ObjectFactory) in order to be able to resolve the controllers.
+
+The same configuration class can be consumed by the fluent api: 
+
+<pre><code>
+      static void Main(string[] args)
+      {
+          var configuration = new IsopConfiguration();
+          new Build()
+            .Configuration(configuration)
+            .Parse(args)
+            .Invoke(Console.Out);
+      }
+</code></pre>
+
+You can invoke your program by (where you have Isop.Cli.exe in the same folder as your dll or exe containing the above class)
+<pre><code>Isop.Cli.exe Customer Add --name value</code></pre>
 
 Look at the <a href="/wallymathieu/isop/blob/master/Example.Cli/Program.cs">Example Cli project</a> for the most recent example of how it is used. 
 
