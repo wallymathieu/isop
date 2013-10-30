@@ -181,9 +181,7 @@
     </Compile>
     <Compile Include='..\Isop.WpfControls\MethodView.xaml.cs'>
       <Link>WpfControls\MethodView.xaml.cs</Link>
-      <DependentUpon>
-        <DependentUpon>MethodView.xaml</DependentUpon>
-      </DependentUpon>
+      <DependentUpon>MethodView.xaml</DependentUpon>
     </Compile>
     <Compile Include='..\Isop.WpfControls\ViewModels\BuildExtensions.cs'>
       <Link>WpfControls\ViewModels\BuildExtensions.cs</Link>
@@ -205,12 +203,8 @@
     </Compile>
     <Page Include='..\Isop.WpfControls\MethodView.xaml'>
       <Link>WpfControls\MethodView.xaml</Link>
-      <Generator>
-        <Generator>MSBuild:Compile</Generator>
-      </Generator>
-      <SubType>
-        <SubType>Designer</SubType>
-      </SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets'/>
