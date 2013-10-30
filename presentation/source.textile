@@ -1,0 +1,95 @@
+
+h1. Isop
+
+h2. Intro: Overview
+
+h3. What kind of problem does this lib solve?
+
+Mostly it's intended to reduce the amount of code needed to create command line applications. It's also intended to give structure to your command line application (to simplify the reuse of your code).
+
+h3. Goal
+
+The goal is to be able to write code like:
+
+<pre><code>someprogram.exe My Action --argument value</code></pre>
+
+So that the class with the name My or MyController and the method with the name Action gets invoked.
+
+h3. Description
+
+This library is intended to be like chocolate pudding mix. Not something that will replace your dinner, but rather something easy to make for dessert. A way of helping you build for instance the essential administrative apps. It’s not a replacement for baking cake (building a full blown administrative interface in html, silverlight, wpf).
+
+h2. How to use?
+
+h3. Having your own Main
+
+You're hooking it up by writing something like:
+<pre><code>static void Main(string[] args)
+{
+  ArgumentParser.Build()
+                .Recognize(typeof(MyController))
+                .Parse(args)
+                .Invoke(Console.Out);
+}</code></pre>
+
+Look at the <a href="/wallymathieu/isop/blob/master/Example/Program.cs">Example project</a> for the most recent example of how it is used. 
+
+h3. Having just a library 
+
+h4. Why do you want to do this? 
+
+You might have different kind of users that want to consume the interaction using different UI. For instance letting your user use Isop.cli.exe for command line or Isop.wpf.exe handle the interaction with a wpf gui. You could add a web interface for the same configuration.
+
+h4. How do you accomplish this?
+
+You're hooking it up by writing something like:
+<pre><code> class IsopConfiguration
+    {
+        public IEnumerable<Type> Recognizes()
+        {
+            return new[] { typeof(MyController) };
+        }
+        public bool RecognizeHelp{get{return true;}}
+    }
+</code></pre>
+
+Then invoking your program by 
+<pre><code>Isop.Cli.exe My Action --argument value</code></pre>
+After you have put Isop.Cli.exe in the same folder as your dll that contains the class IsopConfiguration.
+
+Look at the <a href="/wallymathieu/isop/blob/master/Example.Cli/Program.cs">Example Cli project</a> for the most recent example of how it is used. 
+
+h2. Contrib: How to change? 
+
+h3. Reading the code: Start by browsing the tests
+
+Run the tests. Do they fail? Hopefully not. Read what the test promise that the code is supposed to do.
+
+h3. Changing the code: Add tests
+
+It's missing something? Add another test. It should be red (since the functionality is missing). Change the code so that the tests pass. Refactor the code so that it's easier to read. Run the tests... 
+
+h3. Bugs?
+
+Use "github issue tracker":https://github.com/wallymathieu/isop/issues . This project is an open source project. That means that you cant expect anyone to fix your problems (they might do it anyway).
+
+If youre using a project and you have problem with bugs:
+* Add issue to issue tracker
+  ** If it's an active project, you might get quick response.
+* Fork it
+  ** If you've done something small that fixes the issue, send a pull request with a comment about how it fixes the issue. 
+
+h2. The code and the structure of the code
+
+* Fluent interface ^A thin layer on top of the object model^ 
+  (uses) -> 
+    ** Controller recognizers ^Responsible for setting up the parsing and recognizing of controller input^
+    ** Argument with options ^Responsible for parsing global style parameters^
+      (uses) -> 
+      *** Parser
+      *** Lexer
+
+Note that the fluent api is supposed to be a relatively thin layer on the model. This is to have a nice abstraction to write tests against.
+
+Many of the components in this lib are heavy users of reflection. This is to enable a sort of duck type experience (and have a very loose coupling of your code to isop). The library will also try to read the xml documentation to display better help. Instead of using our own attributes, we use the "data annotations Required attribute":http://msdn.microsoft.com/en-us/library/system.componentmodel.dataannotations.requiredattribute.aspx .
+
