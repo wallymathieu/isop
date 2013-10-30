@@ -38,9 +38,6 @@ Where your controller looks something like this:
             _repository = new CustomerRepository();
         }
 
-        /// <summary>
-        /// add a new customer with name
-        /// </summary>
         public IEnumerable&lt;string&gt; Add(string name)
         { 
             yield return "Starting to insert customer";
