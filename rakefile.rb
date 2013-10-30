@@ -70,9 +70,10 @@ task :regen_cli do
   cli = VisualStudioFiles::CsProj.new(File.open(File.join($dir,'Isop.Auto.Cli','Isop.Cli.csproj'), "r").read)
   cli.clear_links
   isop_files.each do |file|
-    file[:file] = "..\\Isop\\#{file.file}"
-    file[:link] = "Isop\\#{file.file}"
-    cli.add(file)
+    hash = file.to_hash
+    hash[:file] = "..\\Isop\\#{file.file}"
+    hash[:link] = "Isop\\#{file.file}"
+    cli.add(hash)
   end
   File.open(File.join($dir,'Isop.Auto.Cli','Isop.Cli.csproj'), "w") do |f|
     cli.write f
@@ -93,14 +94,16 @@ task :regen_wpf do
   wpf = VisualStudioFiles::CsProj.new(File.open(File.join($dir,'Isop.Wpf','Isop.Wpf.csproj'), "r").read)
   wpf.clear_links
   isop_files.each do |file|
-    file[:file] = "..\\Isop\\#{file.file}"
-    file[:link] = "Isop\\#{file.file}"
-    wpf.add(file)
+    hash = file.to_hash
+    hash[:file] = "..\\Isop\\#{file.file}"
+    hash[:link] = "Isop\\#{file.file}"
+    wpf.add(hash)
   end
   wpfcontrol_files.each do |file|
-    file[:file] = "..\\Isop.WpfControls\\#{file.file}"
-    file[:link] = "WpfControls\\#{file.file}"
-    wpf.add(file)
+    hash = file.to_hash
+    hash[:file] = "..\\Isop.WpfControls\\#{file.file}"
+    hash[:link] = "WpfControls\\#{file.file}"
+    wpf.add(hash)
   end
 
   File.open(File.join($dir,'Isop.Wpf','Isop.Wpf.csproj'), "w") do |f|
