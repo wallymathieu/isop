@@ -111,10 +111,15 @@ end
 
 
 namespace :mono do
-  dir = File.dirname(__FILE__)
   desc "build isop on mono"
   xbuild :build do |msb|
-    msb.properties :configuration => :Debug
+    solution_dir = File.join(File.dirname(__FILE__),'src')
+    nuget_tools_path = File.join(solution_dir, '.nuget')
+    msb.properties :configuration => :Debug, 
+      :SolutionDir => solution_dir,
+      :NuGetToolsPath => nuget_tools_path,
+      :NuGetExePath => File.join(nuget_tools_path, 'NuGet.exe'),
+      :PackagesDir => File.join(solution_dir, 'packages')
     msb.targets :rebuild
     msb.verbosity = 'quiet'
     msb.solution = File.join('.','src',"Isop.sln")
@@ -129,6 +134,7 @@ namespace :mono do
       sh "#{command} #{assemblies}"
     end
   end
+
   desc "copy example cli to cli folder"
   task :copy_cli => :build do
     cp "Example.Cli/bin/Debug/Example.Cli.dll", "Isop.Auto.Cli/bin/Debug"

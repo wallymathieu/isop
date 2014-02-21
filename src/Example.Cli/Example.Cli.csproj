@@ -11,6 +11,7 @@
     <AssemblyName>Example.Cli</AssemblyName>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\isop\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <PackagesConfig>$(ProjectDir)/packages.config</PackagesConfig>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

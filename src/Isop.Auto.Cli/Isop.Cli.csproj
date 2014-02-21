@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition='$(SolutionDir) == &apos;&apos; Or $(SolutionDir) == &apos;*Undefined*&apos;'>..\..\isop\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <PackagesConfig>$(ProjectDir)/packages.config</PackagesConfig>
   </PropertyGroup>
   <PropertyGroup Condition=' &apos;$(Configuration)|$(Platform)&apos; == &apos;Debug|x86&apos; '>
     <PlatformTarget>x86</PlatformTarget>

@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
-        <NuGetToolsPath>$([System.IO.Path]::Combine($(SolutionDir), ".nuget"))</NuGetToolsPath>
-        <NuGetExePath>$(NuGetToolsPath)\nuget.exe</NuGetExePath>
-        <PackagesConfig>$([System.IO.Path]::Combine($(ProjectDir), "packages.config"))</PackagesConfig>
-        <PackagesDir>$([System.IO.Path]::Combine($(SolutionDir), "packages"))</PackagesDir>
+        <NuGetToolsPath Condition="$(NuGetToolsPath) == '' Or $(NuGetToolsPath) == '*Undefined*'">$([System.IO.Path]::Combine($(SolutionDir), ".nuget"))</NuGetToolsPath>
+        <NuGetExePath Condition="$(NuGetExePath) == '' Or $(NuGetExePath) == '*Undefined*'">$(NuGetToolsPath)\nuget.exe</NuGetExePath>
+        <PackagesConfig Condition="$(PackagesConfig) == '' Or $(PackagesConfig) == '*Undefined*'">$([System.IO.Path]::Combine($(ProjectDir), "packages.config"))</PackagesConfig>
+        <PackagesDir Condition="$(PackagesDir) == '' Or $(PackagesDir) == '*Undefined*'">$([System.IO.Path]::Combine($(SolutionDir), "packages"))</PackagesDir>
         <PackageOutputDir Condition="$(PackageOutputDir) == ''">$(TargetDir.Trim('\\'))</PackageOutputDir>
 
         <!-- Package sources used to restore packages. By default will used the registered sources under %APPDATA%\NuGet\NuGet.Config -->
