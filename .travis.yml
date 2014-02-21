@@ -9,6 +9,6 @@ install:
   - sudo installer -pkg "MonoFramework-MDK-${MONO_VERSION}.macos10.xamarin.x86.pkg" -target /
 
 script: 
-  - xbuild ./src/Isop/Isop.csproj
-  - xbuild ./src/Tests/Tests.csproj
+  - bundle install 
+  - rake mono:build
   - /Library/Frameworks/Mono.framework/Versions/${MONO_VERSION}/bin/nunit-console4 ./src/Tests/debug/Tests.dll

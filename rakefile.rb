@@ -1,10 +1,8 @@
 require 'visual_studio_files.rb'
 require 'albacore'
 
-task :default => ['isop:ms:build']
-task :nugetpack => ['isop:ms:nugetpack']
-
-namespace :isop do
+task :default => ['ms:build']
+task :nugetpack => ['ms:nugetpack']
 
 $dir = File.join(File.dirname(__FILE__),'src')
 $nugetfolder = File.join(File.dirname(__FILE__),'nuget')
@@ -119,7 +117,7 @@ namespace :mono do
     msb.properties :configuration => :Debug
     msb.targets :rebuild
     msb.verbosity = 'quiet'
-    msb.solution = "Isop.sln"
+    msb.solution = File.join('.','src',"Isop.sln")
   end
 
   task :test => :build do
@@ -134,5 +132,4 @@ namespace :mono do
   task :copy_cli => :build do
     cp "Example.Cli/bin/Debug/Example.Cli.dll", "Isop.Auto.Cli/bin/Debug"
   end
-end
 end
