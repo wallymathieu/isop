@@ -120,11 +120,12 @@ namespace :mono do
     msb.solution = File.join('.','src',"Isop.sln")
   end
 
+  desc "test with nunit"
   task :test => :build do
     # does not work for some reason 
-    command = "nunit-console"
+    command = "nunit-console4"
     assemblies = "Tests.dll"
-    cd "Tests/bin/Debug" do
+    cd "src/Tests/bin/Debug" do
       sh "#{command} #{assemblies}"
     end
   end
