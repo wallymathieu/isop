@@ -12,6 +12,5 @@ install:
 script: 
   - bundle install 
   - rake mono:install_packages
-  - rake mono:test
-    #- xbuild Isop.sln
-    #- /Library/Frameworks/Mono.framework/Versions/${MONO_VERSION}/bin/nunit-console4 ./Tests/bin/Debug/Tests.dll
+  - rake mono:build
+  - /Library/Frameworks/Mono.framework/Versions/${MONO_VERSION}/bin/nunit-console4 ./src/Tests/bin/Debug/Tests.dll
