@@ -8,6 +8,13 @@ $dir = File.join(File.dirname(__FILE__),'src')
 $nugetfolder = File.join(File.dirname(__FILE__),'nuget')
 
 namespace :ms do
+  desc "Install missing NuGet packages."
+  task :install_packages do |cmd|
+    FileList["src/**/packages.config"].each do |filepath|
+      sh "./src/.nuget/NuGet.exe i #{filepath} -o ./src/packages"
+    end
+    sh "./src/.nuget/NuGet.exe i ./src/.nuget/packages.config -o ./src/packages"
+  end
   desc "build using msbuild"
   msbuild :build do |msb|
     msb.properties :configuration => :Debug
@@ -16,8 +23,10 @@ namespace :ms do
     msb.solution =File.join($dir, "Isop.Wpf.sln")
   end
   desc "test using nunit console"
-  nunit :test => :build do |nunit|
-    nunit.command = Dir.glob(File.join($dir,"packages/NUnit.Runners.*/Tools/nunit-console.exe")).first
+  nunit :test => [:build, :install_packages] do |nunit|
+    command = Dir.glob(File.join($dir,"packages/NUnit.Runners.*/Tools/nunit-console.exe")).first
+    puts command
+    nunit.command = command
     nunit.assemblies File.join($dir,"Tests/bin/Debug/Tests.dll"), File.join($dir,"Isop.Wpf.Tests/bin/Debug/Isop.Wpf.Tests.dll")
   end
   desc "copy example cli to wpf and cli folder"
