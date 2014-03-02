@@ -1,8 +1,9 @@
-h2. The name
+[![Build Status](https://travis-ci.org/wallymathieu/isop.png?branch=master)](https://travis-ci.org/wallymathieu/isop) 
+# The name
 
 Isop is the swedish name for hyssop. Like any spice it is intended to give flavor to the development of command line apps in .net. 
 
-h2. Goal
+# Goal
 
 The goal is to be able to write code like:
 <pre><code>someprogram.exe My Action --argument value</code></pre>
@@ -10,14 +11,14 @@ So that the class with the name My or MyController and the method with the name 
 
 This library is intended to be like chocolate pudding mix. Not something that will replace your dinner, but rather something easy to make for dessert. A way of helping you build for instance the essential administrative apps. It's not a replacement for baking cake (building a full blown administrative interface in html, silverlight, wpf ... ). 
 
-h2. Nuget packages
+# Nuget packages
 
 <a href="http://nuget.org/packages/Isop/">Isop</a>
 <a href="http://nuget.org/packages/Isop.Runners/">Isop.Runners</a>
 
-h2. Example
+# Example
 
-h3. Having your own Main
+## Having your own Main
 
 You're hooking it up by writing something like:
 <pre><code>static void Main(string[] args)
@@ -47,7 +48,7 @@ public class MyController
 </code></pre>
 When invoked it will output two lines to the command prompt, the yielded lines above.
 
-h3. Using a configuration class for isop
+## Using a configuration class for isop
 
 <pre><code>
 class IsopConfiguration:IDisposable
@@ -100,7 +101,7 @@ class Program
     }
 }</code></pre>
 
-h3. Handling errors and unrecognized parameters
+## Handling errors and unrecognized parameters
 
 <pre><code>
 class Program
@@ -152,7 +153,7 @@ Did you mean any of these arguments?
 
 Why all this code? Mostly it's because I want the programmer to be able to have as much freedom as possible to handle errors and show error messages as he/she sees fit.
 
-h3. Using Isop.cli.exe
+## Using Isop.cli.exe
 
 You're hooking it up by writing something like:
 <pre><code> class IsopConfiguration
@@ -212,7 +213,7 @@ You can invoke your program by (where you have Isop.Cli.exe in the same folder a
 
 Look at the <a href="/wallymathieu/isop/blob/master/Example.Cli/Program.cs">Example Cli project</a> for the most recent example of how it is used. 
 
-h2. Alternative
+# Alternative
 
 The alternative for this kind of library is <a href="http://lostechies.com/chadmyers/2011/06/06/cool-stuff-in-fubucore-no-6-command-line/">the framework found in fubucore</a>.
 
