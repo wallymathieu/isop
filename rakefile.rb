@@ -152,7 +152,7 @@ namespace :mono do
   desc "Install missing NuGet packages."
   task :install_packages do |cmd|
     FileList["src/**/packages.config"].each do |filepath|
-      sh "mono --runtime=v4.0.30319 ./src/.nuget/NuGet.exe i #{filepath} -o ./src/packages"
+      sh "mono --runtime=v4.0.30319 ./src/.nuget/NuGet.exe i #{filepath} -o ./src/packages -s http://www.nuget.org/api/v2/"
     end
   end
 
