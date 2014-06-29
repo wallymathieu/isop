@@ -68,7 +68,7 @@ namespace Isop.Tests
         }
         
         [Test
-#if !APPHARBOR
+#if APPHARBOR
         ,Ignore("APPHARBOR")
 #endif
         ] public void Can_read_configuration_from_example_project()
@@ -94,7 +94,7 @@ namespace Isop.Tests
         }
 
         [Test
-#if !APPHARBOR
+#if APPHARBOR
         ,Ignore("APPHARBOR")
 #endif
         ] public void Can_read_documentation_for_properties()
