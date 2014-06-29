@@ -1,4 +1,4 @@
-# Isop [![Build Status](https://travis-ci.org/wallymathieu/isop.png?branch=master)](https://travis-ci.org/wallymathieu/isop) 
+# Isop [![Build Status](https://travis-ci.org/wallymathieu/isop.png?branch=master)](https://travis-ci.org/wallymathieu/isop) [![Build status](https://ci.appveyor.com/api/projects/status/r4fbt9onjg3yfojv)](https://ci.appveyor.com/project/wallymathieu/isop)
 ## The name
 
 Isop is the swedish name for hyssop. Like any spice it is intended to give flavor to the development of command line apps in .net. 
