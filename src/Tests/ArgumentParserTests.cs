@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Isop.Parse;
 using Isop.Parse.Parameters;
@@ -191,7 +192,7 @@ namespace Isop.Tests
             var arguments = new Build { typeof(MyController) }
                             .SetCulture(CultureInfo.InvariantCulture)
                             .SetFactory(factory)
-                            .Parse(new[] { "My", "Action",  "value1","value2", "3", "3.4" });
+                            .Parse(new[] { "My", "Action", "value1", "value2", "3", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
@@ -211,14 +212,14 @@ namespace Isop.Tests
             var build = new Build { typeof(MyController) }
                             .SetCulture(CultureInfo.InvariantCulture)
                             .SetFactory(factory);
-            var expected = DictionaryDescriptionToKv("[param1, True], [param2, True], [param3, True], [param4, True]",Boolean.Parse);
+            var expected = DictionaryDescriptionToKv("[param1, True], [param2, True], [param3, True], [param4, True]", Boolean.Parse);
 
             var recognizers = build.ControllerRecognizers.Single().Value().GetRecognizers("Action");
             Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
 
-        private static IEnumerable<KeyValuePair<string, T>> DictionaryDescriptionToKv<T>(string input, Func<string,T> convert)
+        private static IEnumerable<KeyValuePair<string, T>> DictionaryDescriptionToKv<T>(string input, Func<string, T> convert)
         {
             var expected = Regex.Matches(input,
                                          @"\[(?<p>#?\w*), (?<v>\w*)\]")
@@ -241,10 +242,10 @@ namespace Isop.Tests
                             .SetCulture(CultureInfo.InvariantCulture)
                             .Recognize(typeof(MyOptionalController))
                             .SetFactory(factory);
-            var expected = DictionaryDescriptionToKv("[param1, True], [param2, False], [param3, False], [param4, False]",Boolean.Parse);
+            var expected = DictionaryDescriptionToKv("[param1, True], [param2, False], [param3, False], [param4, False]", Boolean.Parse);
 
             var recognizers = build.ControllerRecognizers.Single().Value().GetRecognizers("Action");
-            Assert.That (recognizers.Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
+            Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
 
@@ -257,16 +258,18 @@ namespace Isop.Tests
                 Assert.That(t, Is.EqualTo(typeof(MyOptionalController)));
                 return
                     (object)
-                    new MyOptionalController() { OnAction = (p1, p2, p3, p4) =>
-                                                                { parameters = new object[] { p1, p2, p3, p4 }; return ""; }
-                                               };
+                    new MyOptionalController()
+                    {
+                        OnAction = (p1, p2, p3, p4) =>
+                                       { parameters = new object[] { p1, p2, p3, p4 }; return ""; }
+                    };
             };
             var arguments = new Build { typeof(MyOptionalController) }
                     .SetCulture(CultureInfo.InvariantCulture)
                     .SetFactory(factory)
-                    .Parse(new[] { "MyOptional", "Action", "--param1", "value1"});
+                    .Parse(new[] { "MyOptional", "Action", "--param1", "value1" });
             arguments.Invoke(new StringWriter());
-            Assert.That(parameters, Is.EquivalentTo(new object[]{"value1",null,null,1}));
+            Assert.That(parameters, Is.EquivalentTo(new object[] { "value1", null, null, 1 }));
         }
 
         [Test]
@@ -478,5 +481,43 @@ namespace Isop.Tests
                 }
             }
         }
+
+        [Test]
+        public void It_can_handle_different_casing_for_enum()
+        {
+            foreach (var pair in new[] { 
+                new { value = "param1", expected = WithEnumController.WithEnum.Param1 }, 
+                new { value = "paramwithcasing", expected = WithEnumController.WithEnum.ParamWithCasing },
+            })
+            {
+                var parameters = new List<WithEnumController.WithEnum?>();
+                Func<Type, object> factory = (Type t) =>
+                {
+                    Assert.That(t, Is.EqualTo(typeof(WithEnumController)));
+                    return
+                        (object)
+                        new WithEnumController
+                        {
+                            OnIndex = (p1) =>
+                            {
+                                parameters.Add(p1);
+                                return "";
+                            }
+                        };
+                };
+
+                var arguments = new Build()
+                                                   .SetCulture(CultureInfo.InvariantCulture)
+                                                   .Recognize(typeof(WithEnumController))
+                                                   .SetFactory(factory)
+                                                   .Parse(new[] { "WithEnum", /*"Index", */"--value", pair.value });
+
+                Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+                arguments.Invoke(new StringWriter());
+                Assert.That(parameters, Is.EquivalentTo(new[] { pair.expected }));
+                
+            }
+        }
+
     }
 }

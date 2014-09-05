@@ -57,6 +57,7 @@
     <Compile Include="ConfigurationTests.cs" />
     <Compile Include="FakeControllers\EnumerableController.cs" />
     <Compile Include="FakeConfigurations\FullConfiguration.cs" />
+    <Compile Include="FakeControllers\WithEnumController.cs" />
     <Compile Include="ListExtensionTests.cs" />
     <Compile Include="FakeControllers\MyFileController.cs" />
     <Compile Include="FakeControllers\MyObjectController.cs" />
