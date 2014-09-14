@@ -13,6 +13,4 @@ install:
 
 script: 
   - bundle install 
-  - rake install_packages
-  - rake build
-  - /Library/Frameworks/Mono.framework/Versions/${MONO_VERSION}/bin/nunit-console4 ./src/Tests/bin/Debug/Tests.dll
+  - rake test

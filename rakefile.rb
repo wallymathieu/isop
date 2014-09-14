@@ -40,6 +40,7 @@ def nunit_cmd()
       command = cmds.first
     end
   else
+    # /Library/Frameworks/Mono.framework/Versions/${MONO_VERSION}/bin/nunit-console4
     raise "Could not find nunit runner!"
   end
   return command
