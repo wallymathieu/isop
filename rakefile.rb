@@ -97,8 +97,6 @@ build :build do |msb|
 end
 
 task :default => ['build']
-task :nugetpack => ['ms:nugetpack']
-
 
 desc "test using nunit console"
 test_runner :test => [:build, :install_packages] do |nunit|
