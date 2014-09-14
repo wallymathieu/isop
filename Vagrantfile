@@ -5,9 +5,11 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "mono-3.2.8"
-  config.vm.box_url = "https://dl.dropboxusercontent.com/u/20581307/mono3.2.8.box"
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.box_url = "https://vagrantcloud.com/ubuntu/boxes/trusty64"
   config.vm.provision :shell, :path => "provisioning/install-rvm.sh",  :args => "stable"
-  config.vm.provision :shell, :path => "provisioning/install-ruby.sh", :args => "2.1.0"
+  config.vm.provision :shell, :path => "provisioning/install-ruby.sh", :args => "2.1.2"
+  config.vm.provision :shell, :path => "provisioning/install-mono.sh"
   config.vm.provision :shell, :path => "provisioning/setup.sh"
+
 end

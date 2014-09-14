@@ -1,11 +1,20 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    albacore (0.3.6)
-      rubyzip (< 1.0.0)
+    albacore (2.0.6)
+      map (~> 6.5)
+      nokogiri (~> 1.5)
+      rake (~> 10)
+      semver2 (~> 3.4)
+    map (6.5.5)
+    mini_portile (0.6.0)
+    nokogiri (1.6.3.1)
+      mini_portile (= 0.6.0)
+    nokogiri (1.6.3.1-x86-mingw32)
+      mini_portile (= 0.6.0)
     rake (10.3.2)
-    rubyzip (0.9.9)
-    visual_studio_files (0.1.1)
+    semver2 (3.4.0)
+    visual_studio_files (0.1.2)
 
 PLATFORMS
   ruby
@@ -14,5 +23,4 @@ PLATFORMS
 DEPENDENCIES
   albacore
   rake
-  rubyzip (~> 0.9.9)
   visual_studio_files

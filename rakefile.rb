@@ -1,69 +1,151 @@
 require 'visual_studio_files.rb'
 require 'albacore'
 
-task :default => ['ms:build']
-task :nugetpack => ['ms:nugetpack']
+require 'rbconfig'
+#http://stackoverflow.com/questions/11784109/detecting-operating-systems-in-ruby
+def os
+  @os ||= (
+    host_os = RbConfig::CONFIG['host_os']
+    case host_os
+    when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+      :windows
+    when /darwin|mac os/
+      :macosx
+    when /linux/
+      :linux
+    when /solaris|bsd/
+      :unix
+    else
+      raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
+    end
+  )
+end
+
+def nuget_exec(parameters)
+
+  command = File.join(File.dirname(__FILE__), "src",".nuget","NuGet.exe")
+  if os == :windows
+    sh "#{command} #{parameters}"
+  else
+    sh "mono --runtime=v4.0.30319 #{command} #{parameters} "
+  end
+end
+
+def nunit_cmd()
+  cmds = Dir.glob(File.join(File.dirname(__FILE__),"src","packages","NUnit.Runners.*","tools","nunit-console.exe"))
+  if cmds.any?
+    if os != :windows
+      command = "mono --runtime=v4.0.30319 #{cmds.first}"
+    else
+      command = cmds.first
+    end
+  else
+    raise "Could not find nunit runner!"
+  end
+  return command
+  
+end
+
+def nunit_exec(dir, tlib)
+    command = nunit_cmd()
+    assemblies= "#{tlib}.dll"
+    cd dir do
+      sh "#{command} #{assemblies}" do  |ok, res|
+        if !ok
+          abort 'Nunit failed!'
+        end
+      end
+    end
+end
 
 $dir = File.join(File.dirname(__FILE__),'src')
 $nugetfolder = File.join(File.dirname(__FILE__),'nuget')
 
-namespace :ms do
-  desc "Install missing NuGet packages."
-  task :install_packages do |cmd|
-    FileList["src/**/packages.config"].each do |filepath|
-      sh "./src/.nuget/NuGet.exe i #{filepath} -o ./src/packages"
-    end
-    sh "./src/.nuget/NuGet.exe i ./src/.nuget/packages.config -o ./src/packages"
-  end
-  desc "build using msbuild"
-  msbuild :build do |msb|
-    msb.properties :configuration => :Debug
-    msb.targets :Clean, :Rebuild
-    msb.verbosity = 'quiet'
-    msb.solution =File.join($dir, "Isop.Wpf.sln")
-  end
-  desc "test using nunit console"
-  nunit :test => [:build, :install_packages] do |nunit|
-    command = Dir.glob(File.join($dir,"packages/NUnit.Runners.*/Tools/nunit-console.exe")).first
-    puts command
-    nunit.command = command
-    nunit.assemblies File.join($dir,"Tests/bin/Debug/Tests.dll"), File.join($dir,"Isop.Wpf.Tests/bin/Debug/Isop.Wpf.Tests.dll")
-  end
-  desc "copy example cli to wpf and cli folder"
-  task :copy_cli => :build do
-    cp File.join($dir,"Example.Cli/bin/Debug/Example.Cli.dll"), File.join($dir,"Isop.Wpf/bin/Debug")
-    cp File.join($dir,"Example.Cli/bin/Debug/Example.Cli.dll"), File.join($dir,"Isop.Auto.Cli/bin/Debug")
-  end
+def with_mono_properties msb
+  solution_dir = File.join(File.dirname(__FILE__),'src')
+  nuget_tools_path = File.join(solution_dir, '.nuget')
+  msb.prop :SolutionDir, solution_dir
+  msb.prop :NuGetToolsPath, nuget_tools_path
+  msb.prop :NuGetExePath, File.join(nuget_tools_path, 'NuGet.exe')
+  msb.prop :PackagesDir, File.join(solution_dir, 'packages')
+end
 
-  task :core_copy_to_nuspec => [:build] do
-    output_directory_lib = File.join($nugetfolder,"Isop/lib/40/")
-    mkdir_p output_directory_lib
-    ['Isop'].each{ |project|
-      cp Dir.glob(File.join($dir,"#{project}/bin/Debug/*.dll")), output_directory_lib
-    }
-    
-  end
-  task :runners_copy_to_nuspec => [:build] do
-    output_directory_lib = File.join($nugetfolder,"Isop.Runners/tools/")
-    mkdir_p output_directory_lib
-    ['Isop.Wpf', 'Isop.Auto.Cli'].each{ |project|
-      cp Dir.glob(File.join($dir,"#{project}/bin/Debug/*.exe")), output_directory_lib
-    }
-  end
+desc "Install missing NuGet packages."
+task :install_packages do
+  package_paths = FileList["src/**/packages.config"]+["src/.nuget/packages.config"]
 
-  desc "create the nuget package"
-  task :nugetpack => [:core_nugetpack, :runners_nugetpack]
-
-  task :core_nugetpack => [:core_copy_to_nuspec] do |nuget|
-    cd File.join($nugetfolder,"Isop") do
-      sh "..\\..\\src\\.nuget\\NuGet.exe pack Isop.nuspec"
-    end
+  package_paths.each.each do |filepath|
+      nuget_exec("i #{filepath} -o ./src/packages -source http://www.nuget.org/api/v2/")
   end
+end
 
-  task :runners_nugetpack => [:runners_copy_to_nuspec] do |nuget|
-    cd File.join($nugetfolder,"Isop.Runners") do
-      sh "..\\..\\src\\.nuget\\NuGet.exe pack Isop.Runners.nuspec"
-    end
+desc "build"
+build :build do |msb|
+  msb.prop :configuration, :Debug
+  msb.prop :platform, "Mixed Platforms"
+  if os != :windows
+    with_mono_properties msb
+  end
+  msb.target = :Rebuild
+  msb.be_quiet
+  msb.nologo
+  if os == :windows
+    msb.sln =File.join($dir, "Isop.Wpf.sln")
+  else
+    msb.sln =File.join($dir, "Isop.sln")
+  end
+end
+
+task :default => ['build']
+task :nugetpack => ['ms:nugetpack']
+
+
+desc "test using nunit console"
+test_runner :test => [:build, :install_packages] do |nunit|
+  command = Dir.glob(File.join($dir,"packages/NUnit.Runners.*/Tools/nunit-console.exe")).first
+  puts command
+  nunit.exe = command
+  files = [File.join($dir,"Tests/bin/Debug/Tests.dll")]
+  if os == :windows
+    files.push File.join($dir,"Isop.Wpf.Tests/bin/Debug/Isop.Wpf.Tests.dll")
+  end
+  nunit.files = files 
+end
+
+desc "copy example cli to wpf and cli folder"
+task :copy_cli => :build do
+  cp File.join($dir,"Example.Cli/bin/Debug/Example.Cli.dll"), File.join($dir,"Isop.Wpf/bin/Debug")
+  cp File.join($dir,"Example.Cli/bin/Debug/Example.Cli.dll"), File.join($dir,"Isop.Auto.Cli/bin/Debug")
+end
+
+task :core_copy_to_nuspec => [:build] do
+  output_directory_lib = File.join($nugetfolder,"Isop/lib/40/")
+  mkdir_p output_directory_lib
+  ['Isop'].each{ |project|
+    cp Dir.glob(File.join($dir,"#{project}/bin/Debug/*.dll")), output_directory_lib
+  }
+  
+end
+task :runners_copy_to_nuspec => [:build] do
+  output_directory_lib = File.join($nugetfolder,"Isop.Runners/tools/")
+  mkdir_p output_directory_lib
+  ['Isop.Wpf', 'Isop.Auto.Cli'].each{ |project|
+    cp Dir.glob(File.join($dir,"#{project}/bin/Debug/*.exe")), output_directory_lib
+  }
+end
+
+desc "create the nuget package"
+task :nugetpack => [:core_nugetpack, :runners_nugetpack]
+
+task :core_nugetpack => [:core_copy_to_nuspec] do |nuget|
+  cd File.join($nugetfolder,"Isop") do
+    nuget_exec "pack Isop.nuspec"
+  end
+end
+
+task :runners_nugetpack => [:runners_copy_to_nuspec] do |nuget|
+  cd File.join($nugetfolder,"Isop.Runners") do
+    nuget_exec "pack Isop.Runners.nuspec"
   end
 end
 
@@ -73,7 +155,7 @@ task :regen_cli do
   isop_files = isop.files.select do |file|
     file.type=='Compile' && !file.file.end_with?('AssemblyInfo.cs')
   end
-    
+  
   cli = VisualStudioFiles::CsProj.new(File.open(File.join($dir,'Isop.Auto.Cli','Isop.Cli.csproj'), "r").read)
   cli.clear_links
   isop_files.each do |file|
@@ -116,44 +198,4 @@ task :regen_wpf do
   File.open(File.join($dir,'Isop.Wpf','Isop.Wpf.csproj'), "w") do |f|
     wpf.write f
   end
-end
-
-
-namespace :mono do
-  desc "build isop on mono"
-  xbuild :build do |msb|
-    solution_dir = File.join(File.dirname(__FILE__),'src')
-    nuget_tools_path = File.join(solution_dir, '.nuget')
-    msb.properties :configuration => :Debug, 
-      :SolutionDir => solution_dir,
-      :NuGetToolsPath => nuget_tools_path,
-      :NuGetExePath => File.join(nuget_tools_path, 'NuGet.exe'),
-      :PackagesDir => File.join(solution_dir, 'packages')
-    msb.targets :rebuild
-    msb.verbosity = 'quiet'
-    msb.solution = File.join('.','src',"Isop.sln")
-  end
-
-  desc "test with nunit"
-  task :test => :build do
-    # does not work for some reason 
-    command = "nunit-console4"
-    assemblies = "Tests.dll"
-    cd "src/Tests/bin/Debug" do
-      sh "#{command} #{assemblies}"
-    end
-  end
-
-  desc "copy example cli to cli folder"
-  task :copy_cli => :build do
-    cp "Example.Cli/bin/Debug/Example.Cli.dll", "Isop.Auto.Cli/bin/Debug"
-  end
-
-  desc "Install missing NuGet packages."
-  task :install_packages do |cmd|
-    FileList["src/**/packages.config"].each do |filepath|
-      sh "mono --runtime=v4.0.30319 ./src/.nuget/NuGet.exe i #{filepath} -o ./src/packages -source http://www.nuget.org/api/v2/"
-    end
-  end
-
 end

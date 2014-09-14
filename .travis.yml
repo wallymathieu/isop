@@ -2,7 +2,7 @@ language: objective-c
 
 env:
   matrix:
-    - MONO_VERSION="3.2.7"
+    - MONO_VERSION="3.8.0"
   global:
     - EnableNuGetPackageRestore=false
 
@@ -12,6 +12,6 @@ install:
 
 script: 
   - bundle install 
-  - rake mono:install_packages
-  - rake mono:build
+  - rake install_packages
+  - rake build
   - /Library/Frameworks/Mono.framework/Versions/${MONO_VERSION}/bin/nunit-console4 ./src/Tests/bin/Debug/Tests.dll
