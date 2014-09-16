@@ -8,21 +8,51 @@ using Isop.Parse;
 
 namespace Isop.Controller
 {
-    public class HelpForControllers
+    public interface IHelpTexts
+    {
+        /// <summary>
+        /// default: And accept the following parameters
+        /// </summary>
+        string AndAcceptTheFollowingParameters { get; set; }
+        /// <summary>
+        /// default: And the short form is
+        /// </summary>
+        string AndTheShortFormIs { get; set; }
+        /// <summary>
+        /// default: "The commands are:"
+        /// </summary>
+        string TheCommandsAre { get; set; }
+        /// <summary>
+        /// default: The sub commands for 
+        /// </summary>
+        string TheSubCommandsFor { get; set; }
+        /// <summary>
+        /// default: "Se 'COMMANDNAME' help command for more information"
+        /// </summary>
+        string HelpCommandForMoreInformation { get; set; }
+        /// <summary>
+        /// default: Se 'COMMANDNAME' help 'command' 'subcommand' for more information
+        /// </summary>
+        string HelpSubCommandForMoreInformation { get; set; }
+        string UnknownAction { get; set; }
+    }
+
+    public class HelpForControllers : IHelpTexts
     {
         private readonly TurnParametersToArgumentWithOptions _turnParametersToArgumentWithOptions;
 
         private readonly ICollection<Type> _classAndMethodRecognizers;
         private readonly TypeContainer _container;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
-        private string _andAcceptTheFollowingParameters;
+        public string AndAcceptTheFollowingParameters { get; set; }
+        public string AndTheShortFormIs { get; set; }
         public string TheCommandsAre { get; set; }
         public string TheSubCommandsFor { get; set; }
         public string HelpCommandForMoreInformation { get; set; }
-
         public string HelpSubCommandForMoreInformation { get; set; }
+        public string UnknownAction { get; set; }
 
-        public HelpForControllers(ICollection<Type> classAndMethodRecognizers, TypeContainer container, 
+        public HelpForControllers(ICollection<Type> classAndMethodRecognizers, TypeContainer container,
             TurnParametersToArgumentWithOptions turnParametersToArgumentWithOptions,
             HelpXmlDocumentation helpXmlDocumentation = null)
         {
@@ -35,58 +65,88 @@ namespace Isop.Controller
             HelpCommandForMoreInformation = "Se 'COMMANDNAME' help <command> for more information";
             TheCommandsAre = "The commands are:";
             TheSubCommandsFor = "The sub commands for ";
-            _andAcceptTheFollowingParameters = "And accept the following parameters";
+            AndAcceptTheFollowingParameters = "And accept the following parameters";
+            AndTheShortFormIs = "And the short form is";
+            UnknownAction = "Unknown action";
         }
-        private string Description(Type t, MethodInfo method = null)
+
+        private string Description(Type t, MethodInfo method = null, bool includeArguments = false)
         {
             var description = t.GetMethods().Match(returnType: typeof(string),
                                                name: "help",
                                                parameters: new[] { typeof(string) });
-            var descr = string.Empty;
+            var descr = new List<string>();
             if (null == description)
             {
                 if (null == method)
                 {
-                    descr = _helpXmlDocumentation.GetDescriptionForType(t);
+                    descr.Add(_helpXmlDocumentation.GetDescriptionForType(t));
                 }
                 else
                 {
-                    descr = _helpXmlDocumentation.GetDescriptionForMethod(method);
+                    descr.Add(_helpXmlDocumentation.GetDescriptionForMethod(method));
                 }
             }
             else
             {
                 var obj = _container.CreateInstance(t);
 
-                descr = (string)description.Invoke(obj, new[] { (method != null ? method.Name : null) });
+                descr.Add((string)description.Invoke(obj, new[] { (method != null ? method.Name : null) }));
             }
-            if (string.IsNullOrEmpty(descr))
+
+            if (method != null && includeArguments)
+            {
+                var arguments = _turnParametersToArgumentWithOptions.GetRecognizers(method).Select(DescriptionAndHelp);
+                descr.AddRange(arguments);
+            }
+
+            if (!descr.Any())
                 return string.Empty;
-            return "  " + descr;
+            return "  " + String.Join(" ", descr);
         }
 
         private string HelpFor(Type type, bool simpleDescription)
         {
-            if (simpleDescription) return type.ControllerName() + Description(type);
-
+            if (simpleDescription)
+            {
+                return type.ControllerName() + Description(type);
+            }
             return type.ControllerName()
                 + Environment.NewLine
                 + Environment.NewLine
-                + String.Join(Environment.NewLine, 
+                + String.Join(Environment.NewLine,
                     type.GetControllerActionMethods()
-                        .Select(m => "  " + m.Name + Description(type, m)).ToArray());
+                        .Select(m => "  " + m.Name + Description(type, m, includeArguments: true)).ToArray());
         }
 
         private string HelpForAction(Type type, string action)
         {
             var method = type.GetControllerActionMethods().SingleOrDefault(m => m.WithName(action));
-            var arguments = _turnParametersToArgumentWithOptions.GetRecognizers(method).Select(DescriptionAndHelp);
+            if (method == null)
+            {
+                var lines = new List<string> 
+                {
+                    UnknownAction,
+                    action
+                };
+                return string.Join(Environment.NewLine, lines);
+            }
+
+            var arguments = _turnParametersToArgumentWithOptions
+                .GetRecognizers(method)
+                .ToArray();
             if (arguments.Any())
             {
-                return string.Format(@"{0} {1}
-{3}:
-{2}", method.Name, Description(type, method), String.Join(", ",
-    arguments), _andAcceptTheFollowingParameters);
+                var lines = new List<string>
+                {
+                    string.Format("{0} {1}", method.Name, Description(type, method)),
+                    string.Format("{0}:", AndAcceptTheFollowingParameters),
+                    String.Join(", ", arguments.Select(DescriptionAndHelp)),
+                    string.Format("{0}:", AndTheShortFormIs),
+                    type.ControllerName() + " " + method.Name + " " +
+                    String.Join(", ", arguments.Select(arg => arg.Argument.LongAlias().ToUpper()))
+                };
+                return string.Join(Environment.NewLine, lines);
             }
             else
             {
@@ -98,18 +158,21 @@ namespace Isop.Controller
         {
             return r.Help();
         }
-        //Description(cmr.Type, methodInfo,
+
         public string Help(string val = null, string action = null)
         {
-            if (string.IsNullOrEmpty(val)) return TheCommandsAre + Environment.NewLine +
-                   String.Join(Environment.NewLine,
-                               _classAndMethodRecognizers
+            if (string.IsNullOrEmpty(val))
+            {
+                var lines = new List<string>();
+                lines.Add(TheCommandsAre);
+                lines.Add(String.Join(Environment.NewLine,
+                           _classAndMethodRecognizers
                                .Where(cmr => cmr != typeof(HelpController))
-                               .Select(cmr => "  " + HelpFor(cmr, true)).ToArray())
-                   + Environment.NewLine
-                   + Environment.NewLine
-                   + HelpCommandForMoreInformation;
-
+                               .Select(cmr => "  " + HelpFor(cmr, true)).ToArray()));
+                lines.Add(string.Empty);
+                lines.Add(HelpCommandForMoreInformation);
+                return string.Join(Environment.NewLine, lines);
+            }
             var controllerRecognizer = _classAndMethodRecognizers.First(type =>
                 type.ControllerName().EqualsIC(val));
             if (string.IsNullOrEmpty(action))

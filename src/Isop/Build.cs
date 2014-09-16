@@ -214,22 +214,11 @@ namespace Isop
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="theCommandsAre">default: "The commands are:"</param>
-        /// <param name="helpCommandForMoreInformation">default: "Se 'COMMANDNAME' help command for more information"</param>
-        /// <param name="theSubCommandsFor">default: The sub commands for </param>
-        /// <param name="helpSubCommandForMoreInformation">default: Se 'COMMANDNAME' help 'command' 'subcommand' for more information</param>
-        /// <returns></returns>
-        public Build HelpTextCommandsAre(string theCommandsAre,
-            string helpCommandForMoreInformation,
-            string theSubCommandsFor,
-            string helpSubCommandForMoreInformation)
+        public Build HelpTextCommandsAre(Action<IHelpTexts> action)
         {
             ShouldRecognizeHelp();
             var helpForControllers = _helpForControllers;
-            helpForControllers.TheCommandsAre = theCommandsAre;
-            helpForControllers.HelpCommandForMoreInformation = helpCommandForMoreInformation;
-            helpForControllers.TheSubCommandsFor = theSubCommandsFor;
-            helpForControllers.HelpSubCommandForMoreInformation = helpSubCommandForMoreInformation;
+            action(helpForControllers);
             return this;
         }
 

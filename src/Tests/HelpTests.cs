@@ -81,11 +81,14 @@ Se 'COMMANDNAME' help <command> for more information")));
                 .Recognize (typeof(MyController))
                 .Recognize (typeof(AnotherController))
                 .ShouldRecognizeHelp ()
-                .HelpTextCommandsAre (
-                    theCommandsAre:"Det finns följande kommandon:", 
-                    helpCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> för ytterligare information",
-                    theSubCommandsFor:"Det finns föjande sub kommandon:",
-                    helpSubCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> <subkommando> för mer information")
+                .HelpTextCommandsAre (h =>
+                {
+                    h.TheCommandsAre = "Det finns följande kommandon:";
+                    h.HelpCommandForMoreInformation ="Se 'Kommandonamn' help <kommando> för ytterligare information";
+                    h.TheSubCommandsFor = "Det finns föjande sub kommandon:";
+                    h.HelpSubCommandForMoreInformation =
+                        "Se 'Kommandonamn' help <kommando> <subkommando> för mer information";
+                })
                 .Help ();
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"Det finns följande kommandon:
   My
@@ -101,18 +104,46 @@ Se 'Kommandonamn' help <kommando> för ytterligare information")));
                 .Recognize (typeof(MyController))
                 .Recognize (typeof(AnotherController))
                 .ShouldRecognizeHelp ()
-                .HelpTextCommandsAre (
-                    theCommandsAre:"Det finns följande kommandon:", 
-                    helpCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> för ytterligare information",
-                    theSubCommandsFor:"Det finns föjande sub kommandon:",
-                    helpSubCommandForMoreInformation:"Se 'Kommandonamn' help <kommando> <subkommando> för mer information")
-                .HelpFor ("my");
+                .HelpTextCommandsAre(h =>
+                {
+                    h.TheCommandsAre = "Det finns följande kommandon:";
+                    h.HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information";
+                    h.TheSubCommandsFor = "Det finns föjande sub kommandon:";
+                    h.HelpSubCommandForMoreInformation =
+                        "Se 'Kommandonamn' help <kommando> <subkommando> för mer information";
+                })
+                .HelpFor("my");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"Det finns föjande sub kommandon:My
-  Action
+  Action   --param1 --param2 --param3 --param4
 
 Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
         }
-        
+
+        [Test]
+        public void It_can_report_usage_for_a_specific_controller_and_action_and_have_a_different_help_text()
+        {
+            var usage = new Build()
+                .Recognize(typeof(MyController))
+                .Recognize(typeof(AnotherController))
+                .ShouldRecognizeHelp()
+                    .HelpTextCommandsAre(h =>
+                    {
+                        h.TheCommandsAre = "Det finns följande kommandon:";
+                        h.HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information";
+                        h.TheSubCommandsFor = "Det finns föjande sub kommandon:";
+                        h.HelpSubCommandForMoreInformation =
+                            "Se 'Kommandonamn' help <kommando> <subkommando> för mer information";
+                        h.AndAcceptTheFollowingParameters = "Och accepterar följande parametrar";
+                        h.AndTheShortFormIs = "Och kortformen är";
+                    })
+                .HelpFor("my","Action");
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action
+Och accepterar följande parametrar:
+--param1, --param2, --param3, --param4
+Och kortformen är:
+My Action PARAM1, PARAM2, PARAM3, PARAM4")));
+        }
+
         private static string[] LineSplit (string usage)
         {
             return usage.Split (new []{"\r","\n"}, StringSplitOptions.RemoveEmptyEntries).Select(l=>l.Trim()).ToArray();
@@ -142,7 +173,7 @@ Se 'COMMANDNAME' help <command> for more information")));
                                     .HelpFor ("Another");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The sub commands for Another
 
-  Action1
+  Action1   --param1
   Action2
 
 Se 'COMMANDNAME' help <command> <subcommand> for more information")));
@@ -158,7 +189,9 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
                                     .HelpFor("Another", "Action1");
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1
 And accept the following parameters:
---param1")));
+--param1
+And the short form is:
+Another Action1 PARAM1")));
         }
      
         [Test]
@@ -197,6 +230,17 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
                                     .ShouldRecognizeHelp()
                                     .HelpFor("Description","action1");
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1   Some description 1")));
+        }
+
+        [Test]
+        public void It_can_report_usage_for_missing_action()
+        {
+            var usage = new Build()
+                                    .Recognize(typeof(DescriptionController))
+                                    .ShouldRecognizeHelp()
+                                    .HelpFor("Description", "actionX");
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Unknown action
+actionX")));
         }
 
         [Test]
