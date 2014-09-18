@@ -11,7 +11,7 @@ Or if you prefer:
 <pre><code>someprogram.exe My Action /argument value</code></pre>
 Isop will also figure out what you mean if you write with an equals sign between argument and value:
 <pre><code>someprogram.exe My Action --argument=value</code></pre>
-Or if you want to write it shorter:
+Or if you want to write it shorter you can skip the argument name:
 <pre><code>someprogram.exe My Action value</code></pre>
 
 So that the class with the name My or MyController and the method with the name Action gets invoked.
