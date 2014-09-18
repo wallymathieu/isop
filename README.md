@@ -7,6 +7,9 @@ Isop is the swedish name for hyssop. Like any spice it is intended to give flavo
 
 The goal is to be able to write code like:
 <pre><code>someprogram.exe My Action --argument value</code></pre>
+Or shorter:
+<pre><code>someprogram.exe My Action value</code></pre>
+
 So that the class with the name My or MyController and the method with the name Action gets invoked.
 
 This library is intended to be like chocolate pudding mix. Not something that will replace your dinner, but rather something easy to make for dessert. A way of helping you build for instance the essential administrative apps. It's not a replacement for baking cake (building a full blown administrative interface in html, silverlight, wpf ... ). 
