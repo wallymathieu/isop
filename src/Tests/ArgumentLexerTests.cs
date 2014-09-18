@@ -18,7 +18,7 @@ namespace Isop.Tests
         }
 
         [Test]
-        public void It_can_tokenize_parameter()
+        public void It_can_tokenize_parameter_minus_minus()
         {
             var lexed = ArgumentLexer.Lex(new[] { "--parameter" });
             var tokens = lexed.ToArray();
@@ -26,27 +26,37 @@ namespace Isop.Tests
         }
 
         [Test]
-        public void It_can_tokenize_parameter2()
+        public void It_can_tokenize_parameter_slash()
         {
             var lexed = ArgumentLexer.Lex(new[] { "/parameter" });
             var tokens = lexed.ToArray();
             Assert.That(tokens, Is.EquivalentTo(new[] { new Token("parameter", TokenType.Parameter, 0) }));
         }
+        
+        [Test]
+        public void It_can_tokenize_parametervalue_slash_and_equals()
+        {
+            var lexed = ArgumentLexer.Lex(new[] { "/parameter=parametervalue" });
+            var tokens = lexed.ToArray();
+            Assert.That(tokens, Is.EquivalentTo(new[] { new Token("parameter", TokenType.Parameter, 0), new Token("parametervalue", TokenType.ParameterValue, 1) }));
+        }
 
         [Test]
-        public void It_can_tokenize_parametervalue()
+        public void It_can_tokenize_parametervalue_minus_minus()
         {
             var lexed = ArgumentLexer.Lex(new[] { "--parameter", "parametervalue" });
             var tokens = lexed.ToArray();
             Assert.That(tokens, Is.EquivalentTo(new[] { new Token("parameter", TokenType.Parameter, 0), new Token("parametervalue", TokenType.ParameterValue, 1) }));
         }
+        
         [Test]
-        public void It_can_tokenize_parametervalue2()
+        public void It_can_tokenize_parametervalue_minus_minus_and_equals()
         {
             var lexed = ArgumentLexer.Lex(new[] { "--parameter=parametervalue" });
             var tokens = lexed.ToArray();
             Assert.That(tokens, Is.EquivalentTo(new[] { new Token("parameter", TokenType.Parameter, 0), new Token("parametervalue", TokenType.ParameterValue, 1) }));
         }
+
         [Test]
         public void It_can_peek_tokenized_value()
         {
