@@ -214,7 +214,7 @@ namespace Isop
         /// <summary>
         /// 
         /// </summary>
-        public Build HelpTextCommandsAre(Action<IHelpTexts> action)
+        public Build HelpTextCommandsAre(Action<HelpTexts> action)
         {
             ShouldRecognizeHelp();
             var helpForControllers = _helpForControllers;

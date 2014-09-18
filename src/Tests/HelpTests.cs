@@ -259,11 +259,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 
 
-        [Test
-#if !APPHARBOR
-        ,Ignore("APPHARBOR")
-#endif
-        ]
+        [Test]
         public void It_can_report_usage_for_controllers_and_actions_with_description_in_comments ()
         {
             var usage = new Build()
@@ -278,14 +274,10 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
 Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 
-        [Test
-#if !APPHARBOR
-        ,Ignore("APPHARBOR")
-#endif
-        ] public void Can_read_xml_doc()
+        [Test] public void Can_read_xml_doc()
         {
             var doc = new HelpXmlDocumentation().GetSummariesFromText (File.ReadAllText("Tests.xml"));
-            Assert.That(doc["P:Isop.Tests.FullConfiguration.Global"],Is.EqualTo("GLOBAL!!"));
+            Assert.That(doc["P:Isop.Tests.FakeConfigurations.FullConfiguration.Global"],Is.EqualTo("GLOBAL!!"));
         }
         
         [Test] public void Can_get_same_key_as_in_xmldoc()

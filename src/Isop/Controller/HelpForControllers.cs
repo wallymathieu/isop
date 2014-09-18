@@ -8,49 +8,54 @@ using Isop.Parse;
 
 namespace Isop.Controller
 {
-    public interface IHelpTexts
+    public class HelpTexts
     {
+        public HelpTexts()
+        {
+            HelpSubCommandForMoreInformation = "Se 'COMMANDNAME' help <command> <subcommand> for more information";
+
+            HelpCommandForMoreInformation = "Se 'COMMANDNAME' help <command> for more information";
+            TheCommandsAre = "The commands are:";
+            TheSubCommandsFor = "The sub commands for ";
+            AndAcceptTheFollowingParameters = "And accept the following parameters";
+            AndTheShortFormIs = "And the short form is";
+            UnknownAction = "Unknown action";
+        }
+
         /// <summary>
         /// default: And accept the following parameters
         /// </summary>
-        string AndAcceptTheFollowingParameters { get; set; }
+        public string AndAcceptTheFollowingParameters { get; set; }
         /// <summary>
         /// default: And the short form is
         /// </summary>
-        string AndTheShortFormIs { get; set; }
+        public string AndTheShortFormIs { get; set; }
         /// <summary>
         /// default: "The commands are:"
         /// </summary>
-        string TheCommandsAre { get; set; }
+        public string TheCommandsAre { get; set; }
         /// <summary>
         /// default: The sub commands for 
         /// </summary>
-        string TheSubCommandsFor { get; set; }
+        public string TheSubCommandsFor { get; set; }
         /// <summary>
         /// default: "Se 'COMMANDNAME' help command for more information"
         /// </summary>
-        string HelpCommandForMoreInformation { get; set; }
+        public string HelpCommandForMoreInformation { get; set; }
         /// <summary>
         /// default: Se 'COMMANDNAME' help 'command' 'subcommand' for more information
         /// </summary>
-        string HelpSubCommandForMoreInformation { get; set; }
-        string UnknownAction { get; set; }
+        public string HelpSubCommandForMoreInformation { get; set; }
+        public string UnknownAction { get; set; }
     }
 
-    public class HelpForControllers : IHelpTexts
+    public class HelpForControllers : HelpTexts
     {
         private readonly TurnParametersToArgumentWithOptions _turnParametersToArgumentWithOptions;
 
         private readonly ICollection<Type> _classAndMethodRecognizers;
         private readonly TypeContainer _container;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
-        public string AndAcceptTheFollowingParameters { get; set; }
-        public string AndTheShortFormIs { get; set; }
-        public string TheCommandsAre { get; set; }
-        public string TheSubCommandsFor { get; set; }
-        public string HelpCommandForMoreInformation { get; set; }
-        public string HelpSubCommandForMoreInformation { get; set; }
-        public string UnknownAction { get; set; }
 
         public HelpForControllers(ICollection<Type> classAndMethodRecognizers, TypeContainer container,
             TurnParametersToArgumentWithOptions turnParametersToArgumentWithOptions,
@@ -60,14 +65,6 @@ namespace Isop.Controller
             _turnParametersToArgumentWithOptions = turnParametersToArgumentWithOptions;
             _classAndMethodRecognizers = classAndMethodRecognizers;
             _helpXmlDocumentation = helpXmlDocumentation ?? new HelpXmlDocumentation();
-            HelpSubCommandForMoreInformation = "Se 'COMMANDNAME' help <command> <subcommand> for more information";
-
-            HelpCommandForMoreInformation = "Se 'COMMANDNAME' help <command> for more information";
-            TheCommandsAre = "The commands are:";
-            TheSubCommandsFor = "The sub commands for ";
-            AndAcceptTheFollowingParameters = "And accept the following parameters";
-            AndTheShortFormIs = "And the short form is";
-            UnknownAction = "Unknown action";
         }
 
         private string Description(Type t, MethodInfo method = null, bool includeArguments = false)
