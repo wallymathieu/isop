@@ -2,62 +2,8 @@ require 'visual_studio_files.rb'
 require 'albacore'
 
 require 'rbconfig'
+require_relative './src/.nuget/nuget'
 #http://stackoverflow.com/questions/11784109/detecting-operating-systems-in-ruby
-def os
-  @os ||= (
-    host_os = RbConfig::CONFIG['host_os']
-    case host_os
-    when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-      :windows
-    when /darwin|mac os/
-      :macosx
-    when /linux/
-      :linux
-    when /solaris|bsd/
-      :unix
-    else
-      raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
-    end
-  )
-end
-
-def nuget_exec(parameters)
-
-  command = File.join(File.dirname(__FILE__), "src",".nuget","NuGet.exe")
-  if os == :windows
-    sh "#{command} #{parameters}"
-  else
-    sh "mono --runtime=v4.0.30319 #{command} #{parameters} "
-  end
-end
-
-def nunit_cmd()
-  cmds = Dir.glob(File.join(File.dirname(__FILE__),"src","packages","NUnit.Runners.*","tools","nunit-console.exe"))
-  if cmds.any?
-    if os != :windows
-      command = "mono --runtime=v4.0.30319 #{cmds.first}"
-    else
-      command = cmds.first
-    end
-  else
-    # /Library/Frameworks/Mono.framework/Versions/${MONO_VERSION}/bin/nunit-console4
-    raise "Could not find nunit runner!"
-  end
-  return command
-  
-end
-
-def nunit_exec(dir, tlib)
-    command = nunit_cmd()
-    assemblies= "#{tlib}.dll"
-    cd dir do
-      sh "#{command} #{assemblies}" do  |ok, res|
-        if !ok
-          abort 'Nunit failed!'
-        end
-      end
-    end
-end
 
 $dir = File.join(File.dirname(__FILE__),'src')
 $nugetfolder = File.join(File.dirname(__FILE__),'nuget')
@@ -76,21 +22,21 @@ task :install_packages do
   package_paths = FileList["src/**/packages.config"]+["src/.nuget/packages.config"]
 
   package_paths.each.each do |filepath|
-      nuget_exec("i #{filepath} -o ./src/packages -source http://www.nuget.org/api/v2/")
+      NuGet::exec("i #{filepath} -o ./src/packages -source http://www.nuget.org/api/v2/")
   end
 end
 
 desc "build"
-build :build do |msb|
+build :build => [:install_packages] do |msb|
   msb.prop :configuration, :Debug
   msb.prop :platform, "Mixed Platforms"
-  if os != :windows
+  if NuGet::os != :windows
     with_mono_properties msb
   end
   msb.target = :Rebuild
   msb.be_quiet
   msb.nologo
-  if os == :windows
+  if NuGet::os == :windows
     msb.sln =File.join($dir, "Isop.Wpf.sln")
   else
     msb.sln =File.join($dir, "Isop.sln")
@@ -100,12 +46,10 @@ end
 task :default => ['build']
 
 desc "test using nunit console"
-test_runner :test => [:build, :install_packages] do |nunit|
-  command = Dir.glob(File.join($dir,"packages/NUnit.Runners.*/Tools/nunit-console.exe")).first
-  puts command
-  nunit.exe = command
+test_runner :test => [:build] do |nunit|
+  nunit.exe = NuGet::nunit_path
   files = [File.join($dir,"Tests/bin/Debug/Tests.dll")]
-  if os == :windows
+  if NuGet::os == :windows
     files.push File.join($dir,"Isop.Wpf.Tests/bin/Debug/Isop.Wpf.Tests.dll")
   end
   nunit.files = files 
@@ -138,13 +82,13 @@ task :nugetpack => [:core_nugetpack, :runners_nugetpack]
 
 task :core_nugetpack => [:core_copy_to_nuspec] do |nuget|
   cd File.join($nugetfolder,"Isop") do
-    nuget_exec "pack Isop.nuspec"
+    NuGet::exec "pack Isop.nuspec"
   end
 end
 
 task :runners_nugetpack => [:runners_copy_to_nuspec] do |nuget|
   cd File.join($nugetfolder,"Isop.Runners") do
-    nuget_exec "pack Isop.Runners.nuspec"
+    NuGet::exec "pack Isop.Runners.nuspec"
   end
 end
 
