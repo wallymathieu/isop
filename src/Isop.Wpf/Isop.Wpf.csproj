@@ -72,8 +72,8 @@
     <Compile Include="Models\MissingArgument.cs" />
     <Compile Include="Models\TypeConversionFailed.cs" />
     <Compile Include="ViewModels\IReceiveResult.cs" />
-    <Compile Include="WpfControls\BoolToVisibilityConverter.cs" />
-    <Compile Include="WpfControls\MethodView.xaml.cs">
+    <Compile Include="BoolToVisibilityConverter.cs" />
+    <Compile Include="MethodView.xaml.cs">
       <DependentUpon>MethodView.xaml</DependentUpon>
     </Compile>
     <Compile Include="SingleScopeOnly.cs" />
@@ -98,7 +98,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="WpfControls\MethodView.xaml">
+    <Page Include="MethodView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

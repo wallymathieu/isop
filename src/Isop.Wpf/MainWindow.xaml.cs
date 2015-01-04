@@ -7,7 +7,6 @@ using System.Windows;
 using Isop.Gui.ViewModels;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Isop.WpfControls;
 using System.Threading.Tasks;
 
 namespace Isop.Gui
