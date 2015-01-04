@@ -1,5 +1,4 @@
-﻿using Isop.Gui.Http;
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 
 namespace Isop.Gui

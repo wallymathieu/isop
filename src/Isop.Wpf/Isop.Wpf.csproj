@@ -67,7 +67,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModels\EmptyMethodViewModel.cs" />
-    <Compile Include="Json\HttpClient.cs" />
     <Compile Include="Json\RequestError.cs" />
     <Compile Include="Json\Request.cs" />
     <Compile Include="Models\MissingArgument.cs" />

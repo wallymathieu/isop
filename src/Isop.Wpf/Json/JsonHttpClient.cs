@@ -1,5 +1,4 @@
-﻿using Isop.Gui.Http;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -31,7 +30,7 @@ namespace Isop.Gui
                 };
 
                 var response = await request.GetResponseAsync();
-                if (jsonRequest.DoStream) 
+                if (jsonRequest.DoStream)
                 {
                     return new JsonResponse(((HttpWebResponse)response).StatusCode, response.GetResponseStream());
                 }
@@ -42,14 +41,31 @@ namespace Isop.Gui
                     return new JsonResponse(((HttpWebResponse)response).StatusCode, c);
                 }
             }
+            catch (WebException ex)
+            {
+                return new JsonResponse(GetRequestException(ex));
+            }
             catch (Exception ex)
             {
-                if (ex is WebException)
-                    return new JsonResponse(HttpClient.GetRequestException((WebException)ex));
-//                if (ex.GetBaseException() is WebException)
-                    return new JsonResponse(HttpClient.GetRequestException((WebException)ex.GetBaseException()));
+                if (ex.GetBaseException() is WebException)
+                    return new JsonResponse(GetRequestException((WebException)ex.GetBaseException()));
+                throw;
             }
         }
 
+        protected internal static RequestError GetRequestException(WebException ex)
+        {
+            if (ex.Response != null)
+            {
+                using (var rstream = ex.Response.GetResponseStream())
+                using (var reader = new StreamReader(rstream, Encoding.UTF8))
+                {
+                    var c = reader.ReadToEnd();
+                    var resp = ((HttpWebResponse)ex.Response);
+                    return new RequestError(resp.StatusCode, c, resp.Headers["ErrorType"]);
+                }
+            }
+            return new RequestError(HttpStatusCode.InternalServerError, ex.Message, "InternalServerError");
+        }
     }
 }

@@ -8,7 +8,6 @@ using System;
 using Isop.Gui.Models;
 using System.Threading.Tasks;
 using System.Net;
-using Isop.Gui.Http;
 using Isop.Gui.ViewModels;
 using FakeItEasy;
 namespace Isop.Wpf.Tests
