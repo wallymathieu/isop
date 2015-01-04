@@ -11,22 +11,22 @@ namespace Isop.Gui.ViewModels
 {
     public class MethodViewModel : INotifyPropertyChanged, IReceiveResult
     {
-        private Isop.Gui.Models.Method data;
         public MethodViewModel(Isop.Gui.Models.Method m, IIsopClient client)
         {
-            data = m;
+            Method = m;
             Parameters = m.Parameters.Select(p => new ParamViewModel(p)).ToArray();
             isopClient = client;
         }
 
-        public string Name { get { return data.Name; } }
-        public string ClassName { get { return data.ClassName; } }
+        public Isop.Gui.Models.Method Method { get; private set; }
+        public string Name { get { return Method.Name; } }
+        public string ClassName { get { return Method.ClassName; } }
 
         public IEnumerable<ParamViewModel> Parameters { get; private set; }
-        public string Help { get { return data.Help; } }
+        public string Help { get { return Method.Help; } }
         private IIsopClient isopClient;
 
-        public string Url { get { return data.Url; } }
+        public string Url { get { return Method.Url; } }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -40,10 +40,6 @@ namespace Isop.Gui.ViewModels
                 _result = value;
                 PropertyChanged.SendPropertyChanged(this, "Result");
             }
-        }
-        public async Task<IReceiveResult> Invoke()
-        {
-            return await isopClient.Invoke(this.data, this);
         }
 
         private string _ErrorMessage;

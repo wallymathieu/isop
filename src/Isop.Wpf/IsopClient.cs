@@ -31,9 +31,16 @@ namespace Isop.Gui
             return JsonConvert.DeserializeObject<Models.Root>(response.Data);
         }
 
-        public async Task<IReceiveResult> Invoke(Models.Method method, IReceiveResult result)
+        public async Task<IReceiveResult> Invoke(Models.Method method, IEnumerable<Models.Param> globalParameters, IReceiveResult result)
         {
             var form = method.Parameters.ToDictionary(p => p.Name, p => p.Value);
+            foreach (var global in globalParameters)
+            {
+                if (!form.ContainsKey(global.Name))
+                {
+                    form.Add(global.Name, global.Value);
+                }
+            }
             using (var rstream = await JsonClient.Request(new Request(BasePath + method.Url, r => r.Post().Form(form).Stream())))
             {
                 if (null != rstream.Stream)

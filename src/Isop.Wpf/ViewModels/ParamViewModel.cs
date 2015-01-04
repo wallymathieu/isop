@@ -5,29 +5,28 @@ namespace Isop.Gui.ViewModels
 {
     public class ParamViewModel : INotifyPropertyChanged
     {
-        private Isop.Gui.Models.Param data;
         public ParamViewModel(Isop.Gui.Models.Param param)
         {
-            data = param;
+            Parameter = param;
             Index = counter++;
-            Type = GetType(data);
+            Type = GetType(Parameter);
         }
 
         private static Type GetType(Isop.Gui.Models.Param p)
         {
             return Type.GetType(p.Type);
         }
-
+        public Isop.Gui.Models.Param Parameter { get; private set; }
         public Type Type { get; private set; }
-        public string Name { get { return data.Name; } }
+        public string Name { get { return Parameter.Name; } }
         public int Index { get; private set; }
-        public bool Required { get { return data.Required; } }
+        public bool Required { get { return Parameter.Required; } }
         public string Value
         {
-            get { return data.Value; }
+            get { return Parameter.Value; }
             set
             {
-                data.Value = value;
+                Parameter.Value = value;
                 PropertyChanged.SendPropertyChanged(this, "Value");
             }
         }
@@ -35,5 +34,6 @@ namespace Isop.Gui.ViewModels
         private static int counter = 0;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
     }
 }

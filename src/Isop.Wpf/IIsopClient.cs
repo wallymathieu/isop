@@ -10,6 +10,6 @@ namespace Isop.Gui
     public interface IIsopClient
     {
         Task<Models.Root> GetModel();
-        Task<IReceiveResult> Invoke(Models.Method method, IReceiveResult result);
+        Task<IReceiveResult> Invoke(Models.Method method, IEnumerable<Models.Param> globalParameters, IReceiveResult result);
     }
 }

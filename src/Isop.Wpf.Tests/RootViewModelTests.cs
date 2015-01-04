@@ -1,32 +1,27 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using Isop.Gui.ViewModels;
-using With;
 using Isop.Gui;
-using Newtonsoft.Json;
 using Isop.Gui.Models;
-using System.Threading.Tasks;
+using FakeItEasy;
 namespace Isop.Wpf.Tests
 {
     [TestFixture]
     public class RootViewModelTests
     {
-        private RootViewModel GetMethodTreeModel(Root b)
-        {
-            var data = JsonConvert.SerializeObject(b);
-            return new IsopClient(new JsonHttpClientThatOnlyReturns(data), "http://localhost:666").GetMethodTreeModel().Result;
-        }
+        private IIsopClient _isopClient;
 
-        private RootViewModel TreeModelWithCurrentMethodSelected()
+        private RootViewModel RootVmWithMethodSelected()
         {
-            var treemodel = GetMethodTreeModel(TreeModel());
+            var mt = RootModelFromSource();
+            var treemodel = new RootViewModel(_isopClient, mt.GlobalParameters.ToArray(), mt.Controllers.ToArray());
 
             treemodel.CurrentMethod = treemodel.Controllers.Single()
                 .Methods.Single(m => m.Name == "Action");
             return treemodel;
         }
 
-        private static Root TreeModel()
+        private static Root RootModelFromSource()
         {
             return new Root
             {
@@ -43,11 +38,16 @@ namespace Isop.Wpf.Tests
                 }
             };
         }
+        [SetUp]
+        public void SetUp()
+        {
+            _isopClient = A.Fake<IIsopClient>();
+        }
 
         [Test]
         public void When_setting_value_on_global_parameter_will_set_value_on_method_parameter()
         {
-            var treemodel = TreeModelWithCurrentMethodSelected();
+            var treemodel = RootVmWithMethodSelected();
             treemodel.GlobalParameters.First().Value = "new value";
             Assert.That(treemodel.CurrentMethod.Parameters.Single().Value,
                 Is.EqualTo("new value"));
@@ -55,7 +55,7 @@ namespace Isop.Wpf.Tests
         [Test]
         public void When_setting_value_on_method_parameter_will_set_value_on_global_parameter()
         {
-            var treemodel = TreeModelWithCurrentMethodSelected();
+            var treemodel = RootVmWithMethodSelected();
             treemodel.CurrentMethod.Parameters.Single().Value = "new value";
             Assert.That(treemodel.GlobalParameters.First().Value,
                 Is.EqualTo("new value"));
@@ -63,7 +63,7 @@ namespace Isop.Wpf.Tests
         [Test]
         public void When_selecting_another_action_will_deregister_event_handlers()
         {
-            var treemodel = TreeModelWithCurrentMethodSelected();
+            var treemodel = RootVmWithMethodSelected();
             var param1 = treemodel.CurrentMethod.Parameters.Single();
             param1.Value = "new value";
             treemodel.CurrentMethod = treemodel.Controllers.Single().Methods.Single(m => m.Name == "AnotherAction");
@@ -78,7 +78,7 @@ namespace Isop.Wpf.Tests
         [Test]
         public void Parameters_does_not_change()
         {
-            var treemodel = TreeModelWithCurrentMethodSelected();
+            var treemodel = RootVmWithMethodSelected();
             var param1 = treemodel.CurrentMethod.Parameters.Single();
             treemodel.CurrentMethod = treemodel.Controllers.Single().Methods.Single(m => m.Name == "AnotherAction");
             Assert.That(treemodel.Controllers.Single()

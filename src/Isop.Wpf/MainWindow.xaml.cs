@@ -58,9 +58,7 @@ namespace Isop.Gui
         {
             if (null == MethodTreeModel.CurrentMethod) return;
 
-            await MethodTreeModel.CurrentMethod.Invoke();
+            await ((App)App.Current).ClientConnection.Invoke(MethodTreeModel.CurrentMethod.Method, MethodTreeModel.GlobalParameters.Select(p=>p.Parameter),MethodTreeModel.CurrentMethod);
         }
-
-
     }
 }
