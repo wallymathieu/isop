@@ -222,7 +222,7 @@ static void Main(string[] args)
 You can invoke your program by (where you have Isop.Cli.exe in the same folder as your dll or exe containing the above class)
 <pre><code>Isop.Cli.exe Customer Add --name value</code></pre>
 
-Look at the <a href="/wallymathieu/isop/blob/master/Example.Cli/Program.cs">Example Cli project</a> for the most recent example of how it is used. 
+Look at the <a href="/wallymathieu/isop/blob/master/Example/Program.cs">Example Cli project</a> for the most recent example of how it is used. 
 
 ## Alternative
 
