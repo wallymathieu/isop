@@ -39,11 +39,11 @@ namespace Isop.Server
             return Build
                 .Parse(
                     new List<string>() { { method.ClassName }, { method.Name } }
-                    .Tap(l => l.AddRange(To(form))))
+                    .Tap(l => l.AddRange(MapToStrings(form))))
                 .Invoke();
         }
 
-        private IEnumerable<string> To(IDictionary<string, object> form)
+        private IEnumerable<string> MapToStrings(IDictionary<string, object> form)
         {
             return form.Map(kv => new string[] { "--" + kv.Key + "=", kv.Value.ToString() }).Flatten<string>();
         }
