@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop", "Isop\Isop.csproj", "{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{55C48544-BD4E-4101-A42C-CCCEB2F92304}"
@@ -17,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{616AC3
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop.Server", "Isop.Server\Isop.Server.csproj", "{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,6 +125,21 @@ Global
 		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Release|x86.ActiveCfg = Release|Any CPU
 		{5437A382-7B54-4964-8BB7-FE4F35DA4ECF}.Release|x86.Build.0 = Release|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Default|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Default|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Default|x86.ActiveCfg = Debug|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -131,7 +150,7 @@ Global
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
 		$1.ResourceNamePolicy = FileFormatDefault
-		$0.TextStylePolicy = $2
+		$0.TextStylePolicy = $4
 		$2.FileWidth = 120
 		$2.NoTabsAfterNonTabs = True
 		$2.inheritsSet = VisualStudio
@@ -141,7 +160,6 @@ Global
 		$3.inheritsSet = Mono
 		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
-		$0.TextStylePolicy = $4
 		$4.FileWidth = 120
 		$4.inheritsSet = VisualStudio
 		$4.inheritsScope = text/plain

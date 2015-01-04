@@ -46,17 +46,17 @@
     <Compile Include='..\Isop\Configuration\ConfigureUsingInstance.cs'>
       <Link>Isop\Configuration\ConfigureUsingInstance.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Controller\FindMethodAmongLexedTokens.cs'>
-      <Link>Isop\Controller\FindMethodAmongLexedTokens.cs</Link>
+    <Compile Include='..\Isop\Controllers\FindMethodAmongLexedTokens.cs'>
+      <Link>Isop\Controllers\FindMethodAmongLexedTokens.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Controller\TurnParametersToArgumentWithOptions.cs'>
-      <Link>Isop\Controller\TurnParametersToArgumentWithOptions.cs</Link>
+    <Compile Include='..\Isop\Controllers\TurnParametersToArgumentWithOptions.cs'>
+      <Link>Isop\Controllers\TurnParametersToArgumentWithOptions.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Infrastructure\ListExtensions.cs'>
       <Link>Isop\Infrastructure\ListExtensions.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Controller\TypeContainer.cs'>
-      <Link>Isop\Controller\TypeContainer.cs</Link>
+    <Compile Include='..\Isop\Controllers\TypeContainer.cs'>
+      <Link>Isop\Controllers\TypeContainer.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Infrastructure\ReflectionExtensions.cs'>
       <Link>Isop\Infrastructure\ReflectionExtensions.cs</Link>
@@ -76,8 +76,8 @@
     <Compile Include='..\Isop\Build.cs'>
       <Link>Isop\Build.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Controller\ControllerRecognizer.cs'>
-      <Link>Isop\Controller\ControllerRecognizer.cs</Link>
+    <Compile Include='..\Isop\Controllers\ControllerRecognizer.cs'>
+      <Link>Isop\Controllers\ControllerRecognizer.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Lex\TokenType.cs'>
       <Link>Isop\Lex\TokenType.cs</Link>
@@ -121,11 +121,11 @@
     <Compile Include='..\Isop\TypeConversionFailedException.cs'>
       <Link>Isop\TypeConversionFailedException.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Controller\RewriteLexedTokensToSupportHelpAndIndex.cs'>
-      <Link>Isop\Controller\RewriteLexedTokensToSupportHelpAndIndex.cs</Link>
+    <Compile Include='..\Isop\Controllers\RewriteLexedTokensToSupportHelpAndIndex.cs'>
+      <Link>Isop\Controllers\RewriteLexedTokensToSupportHelpAndIndex.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Controller\ParsedMethod.cs'>
-      <Link>Isop\Controller\ParsedMethod.cs</Link>
+    <Compile Include='..\Isop\Controllers\ParsedMethod.cs'>
+      <Link>Isop\Controllers\ParsedMethod.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Infrastructure\MethodInfoOrProperty.cs'>
       <Link>Isop\Infrastructure\MethodInfoOrProperty.cs</Link>
@@ -133,14 +133,14 @@
     <Compile Include='..\Isop\Help\HelpXmlDocumentation.cs'>
       <Link>Isop\Help\HelpXmlDocumentation.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Controller\HelpController.cs'>
-      <Link>Isop\Controller\HelpController.cs</Link>
+    <Compile Include='..\Isop\Controllers\HelpController.cs'>
+      <Link>Isop\Controllers\HelpController.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Help\HelpForArgumentWithOptions.cs'>
       <Link>Isop\Help\HelpForArgumentWithOptions.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Controller\HelpForControllers.cs'>
-      <Link>Isop\Controller\HelpForControllers.cs</Link>
+    <Compile Include='..\Isop\Controllers\HelpForControllers.cs'>
+      <Link>Isop\Controllers\HelpForControllers.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets'/>

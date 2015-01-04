@@ -1,8 +1,8 @@
-<?xml version='1.0' encoding='UTF-8'?> 
-<Project DefaultTargets='Build' ToolsVersion='4.0' xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=' &apos;$(Configuration)&apos; == &apos;&apos; '>Debug</Configuration>
-    <Platform Condition=' &apos;$(Platform)&apos; == &apos;&apos; '>x86</Platform>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{47DA4A1C-3FB5-4FEE-99B3-CE102BCD349C}</ProjectGuid>
@@ -10,15 +10,18 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Isop.Gui</RootNamespace>
     <AssemblyName>Isop.Wpf</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <PackagesConfig>$(ProjectDir)/packages.config</PackagesConfig>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
-  <PropertyGroup Condition=' &apos;$(Configuration)|$(Platform)&apos; == &apos;Debug|x86&apos; '>
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -26,8 +29,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition=' &apos;$(Configuration)|$(Platform)&apos; == &apos;Release|x86&apos; '>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -35,180 +39,95 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include='System'/>
-    <Reference Include='System.ComponentModel.DataAnnotations'/>
-    <Reference Include='System.Data'/>
-    <Reference Include='System.Xml'/>
-    <Reference Include='Microsoft.CSharp'/>
-    <Reference Include='System.Core'/>
-    <Reference Include='System.Xml.Linq'/>
-    <Reference Include='System.Data.DataSetExtensions'/>
-    <Reference Include='System.Xaml'>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.7\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include='WindowsBase'/>
-    <Reference Include='PresentationCore'/>
-    <Reference Include='PresentationFramework'/>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include='App.xaml'>
+    <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include='MainWindow.xaml'>
+    <Compile Include="ViewModels\EmptyMethodViewModel.cs" />
+    <Compile Include="Json\HttpClient.cs" />
+    <Compile Include="Json\RequestError.cs" />
+    <Compile Include="Json\Request.cs" />
+    <Compile Include="Models\MissingArgument.cs" />
+    <Compile Include="Models\TypeConversionFailed.cs" />
+    <Compile Include="ViewModels\IReceiveResult.cs" />
+    <Compile Include="WpfControls\BoolToVisibilityConverter.cs" />
+    <Compile Include="WpfControls\MethodView.xaml.cs">
+      <DependentUpon>MethodView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SingleScopeOnly.cs" />
+    <Compile Include="ViewModels\ControllerViewModel.cs" />
+    <Compile Include="ViewModels\MethodViewModel.cs" />
+    <Compile Include="ViewModels\RootViewModel.cs" />
+    <Compile Include="ViewModels\ParamViewModel.cs" />
+    <Compile Include="ViewModels\ParamExtension.cs" />
+    <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include='App.xaml.cs'>
+    <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include='MainWindow.xaml.cs'>
+    <Compile Include="IIsopClient.cs" />
+    <Compile Include="Json\IJSonHttpClient.cs" />
+    <Compile Include="Json\JsonHttpClient.cs" />
+    <Compile Include="Json\JsonResponse.cs" />
+    <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include='Properties\AssemblyInfo.cs'>
-      <SubType>Code</SubType>
-    </Compile>
-    <AppDesigner Include='Properties\'/>
-    <Compile Include='..\Isop\Configuration\ConfigureUsingInstance.cs'>
-      <Link>Isop\Configuration\ConfigureUsingInstance.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controller\FindMethodAmongLexedTokens.cs'>
-      <Link>Isop\Controller\FindMethodAmongLexedTokens.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controller\TurnParametersToArgumentWithOptions.cs'>
-      <Link>Isop\Controller\TurnParametersToArgumentWithOptions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Infrastructure\ListExtensions.cs'>
-      <Link>Isop\Infrastructure\ListExtensions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controller\TypeContainer.cs'>
-      <Link>Isop\Controller\TypeContainer.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Infrastructure\ReflectionExtensions.cs'>
-      <Link>Isop\Infrastructure\ReflectionExtensions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Infrastructure\StringExtensions.cs'>
-      <Link>Isop\Infrastructure\StringExtensions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Configuration\IsopAutoConfiguration.cs'>
-      <Link>Isop\Configuration\IsopAutoConfiguration.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Lex\ArgumentLexer.cs'>
-      <Link>Isop\Lex\ArgumentLexer.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\ArgumentParser.cs'>
-      <Link>Isop\Parse\ArgumentParser.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Build.cs'>
-      <Link>Isop\Build.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controller\ControllerRecognizer.cs'>
-      <Link>Isop\Controller\ControllerRecognizer.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Lex\TokenType.cs'>
-      <Link>Isop\Lex\TokenType.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Lex\Token.cs'>
-      <Link>Isop\Lex\Token.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Infrastructure\PeekEnumerable.cs'>
-      <Link>Isop\Infrastructure\PeekEnumerable.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\MissingArgumentException.cs'>
-      <Link>Isop\MissingArgumentException.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\ArgumentParameter.cs'>
-      <Link>Isop\Parse\ArgumentParameter.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\Parameters\OrdinalParameter.cs'>
-      <Link>Isop\Parse\Parameters\OrdinalParameter.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\Parameters\OptionParameter.cs'>
-      <Link>Isop\Parse\Parameters\OptionParameter.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\Parameters\VisualStudioParameter.cs'>
-      <Link>Isop\Parse\Parameters\VisualStudioParameter.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\ArgumentWithOptions.cs'>
-      <Link>Isop\Parse\ArgumentWithOptions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\RecognizedArgument.cs'>
-      <Link>Isop\Parse\RecognizedArgument.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\ParsedArguments.cs'>
-      <Link>Isop\Parse\ParsedArguments.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\MergedParsedArguments.cs'>
-      <Link>Isop\Parse\MergedParsedArguments.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\UnrecognizedArgument.cs'>
-      <Link>Isop\Parse\UnrecognizedArgument.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\TypeConversionFailedException.cs'>
-      <Link>Isop\TypeConversionFailedException.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controller\RewriteLexedTokensToSupportHelpAndIndex.cs'>
-      <Link>Isop\Controller\RewriteLexedTokensToSupportHelpAndIndex.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controller\ParsedMethod.cs'>
-      <Link>Isop\Controller\ParsedMethod.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Infrastructure\MethodInfoOrProperty.cs'>
-      <Link>Isop\Infrastructure\MethodInfoOrProperty.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Help\HelpXmlDocumentation.cs'>
-      <Link>Isop\Help\HelpXmlDocumentation.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controller\HelpController.cs'>
-      <Link>Isop\Controller\HelpController.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Help\HelpForArgumentWithOptions.cs'>
-      <Link>Isop\Help\HelpForArgumentWithOptions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controller\HelpForControllers.cs'>
-      <Link>Isop\Controller\HelpForControllers.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop.WpfControls\BoolToVisibilityConverter.cs'>
-      <Link>WpfControls\BoolToVisibilityConverter.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop.WpfControls\SingleScopeOnly.cs'>
-      <Link>WpfControls\SingleScopeOnly.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop.WpfControls\MethodView.xaml.cs'>
-      <Link>WpfControls\MethodView.xaml.cs</Link>
-      <DependentUpon>MethodView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include='..\Isop.WpfControls\ViewModels\BuildExtensions.cs'>
-      <Link>WpfControls\ViewModels\BuildExtensions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop.WpfControls\ViewModels\Controller.cs'>
-      <Link>WpfControls\ViewModels\Controller.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop.WpfControls\ViewModels\Method.cs'>
-      <Link>WpfControls\ViewModels\Method.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop.WpfControls\ViewModels\MethodTreeModel.cs'>
-      <Link>WpfControls\ViewModels\MethodTreeModel.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop.WpfControls\ViewModels\Param.cs'>
-      <Link>WpfControls\ViewModels\Param.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop.WpfControls\ViewModels\ParamExtension.cs'>
-      <Link>WpfControls\ViewModels\ParamExtension.cs</Link>
-    </Compile>
-    <Page Include='..\Isop.WpfControls\MethodView.xaml'>
-      <Link>WpfControls\MethodView.xaml</Link>
+    <Page Include="WpfControls\MethodView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets'/>
+  <ItemGroup>
+    <Compile Include="IsopClient.cs" />
+    <Compile Include="MissingArgumentException.cs" />
+    <Compile Include="Models\Controller.cs" />
+    <Compile Include="Models\Method.cs" />
+    <Compile Include="Models\Root.cs" />
+    <Compile Include="Models\Param.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

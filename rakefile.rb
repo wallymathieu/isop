@@ -111,34 +111,3 @@ task :regen_cli do
     cli.write f
   end
 end
-
-desc "regenerate links in isop wpf"
-task :regen_wpf do
-  isop = VisualStudioFiles::CsProj.new(File.open(File.join($dir,'Isop','Isop.csproj'), "r").read)
-  isop_files = isop.files.select do |file|
-    file.type=='Compile' && !file.file.end_with?('AssemblyInfo.cs')
-  end
-  wpfcontrols = VisualStudioFiles::CsProj.new(File.open(File.join($dir,'Isop.WpfControls','Isop.WpfControls.csproj'), "r").read)
-  wpfcontrol_files = wpfcontrols.files.select do |file|
-    !file.file.end_with?('AssemblyInfo.cs')
-  end
-  
-  wpf = VisualStudioFiles::CsProj.new(File.open(File.join($dir,'Isop.Wpf','Isop.Wpf.csproj'), "r").read)
-  wpf.clear_links
-  isop_files.each do |file|
-    hash = file.to_hash
-    hash[:file] = "..\\Isop\\#{file.file}"
-    hash[:link] = "Isop\\#{file.file}"
-    wpf.add(hash)
-  end
-  wpfcontrol_files.each do |file|
-    hash = file.to_hash
-    hash[:file] = "..\\Isop.WpfControls\\#{file.file}"
-    hash[:link] = "WpfControls\\#{file.file}"
-    wpf.add(hash)
-  end
-
-  File.open(File.join($dir,'Isop.Wpf','Isop.Wpf.csproj'), "w") do |f|
-    wpf.write f
-  end
-end

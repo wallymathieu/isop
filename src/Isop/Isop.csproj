@@ -49,17 +49,17 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Configuration\ConfigureUsingInstance.cs" />
-    <Compile Include="Controller\FindMethodAmongLexedTokens.cs" />
-    <Compile Include="Controller\TurnParametersToArgumentWithOptions.cs" />
+    <Compile Include="Controllers\FindMethodAmongLexedTokens.cs" />
+    <Compile Include="Controllers\TurnParametersToArgumentWithOptions.cs" />
     <Compile Include="Infrastructure\ListExtensions.cs" />
-    <Compile Include="Controller\TypeContainer.cs" />
+    <Compile Include="Controllers\TypeContainer.cs" />
     <Compile Include="Infrastructure\ReflectionExtensions.cs" />
     <Compile Include="Infrastructure\StringExtensions.cs" />
     <Compile Include="Configuration\IsopAutoConfiguration.cs" />
     <Compile Include="Lex\ArgumentLexer.cs" />
     <Compile Include="Parse\ArgumentParser.cs" />
     <Compile Include="Build.cs" />
-    <Compile Include="Controller\ControllerRecognizer.cs" />
+    <Compile Include="Controllers\ControllerRecognizer.cs" />
     <Compile Include="Lex\TokenType.cs" />
     <Compile Include="Lex\Token.cs" />
     <Compile Include="Infrastructure\PeekEnumerable.cs" />
@@ -74,13 +74,13 @@
     <Compile Include="Parse\MergedParsedArguments.cs" />
     <Compile Include="Parse\UnrecognizedArgument.cs" />
     <Compile Include="TypeConversionFailedException.cs" />
-    <Compile Include="Controller\RewriteLexedTokensToSupportHelpAndIndex.cs" />
-    <Compile Include="Controller\ParsedMethod.cs" />
+    <Compile Include="Controllers\RewriteLexedTokensToSupportHelpAndIndex.cs" />
+    <Compile Include="Controllers\ParsedMethod.cs" />
     <Compile Include="Infrastructure\MethodInfoOrProperty.cs" />
     <Compile Include="Help\HelpXmlDocumentation.cs" />
-    <Compile Include="Controller\HelpController.cs" />
+    <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Help\HelpForArgumentWithOptions.cs" />
-    <Compile Include="Controller\HelpForControllers.cs" />
+    <Compile Include="Controllers\HelpForControllers.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -4,11 +4,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using Isop.Parse;
-using Isop.WpfControls.ViewModels;
+using Isop.Gui.ViewModels;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Isop.WpfControls;
+using System.Threading.Tasks;
 
 namespace Isop.Gui
 {
@@ -17,74 +17,48 @@ namespace Isop.Gui
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MethodTreeModel MethodTreeModel { get; set; }
+        public RootViewModel MethodTreeModel { get; set; }
 
         public MainWindow()
         {
-            MethodTreeModel = ((App)App.Current).ParserBuilder.GetMethodTreeModel();
+            MethodTreeModel = new RootViewModel(((App)App.Current).ClientConnection);
             InitializeComponent();
+            var empty = new EmptyMethodViewModel();
+            textBlock2.DataContext = empty;
+            textBlock1.DataContext = empty;
             paramview.Source = MethodTreeModel.GlobalParameters;
-            textBlock2.Text = string.Empty;
             controllersAndCommands.DataContext = MethodTreeModel.Controllers;
-            textBlock1.Text = string.Empty;
+
+            var conn = ((App)App.Current).ClientConnection;
+            var model = conn.GetModel();
+            model.ContinueWith((t) =>
+                MethodTreeModel.Accept(t.Result),
+                TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void SelectedMethodChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue is Method)
+            if (e.NewValue is MethodViewModel)
             {
-                MethodTreeModel.CurrentMethod = (Method)e.NewValue;
+                MethodTreeModel.CurrentMethod = (MethodViewModel)e.NewValue;
                 methodview.DataContext = e.NewValue;
                 methodview.Source = MethodTreeModel.CurrentMethod.Parameters;
-                textBlock2.Text = MethodTreeModel.CurrentMethod.Help;
-                textBlock1.Text = string.Empty;
+                textBlock2.DataContext = MethodTreeModel.CurrentMethod;
+                textBlock1.DataContext = MethodTreeModel.CurrentMethod;
+            }
+            else
+            {
+                var empty = new EmptyMethodViewModel();
+                textBlock2.DataContext = empty;
+                textBlock1.DataContext = empty;
             }
         }
 
-        private void ExecuteMethodButtonClick(object sender, RoutedEventArgs e)
+        private async void ExecuteMethodButtonClick(object sender, RoutedEventArgs e)
         {
-            var cout = new StringWriter(CultureInfo.CurrentCulture);
-            try
-            {
-                MethodTreeModel.GlobalParameters.GetParsedArguments().Invoke(cout);
-            }
-            catch (MissingArgumentException ex)
-            {
-                textBlock1.Text = String.Format("Missing argument(s): {0}", String.Join(", ", ex.Arguments.Select(a => String.Format("{0}: {1}", a.Key, a.Value)).ToArray()));
-                return;
-            }
-#if DEBUG
-            catch (Exception ex1)
-            {
-                textBlock1.Text = string.Join(Environment.NewLine, new object[]{ 
-                    "The global parameter invokation failed with exception:",
-                    ex1.Message, ex1.StackTrace});
-                return;
-            }
-#endif
             if (null == MethodTreeModel.CurrentMethod) return;
 
-            cout.WriteLine();
-            try
-            {
-                var parsedMethod = MethodTreeModel.Build.Parse(MethodTreeModel.CurrentMethod);
-                parsedMethod.Invoke(cout);
-            }
-            catch (MissingArgumentException ex)
-            {
-                textBlock1.Text = String.Format("Missing argument(s): {0}", String.Join(", ", ex.Arguments.Select(a => String.Format("{0}: {1}", a.Key, a.Value)).ToArray()));
-                return;
-            }
-#if DEBUG
-            catch (Exception ex1)
-            {
-                textBlock1.Text = string.Join(Environment.NewLine, new object[] { 
-                    "The invokation of the action failed with exception:", 
-                    ex1.Message, ex1.StackTrace });
-                return;
-            }
-#endif
-            textBlock1.Text = cout.ToString();
+            await MethodTreeModel.CurrentMethod.Invoke();
         }
 
 

@@ -30,18 +30,28 @@ namespace Isop.Parse
 
         public IEnumerable<ArgumentWithOptions> ArgumentWithOptions { get; set; }
 
-        public virtual void Invoke(TextWriter cout)
+        public void Invoke(TextWriter cout)
+        {
+            foreach (var item in Invoke())
+            {
+                cout.WriteLine(item);
+            }
+        }
+
+        public virtual IEnumerable<string> Invoke() 
         {
             foreach (var argument in RecognizedArguments.Where(argument => null != argument.WithOptions.Action))
             {
                 argument.WithOptions.Action(argument.Value);
             }
+            return new string[0];
         }
 
         public ParsedArguments Merge(ParsedArguments args)
         {
             return Merge(this, args);
         }
+
         public static ParsedArguments Merge(ParsedArguments first, ParsedArguments second)
         {
             return new MergedParsedArguments(first, second);

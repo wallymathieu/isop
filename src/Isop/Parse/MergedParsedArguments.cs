@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -16,10 +17,16 @@ namespace Isop.Parse
             ArgumentWithOptions = first.ArgumentWithOptions.Union(second.ArgumentWithOptions);
             UnRecognizedArguments = first.UnRecognizedArguments.Intersect(second.UnRecognizedArguments);
         }
-        public override void Invoke(TextWriter cout)
+        public override IEnumerable<string> Invoke()
         {
-            _first.Invoke(cout);
-            _second.Invoke(cout);
+            foreach (var item in _first.Invoke())
+            {
+                yield return item;
+            };
+            foreach (var item in _second.Invoke())
+            {
+                yield return item;
+            }
         }
     }
 }

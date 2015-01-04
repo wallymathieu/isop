@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Isop.Gui.Http;
+using System.IO;
 using System.Windows;
 
 namespace Isop.Gui
@@ -10,18 +11,15 @@ namespace Isop.Gui
     {
         protected override void OnExit(ExitEventArgs e)
         {
-            ParserBuilder.Dispose();
+            ClientConnection.Dispose();
             base.OnExit(e);
         }
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            var path = Directory.GetParent(System.Reflection.Assembly.GetExecutingAssembly().Location)
-                .FullName;
-            ParserBuilder = new Build().ConfigurationFrom(
-                path);
+            ClientConnection = new IsopClient(new JsonHttpClient(), "http://localhost:8080");
         }
 
-        public Build ParserBuilder { get; set; }
+        public IsopClient ClientConnection { get; set; }
     }
 }

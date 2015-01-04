@@ -6,21 +6,21 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Isop.Configuration;
-using Isop.Controller;
 using Isop.Help;
 using Isop.Infrastructure;
 using Isop.Lex;
 using Isop.Parse;
 using TypeConverterFunc = System.Func<System.Type, string, System.Globalization.CultureInfo, object>;
+using Isop.Controllers;
 namespace Isop
 {
     /// <summary>
     /// represents a configuration build
     /// </summary>
-    public class Build : ConfigureUsingInstance,ICollection<Type>, IDisposable
+    public class Build : ConfigureUsingInstance, ICollection<Type>, IDisposable
     {
         private readonly IList<ArgumentWithOptions> _argumentRecognizers;
-        private readonly IList<KeyValuePair<Type,Func<ControllerRecognizer>>> _controllerRecognizers;
+        private readonly IList<KeyValuePair<Type, Func<ControllerRecognizer>>> _controllerRecognizers;
         private HelpForControllers _helpForControllers;
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
@@ -123,7 +123,7 @@ namespace Isop
 
         public Build()
         {
-            _controllerRecognizers = new List<KeyValuePair<Type,Func<ControllerRecognizer>>>();
+            _controllerRecognizers = new List<KeyValuePair<Type, Func<ControllerRecognizer>>>();
             _argumentRecognizers = new List<ArgumentWithOptions>();
         }
 
@@ -158,6 +158,11 @@ namespace Isop
             return Parse(arg.ToList());
         }
 
+        public ParsedArguments Parse(string className, string method, IEnumerable<KeyValuePair<string,object>> arg)
+        {
+            throw new NotImplementedException();
+        }
+
         public ParsedArguments Parse(List<string> arg)
         {
             var argumentParser = new ArgumentParser(_argumentRecognizers, _allowInferParameter);
@@ -176,10 +181,15 @@ namespace Isop
             parsedArguments.AssertFailOnUnMatched();
             return parsedArguments;
         }
+        
+        public Build Recognize<T>(CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false)
+        {
+            return Recognize(typeof(T), cultureInfo, typeConverter, ignoreGlobalUnMatchedParameters);
+        }
 
         public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false)
         {
-            _controllerRecognizers.Add(new KeyValuePair<Type, Func<ControllerRecognizer>>(arg, ()=> new ControllerRecognizer(arg,
+            _controllerRecognizers.Add(new KeyValuePair<Type, Func<ControllerRecognizer>>(arg, () => new ControllerRecognizer(arg,
                 cultureInfo ?? CultureInfo,
                 typeConverter ?? TypeConverter,
                 ignoreGlobalUnMatchedParameters,
@@ -241,8 +251,8 @@ namespace Isop
         {
             if (_helpController == null)
             {
-                _helpForControllers = new HelpForControllers(Recognizes, _container, 
-                    new TurnParametersToArgumentWithOptions(CultureInfo, TypeConverter), 
+                _helpForControllers = new HelpForControllers(Recognizes, _container,
+                    new TurnParametersToArgumentWithOptions(CultureInfo, TypeConverter),
                     HelpXmlDocumentation);
                 _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
                 _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
@@ -299,6 +309,12 @@ namespace Isop
         public Build Configuration(Type type)
         {
             return Configuration(type, Activator.CreateInstance(type));
+        }
+
+        public Build ConfigurationFromAssemblyPath()
+        {
+            var path = Directory.GetParent(System.Reflection.Assembly.GetExecutingAssembly().Location).FullName;
+            return ConfigurationFrom(path);
         }
 
         public Build ConfigurationFrom(string path)

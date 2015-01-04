@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using Isop.WpfControls.ViewModels;
-using System.ComponentModel;
-using Isop.WpfControls;
+﻿using NUnit.Framework;
+using Isop.Gui;
 
 namespace Isop.Wpf.Tests
 {

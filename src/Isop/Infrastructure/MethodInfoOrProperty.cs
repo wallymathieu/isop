@@ -1,7 +1,7 @@
 using System.Reflection;
 using Isop.Infrastructure;
 
-namespace Isop.Controller
+namespace Isop.Infrastructure
 {
     public class MethodInfoOrProperty
     {

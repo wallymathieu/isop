@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Isop.Controller;
 using Isop.Parse;
 
 namespace Isop.Auto.Cli
@@ -11,12 +10,8 @@ namespace Isop.Auto.Cli
 
         static void Main(string[] args)
         {
-            var path =  Directory.GetParent(System.Reflection.Assembly.GetExecutingAssembly().Location)
-                .FullName;
-            using(var parserBuilder = new Build().ConfigurationFrom(
-                path))
+            using(var parserBuilder = new Build().ConfigurationFromAssemblyPath())
             {
-            
                 try
                 {
                     var parsedMethod = parserBuilder.Parse(args);

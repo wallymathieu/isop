@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <div class="global_parameters">
+        @Each.GlobalParameters
+        <label for="@Current.Name">@Current.Name</label>
+        <input name="@Current.Name" />
+        @EndEach
+    </div>
+    <div class="controllers">
+        @Each.Controllers
+        <a href="@Current.Url">@Current.Name</a>
+        @EndEach
+    </div>
+</body>
+</html>
