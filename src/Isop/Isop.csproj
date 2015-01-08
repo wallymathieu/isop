@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -80,7 +81,6 @@
     <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Help\HelpForArgumentWithOptions.cs" />
     <Compile Include="Controllers\HelpForControllers.cs" />
-    <Compile Include="Configuration\Configuration.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

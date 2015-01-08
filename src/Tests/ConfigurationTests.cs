@@ -3,6 +3,7 @@ using Isop.Tests.FakeConfigurations;
 using Isop.Tests.FakeControllers;
 using NUnit.Framework;
 using System.IO;
+using Isop.Configurations;
 
 namespace Isop.Tests
 {

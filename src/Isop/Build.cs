@@ -5,13 +5,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Isop.Configuration;
 using Isop.Help;
 using Isop.Infrastructure;
 using Isop.Lex;
 using Isop.Parse;
 using TypeConverterFunc = System.Func<System.Type, string, System.Globalization.CultureInfo, object>;
 using Isop.Controllers;
+using Isop.Configurations;
 namespace Isop
 {
     /// <summary>
@@ -98,11 +98,17 @@ namespace Isop
 
         public bool Remove(Type item)
         {
-            var withType = _controllerRecognizers.Where(c=>c.Key == item).ToArray();
-            foreach(var element in withType)
+            var withType = _controllerRecognizers.Where(c => c.Key == item).ToArray();
+            if (!withType.Any())
+            {
+                return false;
+            }
+
+            foreach (var element in withType)
             {
                 _controllerRecognizers.Remove(element);
             }
+            return true;
         }
 
         public int Count
@@ -180,7 +186,7 @@ namespace Isop
             parsedArguments.AssertFailOnUnMatched();
             return parsedArguments;
         }
-        
+
         public Build Recognize<T>(CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false)
         {
             return Recognize(typeof(T), cultureInfo, typeConverter, ignoreGlobalUnMatchedParameters);
