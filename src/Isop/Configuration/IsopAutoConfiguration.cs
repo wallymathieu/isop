@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Isop.Infrastructure;
 
-namespace Isop
+namespace Isop.Configurations
 {
     public class IsopAutoConfiguration
     {
@@ -17,7 +17,7 @@ namespace Isop
         {
             return _assembly.GetTypes().Where(t=>
                 t.IsPublic
-                && StringExtensions.EndsWithIC(t.Name, "controller") 
+                && t.Name.EndsWithIC("controller") 
                 && t.GetConstructors().Any(ctor=>ctor.GetParameters().Length==0)
                 );
         }

@@ -54,7 +54,7 @@ namespace Isop
                 }
                 else if (RecognizesHelp)
                 {
-                    throw new NotImplementedException("! Deregister help controller etc");
+                    throw new Exception("Not supported: Need to deregister help controller etc");
                 }
             }
         }
@@ -98,7 +98,11 @@ namespace Isop
 
         public bool Remove(Type item)
         {
-            throw new NotImplementedException();
+            var withType = _controllerRecognizers.Where(c=>c.Key == item).ToArray();
+            foreach(var element in withType)
+            {
+                _controllerRecognizers.Remove(element);
+            }
         }
 
         public int Count
@@ -156,11 +160,6 @@ namespace Isop
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
             return Parse(arg.ToList());
-        }
-
-        public ParsedArguments Parse(string className, string method, IEnumerable<KeyValuePair<string,object>> arg)
-        {
-            throw new NotImplementedException();
         }
 
         public ParsedArguments Parse(List<string> arg)
@@ -346,8 +345,7 @@ namespace Isop
 
         public HelpController HelpController()
         {
-            if (_helpController != null) return _helpController;
-            return null;
+            return _helpController;
         }
     }
 }

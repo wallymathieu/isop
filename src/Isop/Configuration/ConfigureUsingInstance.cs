@@ -5,7 +5,7 @@ using Isop.Help;
 using Isop.Infrastructure;
 using Isop.Parse;
 
-namespace Isop.Configuration
+namespace Isop.Configurations
 {
     public abstract class ConfigureUsingInstance
     {
