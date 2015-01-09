@@ -27,7 +27,7 @@ namespace Isop.Wpf.ServerIntegration
 
         private RootViewModel GetRootModelFromBuild(Build b)
         {
-            var server = new Isop.Server.IsopServerFromBuild(b);
+            var server = new Isop.Server.IsopServerFromBuild( ()=> b );
             var data = JsonConvert.SerializeObject(server.GetModel());
             return new IsopClient(new JsonHttpClientThatOnlyReturns(data), "http://localhost:666").GetMethodTreeModel().Result;
         }
