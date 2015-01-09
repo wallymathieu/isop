@@ -3,10 +3,12 @@ using Isop.Tests.FakeConfigurations;
 using Isop.Tests.FakeControllers;
 using NUnit.Framework;
 using System.IO;
-using Isop.Configurations;
 
 namespace Isop.Tests
 {
+    using Configurations;
+    using Infrastructure;
+
     [TestFixture]
     public class ConfigurationTests
     {
@@ -49,7 +51,7 @@ namespace Isop.Tests
         }
         [Test] public void Can_use_autoconfiguration()
         {
-            var recognizes = new IsopAutoConfiguration(this.GetType().Assembly).Recognizes().ToArray();
+            var recognizes = new AssemblyScanner(this.GetType().Assembly).LooksLikeControllers().ToArray();
             Assert.That(recognizes,Is.EquivalentTo(new []{typeof(MyController)}));
         }
     }

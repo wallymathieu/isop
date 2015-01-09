@@ -4,6 +4,7 @@ using System.Globalization;
 using Isop.Help;
 using Isop.Infrastructure;
 using Isop.Parse;
+using System.Reflection;
 
 namespace Isop.Configurations
 {
@@ -20,7 +21,34 @@ namespace Isop.Configurations
         public abstract bool RecognizeHelp { get; set; }
         public abstract IList<ArgumentWithOptions> ArgumentRecognizers { get; }
 
-        public void Configure(Type t, object instance)
+        private void ConfigureRecognizes(Type t, object instance, MethodInfo[] methods=null)
+        {
+            var recognizesMethod = (methods ?? t.GetPublicInstanceMethods()).MatchGet(name: "Recognizes",
+                returnType: typeof(IEnumerable<Type>),
+                parameters: new Type[0]);
+            if (null != recognizesMethod)
+            {
+                var recognizes = (IEnumerable<Type>)recognizesMethod.Invoke(instance, new object[0]);
+                foreach (var recognized in recognizes)
+                {
+                    Recognizes.Add(recognized);
+                }
+            }
+        }
+
+        private void ConfigurationPublicWritableFields(object instance, MethodInfo[] methods)
+        {
+            var configurationSetters = methods.FindSet();
+            foreach (var methodInfo in configurationSetters)
+            {
+                var action = (Action<String>)Delegate.CreateDelegate(typeof(Action<String>), instance, methodInfo.MethodInfo);
+                var description = HelpXmlDocumentation.GetDescriptionForMethod(methodInfo.MethodInfo);
+                ArgumentRecognizers.Add(new ArgumentWithOptions(methodInfo.Name.RemoveSetFromBeginningOfString(), action: action, required: methodInfo.Required, description: description, type: typeof(string)));
+            }
+        }
+
+
+        internal void Configure(Type t, object instance)
         {
             var methods = t.GetPublicInstanceMethods();
 
@@ -30,36 +58,16 @@ namespace Isop.Configurations
             if (null != culture)
                 CultureInfo = (CultureInfo)culture.Invoke(instance, new object[0]);
 
-            var recognizesMethod = methods.MatchGet(name: "Recognizes",
-                                                    returnType: typeof(IEnumerable<Type>),
-                                                    parameters: new Type[0]);
-            if (null != recognizesMethod)
-            {
-                var recognizes = (IEnumerable<Type>)recognizesMethod.Invoke(instance, new object[0]);
-                foreach (var recognized in recognizes)
-                {
-                    Recognizes.Add(recognized);
-                }
-            }
+            ConfigureRecognizes(t, instance, methods);
+           
             var objectFactory = methods.Match(name: "ObjectFactory",
                                               returnType: typeof(object),
                                               parameters: new[] { typeof(Type) });
             if (null != objectFactory)
                 Factory = (Func<Type, object>)Delegate.CreateDelegate(typeof(Func<Type, object>), instance, objectFactory);
 
-            var configurationSetters = methods.FindSet();
-            foreach (var methodInfo in configurationSetters)
-            {
-                var action = (Action<String>)Delegate.CreateDelegate(typeof(Action<String>),
-                                                                      instance, methodInfo.MethodInfo);
-                var description = HelpXmlDocumentation.GetDescriptionForMethod(methodInfo.MethodInfo);
-                ArgumentRecognizers.Add(new ArgumentWithOptions(methodInfo.Name.RemoveSetFromBeginningOfString(),
-                                                                      action: action,
-                                                                      required: methodInfo.Required,
-                                                                      description: description,
-                                                                      type: typeof(string)));
+            ConfigurationPublicWritableFields(instance, methods);
 
-            }
             var recongizeHelp = methods.MatchGet(name: "RecognizeHelp",
                                                  returnType: typeof(bool),
                                                  parameters: new Type[0]);

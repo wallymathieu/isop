@@ -5,15 +5,16 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Isop.Help;
-using Isop.Infrastructure;
-using Isop.Lex;
-using Isop.Parse;
-using TypeConverterFunc = System.Func<System.Type, string, System.Globalization.CultureInfo, object>;
-using Isop.Controllers;
-using Isop.Configurations;
 namespace Isop
 {
+    using Infrastructure;
+    using Help;
+    using Lex;
+    using Parse;
+    using TypeConverterFunc = System.Func<System.Type, string, System.Globalization.CultureInfo, object>;
+    using Controllers;
+    using Configurations;
+
     /// <summary>
     /// represents a configuration build
     /// </summary>
@@ -301,7 +302,7 @@ namespace Isop
         {
             return Configuration(typeof(T), instance);
         }
-        public Build Configuration(Type t, object instance)
+        internal Build Configuration(Type t, object instance)
         {
             Configure(t, instance);
 
@@ -318,32 +319,36 @@ namespace Isop
 
         public Build ConfigurationFromAssemblyPath()
         {
-            var path = Directory.GetParent(System.Reflection.Assembly.GetExecutingAssembly().Location).FullName;
-            return ConfigurationFrom(path);
+            return ConfigurationFrom(ExecutionAssembly.Path());
         }
-
+        /// <summary>
+        /// Will load all the assemblies in the path in order to scan them.
+        /// </summary>
         public Build ConfigurationFrom(string path)
         {
-            var files = Directory.GetFiles(path)
-                .Where(f =>
-                {
-                    var ext = Path.GetExtension(f);
-                    return ext.EqualsIC(".dll") || ext.EqualsIC(".exe");
-                })
-                .Where(f => !Path.GetFileNameWithoutExtension(f).StartsWithIC("Isop"));
-            foreach (var file in files)
+            var loadAssemblies = new LoadAssemblies();
+            var assemblies = loadAssemblies.LoadFrom(path);
+            foreach (var assembly in assemblies)
             {
-                var assembly = Assembly.LoadFile(file);
-                var isopconfigurations = assembly.GetTypes()
-                    .Where(type => type.Name.EqualsIC("isopconfiguration"));
-                foreach (var config in isopconfigurations)
-                {
-                    Configuration(config);
-                }
-                if (!isopconfigurations.Any())
-                {
-                    new IsopAutoConfiguration(assembly)
-                        .AddToConfiguration(this);
+                ConfigurationFrom(assembly);
+            }
+            return this;
+        }
+
+        public Build ConfigurationFrom(Assembly assembly)
+        {
+            var autoConfiguration = new AssemblyScanner(assembly);
+            var isopconfigurations = autoConfiguration.IsopConfigurations()
+                .ToArray();
+            foreach (var config in isopconfigurations)
+            {
+                Configuration(config);
+            }
+
+            if (!isopconfigurations.Any())
+            {
+                foreach (var item in autoConfiguration.LooksLikeControllers()) {
+                    this.Recognize(item);
                 }
             }
             return this;

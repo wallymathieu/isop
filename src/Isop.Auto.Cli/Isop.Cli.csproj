@@ -3,8 +3,6 @@
   <PropertyGroup>
     <Configuration Condition=' &apos;$(Configuration)&apos; == &apos;&apos; '>Debug</Configuration>
     <Platform Condition=' &apos;$(Platform)&apos; == &apos;&apos; '>x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C5008846-A54B-46C3-B144-973E50B8620F}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -43,9 +41,6 @@
   <ItemGroup>
     <Compile Include='Program.cs'/>
     <Compile Include='Properties\AssemblyInfo.cs'/>
-    <Compile Include='..\Isop\Configuration\ConfigureUsingInstance.cs'>
-      <Link>Isop\Configuration\ConfigureUsingInstance.cs</Link>
-    </Compile>
     <Compile Include='..\Isop\Controllers\FindMethodAmongLexedTokens.cs'>
       <Link>Isop\Controllers\FindMethodAmongLexedTokens.cs</Link>
     </Compile>
@@ -63,9 +58,6 @@
     </Compile>
     <Compile Include='..\Isop\Infrastructure\StringExtensions.cs'>
       <Link>Isop\Infrastructure\StringExtensions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Configuration\IsopAutoConfiguration.cs'>
-      <Link>Isop\Configuration\IsopAutoConfiguration.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Lex\ArgumentLexer.cs'>
       <Link>Isop\Lex\ArgumentLexer.cs</Link>
@@ -141,6 +133,24 @@
     </Compile>
     <Compile Include='..\Isop\Controllers\HelpForControllers.cs'>
       <Link>Isop\Controllers\HelpForControllers.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Infrastructure\LoadAssemblies.cs'>
+      <Link>Isop\Infrastructure\LoadAssemblies.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Infrastructure\ExecutionAssembly.cs'>
+      <Link>Isop\Infrastructure\ExecutionAssembly.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Infrastructure\AssemblyScanner.cs'>
+      <Link>Isop\Infrastructure\AssemblyScanner.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Configurations\ConfigureUsingInstance.cs'>
+      <Link>Isop\Configurations\ConfigureUsingInstance.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Configurations\Configuration.cs'>
+      <Link>Isop\Configurations\Configuration.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Infrastructure\Conventions.cs'>
+      <Link>Isop\Infrastructure\Conventions.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets'/>

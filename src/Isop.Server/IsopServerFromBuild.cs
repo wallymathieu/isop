@@ -12,16 +12,16 @@ namespace Isop.Server
 {
     public class IsopServerFromBuild : IIsopServer
     {
-        Build Build;
+        Func<Build> Build;
 
-        public IsopServerFromBuild(Build build)
+        public IsopServerFromBuild(Func<Build> build)
         {
             Build = build;
         }
 
         public Models.Controller GetController(string controller)
         {
-            return Map.GetMethodTreeModel(Build).Controllers.Single(c => c.Name.EqualsIC(controller));
+            return GetModel().Controllers.Single(c => c.Name.EqualsIC(controller));
         }
 
         public Models.Method GetControllerMethod(string controller, string method)
@@ -31,16 +31,22 @@ namespace Isop.Server
 
         public Models.MethodTreeModel GetModel()
         {
-            return Map.GetMethodTreeModel(Build);
+            using (var build = Build())
+            {
+                return Map.GetMethodTreeModel(build);
+            }
         }
 
         public IEnumerable<string> InvokeMethod(Models.Method method, IDictionary<string, object> form)
         {
-            return Build
+            using (var build = Build())
+            {
+                return build
                 .Parse(
                     new List<string>() { { method.ClassName }, { method.Name } }
                     .Tap(l => l.AddRange(MapToStrings(form))))
                 .Invoke();
+            }
         }
 
         private IEnumerable<string> MapToStrings(IDictionary<string, object> form)

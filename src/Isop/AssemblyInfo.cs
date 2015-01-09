@@ -2,6 +2,7 @@ using System.Reflection;
 
 // Information about this assembly is defined by the following attributes. 
 // Change them to the values specific to your project.
+using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("Isop")]
 [assembly: AssemblyDescription("Command line helper library.")]
@@ -23,3 +24,5 @@ using System.Reflection;
 
 //[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("")]
+[assembly: InternalsVisibleTo("Isop.Server")]
+[assembly: InternalsVisibleTo("Tests")]

@@ -125,7 +125,7 @@ namespace Isop.Wpf.Tests.Server
         class FakeIsopServerWithSingleIntAction : IsopServerFromBuild
         {
             public FakeIsopServerWithSingleIntAction()
-                : base(new Build { typeof(Isop.Tests.FakeControllers.SingleIntAction) })
+                : base( ()=> new Build { typeof(Isop.Tests.FakeControllers.SingleIntAction) })
             {
             }
         }

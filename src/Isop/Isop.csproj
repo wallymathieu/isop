@@ -3,8 +3,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Isop</RootNamespace>
@@ -48,14 +46,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Configuration\ConfigureUsingInstance.cs" />
     <Compile Include="Controllers\FindMethodAmongLexedTokens.cs" />
     <Compile Include="Controllers\TurnParametersToArgumentWithOptions.cs" />
     <Compile Include="Infrastructure\ListExtensions.cs" />
     <Compile Include="Controllers\TypeContainer.cs" />
     <Compile Include="Infrastructure\ReflectionExtensions.cs" />
     <Compile Include="Infrastructure\StringExtensions.cs" />
-    <Compile Include="Configuration\IsopAutoConfiguration.cs" />
     <Compile Include="Lex\ArgumentLexer.cs" />
     <Compile Include="Parse\ArgumentParser.cs" />
     <Compile Include="Build.cs" />
@@ -81,6 +77,12 @@
     <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Help\HelpForArgumentWithOptions.cs" />
     <Compile Include="Controllers\HelpForControllers.cs" />
+    <Compile Include="Infrastructure\LoadAssemblies.cs" />
+    <Compile Include="Infrastructure\ExecutionAssembly.cs" />
+    <Compile Include="Infrastructure\AssemblyScanner.cs" />
+    <Compile Include="Configurations\ConfigureUsingInstance.cs" />
+    <Compile Include="Configurations\Configuration.cs" />
+    <Compile Include="Infrastructure\Conventions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

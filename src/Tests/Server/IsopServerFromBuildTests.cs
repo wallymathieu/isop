@@ -19,7 +19,7 @@ namespace Isop.Wpf.Tests.Server
         [SetUp]
         public void SetUp()
         {
-            _data = new IsopServerFromBuild(new Build().Recognize<MyController>());
+            _data = new IsopServerFromBuild( ()=> new Build().Recognize<MyController>());
         }
 
         [Test]
