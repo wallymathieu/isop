@@ -1,0 +1,11 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "."
+		}
+	],
+    "solution_file":"./src/Isop.sln",
+    "auto_complete": true
+}

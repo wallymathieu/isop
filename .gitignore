@@ -27,3 +27,4 @@ nuget/Isop.Runners/*.nupkg
 nuget/Isop.Runners/tools/
 .bundle
 .vagrant
+*.sublime-workspace
