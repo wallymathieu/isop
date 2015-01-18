@@ -140,6 +140,7 @@ namespace Isop.Wpf.Tests.Server
 
             // Then
             Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result.Body["p"].Map(p => p.InnerText).Join("\n"), Is.StringContaining("param"));
         }
     }
 }
