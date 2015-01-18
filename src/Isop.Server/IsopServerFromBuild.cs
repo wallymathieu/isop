@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using With;
-using With.Rubyfy;
 using System.Linq;
 using Isop.Infrastructure;
 using Isop.Server.Models;
@@ -40,17 +38,17 @@ namespace Isop.Server
         {
             using (var build = Build())
             {
+                var l = new List<string>() { { method.ClassName }, { method.Name } };
+                l.AddRange(MapToStrings(form));
                 return build
-                .Parse(
-                    new List<string>() { { method.ClassName }, { method.Name } }
-                    .Tap(l => l.AddRange(MapToStrings(form))))
-                .Invoke();
+                    .Parse(l)
+                    .Invoke();
             }
         }
 
         private IEnumerable<string> MapToStrings(IDictionary<string, object> form)
         {
-            return form.Map(kv => new string[] { "--" + kv.Key + "=", kv.Value.ToString() }).Flatten<string>();
+            return form.SelectMany(kv => new string[] { "--" + kv.Key + "=", kv.Value.ToString() });
         }
 
         private class Map
@@ -75,7 +73,8 @@ namespace Isop.Server
             {
                 var @params = m.GetArguments().Select(p => new Param(p.Type, p.Name, p.Required)).ToArray();
 
-                var help = that.HelpController().Yield(h => h != null ? h.Index(type.Name, m.Name) : null);
+                var helpController = that.HelpController();
+                var help = helpController != null ? helpController.Index(type.Name, m.Name) : null;
 
                 return new Method(m.Name, type.Name, help)
                 {

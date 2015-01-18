@@ -57,8 +57,8 @@ end
 
 desc "copy example cli to wpf and cli folder"
 task :copy_cli => :build do
-  cp File.join($dir,"Example.Cli/bin/Debug/Example.Cli.dll"), File.join($dir,"Isop.Wpf/bin/Debug")
-  cp File.join($dir,"Example.Cli/bin/Debug/Example.Cli.dll"), File.join($dir,"Isop.Auto.Cli/bin/Debug")
+  cp File.join($dir,"Example/bin/Debug/Example.dll"), File.join($dir,"Isop.Server/bin/Debug")
+  cp File.join($dir,"Example/bin/Debug/Example.dll"), File.join($dir,"Isop.Auto.Cli/bin/Debug")
 end
 
 task :core_copy_to_nuspec => [:build] do
