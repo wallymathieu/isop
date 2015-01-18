@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Isop.Parse;
+using Isop.CommandLine.Parse;
 
 namespace Isop.Auto.Cli
 {
@@ -22,7 +22,7 @@ namespace Isop.Auto.Cli
 {0}
 Did you mean any of these arguments?
 {1}", String.Join(",", parsedMethod.UnRecognizedArguments.Select(unrec => unrec.Value).ToArray()),
-      String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Argument.ToString()).ToArray()));
+      String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Name).ToArray()));
                         Console.WriteLine(unRecognizedArgumentsMessage);
                     }else
                     {
@@ -42,7 +42,7 @@ Did you mean any of these arguments?
                 }
                 catch (MissingArgumentException ex)
                 {
-                    Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray())));
+                    Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.ToArray())));
                     if (parserBuilder.RecognizesHelp)
                         Console.WriteLine(parserBuilder.Help());
                 }

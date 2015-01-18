@@ -8,6 +8,6 @@ namespace Isop.Server.Models
     public class MissingArgument
     {
         public string Message;
-        public IDictionary<string, string> Arguments;
+        public IList<string> Arguments;
     }
 }

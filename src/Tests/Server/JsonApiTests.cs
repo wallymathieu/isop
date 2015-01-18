@@ -162,7 +162,7 @@ namespace Isop.Wpf.Tests.Server
             Assert.AreEqual("MissingArgument", result.Headers["ErrorType"]);
             var response = result.Body.DeserializeJson<Isop.Server.Models.MissingArgument>();
 
-            Assert.That(response.Arguments, Is.EquivalentTo(new[] { new KeyValuePair<string, string>("Param", "--param") }));
+            Assert.That(response.Arguments, Is.EquivalentTo(new[] { "param" }));
         }
 
         [Test]

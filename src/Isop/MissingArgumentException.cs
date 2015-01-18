@@ -8,7 +8,7 @@ namespace Isop
         /// <summary>
         /// The arguments. The key are the argument, the value is the description or help.
         /// </summary>
-        public List<KeyValuePair<string, string>> Arguments;
+        public string[] Arguments{get{ return (string[])Data["Arguments"];}set{ Data["Arguments"] = value; }}
         public MissingArgumentException() { }
 
         public MissingArgumentException(string message) : base(message) { }

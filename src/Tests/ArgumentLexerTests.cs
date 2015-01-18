@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Isop.Infrastructure;
-using Isop.Lex;
+using Isop.CommandLine.Lex;
 using NUnit.Framework;
 
 namespace Isop.Tests

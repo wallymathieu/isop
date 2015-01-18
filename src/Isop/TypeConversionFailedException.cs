@@ -2,13 +2,12 @@ using System;
 
 namespace Isop
 {
-   
     [Serializable]
     public class TypeConversionFailedException : Exception
     {
-        public string Argument;
-        public string Value;
-        public Type TargetType;
+        public string Argument{get{ return (string)Data["Argument"];}set{ Data["Argument"] = value; }}
+        public string Value{get{ return (string)Data["Value"];}set{ Data["Value"] = value; }}
+        public Type TargetType{get{ return (Type)Data["TargetType"];}set{ Data["TargetType"] = value; }}
      public TypeConversionFailedException ()
      {
      }

@@ -41,8 +41,6 @@ namespace Isop.Infrastructure
         {
             return GetEnumerator();
         }
-
     }
-    
 }
-
+    

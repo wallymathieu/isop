@@ -283,9 +283,9 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test] public void Can_get_same_key_as_in_xmldoc()
         {
             var helpXml = new HelpXmlDocumentation();
-            var _global = typeof(FullConfiguration).GetMethods().MatchGet("Global");
-            Assert.That(helpXml.GetKey(_global.MethodInfo), Is.EqualTo("P:Isop.Tests.FakeConfigurations.FullConfiguration.Global"));
-            var action1 = typeof(DescriptionWithCommentsController).GetMethods().Match(name:"Action1");
+            var _global = typeof(FullConfiguration).GetMethods().Single(m=>m.Name.EndsWith("Global") && m.Name.StartsWithIC("set"));
+            Assert.That(helpXml.GetKey(_global), Is.EqualTo("P:Isop.Tests.FakeConfigurations.FullConfiguration.Global"));
+            var action1 = typeof(DescriptionWithCommentsController).GetMethods().Single(m=>m.Name.Equals("Action1"));
             Assert.That(helpXml.GetKey(action1), Is.EqualTo("M:Isop.Tests.FakeControllers.DescriptionWithCommentsController.Action1"));
             
         }

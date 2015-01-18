@@ -9,9 +9,9 @@ namespace Isop.Server
     {
         public ControllerSegmentConstraint(IIsopServer data)
         {
-            this.data = data;
+            _data = data;
         }
-        IIsopServer data;
+        private readonly IIsopServer _data;
         public override string Name
         {
             get { return "Controller"; }
@@ -21,11 +21,11 @@ namespace Isop.Server
         {
             try
             {
-                data.GetController(segment);
+                _data.GetController(segment);
                 matchedValue = segment;
                        return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 matchedValue = null;
                 return false;            

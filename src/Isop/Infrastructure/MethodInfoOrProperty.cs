@@ -1,5 +1,8 @@
 using System.Reflection;
 using Isop.Infrastructure;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Isop.Infrastructure
 {
@@ -12,10 +15,15 @@ namespace Isop.Infrastructure
             get { return MethodInfo.Name; }
         }
 
-        public MethodInfoOrProperty(MethodInfo methodInfo, PropertyInfo property=null)
+        private static readonly Regex _getOrSet = new Regex("^(get|set)_", RegexOptions.IgnoreCase);
+
+        public MethodInfoOrProperty(MethodInfo methodInfo)
         {
             MethodInfo = methodInfo;
-            Property = property;
+            if (_getOrSet.IsMatch(methodInfo.Name))
+            {
+                Property = methodInfo.DeclaringType.GetProperty(_getOrSet.Replace(methodInfo.Name, ""));
+            }
         }
 
         public MethodInfo MethodInfo { get; private set; }
@@ -29,12 +37,22 @@ namespace Isop.Infrastructure
         {
             get
             {
-                if (null != Property && Property.Required())
+                if (null != Property && IsRequired(Property))
                     return true;
-                if (null != MethodInfo && MethodInfo.Required())
+                if (null != MethodInfo && IsRequired(MethodInfo))
                     return true;
                 return false;
             }
+        }
+
+        private static bool IsRequired(PropertyInfo propertyInfo)
+        {
+            return propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();
+        }
+
+        private static bool IsRequired(MethodInfo methodInfo)
+        {
+            return methodInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();
         }
     }
 

@@ -61,7 +61,7 @@ namespace Isop.Server
             return new MissingArgument
             {
                 Message = "Missing arguments.",
-                Arguments = ex.Arguments.ToDictionary(arg => arg.Key, arg => arg.Value)
+                Arguments = ex.Arguments.ToArray()
             };
         }
 

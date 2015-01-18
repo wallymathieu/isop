@@ -5,10 +5,10 @@ using Isop.Tests.FakeControllers;
 using NUnit.Framework;
 using System.Globalization;
 using TypeConverterFunc = System.Func<System.Type, string, System.Globalization.CultureInfo, object>;
-using Isop.Controllers;
 
 namespace Isop.Tests
 {
+    using Help;
     [TestFixture]
     public class ConfigurationCanReadFullConfigurationTests
     {

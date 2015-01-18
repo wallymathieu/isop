@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Linq;
 using System.IO;
 using Isop.Infrastructure;
+using System.Text.RegularExpressions;
 
 namespace Isop.Help
 {
@@ -60,10 +61,10 @@ namespace Isop.Help
         {
            return  GetKey(method.DeclaringType,method);
         }
+        private static Regex _getOrSet = new Regex("^(get|set)_",RegexOptions.IgnoreCase);
         public string GetKey(Type t,MethodInfo method)
         {
-            if (method.Name.StartsWithIC("get_")
-                || method.Name.StartsWithIC("set_"))
+            if (_getOrSet.IsMatch(method.Name))
                 return "P:"+GetFullName(t)+"."+method.Name.Substring(4);
             return "M:"+GetFullName(t)+"."+method.Name;
         }

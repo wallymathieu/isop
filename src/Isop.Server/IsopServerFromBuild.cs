@@ -6,7 +6,6 @@ using System.Linq;
 using Isop.Infrastructure;
 using Isop.Server.Models;
 using System.Reflection;
-using Isop.Controllers;
 
 namespace Isop.Server
 {
@@ -63,23 +62,22 @@ namespace Isop.Server
                                                    .Select(p => new Param(typeof(string), p.Argument.ToString(), p.Required)))
                                                .ToArray(),
                                            controllers: that.Recognizes
-                                               .Where(cmr => !cmr.ControllerName().EqualsIC("help"))
-                                               .Select(cmr => Controller(that, cmr)).ToArray());
+                                             .Where(cmr => !cmr.IsHelp())
+                    .Select(cmr => Controller(that, cmr)).ToArray());
             }
 
-            private static Isop.Server.Models.Controller Controller(Build that, Type type)
+            private static Isop.Server.Models.Controller Controller(Build that, Isop.Domain.Controller type)
             {
-                return new Isop.Server.Models.Controller(type.ControllerName(), type.GetControllerActionMethods().Select(m => Method(that, type, m)).ToArray());
+                return new Isop.Server.Models.Controller(type.Name, type.GetControllerActionMethods().Select(m => Method(that, type, m)).ToArray());
             }
 
-            private static Method Method(Build that, Type type, MethodInfo m)
+            private static Method Method(Build that, Isop.Domain.Controller type, Isop.Domain.Method m)
             {
-                var t = new TurnParametersToArgumentWithOptions(that.CultureInfo, that.TypeConverter);
-                var @params = t.GetRecognizers(m).Select(p => new Param(p.Type, p.Argument.Prototype, p.Required)).ToArray();
+                var @params = m.GetArguments().Select(p => new Param(p.Type, p.Name, p.Required)).ToArray();
 
-                var help = that.HelpController().Yield(h => h != null ? h.Index(type.ControllerName(), m.Name) : null);
+                var help = that.HelpController().Yield(h => h != null ? h.Index(type.Name, m.Name) : null);
 
-                return new Method(m.Name, type.ControllerName(), help)
+                return new Method(m.Name, type.Name, help)
                 {
                     Parameters = new List<Param>(@params.ToArray())
                 };

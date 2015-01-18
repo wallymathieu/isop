@@ -46,43 +46,48 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Controllers\FindMethodAmongLexedTokens.cs" />
-    <Compile Include="Controllers\TurnParametersToArgumentWithOptions.cs" />
-    <Compile Include="Infrastructure\ListExtensions.cs" />
-    <Compile Include="Controllers\TypeContainer.cs" />
-    <Compile Include="Infrastructure\ReflectionExtensions.cs" />
     <Compile Include="Infrastructure\StringExtensions.cs" />
-    <Compile Include="Lex\ArgumentLexer.cs" />
-    <Compile Include="Parse\ArgumentParser.cs" />
     <Compile Include="Build.cs" />
-    <Compile Include="Controllers\ControllerRecognizer.cs" />
-    <Compile Include="Lex\TokenType.cs" />
-    <Compile Include="Lex\Token.cs" />
     <Compile Include="Infrastructure\PeekEnumerable.cs" />
     <Compile Include="MissingArgumentException.cs" />
-    <Compile Include="Parse\ArgumentParameter.cs" />
-    <Compile Include="Parse\Parameters\OrdinalParameter.cs" />
-    <Compile Include="Parse\Parameters\OptionParameter.cs" />
-    <Compile Include="Parse\Parameters\VisualStudioParameter.cs" />
-    <Compile Include="Parse\ArgumentWithOptions.cs" />
-    <Compile Include="Parse\RecognizedArgument.cs" />
-    <Compile Include="Parse\ParsedArguments.cs" />
-    <Compile Include="Parse\MergedParsedArguments.cs" />
-    <Compile Include="Parse\UnrecognizedArgument.cs" />
     <Compile Include="TypeConversionFailedException.cs" />
-    <Compile Include="Controllers\RewriteLexedTokensToSupportHelpAndIndex.cs" />
-    <Compile Include="Controllers\ParsedMethod.cs" />
     <Compile Include="Infrastructure\MethodInfoOrProperty.cs" />
     <Compile Include="Help\HelpXmlDocumentation.cs" />
-    <Compile Include="Controllers\HelpController.cs" />
-    <Compile Include="Help\HelpForArgumentWithOptions.cs" />
-    <Compile Include="Controllers\HelpForControllers.cs" />
     <Compile Include="Infrastructure\LoadAssemblies.cs" />
     <Compile Include="Infrastructure\ExecutionAssembly.cs" />
     <Compile Include="Infrastructure\AssemblyScanner.cs" />
     <Compile Include="Configurations\ConfigureUsingInstance.cs" />
-    <Compile Include="Configurations\Configuration.cs" />
-    <Compile Include="Infrastructure\Conventions.cs" />
+    <Compile Include="Domain\Configuration.cs" />
+    <Compile Include="Domain\Controller.cs" />
+    <Compile Include="Domain\Method.cs" />
+    <Compile Include="Domain\Parameter.cs" />
+    <Compile Include="Domain\Property.cs" />
+    <Compile Include="Domain\Argument.cs" />
+    <Compile Include="Domain\ConvertArgumentsToParameterValue.cs" />
+    <Compile Include="Domain\DefaultConverter.cs" />
+    <Compile Include="CommandLine\FindMethodAmongLexedTokens.cs" />
+    <Compile Include="CommandLine\ControllerRecognizer.cs" />
+    <Compile Include="CommandLine\RewriteLexedTokensToSupportHelpAndIndex.cs" />
+    <Compile Include="CommandLine\ParsedMethod.cs" />
+    <Compile Include="Domain\TypeContainer.cs" />
+    <Compile Include="Help\HelpForControllers.cs" />
+    <Compile Include="Help\HelpTexts.cs" />
+    <Compile Include="Help\HelpController.cs" />
+    <Compile Include="CommandLine\Help\HelpForArgumentWithOptions.cs" />
+    <Compile Include="CommandLine\Lex\ArgumentLexer.cs" />
+    <Compile Include="CommandLine\Lex\Token.cs" />
+    <Compile Include="CommandLine\Lex\TokenType.cs" />
+    <Compile Include="CommandLine\Parse\ArgumentParameter.cs" />
+    <Compile Include="CommandLine\Parse\ArgumentParser.cs" />
+    <Compile Include="CommandLine\Parse\ArgumentWithOptions.cs" />
+    <Compile Include="CommandLine\Parse\MergedParsedArguments.cs" />
+    <Compile Include="CommandLine\Parse\Parameters\OptionParameter.cs" />
+    <Compile Include="CommandLine\Parse\Parameters\OrdinalParameter.cs" />
+    <Compile Include="CommandLine\Parse\Parameters\VisualStudioParameter.cs" />
+    <Compile Include="CommandLine\Parse\ParsedArguments.cs" />
+    <Compile Include="CommandLine\Parse\RecognizedArgument.cs" />
+    <Compile Include="CommandLine\Parse\UnrecognizedArgument.cs" />
+    <Compile Include="Domain\Conventions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -90,4 +95,8 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <ItemGroup>
+    <Folder Include="Domain\" />
+    <Folder Include="CommandLine\Help\" />
+  </ItemGroup>
 </Project>

@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Isop.Parse;
-using Isop.Parse.Parameters;
+using Isop.CommandLine.Parse;
+using Isop.CommandLine.Parse.Parameters;
 using Isop.Tests.FakeControllers;
 using NUnit.Framework;
 
@@ -24,7 +24,7 @@ namespace Isop.Tests
             var arguments = parser.RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.WithOptions.Argument.ToString(), Is.EqualTo("&argument"));
+            Assert.That(arg1.Argument.Name, Is.EqualTo("argument"));
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace Isop.Tests
 
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Argument, Is.EqualTo("b"));
+            Assert.That(arg1.RawArgument, Is.EqualTo("b"));
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace Isop.Tests
                 .Parse(new[] { "-a", "--beta" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Argument, Is.EqualTo("beta"));
+            Assert.That(arg1.RawArgument, Is.EqualTo("beta"));
         }
 
         [Test]
@@ -58,7 +58,7 @@ namespace Isop.Tests
                 .Parse(new[] { "-a", "--beta", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Argument, Is.EqualTo("beta"));
+            Assert.That(arg1.RawArgument, Is.EqualTo("beta"));
             Assert.That(arg1.Value, Is.EqualTo("value"));
         }
         [Test]
@@ -75,7 +75,7 @@ namespace Isop.Tests
                 .Parse(new[] { "first" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.Argument, Is.EqualTo("first"));
+            Assert.That(arg1.RawArgument, Is.EqualTo("first"));
         }
         [Test]
         public void It_can_parse_parameter_with_equals()
@@ -86,7 +86,7 @@ namespace Isop.Tests
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.EqualTo("test"));
-            Assert.That(arg1.Argument, Is.EqualTo("beta"));
+            Assert.That(arg1.RawArgument, Is.EqualTo("beta"));
         }
         [Test]
         public void It_can_parse_parameter_alias()
@@ -96,9 +96,8 @@ namespace Isop.Tests
                 .Parse(new[] { "-a", "-b=test", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.WithOptions.Argument.ToString(), Is.EqualTo("beta|b="));
             Assert.That(arg1.Value, Is.EqualTo("test"));
-            Assert.That(arg1.Argument, Is.EqualTo("b"));
+            Assert.That(arg1.RawArgument, Is.EqualTo("b"));
         }
         [Test]
         public void It_can_report_unrecognized_parameters()
@@ -121,10 +120,8 @@ namespace Isop.Tests
                 .Parse(new[] { "test", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(2));
             var arg1 = arguments.First();
-            Assert.That(arg1.WithOptions.Argument.ToString(), Is.EqualTo("beta|b="));
             Assert.That(arg1.Value, Is.EqualTo("test"));
             var arg2 = arguments.Last();
-            Assert.That(arg2.WithOptions.Argument.ToString(), Is.EqualTo("alpha|a="));
             Assert.That(arg2.Value, Is.EqualTo("value"));
         }
         [Test]
@@ -152,9 +149,8 @@ namespace Isop.Tests
                 .Parse(new[] { "alpha" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
-            Assert.That(arg1.WithOptions.Argument.ToString(), Is.EqualTo("alpha"));
             Assert.That(arg1.Value, Is.Null);
-            Assert.That(arg1.Argument, Is.EqualTo("alpha"));
+            Assert.That(arg1.RawArgument, Is.EqualTo("alpha"));
         }
 
         [Test]
@@ -215,7 +211,7 @@ namespace Isop.Tests
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, True], [param3, True], [param4, True]", Boolean.Parse);
 
             var recognizers = build.ControllerRecognizers.Single().Value().GetRecognizers("Action");
-            Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
+            Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Name, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
 
@@ -245,7 +241,7 @@ namespace Isop.Tests
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, False], [param3, False], [param4, False]", Boolean.Parse);
 
             var recognizers = build.ControllerRecognizers.Single().Value().GetRecognizers("Action");
-            Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Argument.Prototype, r.Required)).ToArray(),
+            Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Name, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
 

@@ -5,71 +5,61 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+
 namespace Isop
 {
     using Infrastructure;
     using Help;
-    using Lex;
-    using Parse;
+    using CommandLine;
+    using CommandLine.Lex;
+    using CommandLine.Parse;
+    using CommandLine.Help;
     using TypeConverterFunc = System.Func<System.Type, string, System.Globalization.CultureInfo, object>;
-    using Controllers;
     using Configurations;
-
+    using Domain;
     /// <summary>
     /// represents a configuration build
     /// </summary>
-    public class Build : ConfigureUsingInstance, ICollection<Type>, IDisposable
+    public class Build : ICollection<Type>, IDisposable
     {
-        private readonly IList<ArgumentWithOptions> _argumentRecognizers;
-        private readonly IList<KeyValuePair<Type, Func<ControllerRecognizer>>> _controllerRecognizers;
         private HelpForControllers _helpForControllers;
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
-        private readonly TypeContainer _container = new TypeContainer();
-        public override Func<Type, object> Factory
+        private readonly TypeContainer _container;
+        private readonly Configuration _configuration=new Configuration();
+        public virtual CultureInfo CultureInfo { get{ return _configuration.CultureInfo;} set{ _configuration.CultureInfo = value;} }
+        public Func<Type, object> Factory
         {
             get
             {
-                return _container.Factory;
+                return _configuration.Factory;
             }
             set
             {
-                _container.Factory = value;
+                _configuration.Factory = value;
             }
         }
 
-        public override TypeConverterFunc TypeConverter
+        public TypeConverterFunc TypeConverter
         {
-            get;
-            set;
+            get{ return _configuration.TypeConverter; }
+            set{ _configuration.TypeConverter = value; }
         }
 
-        public override bool RecognizeHelp
+        public bool RecognizeHelp
         {
-            get { return RecognizesHelp; }
+            get { return _configuration.RecognizesHelp; }
             set
             {
-                if (value)
-                {
-                    ShouldRecognizeHelp();
-                }
-                else if (RecognizesHelp)
-                {
-                    throw new Exception("Not supported: Need to deregister help controller etc");
-                }
+                _configuration.RecognizesHelp = value;
             }
-        }
-
-        public override IList<ArgumentWithOptions> ArgumentRecognizers
-        {
-            get { return _argumentRecognizers; }
         }
 
         readonly HelpXmlDocumentation _HelpXmlDocumentation = new HelpXmlDocumentation();
 
         public IEnumerator<Type> GetEnumerator()
         {
-            return _controllerRecognizers.Select(cmr => cmr.Key).GetEnumerator();
+            return _configuration.Recognizes.Select(c => c.Type).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -89,7 +79,7 @@ namespace Isop
 
         public bool Contains(Type item)
         {
-            return _controllerRecognizers.Any(kv => kv.Key == item);
+            return _configuration.Recognizes.Any(kv => kv.Type == item);
         }
 
         public void CopyTo(Type[] array, int arrayIndex)
@@ -99,7 +89,7 @@ namespace Isop
 
         public bool Remove(Type item)
         {
-            var withType = _controllerRecognizers.Where(c => c.Key == item).ToArray();
+            var withType = _configuration.Recognizes.Where(c => c.Type == item).ToArray();
             if (!withType.Any())
             {
                 return false;
@@ -107,14 +97,14 @@ namespace Isop
 
             foreach (var element in withType)
             {
-                _controllerRecognizers.Remove(element);
+                _configuration.Recognizes.Remove(element);
             }
             return true;
         }
 
         public int Count
         {
-            get { return _controllerRecognizers.Count; }
+            get { return _configuration.Recognizes.Count; }
         }
 
         public bool IsReadOnly
@@ -122,25 +112,24 @@ namespace Isop
             get { return false; }
         }
 
-        public override ICollection<Type> Recognizes
+        public ICollection<Controller> Recognizes
         {
-            get { return this; }
+            get { return _configuration.Recognizes; }
         }
 
-        public override HelpXmlDocumentation HelpXmlDocumentation
+        public HelpXmlDocumentation HelpXmlDocumentation
         {
             get { return _HelpXmlDocumentation; }
         }
 
         public Build()
         {
-            _controllerRecognizers = new List<KeyValuePair<Type, Func<ControllerRecognizer>>>();
-            _argumentRecognizers = new List<ArgumentWithOptions>();
+            _container = new TypeContainer(_configuration);
         }
 
-        public Build Parameter(ArgumentParameter argument, Action<string> action = null, bool required = false, string description = null)
+        public Build Parameter(string argument, Action<string> action = null, bool required = false, string description = null)
         {
-            _argumentRecognizers.Add(new ArgumentWithOptions(argument, action, required, description, typeof(string)));
+            _configuration.Properties.Add(new Property(argument, action, required, description, typeof(string)));
             return this;
         }
         /// <summary>
@@ -150,7 +139,7 @@ namespace Isop
         /// <returns></returns>
         public Build SetCulture(CultureInfo cultureInfo)
         {
-            CultureInfo = cultureInfo; return this;
+            this.CultureInfo = cultureInfo; return this;
         }
 
         public Build SetTypeConverter(TypeConverterFunc typeconverter)
@@ -160,7 +149,7 @@ namespace Isop
 
         public Build SetFactory(Func<Type, Object> factory)
         {
-            _container.Factory = factory;
+            Factory = factory;
             return this;
         }
 
@@ -171,12 +160,12 @@ namespace Isop
 
         public ParsedArguments Parse(List<string> arg)
         {
-            var argumentParser = new ArgumentParser(_argumentRecognizers, _allowInferParameter);
+            var argumentParser = new ArgumentParser(GlobalParameters, _allowInferParameter, CultureInfo);
             var lexed = ArgumentLexer.Lex(arg).ToList();
             var parsedArguments = argumentParser.Parse(lexed, arg);
-            if (_controllerRecognizers.Any())
+            if (ControllerRecognizers.Any())
             {
-                var recognizers = _controllerRecognizers.Select(cr => cr.Value());
+                var recognizers = ControllerRecognizers.Select(cr => cr.Value());
                 var controllerRecognizer = recognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
                 if (null != controllerRecognizer)
                 {
@@ -188,28 +177,20 @@ namespace Isop
             return parsedArguments;
         }
 
-        public Build Recognize<T>(CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false)
+        public Build Recognize<T>(bool ignoreGlobalUnMatchedParameters = false)
         {
-            return Recognize(typeof(T), cultureInfo, typeConverter, ignoreGlobalUnMatchedParameters);
+            return Recognize(typeof(T), ignoreGlobalUnMatchedParameters);
         }
 
-        public Build Recognize(Type arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false)
+        public Build Recognize(Type arg, bool ignoreGlobalUnMatchedParameters = false)
         {
-            _controllerRecognizers.Add(new KeyValuePair<Type, Func<ControllerRecognizer>>(arg, () => new ControllerRecognizer(arg,
-                cultureInfo ?? CultureInfo,
-                typeConverter ?? TypeConverter,
-                ignoreGlobalUnMatchedParameters,
-                _allowInferParameter)));
+            _configuration.Recognizes.Add(new Controller(arg, ignoreGlobalUnMatchedParameters));
             return this;
         }
-        public Build Recognize(Object arg, CultureInfo cultureInfo = null, TypeConverterFunc typeConverter = null, bool ignoreGlobalUnMatchedParameters = false)
+        public Build Recognize(Object arg, bool ignoreGlobalUnMatchedParameters = false)
         {
             var type = arg.GetType();
-            _controllerRecognizers.Add(new KeyValuePair<Type, Func<ControllerRecognizer>>(type, () => new ControllerRecognizer(type,
-               cultureInfo ?? CultureInfo,
-               typeConverter ?? TypeConverter,
-               ignoreGlobalUnMatchedParameters,
-               _allowInferParameter)));
+            _configuration.Recognizes.Add(new Controller(type, ignoreGlobalUnMatchedParameters));
             _container.Instances.Add(type, arg);
             return this;
         }
@@ -223,7 +204,7 @@ namespace Isop
         public String Help()
         {
             var cout = new StringWriter(CultureInfo);
-            Parse(new[] { "Help" }).Invoke(cout);
+            Parse(new[] { Conventions.Help }).Invoke(cout);
             return cout.ToString();
         }
 
@@ -233,6 +214,7 @@ namespace Isop
         public Build HelpTextCommandsAre(Action<HelpTexts> action)
         {
             ShouldRecognizeHelp();
+            HelpController();
             var helpForControllers = _helpForControllers;
             action(helpForControllers);
             return this;
@@ -241,6 +223,7 @@ namespace Isop
         public Build HelpTextArgumentsAre(string theArgumentsAre)
         {
             ShouldRecognizeHelp();
+            HelpController();
             _helpForArgumentWithOptions.TheArgumentsAre = theArgumentsAre;
             return this;
         }
@@ -248,38 +231,43 @@ namespace Isop
         public string HelpFor(string controller, string action = null)
         {
             var cout = new StringWriter(CultureInfo);
-            Parse(new[] { "Help", controller, action }
+            Parse(new[] { Conventions.Help, controller, action }
                 .Where(s => !string.IsNullOrEmpty(s))).Invoke(cout);
             return cout.ToString();
         }
 
         public Build ShouldRecognizeHelp()
         {
-            if (_helpController == null)
-            {
-                _helpForControllers = new HelpForControllers(Recognizes, _container,
-                    new TurnParametersToArgumentWithOptions(CultureInfo, TypeConverter),
-                    HelpXmlDocumentation);
-                _helpForArgumentWithOptions = new HelpForArgumentWithOptions(_argumentRecognizers);
-                _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
-                Recognize(_helpController, ignoreGlobalUnMatchedParameters: true);
-            }
+            _configuration.RecognizesHelp = true;
             return this;
         }
 
         public bool RecognizesHelp
         {
-            get { return _helpController != null; }
+            get { return _configuration.RecognizesHelp; }
         }
 
         public IEnumerable<KeyValuePair<Type, Func<ControllerRecognizer>>> ControllerRecognizers
         {
-            get { return _controllerRecognizers; }
+            get 
+            { 
+                if (RecognizeHelp && ! _configuration.Recognizes.Any(c=>c.Type==typeof(HelpController)))
+                {
+                    Recognize(HelpController(), ignoreGlobalUnMatchedParameters: true);
+                }
+
+                return _configuration.Recognizes.Select(
+                    c=>new KeyValuePair<Type,Func<ControllerRecognizer>>(
+                        c.Type,
+                        ()=>new ControllerRecognizer(c, _configuration, _allowInferParameter))); 
+            }
         }
 
         public IEnumerable<ArgumentWithOptions> GlobalParameters
         {
-            get { return _argumentRecognizers; }
+            get { 
+                return _configuration.Properties.Select(p => new ArgumentWithOptions(p.Name, p.Action, p.Required, p.Description, p.Type)).ToList();
+            }
         }
 
         public Func<Type, object> GetFactory()
@@ -304,7 +292,7 @@ namespace Isop
         }
         internal Build Configuration(Type t, object instance)
         {
-            Configure(t, instance);
+            new ConfigureUsingInstance(_configuration, _HelpXmlDocumentation).Configure(t, instance);
 
             if (instance is IDisposable)
                 disposables.Add((IDisposable)instance);
@@ -356,6 +344,13 @@ namespace Isop
 
         public HelpController HelpController()
         {
+            if (_helpController == null && _configuration.RecognizesHelp)
+            {
+                _helpForControllers = new HelpForControllers(_configuration.Recognizes, _container,
+                    HelpXmlDocumentation);
+                _helpForArgumentWithOptions = new HelpForArgumentWithOptions(GlobalParameters);
+                _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
+            }
             return _helpController;
         }
     }

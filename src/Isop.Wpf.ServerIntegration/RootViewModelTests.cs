@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Isop.Parse;
 using NUnit.Framework;
 using Isop.Gui.ViewModels;
 using Isop.Gui;
@@ -42,8 +41,7 @@ namespace Isop.Wpf.ServerIntegration
         public void Can_get_vm_from_configuration()
         {
             var treemodel = GetRootModelFromBuild(new Build()
-                .Parameter(
-                    new ArgumentParameter("name", new[] { "name" })));
+                .Parameter("name"));
             Assert.That(treemodel.GlobalParameters.Count(), Is.EqualTo(1));
 
             Assert.That(treemodel.GlobalParameters.Select(p => p.Name),

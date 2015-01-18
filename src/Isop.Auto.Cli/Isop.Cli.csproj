@@ -41,41 +41,11 @@
   <ItemGroup>
     <Compile Include='Program.cs'/>
     <Compile Include='Properties\AssemblyInfo.cs'/>
-    <Compile Include='..\Isop\Controllers\FindMethodAmongLexedTokens.cs'>
-      <Link>Isop\Controllers\FindMethodAmongLexedTokens.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controllers\TurnParametersToArgumentWithOptions.cs'>
-      <Link>Isop\Controllers\TurnParametersToArgumentWithOptions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Infrastructure\ListExtensions.cs'>
-      <Link>Isop\Infrastructure\ListExtensions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controllers\TypeContainer.cs'>
-      <Link>Isop\Controllers\TypeContainer.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Infrastructure\ReflectionExtensions.cs'>
-      <Link>Isop\Infrastructure\ReflectionExtensions.cs</Link>
-    </Compile>
     <Compile Include='..\Isop\Infrastructure\StringExtensions.cs'>
       <Link>Isop\Infrastructure\StringExtensions.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Lex\ArgumentLexer.cs'>
-      <Link>Isop\Lex\ArgumentLexer.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\ArgumentParser.cs'>
-      <Link>Isop\Parse\ArgumentParser.cs</Link>
-    </Compile>
     <Compile Include='..\Isop\Build.cs'>
       <Link>Isop\Build.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controllers\ControllerRecognizer.cs'>
-      <Link>Isop\Controllers\ControllerRecognizer.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Lex\TokenType.cs'>
-      <Link>Isop\Lex\TokenType.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Lex\Token.cs'>
-      <Link>Isop\Lex\Token.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Infrastructure\PeekEnumerable.cs'>
       <Link>Isop\Infrastructure\PeekEnumerable.cs</Link>
@@ -83,56 +53,14 @@
     <Compile Include='..\Isop\MissingArgumentException.cs'>
       <Link>Isop\MissingArgumentException.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Parse\ArgumentParameter.cs'>
-      <Link>Isop\Parse\ArgumentParameter.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\Parameters\OrdinalParameter.cs'>
-      <Link>Isop\Parse\Parameters\OrdinalParameter.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\Parameters\OptionParameter.cs'>
-      <Link>Isop\Parse\Parameters\OptionParameter.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\Parameters\VisualStudioParameter.cs'>
-      <Link>Isop\Parse\Parameters\VisualStudioParameter.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\ArgumentWithOptions.cs'>
-      <Link>Isop\Parse\ArgumentWithOptions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\RecognizedArgument.cs'>
-      <Link>Isop\Parse\RecognizedArgument.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\ParsedArguments.cs'>
-      <Link>Isop\Parse\ParsedArguments.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\MergedParsedArguments.cs'>
-      <Link>Isop\Parse\MergedParsedArguments.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Parse\UnrecognizedArgument.cs'>
-      <Link>Isop\Parse\UnrecognizedArgument.cs</Link>
-    </Compile>
     <Compile Include='..\Isop\TypeConversionFailedException.cs'>
       <Link>Isop\TypeConversionFailedException.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controllers\RewriteLexedTokensToSupportHelpAndIndex.cs'>
-      <Link>Isop\Controllers\RewriteLexedTokensToSupportHelpAndIndex.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controllers\ParsedMethod.cs'>
-      <Link>Isop\Controllers\ParsedMethod.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Infrastructure\MethodInfoOrProperty.cs'>
       <Link>Isop\Infrastructure\MethodInfoOrProperty.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Help\HelpXmlDocumentation.cs'>
       <Link>Isop\Help\HelpXmlDocumentation.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controllers\HelpController.cs'>
-      <Link>Isop\Controllers\HelpController.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Help\HelpForArgumentWithOptions.cs'>
-      <Link>Isop\Help\HelpForArgumentWithOptions.cs</Link>
-    </Compile>
-    <Compile Include='..\Isop\Controllers\HelpForControllers.cs'>
-      <Link>Isop\Controllers\HelpForControllers.cs</Link>
     </Compile>
     <Compile Include='..\Isop\Infrastructure\LoadAssemblies.cs'>
       <Link>Isop\Infrastructure\LoadAssemblies.cs</Link>
@@ -146,11 +74,98 @@
     <Compile Include='..\Isop\Configurations\ConfigureUsingInstance.cs'>
       <Link>Isop\Configurations\ConfigureUsingInstance.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Configurations\Configuration.cs'>
-      <Link>Isop\Configurations\Configuration.cs</Link>
+    <Compile Include='..\Isop\Domain\Configuration.cs'>
+      <Link>Isop\Domain\Configuration.cs</Link>
     </Compile>
-    <Compile Include='..\Isop\Infrastructure\Conventions.cs'>
-      <Link>Isop\Infrastructure\Conventions.cs</Link>
+    <Compile Include='..\Isop\Domain\Controller.cs'>
+      <Link>Isop\Domain\Controller.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Domain\Method.cs'>
+      <Link>Isop\Domain\Method.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Domain\Parameter.cs'>
+      <Link>Isop\Domain\Parameter.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Domain\Property.cs'>
+      <Link>Isop\Domain\Property.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Domain\Argument.cs'>
+      <Link>Isop\Domain\Argument.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Domain\ConvertArgumentsToParameterValue.cs'>
+      <Link>Isop\Domain\ConvertArgumentsToParameterValue.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Domain\DefaultConverter.cs'>
+      <Link>Isop\Domain\DefaultConverter.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\FindMethodAmongLexedTokens.cs'>
+      <Link>Isop\CommandLine\FindMethodAmongLexedTokens.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\ControllerRecognizer.cs'>
+      <Link>Isop\CommandLine\ControllerRecognizer.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\RewriteLexedTokensToSupportHelpAndIndex.cs'>
+      <Link>Isop\CommandLine\RewriteLexedTokensToSupportHelpAndIndex.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\ParsedMethod.cs'>
+      <Link>Isop\CommandLine\ParsedMethod.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Domain\TypeContainer.cs'>
+      <Link>Isop\Domain\TypeContainer.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Help\HelpForControllers.cs'>
+      <Link>Isop\Help\HelpForControllers.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Help\HelpTexts.cs'>
+      <Link>Isop\Help\HelpTexts.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Help\HelpController.cs'>
+      <Link>Isop\Help\HelpController.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Help\HelpForArgumentWithOptions.cs'>
+      <Link>Isop\CommandLine\Help\HelpForArgumentWithOptions.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Lex\ArgumentLexer.cs'>
+      <Link>Isop\CommandLine\Lex\ArgumentLexer.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Lex\Token.cs'>
+      <Link>Isop\CommandLine\Lex\Token.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Lex\TokenType.cs'>
+      <Link>Isop\CommandLine\Lex\TokenType.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Parse\ArgumentParameter.cs'>
+      <Link>Isop\CommandLine\Parse\ArgumentParameter.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Parse\ArgumentParser.cs'>
+      <Link>Isop\CommandLine\Parse\ArgumentParser.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Parse\ArgumentWithOptions.cs'>
+      <Link>Isop\CommandLine\Parse\ArgumentWithOptions.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Parse\MergedParsedArguments.cs'>
+      <Link>Isop\CommandLine\Parse\MergedParsedArguments.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Parse\Parameters\OptionParameter.cs'>
+      <Link>Isop\CommandLine\Parse\Parameters\OptionParameter.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Parse\Parameters\OrdinalParameter.cs'>
+      <Link>Isop\CommandLine\Parse\Parameters\OrdinalParameter.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Parse\Parameters\VisualStudioParameter.cs'>
+      <Link>Isop\CommandLine\Parse\Parameters\VisualStudioParameter.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Parse\ParsedArguments.cs'>
+      <Link>Isop\CommandLine\Parse\ParsedArguments.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Parse\RecognizedArgument.cs'>
+      <Link>Isop\CommandLine\Parse\RecognizedArgument.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\CommandLine\Parse\UnrecognizedArgument.cs'>
+      <Link>Isop\CommandLine\Parse\UnrecognizedArgument.cs</Link>
+    </Compile>
+    <Compile Include='..\Isop\Domain\Conventions.cs'>
+      <Link>Isop\Domain\Conventions.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets'/>
