@@ -6,15 +6,15 @@
 </head>
 <body>
     <div class="global_parameters">
-        @Each.GlobalParameters
-        <label for="@Current.Name">@Current.Name</label>
-        <input name="@Current.Name" />
-        @EndEach
+        {{#each GlobalParameters}}
+        <label for="{{Name}}">{{Name}}</label>
+        <input name="{{Name}}" />
+        {{/each}}
     </div>
     <div class="controllers">
-        @Each.Controllers
-        <a href="@Current.Url">@Current.Name</a>
-        @EndEach
+        {{#each Controllers}}
+        <a href="{{Url}}">{{Name}}</a>
+        {{/each}}
     </div>
 </body>
 </html>

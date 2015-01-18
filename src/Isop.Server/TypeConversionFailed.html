@@ -3,12 +3,22 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title></title>
+    <title>Type conversion failed</title>
 </head>
 <body>
-    @Model.Message 
-    @Model.Argument
-    @Model.Value
-    @Model.TargetType
+    <h1>
+        {{Message }}
+    </h1>
+    <dl>
+        <dt>Argument</dt>
+        <dd>{{Argument}}</dd>
+
+        <dt>Value</dt>
+        <dd>{{Value}}</dd>
+
+        <dt>TargetType</dt>
+        <dd>{{TargetType}}</dd>
+
+    </dl>
 </body>
 </html>

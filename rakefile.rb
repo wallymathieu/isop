@@ -22,7 +22,7 @@ task :install_packages do
   package_paths = FileList["src/**/packages.config"]+["src/.nuget/packages.config"]
 
   package_paths.each.each do |filepath|
-      NuGet::exec("i #{filepath} -o ./src/packages -source http://www.nuget.org/api/v2/")
+      NuGet::exec("i #{filepath} -o ./src/packages")
   end
 end
 
@@ -57,8 +57,8 @@ end
 
 desc "copy example cli to wpf and cli folder"
 task :copy_cli => :build do
-  cp File.join($dir,"Example/bin/Debug/Example.dll"), File.join($dir,"Isop.Server/bin/Debug")
-  cp File.join($dir,"Example/bin/Debug/Example.dll"), File.join($dir,"Isop.Auto.Cli/bin/Debug")
+  cp File.join($dir,"Example/bin/Debug/Example.exe"), File.join($dir,"Isop.Server/bin/Debug")
+  cp File.join($dir,"Example/bin/Debug/Example.exe"), File.join($dir,"Isop.Auto.Cli/bin/Debug")
 end
 
 task :core_copy_to_nuspec => [:build] do

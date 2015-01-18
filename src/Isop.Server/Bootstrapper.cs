@@ -52,7 +52,13 @@ namespace Isop.Server
             }
         }
 
-
+        protected override IEnumerable<Type> ViewEngines
+        {
+            get
+            {
+                return new[] { typeof(Nancy.ViewEngines.Veil.VeilViewEngine) };
+            }
+        }
         //protected override void RequestStartup(ILifetimeScope requestContainer, IPipelines pipelines, NancyContext context)
         //{
 

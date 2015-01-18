@@ -3,14 +3,14 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title></title>
+    <title>Missing argument</title>
 </head>
 <body>
-    @Model.Message
-    @Each.Arguments
-    <p>
-        @Current
-    </p>
-    @EndEach
+    <h1>
+        {{Message}}
+    </h1>
+        {{#each Arguments}}
+        <p>{{this}}</p>
+        {{/each}}
 </body>
 </html>

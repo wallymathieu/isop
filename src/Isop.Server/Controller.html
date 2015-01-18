@@ -3,14 +3,14 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>@Model.Name</title>
+    <title>{{Name}}</title>
 </head>
 <body>
-    <h1>@Model.Name</h1>
+    <h1>{{Name}}</h1>
     <div class="methods">
-        @Each.Methods
-        <a href="@Current.Url">@Current.Name</a>
-        @EndEach
+        {{#each Methods}}
+        <a href="{{Url}}">{{Name}}</a>
+        {{/each}}
     </div>
 </body>
 </html>

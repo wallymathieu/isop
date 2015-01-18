@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Nancy.ViewEngines.Veil, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Nancy.ViewEngines.Veil.0.3.0\lib\net40\Nancy.ViewEngines.Veil.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -47,10 +51,19 @@
     <Reference Include="Nancy.Hosting.Self">
       <HintPath>..\packages\Nancy.Hosting.Self.0.23.2\lib\net40\Nancy.Hosting.Self.dll</HintPath>
     </Reference>
+    <Reference Include="Veil, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Veil.0.3.0\lib\net40\Veil.dll</HintPath>
+    </Reference>
+    <Reference Include="Veil.Handlebars, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Veil.Handlebars.0.3.0\lib\net40\Veil.Handlebars.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="ControllerModule.cs" />
+    <Compile Include="CustomParserRegistration.cs" />
     <Compile Include="IsopServerFromAssemblyLocation.cs" />
     <Compile Include="IsopServerFromBuild.cs" />
     <Compile Include="IIsopServer.cs" />
