@@ -11,11 +11,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop.Cli", "Isop.Auto.Cli\Isop.Cli.csproj", "{C5008846-A54B-46C3-B144-973E50B8620F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop.Wpf", "Isop.Wpf\Isop.Wpf.csproj", "{47DA4A1C-3FB5-4FEE-99B3-CE102BCD349C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop.Wpf.Tests", "Isop.Wpf.Tests\Isop.Wpf.Tests.csproj", "{469E06C3-4DCC-44DF-A653-186272D53D7E}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{616AC38F-F483-4A59-A09C-EB817929F7C7}"
 	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\nuget.rb = .nuget\nuget.rb
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{623E4E99-6404-4ED3-ACC4-98BB79C8978B}"
+	ProjectSection(SolutionItems) = preProject
+		..\rakefile.rb = ..\rakefile.rb
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop.Server", "Isop.Server\Isop.Server.csproj", "{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}"
@@ -167,10 +179,19 @@ Global
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
 		$1.ResourceNamePolicy = FileFormatDefault
-		$0.TextStylePolicy = $2
+		$0.TextStylePolicy = $4
 		$2.FileWidth = 120
-		$2.TabsToSpaces = False
+		$2.NoTabsAfterNonTabs = True
 		$2.inheritsSet = VisualStudio
 		$2.inheritsScope = text/plain
+		$2.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $3
+		$3.inheritsSet = Mono
+		$3.inheritsScope = text/x-csharp
+		$3.scope = text/x-csharp
+		$4.FileWidth = 120
+		$4.inheritsSet = VisualStudio
+		$4.inheritsScope = text/plain
+		$4.scope = text/plain
 	EndGlobalSection
 EndGlobal
