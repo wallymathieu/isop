@@ -31,7 +31,6 @@ namespace Isop.Gui.ViewModels
         /// </summary>
         private SingleScopeOnly singleEventHandlerScope;
         private MethodViewModel _currentMethod;
-        private System.Threading.Tasks.Task<Isop.Client.Models.Root> task;
         private Isop.Client.IIsopClient isopClient;
         private Isop.Client.Models.Root root;
         public MethodViewModel CurrentMethod
