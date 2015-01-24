@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <package >
   <metadata>
     <id>Isop</id>
@@ -11,10 +11,14 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Isop is a library to help simplify and structure command line apps. The Isop dll is used if you want to have your own console application. The Isop.Cli.exe and Isop.Wpf.exe (from the Isop.Runners package) if you dont care about implementing a &apos;Main&apos; method.</description>
     <copyright>Copyright 2015</copyright>
-    <releaseNotes>An internal model. Some minor api changes due to this addition.
+    <releaseNotes>
+      An internal model. Some minor api changes due to this addition.
     </releaseNotes>
-    <references>
+    <!--<references>
       <reference file="Isop.dll" />
-    </references>
+    </references>-->
   </metadata>
+  <files>
+    <file src="bin\Release\Isop.dll" target="lib\40\" />
+  </files>
 </package>

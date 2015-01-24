@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Isop.Wpf</id>
+    <title>Isop.Wpf</title>
+    <version>2.0.0-pre1</version>
+    <authors>Oskar Gewalli</authors>
+    <owners>Oskar Gewalli</owners>
+    <licenseUrl>http://www.opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/wallymathieu/isop</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Isop is a library to help simplify and structure command line apps.Isop.Wpf.exe can be used to get an overview of available commandline actions.</description>
+    <copyright>Copyright 2013</copyright>
+  </metadata>
+</package>

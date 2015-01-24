@@ -2,3 +2,6 @@ version: 1.0.{build}
 build:
   project: src\Isop.Wpf.sln
   verbosity: minimal
+nuget:
+  account_feed: true
+  project_feed: true
