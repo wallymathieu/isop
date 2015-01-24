@@ -98,9 +98,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Index.html" />
-    <Content Include="MissingArgument.html" />
-    <Content Include="TypeConversionFailed.html" />
+    <EmbeddedResource Include="Index.html" />
+    <EmbeddedResource Include="MissingArgument.html" />
+    <EmbeddedResource Include="TypeConversionFailed.html" />
     <EmbeddedResource Include="Controller.html" />
     <EmbeddedResource Include="ControllerAction.html" />
   </ItemGroup>
