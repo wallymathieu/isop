@@ -6,25 +6,23 @@ using System.Net;
 using Isop.Gui;
 using System.ComponentModel;
 using Isop.Gui.ViewModels;
-
+using Isop.Client.Models;
 namespace Isop.Gui.ViewModels
 {
     public class MethodViewModel : INotifyPropertyChanged, IReceiveResult
     {
-        public MethodViewModel(Isop.Gui.Models.Method m, IIsopClient client)
+        public MethodViewModel(Isop.Client.Models.Method m)
         {
             Method = m;
             Parameters = m.Parameters.Select(p => new ParamViewModel(p)).ToArray();
-            isopClient = client;
         }
 
-        public Isop.Gui.Models.Method Method { get; private set; }
+        public Isop.Client.Models.Method Method { get; private set; }
         public string Name { get { return Method.Name; } }
         public string ClassName { get { return Method.ClassName; } }
 
         public IEnumerable<ParamViewModel> Parameters { get; private set; }
         public string Help { get { return Method.Help; } }
-        private IIsopClient isopClient;
 
         public string Url { get { return Method.Url; } }
 
@@ -55,9 +53,9 @@ namespace Isop.Gui.ViewModels
                 Result = _ErrorMessage;
             }
         }
-        private object _Error;
+        private IErrorMessage _Error;
 
-        public object Error
+        public IErrorMessage Error
         {
             get { return _Error; }
             set

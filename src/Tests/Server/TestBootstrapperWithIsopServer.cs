@@ -3,7 +3,7 @@ using Isop.Server;
 using Nancy.Bootstrapper;
 using Nancy.TinyIoc;
 
-namespace Isop.Wpf.Tests.Server
+namespace Isop.Tests.Server
 {
     public class TestBootstrapperWithIsopServer <TISopServer>: Bootstrapper 
         where TISopServer: class, IIsopServer

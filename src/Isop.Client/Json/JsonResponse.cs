@@ -1,11 +1,9 @@
 ﻿using System;
 using System.IO;
-namespace Isop.Gui
+namespace Isop.Client.Json
 {
     public class JsonResponse : IDisposable
     {
-        public RequestError RequestException { get; private set; }
-        public string ErrorMessage { get { return RequestException != null ? RequestException.Message : null; } }
         public System.Net.HttpStatusCode HttpStatusCode { get; private set; }
         public string Data { get; private set; }
         public Stream Stream { get; private set; }
@@ -14,13 +12,6 @@ namespace Isop.Gui
         {
             this.HttpStatusCode = httpStatusCode;
             this.Data = response;
-        }
-
-        public JsonResponse(RequestError requestException)
-        {
-            this.Data = null;
-            this.RequestException = requestException;
-            this.HttpStatusCode = requestException.HttpStatusCode;
         }
 
         public JsonResponse(System.Net.HttpStatusCode httpStatusCode, System.IO.Stream stream)

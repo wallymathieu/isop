@@ -6,9 +6,11 @@ namespace Isop.Server.Models
     {
         public Method()
         {
+            Parameters = new Param[0];
         }
 
         public Method(string name, string className, string help)
+            :this()
         {
             Name = name;
             ClassName = className;

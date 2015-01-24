@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Collections.Generic;
+using Isop.Infrastructure;
 
 namespace Isop.Domain
 {
@@ -17,7 +18,7 @@ namespace Isop.Domain
 
         public Func<Type, object> Factory { get; set; }
 
-        public Func<Type, string, CultureInfo, object> TypeConverter { get; set; }
+        public TypeConverterFunc TypeConverter { get; set; }
 
         public bool RecognizesHelp { get; set; }
     }

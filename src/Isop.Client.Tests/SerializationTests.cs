@@ -1,14 +1,15 @@
 ﻿using System.Linq;
 using NUnit.Framework;
-using Isop.Gui.ViewModels;
-using Isop.Gui;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using Isop.Client.Json;
+using Isop.Client;
+using Isop.Client.Models;
 
 namespace Isop.Wpf.ServerIntegration
 {
     [TestFixture]
-    public class RootViewModelTests
+    public class SerializationTests
     {
         class JsonHttpClientThatOnlyReturns : IJSonHttpClient
         {
@@ -24,11 +25,12 @@ namespace Isop.Wpf.ServerIntegration
             }
         }
 
-        private RootViewModel GetRootModelFromBuild(Build b)
+        private Root GetRootModelFromBuild(Build b)
         {
             var server = new Isop.Server.IsopServerFromBuild( ()=> b );
             var data = JsonConvert.SerializeObject(server.GetModel());
-            return new IsopClient(new JsonHttpClientThatOnlyReturns(data), "http://localhost:666").GetMethodTreeModel().Result;
+            var client = new IsopClient(new JsonHttpClientThatOnlyReturns(data), "http://localhost:666");
+            return client.GetModel().Result;
         }
 
         private class MyController

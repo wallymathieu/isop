@@ -48,6 +48,6 @@ namespace Isop.Tests.FakeConfigurations
         {
             return TypeConverter;
         }
-        public static object TypeConverter(Type t, string s, CultureInfo c){ return null; }
+        public static object TypeConverter(Type t, string s, CultureInfo c) { return "FullConfigurationTypeConverter"; }
     }
 }

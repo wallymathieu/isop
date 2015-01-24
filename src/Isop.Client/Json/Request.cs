@@ -6,7 +6,7 @@ using System.Net;
 using System.Collections.Specialized;
 using Newtonsoft.Json;
 
-namespace Isop.Gui
+namespace Isop.Client.Json
 {
     public class Request
     {

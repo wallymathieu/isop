@@ -167,6 +167,9 @@
     <Compile Include='..\Isop\Domain\Conventions.cs'>
       <Link>Isop\Domain\Conventions.cs</Link>
     </Compile>
+    <Compile Include='..\Isop\Infrastructure\TypeConverterFunc.cs'>
+      <Link>Isop\Infrastructure\TypeConverterFunc.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project='$(MSBuildToolsPath)\Microsoft.CSharp.targets'/>
   <Import Project='$(SolutionDir)\.nuget\nuget.targets'/>

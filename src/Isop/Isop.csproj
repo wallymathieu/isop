@@ -88,6 +88,7 @@
     <Compile Include="CommandLine\Parse\RecognizedArgument.cs" />
     <Compile Include="CommandLine\Parse\UnrecognizedArgument.cs" />
     <Compile Include="Domain\Conventions.cs" />
+    <Compile Include="Infrastructure\TypeConverterFunc.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -95,8 +96,5 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <ItemGroup>
-    <Folder Include="Domain\" />
-    <Folder Include="CommandLine\Help\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

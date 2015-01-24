@@ -25,10 +25,10 @@ namespace Isop.Configurations
         {
             return t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
         }
-     
-        void ConfigureRecognizes(Type t, object instance, MethodInfo[] methods=null)
+
+        void ConfigureRecognizes(Type t, object instance, MethodInfo[] methods = null)
         {
-            var recognizesMethod = MatchGet((methods ?? GetPublicInstanceMethods(t)), 
+            var recognizesMethod = MatchGet((methods ?? GetPublicInstanceMethods(t)),
                 name: new Regex("Recognizes", RegexOptions.IgnoreCase),
                 returnType: typeof(IEnumerable<Type>),
                 parameters: new Type[0]);
@@ -37,7 +37,7 @@ namespace Isop.Configurations
                 var recognizes = (IEnumerable<Type>)recognizesMethod.Invoke(instance, new object[0]);
                 foreach (var recognized in recognizes)
                 {
-                    _configuration.Recognizes.Add(new Controller(recognized,false));
+                    _configuration.Recognizes.Add(new Controller(recognized, false));
                 }
             }
         }
@@ -63,9 +63,9 @@ namespace Isop.Configurations
         void ObjectFactory(object instance, MethodInfo[] methods)
         {
             var name = new Regex("(Object)?Factory", RegexOptions.IgnoreCase);
-            var objectFactory = methods.Where(m => 
-                m.ReturnType ==  typeof(object)
-                && m.GetParameters().Select(p => p.ParameterType).SequenceEqual(new[] {typeof(Type)})
+            var objectFactory = methods.Where(m =>
+                m.ReturnType == typeof(object)
+                && m.GetParameters().Select(p => p.ParameterType).SequenceEqual(new[] { typeof(Type) })
                 && name.IsMatch(m.Name))
                 .SingleOrDefault();
             if (null != objectFactory)
@@ -76,9 +76,9 @@ namespace Isop.Configurations
 
         void CultureInfo(object instance, MethodInfo[] methods)
         {
-            var culture = MatchGet(methods, 
-                name: new Regex("Culture(Info)?", RegexOptions.IgnoreCase), 
-                returnType: typeof(CultureInfo), 
+            var culture = MatchGet(methods,
+                name: new Regex("Culture(Info)?", RegexOptions.IgnoreCase),
+                returnType: typeof(CultureInfo),
                 parameters: new Type[0]);
             if (null != culture)
             {
@@ -97,10 +97,31 @@ namespace Isop.Configurations
 
         void TypeConverter(object instance, MethodInfo[] methods)
         {
-            var typeconv = MatchGet(methods, name: new Regex("(Type)?Converter", RegexOptions.IgnoreCase), returnType: typeof(Func<Type, string, CultureInfo, object>), parameters: new Type[0]);
+            var typeconv = MatchGet(methods,
+                name: new Regex("(Type)?Converter", RegexOptions.IgnoreCase),
+                returnType: typeof(object),
+                parameters: new Type[] { typeof(Type), typeof(string), typeof(CultureInfo) });
             if (null != typeconv)
             {
-                _configuration.TypeConverter = (Func<Type, string, CultureInfo, object>)typeconv.Invoke(instance, new object[0]);
+                _configuration.TypeConverter = (type, value, culture) => typeconv.Invoke(instance, new object[] { type, value, culture });
+            }
+            else
+            {
+                ReturnsFuncTypeConverter(instance, methods);
+            }
+        }
+
+        private void ReturnsFuncTypeConverter(object instance, MethodInfo[] methods)
+        {
+            // old style
+            var getTypeconv = MatchGet(methods,
+                name: new Regex("(Type)?Converter", RegexOptions.IgnoreCase),
+                returnType: typeof(Func<Type, string, CultureInfo, object>),
+                parameters: new Type[0]);
+            if (null != getTypeconv)
+            {
+                var typeConv = (Func<Type, string, CultureInfo, object>)getTypeconv.Invoke(instance, new object[0]);
+                _configuration.TypeConverter = (type, value, culture) => typeConv(type, value, culture);
             }
         }
 
@@ -111,7 +132,7 @@ namespace Isop.Configurations
             CultureInfo(instance, methods);
 
             ConfigureRecognizes(t, instance, methods);
-           
+
             ObjectFactory(instance, methods);
 
             ConfigurationPublicWritableFields(instance, methods);
@@ -124,17 +145,17 @@ namespace Isop.Configurations
         static IEnumerable<MethodInfoOrProperty> FindSet(IEnumerable<MethodInfo> methods)
         {
             return methods
-                .Where(m=> _set.IsMatch(m.Name))
-                .Select(m=> new MethodInfoOrProperty(m));
+                .Where(m => _set.IsMatch(m.Name))
+                .Select(m => new MethodInfoOrProperty(m));
         }
 
-        static MethodInfoOrProperty MatchGet (IEnumerable<MethodInfo> methods, Regex name, Type returnType, IEnumerable<Type> parameters)
+        static MethodInfoOrProperty MatchGet(IEnumerable<MethodInfo> methods, Regex name, Type returnType, IEnumerable<Type> parameters)
         {
-            return methods.Where(m=>
-                m.ReturnType.Equals(returnType) 
-                && m.GetParameters().Select(p=>p.ParameterType).SequenceEqual(parameters)
-                && name.IsMatch( _get.Replace(m.Name,"")))
-                .Select(m=> new MethodInfoOrProperty(m))
+            return methods.Where(m =>
+                m.ReturnType.Equals(returnType)
+                && m.GetParameters().Select(p => p.ParameterType).SequenceEqual(parameters)
+                && name.IsMatch(_get.Replace(m.Name, "")))
+                .Select(m => new MethodInfoOrProperty(m))
                 .FirstOrDefault();
         }
     }

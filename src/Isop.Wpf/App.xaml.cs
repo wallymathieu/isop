@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using Isop.Client;
+using Isop.Client.Json;
+using System.IO;
 using System.Windows;
 
 namespace Isop.Gui
@@ -10,7 +12,6 @@ namespace Isop.Gui
     {
         protected override void OnExit(ExitEventArgs e)
         {
-            ClientConnection.Dispose();
             base.OnExit(e);
         }
         protected override void OnStartup(StartupEventArgs e)

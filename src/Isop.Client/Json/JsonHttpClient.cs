@@ -4,7 +4,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Isop.Gui
+namespace Isop.Client.Json
 {
     public class JsonHttpClient : IJSonHttpClient
     {
@@ -43,17 +43,17 @@ namespace Isop.Gui
             }
             catch (WebException ex)
             {
-                return new JsonResponse(GetRequestException(ex));
+                throw GetRequestException(ex);
             }
             catch (Exception ex)
             {
                 if (ex.GetBaseException() is WebException)
-                    return new JsonResponse(GetRequestException((WebException)ex.GetBaseException()));
+                    throw GetRequestException((WebException)ex.GetBaseException());
                 throw;
             }
         }
 
-        protected internal static RequestError GetRequestException(WebException ex)
+        protected internal static RequestException GetRequestException(WebException ex)
         {
             if (ex.Response != null)
             {
@@ -62,10 +62,10 @@ namespace Isop.Gui
                 {
                     var c = reader.ReadToEnd();
                     var resp = ((HttpWebResponse)ex.Response);
-                    return new RequestError(resp.StatusCode, c, resp.Headers["ErrorType"]);
+                    return new RequestException(resp.StatusCode, c, resp.Headers["ErrorType"]);
                 }
             }
-            return new RequestError(HttpStatusCode.InternalServerError, ex.Message, "InternalServerError");
+            return new RequestException(HttpStatusCode.InternalServerError, ex.Message, "InternalServerError");
         }
     }
 }

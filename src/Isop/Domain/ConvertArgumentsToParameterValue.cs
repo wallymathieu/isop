@@ -12,9 +12,9 @@ namespace Isop.Domain
 
     public class ConvertArgumentsToParameterValue
     {
-        private readonly Func<Type, string, CultureInfo, object> _typeConverter;
+        private readonly TypeConverterFunc _typeConverter;
         private readonly CultureInfo _culture;
-        public ConvertArgumentsToParameterValue(CultureInfo culture, Func<Type, string, CultureInfo, object> typeConverter)
+        public ConvertArgumentsToParameterValue(CultureInfo culture, TypeConverterFunc typeConverter)
         {
             _culture = culture ?? CultureInfo.CurrentCulture;
             _typeConverter = typeConverter?? new DefaultConverter().ConvertFrom;

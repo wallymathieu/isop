@@ -5,15 +5,20 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.IO;
+using System.Text;
+using Isop.Client.Json;
+using Isop.Client;
 namespace Isop.Gui.ViewModels
 {
     public class RootViewModel
     {
-        public RootViewModel(Gui.IIsopClient isopClient, IEnumerable<Gui.Models.Param> globalParameters = null, IEnumerable<Gui.Models.Controller> controllers = null)
+        public RootViewModel(IIsopClient isopClient, Isop.Client.Models.Root root = null)
         {
             this.isopClient = isopClient;
-            GlobalParameters = new ObservableCollection<ParamViewModel>((globalParameters ?? new Gui.Models.Param[0]).Select(Map));
-            Controllers = new ObservableCollection<ControllerViewModel>((controllers ?? new Gui.Models.Controller[0]).Select(Map));
+            this.root = root ?? new Isop.Client.Models.Root();
+            GlobalParameters = new ObservableCollection<ParamViewModel>((root.GlobalParameters ?? new Isop.Client.Models.Param[0]).Select(Map));
+            Controllers = new ObservableCollection<ControllerViewModel>((root.Controllers ?? new Isop.Client.Models.Controller[0]).Select(Map));
             singleEventHandlerScope = new SingleScopeOnly();
             GlobalParameters.RegisterPropertyChanged(globalValueChanged);
         }
@@ -26,8 +31,9 @@ namespace Isop.Gui.ViewModels
         /// </summary>
         private SingleScopeOnly singleEventHandlerScope;
         private MethodViewModel _currentMethod;
-        private System.Threading.Tasks.Task<Gui.Models.Root> task;
-        private Gui.IIsopClient isopClient;
+        private System.Threading.Tasks.Task<Isop.Client.Models.Root> task;
+        private Isop.Client.IIsopClient isopClient;
+        private Isop.Client.Models.Root root;
         public MethodViewModel CurrentMethod
         {
             get { return _currentMethod; }
@@ -67,8 +73,9 @@ namespace Isop.Gui.ViewModels
             });
         }
 
-        public void Accept(Gui.Models.Root res)
+        public void Accept(Isop.Client.Models.Root res)
         {
+            root = res;
             foreach (var pvm in res.GlobalParameters.Select(Map))
             {
                 GlobalParameters.Add(pvm);
@@ -79,19 +86,79 @@ namespace Isop.Gui.ViewModels
             }
         }
 
-        private ControllerViewModel Map(Gui.Models.Controller c)
+        private ControllerViewModel Map(Isop.Client.Models.Controller c)
         {
             return new Isop.Gui.ViewModels.ControllerViewModel()
             {
                 Name = c.Name,
                 Methods = c.Methods.Select(m =>
-                    new MethodViewModel(m, isopClient)).ToArray()
+                    new MethodViewModel(m)).ToArray()
             };
         }
 
-        private static ParamViewModel Map(Gui.Models.Param p)
+        private static ParamViewModel Map(Isop.Client.Models.Param p)
         {
             return new ParamViewModel(p);
+        }
+
+        public async Task<MethodViewModel> Execute() 
+        {
+            await Invoke(root, CurrentMethod.Method, CurrentMethod);
+            return CurrentMethod;
+        }
+
+        private async Task<IReceiveResult> Invoke(Isop.Client.Models.Root root, Isop.Client.Models.Method method, IReceiveResult result)
+        {
+            try
+            {
+                result.Result = String.Empty;
+                result.Error = null;
+                result.ErrorMessage = String.Empty;
+                using (var rstream = await isopClient.Invoke(root, method, r => r.Stream()))
+                {
+                    if (null != rstream.Stream)
+                        using (var reader = new StreamReader(rstream.Stream, Encoding.UTF8))
+                        {
+                            while (true)
+                            {
+                                var line = await reader.ReadLineAsync();
+                                if (line == null)
+                                {
+                                    break;
+                                }
+                                result.Result += line;
+                            }
+                        }
+
+                    return result;
+                }
+            }
+            catch (AggregateException aggEx)
+            {
+                if (aggEx.InnerExceptions.Count == 1 && aggEx.InnerExceptions.Any(e => e is RequestException))
+                {
+                    var requestException = (RequestException)aggEx.InnerExceptions.Single();
+                    var errorObject = requestException.ErrorObject();
+                    if (null != errorObject)
+                    {
+                        result.Error = errorObject;
+                        result.ErrorMessage = errorObject.Message;
+                        return result;
+                    }
+                }
+                throw;
+            }
+            catch (RequestException ex)
+            {
+                var errorObject = ex.ErrorObject();
+                if (null != errorObject)
+                {
+                    result.Error = errorObject;
+                    result.ErrorMessage = errorObject.Message;
+                    return result;
+                }
+                throw;
+            }
         }
     }
 }

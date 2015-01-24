@@ -9,7 +9,7 @@ using Nancy.Helpers;
 using Isop.Server;
 using System.Collections.Generic;
 
-namespace Isop.Wpf.Tests.Server
+namespace Isop.Tests.Server
 {
     [TestFixture]
     public class JsonApiTests

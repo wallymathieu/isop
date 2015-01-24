@@ -48,7 +48,7 @@ task :default => ['build']
 desc "test using nunit console"
 test_runner :test => [:build] do |nunit|
   nunit.exe = NuGet::nunit_path
-  files = [File.join($dir,"Tests/bin/Debug/Tests.dll")]
+  files = [File.join($dir,"Tests/bin/Debug/Tests.dll"), File.join($dir,"Isop.Client.Tests/bin/Debug/Isop.Client.Tests.dll")]
   if NuGet::os == :windows
     files.push File.join($dir,"Isop.Wpf.Tests/bin/Debug/Isop.Wpf.Tests.dll")
   end

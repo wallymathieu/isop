@@ -1,15 +1,12 @@
 ﻿using System.Linq;
 using NUnit.Framework;
-using With;
-using Isop.Gui;
 using Newtonsoft.Json;
 using System.IO;
-using System;
-using Isop.Gui.Models;
-using System.Threading.Tasks;
-using System.Net;
+using Isop.Client.Models;
 using Isop.Gui.ViewModels;
 using FakeItEasy;
+using Isop.Client.Json;
+using Isop.Client;
 namespace Isop.Wpf.Tests
 {
     [TestFixture]
@@ -59,7 +56,7 @@ namespace Isop.Wpf.Tests
                     RootModelFromSource())));
 
             var mt = _isopClient.GetModel().Result;
-            var treemodel = new RootViewModel(_isopClient, mt.GlobalParameters.ToArray(), mt.Controllers.ToArray());
+            var treemodel = new RootViewModel(_isopClient, mt);
 
             treemodel.CurrentMethod = treemodel.Controllers.Single()
                 .Methods.Single(m => m.Name == "Action");
@@ -76,10 +73,7 @@ namespace Isop.Wpf.Tests
                 .Returns(new JsonResponse(System.Net.HttpStatusCode.OK,
                     WithSomeNoise()));
 
-            var result = _isopClient.Invoke(
-                treemodel.CurrentMethod.Method,
-                treemodel.GlobalParameters.Select(p => p.Parameter),
-                treemodel.CurrentMethod).Result;
+            var result = treemodel.Execute().Result;
         }
 
         [Test]
@@ -89,13 +83,10 @@ namespace Isop.Wpf.Tests
             var param1 = treemodel.CurrentMethod.Parameters.Single();
             param1.Value = "new value";
             A.CallTo(() => _jsonHttpClient.Request(A<Request>._))
-                .Returns(new JsonResponse(new RequestError(System.Net.HttpStatusCode.BadRequest, 
-                    "{\"Message\":\"TypeConversionFailed !!\"}", "TypeConversionFailed")));
+                .Throws(new RequestException(System.Net.HttpStatusCode.BadRequest, 
+                    "{\"Message\":\"TypeConversionFailed !!\"}", "TypeConversionFailed"));
 
-            var result = _isopClient.Invoke(
-                treemodel.CurrentMethod.Method,
-                treemodel.GlobalParameters.Select(p => p.Parameter),
-                treemodel.CurrentMethod).Result;
+            var result = treemodel.Execute().Result;
             Assert.That(result.ErrorMessage, Is.EqualTo("TypeConversionFailed !!"));
         }
 
@@ -106,13 +97,10 @@ namespace Isop.Wpf.Tests
             var param1 = treemodel.CurrentMethod.Parameters.Single();
             param1.Value = "new value";
             A.CallTo(() => _jsonHttpClient.Request(A<Request>._))
-                .Returns(new JsonResponse(new RequestError(System.Net.HttpStatusCode.BadRequest,
-                    "{\"Message\":\"MissingArgument !!\"}", "MissingArgument")));
+                .Throws(new RequestException(System.Net.HttpStatusCode.BadRequest,
+                    "{\"Message\":\"MissingArgument !!\"}", "MissingArgument"));
 
-            var result = _isopClient.Invoke(
-                treemodel.CurrentMethod.Method,
-                treemodel.GlobalParameters.Select(p => p.Parameter),
-                treemodel.CurrentMethod).Result;
+            var result = treemodel.Execute().Result;
             Assert.That(result.ErrorMessage, Is.EqualTo("MissingArgument !!"));
         }
     }

@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using With;
-namespace Isop.Wpf.Tests.Server
+namespace Isop.Tests.Server
 {
     [TestFixture]
     public class IsopServerFromBuildTests

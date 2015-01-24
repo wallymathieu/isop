@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Isop.Gui.Models
+namespace Isop.Client.Models
 {
     public class Param 
     {

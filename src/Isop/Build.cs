@@ -14,7 +14,6 @@ namespace Isop
     using CommandLine.Lex;
     using CommandLine.Parse;
     using CommandLine.Help;
-    using TypeConverterFunc = System.Func<System.Type, string, System.Globalization.CultureInfo, object>;
     using Configurations;
     using Domain;
     /// <summary>

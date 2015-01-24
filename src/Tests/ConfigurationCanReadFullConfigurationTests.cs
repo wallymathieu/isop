@@ -32,7 +32,8 @@ namespace Isop.Tests
         [Test]
         public void RecognizeTypeConverter()
         {
-            Assert.That(_parserBuilder.TypeConverter, Is.EqualTo((TypeConverterFunc)FullConfiguration.TypeConverter));
+            Assert.That(_parserBuilder.TypeConverter(typeof(string), "", _parserBuilder.CultureInfo), 
+                Is.EqualTo(FullConfiguration.TypeConverter(typeof(string), "", _parserBuilder.CultureInfo)));
         }
         [Test]
         public void RecognizeRecognizers()

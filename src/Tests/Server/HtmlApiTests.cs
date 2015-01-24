@@ -4,10 +4,9 @@ using NUnit.Framework;
 using System.Linq;
 using With.Rubyfy;
 using With;
-using Nancy.Bootstrapper;
 using Nancy.Helpers;
 using Isop.Server;
-namespace Isop.Wpf.Tests.Server
+namespace Isop.Tests.Server
 {
     [TestFixture]
     public class HtmlApiTests

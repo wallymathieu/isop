@@ -6,12 +6,14 @@ namespace Isop.Server.Models
     {
         public Controller()
         {
+            Methods = new Method[0];
         }
 
-        public Controller(string name, IEnumerable<Method> actions)
+        public Controller(string name, IEnumerable<Method> methods)
+            :this()
         {
             Name = name;
-            Methods = actions;
+            Methods = methods;
             Url = "/"+name;
         }
         public string Name { get; set; }

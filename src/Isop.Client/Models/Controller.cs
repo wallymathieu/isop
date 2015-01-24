@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Isop.Gui.Models
+namespace Isop.Client.Models
 {
     public class Controller
     {

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Nancy.TinyIoc;
+using Newtonsoft.Json;
 namespace Isop.Server
 {
     public class Bootstrapper : DefaultNancyBootstrapper
@@ -26,6 +27,8 @@ namespace Isop.Server
 
             existingContainer
                 .Register<IIsopServer, IsopServerFromAssemblyLocation>();
+
+            existingContainer.Register<JsonSerializer, CustomJsonSerializer>();
 
         }
 
