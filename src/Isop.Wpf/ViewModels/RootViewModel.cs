@@ -16,7 +16,7 @@ namespace Isop.Gui.ViewModels
         public RootViewModel(IIsopClient isopClient, Isop.Client.Models.Root root = null)
         {
             this.isopClient = isopClient;
-            this.root = root ?? new Isop.Client.Models.Root();
+            this.root = root = root ?? new Isop.Client.Models.Root();
             GlobalParameters = new ObservableCollection<ParamViewModel>((root.GlobalParameters ?? new Isop.Client.Models.Param[0]).Select(Map));
             Controllers = new ObservableCollection<ControllerViewModel>((root.Controllers ?? new Isop.Client.Models.Controller[0]).Select(Map));
             singleEventHandlerScope = new SingleScopeOnly();
