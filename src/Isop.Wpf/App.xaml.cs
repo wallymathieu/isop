@@ -17,7 +17,7 @@ namespace Isop.Gui
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            ClientConnection = new IsopClient(new JsonHttpClient(), "http://localhost:8080");
+            ClientConnection = new IsopClient(new JsonHttpClient(), "http://localhost:8080/");
         }
 
         public IsopClient ClientConnection { get; set; }

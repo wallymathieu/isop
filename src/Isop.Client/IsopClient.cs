@@ -20,7 +20,7 @@ namespace Isop.Client
 
         public async Task<Isop.Client.Models.Root> GetModel()
         {
-            var response = await JsonClient.Request(new Request(BasePath + "/", r => r.Get()));
+            var response = await JsonClient.Request(new Request(BasePath, r => r.Get()));
             return JsonConvert.DeserializeObject<Isop.Client.Models.Root>(response.Data);
         }
 
@@ -39,6 +39,8 @@ namespace Isop.Client
 
         private async Task<JsonResponse> Invoke(Isop.Client.Models.Method method, Dictionary<string, string> form, Func<Request.Configure, Request.Configure> action)
         {
+            var uri = new Uri(BasePath);
+            var url = uri.Scheme + "://" + uri.Host + (uri.IsDefaultPort ? "" : ":" + uri.Port);
             return await JsonClient.Request(new Request(BasePath + method.Url, r => action(r.Post().Form(form))));
         }
     }
