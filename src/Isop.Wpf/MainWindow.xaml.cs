@@ -8,6 +8,8 @@ using Isop.Gui.ViewModels;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Isop.Client;
+using Isop.Client.Json;
 
 namespace Isop.Gui
 {
@@ -20,7 +22,9 @@ namespace Isop.Gui
 
         public MainWindow()
         {
-            MethodTreeModel = new RootViewModel(((App)App.Current).ClientConnection);
+            var conn = new IsopClient(new JsonHttpClient(), "http://localhost:8080/");
+
+            MethodTreeModel = new RootViewModel(conn);
             InitializeComponent();
             var empty = new EmptyMethodViewModel();
             textBlock2.DataContext = empty;
@@ -28,7 +32,6 @@ namespace Isop.Gui
             paramview.Source = MethodTreeModel.GlobalParameters;
             controllersAndCommands.DataContext = MethodTreeModel.Controllers;
 
-            var conn = ((App)App.Current).ClientConnection;
             var model = conn.GetModel();
             model.ContinueWith((t) =>
                 MethodTreeModel.Accept(t.Result),
