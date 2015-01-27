@@ -10,6 +10,8 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using Isop.Client;
 using Isop.Client.Json;
+using Isop.Gui.Adapters;
+using Isop.Infrastructure;
 
 namespace Isop.Gui
 {
@@ -19,23 +21,69 @@ namespace Isop.Gui
     public partial class MainWindow : Window
     {
         public RootViewModel MethodTreeModel { get; set; }
+        private SelectClient selectClient;
 
         public MainWindow()
         {
-            var conn = new IsopClient(new JsonHttpClient(), "http://localhost:8080/");
-
-            MethodTreeModel = new RootViewModel(conn);
+            MethodTreeModel = new RootViewModel();
             InitializeComponent();
+            selectClient = new SelectClient();
+            selectClient.Source.Loaded += Source_Loaded;
             var empty = new EmptyMethodViewModel();
-            textBlock2.DataContext = empty;
-            textBlock1.DataContext = empty;
+            ResultBlock.DataContext = empty;
+            HelpBlock.DataContext = empty;
             paramview.Source = MethodTreeModel.GlobalParameters;
             controllersAndCommands.DataContext = MethodTreeModel.Controllers;
 
-            var model = conn.GetModel();
+            var conn = new IsopClient(new JsonHttpClient(), "http://localhost:8080/");
+            InitFromClient(new JsonClient(conn), _ =>
+            {
+                var assemblies = new LoadAssemblies().LoadFrom(ExecutionAssembly.Path()).ToArray();
+                var build = new Build();
+                foreach (var assembly in assemblies)
+                {
+                    build.ConfigurationFrom(assembly);
+                }
+                InitFromClient(new BuildClient(build));
+            });
+        }
+
+        private void InitFromClient(IClient client, Action<AggregateException> onfailure = null)
+        {
+            var model = client.GetModel();
+            MethodTreeModel.Client = client;
+            AsyncLoad(model, onfailure);
+        }
+
+        void Source_Loaded()
+        {
+            var client = selectClient.Source.GetClient();
+            if (client != null)
+            {
+                MethodTreeModel.Client = client;
+                var model = client.GetModel();
+                AsyncLoad(model);
+            }
+        }
+
+        private void AsyncLoad(Task<Client.Models.Root> model, Action<AggregateException> onfailure = null)
+        {
             model.ContinueWith((t) =>
-                MethodTreeModel.Accept(t.Result),
-                TaskScheduler.FromCurrentSynchronizationContext());
+                {
+                    if (t.Exception != null)
+                    {
+                        if (onfailure != null) { onfailure(t.Exception); }
+                    }
+                    else
+                    {
+                        MethodTreeModel.Accept(t.Result);
+                    }
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        private void SelectClient(object sender, RoutedEventArgs e)
+        {
+            selectClient.Show();
         }
 
         private void SelectedMethodChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -45,14 +93,14 @@ namespace Isop.Gui
                 MethodTreeModel.CurrentMethod = (MethodViewModel)e.NewValue;
                 methodview.DataContext = e.NewValue;
                 methodview.Source = MethodTreeModel.CurrentMethod.Parameters;
-                textBlock2.DataContext = MethodTreeModel.CurrentMethod;
-                textBlock1.DataContext = MethodTreeModel.CurrentMethod;
+                ResultBlock.DataContext = MethodTreeModel.CurrentMethod;
+                HelpBlock.DataContext = MethodTreeModel.CurrentMethod;
             }
             else
             {
                 var empty = new EmptyMethodViewModel();
-                textBlock2.DataContext = empty;
-                textBlock1.DataContext = empty;
+                ResultBlock.DataContext = empty;
+                HelpBlock.DataContext = empty;
             }
         }
 
@@ -61,6 +109,17 @@ namespace Isop.Gui
             if (null == MethodTreeModel.CurrentMethod) return;
 
             await MethodTreeModel.Execute();
+        }
+
+        private void Window_Drop(object sender, DragEventArgs e)
+        {
+            selectClient.Show();
+            selectClient.Window_Drop(sender, e);
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            selectClient.Close();
         }
     }
 }

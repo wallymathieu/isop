@@ -81,6 +81,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlternativeApiTests.cs" />
     <Compile Include="ConfigurationCanReadFullConfigurationTests.cs" />
     <Compile Include="FakeControllers\DescriptionController.cs" />
     <Compile Include="FakeControllers\DescriptionWithCommentsController.cs" />

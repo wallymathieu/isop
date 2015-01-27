@@ -5,6 +5,7 @@ using Isop.Gui;
 using Isop.Client.Models;
 using FakeItEasy;
 using Isop.Client;
+using Isop.Gui.Adapters;
 namespace Isop.Wpf.Tests
 {
     [TestFixture]
@@ -15,7 +16,7 @@ namespace Isop.Wpf.Tests
         private RootViewModel RootVmWithMethodSelected()
         {
             var mt = RootModelFromSource();
-            var treemodel = new RootViewModel(_isopClient, mt);
+            var treemodel = new RootViewModel(new JsonClient(_isopClient), mt);
 
             treemodel.CurrentMethod = treemodel.Controllers.Single()
                 .Methods.Single(m => m.Name == "Action");

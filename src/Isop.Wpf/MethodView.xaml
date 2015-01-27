@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:Gui="clr-namespace:Isop.Gui" mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300" >
 
     <UserControl.Resources>
         <Gui:BoolToVisibilityConverter x:Key="BoolToVisConverter" />
@@ -13,8 +13,8 @@
             <DataTemplate>
                 <StackPanel Orientation="Horizontal">
                     <Label Content="{Binding Name}" VerticalAlignment="Center"/>
-                    <TextBox Width="50" Text="{Binding Value}" Margin="5,0,0,0"/>
-                    <Label Content="*" Visibility="{Binding Required, Converter={StaticResource BoolToVisConverter}}"/>
+                    <TextBox Width="50" Text="{Binding Value}" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                    <Label Content="*" Visibility="{Binding Required, Converter={StaticResource BoolToVisConverter}}" VerticalAlignment="Center"/>
                 </StackPanel>
             </DataTemplate>
         </ListBox.ItemTemplate>

@@ -7,7 +7,7 @@ namespace Isop.Client.Models
         public string Name { get; set; }
         public string ClassName { get; set; }
         public IEnumerable<Param> Parameters { get; set; }
-        public string Help { get; private set; }
+        public string Help { get; set; }
         public string Url { get; set; }
     }
 }

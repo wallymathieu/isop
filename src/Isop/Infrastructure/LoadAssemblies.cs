@@ -18,6 +18,7 @@ namespace Isop.Infrastructure
                     return ext.EqualsIC(".dll") || ext.EqualsIC(".exe");
                 })
                 .Where(f => !Path.GetFileNameWithoutExtension(f).StartsWithIC("Isop"));
+            
             foreach (var file in files)
             {
                 var assembly = Assembly.LoadFile(file);

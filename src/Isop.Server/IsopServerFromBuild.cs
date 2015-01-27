@@ -38,17 +38,12 @@ namespace Isop.Server
         {
             using (var build = Build())
             {
-                var l = new List<string>() { { method.ClassName }, { method.Name } };
-                l.AddRange(MapToStrings(form));
                 return build
-                    .Parse(l)
+                    .Controller(method.ClassName)
+                    .Action(method.Name)
+                    .Parameters(form.ToDictionary(p => p.Key, p => p.Value != null ? p.Value.ToString() : (string)null))
                     .Invoke();
             }
-        }
-
-        private IEnumerable<string> MapToStrings(IDictionary<string, object> form)
-        {
-            return form.SelectMany(kv => new string[] { "--" + kv.Key + "=", kv.Value.ToString() });
         }
 
         private class Map

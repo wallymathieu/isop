@@ -75,6 +75,11 @@ namespace Isop.CommandLine.Parse
             var maxLength = Aliases.Max(a => a.Length);
             return Aliases.SingleOrDefault(a => a.Length == maxLength);
         }
+
+        public bool Accept(string value)
+        {
+            return HasAlias(value);
+        }
     }
 }
 

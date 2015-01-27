@@ -66,7 +66,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Adapters\BuildClient.cs" />
+    <Compile Include="Adapters\JsonClient.cs" />
+    <Compile Include="ControllersView.xaml.cs">
+      <DependentUpon>ControllersView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FromDroppedFile.cs" />
+    <Compile Include="SelectClient.xaml.cs">
+      <DependentUpon>SelectClient.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\EmptyMethodViewModel.cs" />
+    <Compile Include="Adapters\IClient.cs" />
     <Compile Include="ViewModels\IReceiveResult.cs" />
     <Compile Include="BoolToVisibilityConverter.cs" />
     <Compile Include="MethodView.xaml.cs">
@@ -78,6 +88,11 @@
     <Compile Include="ViewModels\RootViewModel.cs" />
     <Compile Include="ViewModels\ParamViewModel.cs" />
     <Compile Include="ViewModels\ParamExtension.cs" />
+    <Compile Include="ViewModels\SelectClientViewModel.cs" />
+    <Page Include="ControllersView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -93,6 +108,10 @@
     <Page Include="MethodView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SelectClient.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -112,7 +131,12 @@
       <Project>{a6f3bf74-a744-4886-9777-b9fd6cfa7f5b}</Project>
       <Name>Isop.Client</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Isop\Isop.csproj">
+      <Project>{3b16baf9-69f1-4a7b-a6c0-62de88fd38cb}</Project>
+      <Name>Isop</Name>
+    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

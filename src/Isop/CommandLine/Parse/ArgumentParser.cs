@@ -19,7 +19,7 @@ namespace Isop.CommandLine.Parse
         {
             _argumentWithOptions = argumentWithOptions;
             _allowInferParameter = allowInferParameter;
-            this.cultureInfo = cultureInfo; 
+            this.cultureInfo = cultureInfo;
         }
 
         public ParsedArguments Parse(IEnumerable<string> arguments)
@@ -114,7 +114,7 @@ namespace Isop.CommandLine.Parse
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
                 .Select(v => new UnrecognizedArgument { Index = v.i, Value = v.value });
 
-            return new ParsedArguments(argumentList)
+            return new ParsedArguments()
             {
                 ArgumentWithOptions = _argumentWithOptions.ToArray(),
                 RecognizedArguments = recognized,
@@ -122,7 +122,8 @@ namespace Isop.CommandLine.Parse
             };
         }
 
-        private bool Accept(Argument argument, int index, string value){
+        private bool Accept(Argument argument, int index, string value)
+        {
             if (argument is ArgumentWithOptions)
             {
                 return ((ArgumentWithOptions)argument).Argument.Accept(index, value);
@@ -142,8 +143,49 @@ namespace Isop.CommandLine.Parse
                                    argumentWithOptions,
                                    current.Index,
                                    argumentWithOptions.Name,
-                                   current.Value) {InferredOrdinal = true});
+                                   current.Value) { InferredOrdinal = true });
             }
+        }
+
+        public ParsedArguments Parse(Dictionary<string, string> arg)
+        {
+            var recognized = new List<RecognizedArgument>();
+            var unRecognizedArguments = new List<UnrecognizedArgument>();
+            var index = 0;
+            foreach (var current in arg)
+            {
+                var argumentWithOptions = _argumentWithOptions
+                        .SingleOrDefault(argopt => Accept(argopt, current.Key));
+
+
+                if (null == argumentWithOptions)
+                {
+                    unRecognizedArguments.Add(new UnrecognizedArgument { Value = current.Key, Index = index++ });
+                    continue;
+                }
+                recognized.Add(new RecognizedArgument(
+                            argumentWithOptions,
+                            index++,
+                            current.Key,
+                            current.Value));
+
+            }
+            return new ParsedArguments()
+            {
+                ArgumentWithOptions = _argumentWithOptions.ToArray(),
+                RecognizedArguments = recognized,
+                UnRecognizedArguments = unRecognizedArguments
+            };
+
+        }
+
+        private bool Accept(Argument argument, string value)
+        {
+            if (argument is ArgumentWithOptions)
+            {
+                return ((ArgumentWithOptions)argument).Argument.Accept(value);
+            }
+            return ArgumentParameter.Parse(argument.Name, cultureInfo).Accept(value);
         }
     }
 }

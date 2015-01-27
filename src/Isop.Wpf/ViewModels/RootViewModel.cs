@@ -9,11 +9,12 @@ using System.IO;
 using System.Text;
 using Isop.Client.Json;
 using Isop.Client;
+using Isop.Gui.Adapters;
 namespace Isop.Gui.ViewModels
 {
     public class RootViewModel
     {
-        public RootViewModel(IIsopClient isopClient, Isop.Client.Models.Root root = null)
+        public RootViewModel(IClient isopClient = null, Isop.Client.Models.Root root = null)
         {
             this.isopClient = isopClient;
             this.root = root = root ?? new Isop.Client.Models.Root();
@@ -31,7 +32,7 @@ namespace Isop.Gui.ViewModels
         /// </summary>
         private SingleScopeOnly singleEventHandlerScope;
         private MethodViewModel _currentMethod;
-        private Isop.Client.IIsopClient isopClient;
+        private IClient isopClient;
         private Isop.Client.Models.Root root;
         public MethodViewModel CurrentMethod
         {
@@ -100,63 +101,29 @@ namespace Isop.Gui.ViewModels
             return new ParamViewModel(p);
         }
 
-        public async Task<MethodViewModel> Execute() 
+        public async Task<MethodViewModel> Execute()
         {
-            await Invoke(root, CurrentMethod.Method, CurrentMethod);
+            await isopClient.Invoke(root, CurrentMethod.Method, CurrentMethod);
             return CurrentMethod;
         }
 
-        private async Task<IReceiveResult> Invoke(Isop.Client.Models.Root root, Isop.Client.Models.Method method, IReceiveResult result)
+        private void Clear()
         {
-            try
-            {
-                result.Result = String.Empty;
-                result.Error = null;
-                result.ErrorMessage = String.Empty;
-                using (var rstream = await isopClient.Invoke(root, method, r => r.Stream()))
-                {
-                    if (null != rstream.Stream)
-                        using (var reader = new StreamReader(rstream.Stream, Encoding.UTF8))
-                        {
-                            while (true)
-                            {
-                                var line = await reader.ReadLineAsync();
-                                if (line == null)
-                                {
-                                    break;
-                                }
-                                result.Result += line;
-                            }
-                        }
+            this.root = new Isop.Client.Models.Root();
+            GlobalParameters.Clear();
+            Controllers.Clear();
+        }
 
-                    return result;
-                }
-            }
-            catch (AggregateException aggEx)
+        public IClient Client
+        {
+            get
             {
-                if (aggEx.InnerExceptions.Count == 1 && aggEx.InnerExceptions.Any(e => e is RequestException))
-                {
-                    var requestException = (RequestException)aggEx.InnerExceptions.Single();
-                    var errorObject = requestException.ErrorObject();
-                    if (null != errorObject)
-                    {
-                        result.Error = errorObject;
-                        result.ErrorMessage = errorObject.Message;
-                        return result;
-                    }
-                }
-                throw;
+                return isopClient;
             }
-            catch (RequestException ex)
+            set
             {
-                var errorObject = ex.ErrorObject();
-                if (null != errorObject)
-                {
-                    result.Error = errorObject;
-                    result.ErrorMessage = errorObject.Message;
-                    return result;
-                }
-                throw;
+                isopClient = value;
+                Clear();
             }
         }
     }

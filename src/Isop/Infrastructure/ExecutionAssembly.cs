@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 namespace Isop.Infrastructure
 {
-    internal class ExecutionAssembly
+    public class ExecutionAssembly
     {
         public static string Path()
         {

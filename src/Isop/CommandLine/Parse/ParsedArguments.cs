@@ -6,11 +6,8 @@ namespace Isop.CommandLine.Parse
 {
     public class ParsedArguments
     {
-        public IList<string> Args { get; set; }
-
-        public ParsedArguments(IList<string> args)
+        public ParsedArguments()
         {
-            Args = args;
         }
 
         /// <summary>
@@ -18,7 +15,6 @@ namespace Isop.CommandLine.Parse
         /// </summary>
         /// <param name="parsedArguments"></param>
         public ParsedArguments(ParsedArguments parsedArguments)
-            :this(parsedArguments.Args)
         {
             RecognizedArguments = parsedArguments.RecognizedArguments;
             ArgumentWithOptions = parsedArguments.ArgumentWithOptions;

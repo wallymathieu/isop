@@ -18,7 +18,7 @@ namespace Isop.CommandLine
         private readonly Controller _controller;
         /// <summary>
         /// </summary>
-        public ControllerRecognizer(Controller controller, 
+        public ControllerRecognizer(Controller controller,
             Configuration configuration,
             bool allowInferParameter = false)
         {
@@ -32,7 +32,7 @@ namespace Isop.CommandLine
             return _controller.GetMethod(methodname).GetArguments();
         }
 
-        private CultureInfo Culture {get { return _configuration.CultureInfo ?? CultureInfo.CurrentCulture;}}
+        private CultureInfo Culture { get { return _configuration.CultureInfo ?? CultureInfo.CurrentCulture; } }
 
         public bool Recognize(IEnumerable<string> arg)
         {
@@ -85,7 +85,7 @@ namespace Isop.CommandLine
                 throw new MissingArgumentException("Missing arguments")
                           {
                               Arguments = unMatchedRequiredArguments
-                        .Select(unmatched => unmatched.Name).ToArray()
+                                .Select(unmatched => unmatched.Name).ToArray()
                           };
             }
             var convertArgument = new ConvertArgumentsToParameterValue(_configuration.CultureInfo, _configuration.TypeConverter);
@@ -99,15 +99,37 @@ namespace Isop.CommandLine
                            RecognizedClass = _controller.Type
                        };
         }
-            
-        public ParsedArguments ParseArgumentsAndMerge(ParsedArguments parsedArguments, Action<ParsedMethod> action=null)
+
+        public ParsedArguments ParseArgumentsAndMerge(IEnumerable<string> arg, ParsedArguments parsedArguments, Action<ParsedMethod> action = null)
         {
-            var parsedMethod = Parse(parsedArguments.Args);
+            var parsedMethod = Parse(arg);
             if (action != null) action(parsedMethod);
             // Inferred ordinal arguments should not be recognized twice
             parsedArguments.RecognizedArguments = parsedArguments.RecognizedArguments
                 .Where(argopts =>
                     !parsedMethod.RecognizedArguments.Any(pargopt => pargopt.Index == argopts.Index && argopts.InferredOrdinal));
+            var merged = parsedArguments.Merge(parsedMethod);
+            if (!_controller.IgnoreGlobalUnMatchedParameters)
+                merged.AssertFailOnUnMatched();
+            return merged;
+        }
+
+        public bool Recognize(string controllerName, string actionName)
+        {
+            return _controller.Recognize(controllerName, actionName);
+        }
+
+        public ParsedArguments ParseArgumentsAndMerge(string actionName, Dictionary<string, string> arg, ParsedArguments parsedArguments, Action<ParsedMethod> action)
+        {
+
+            var methodInfo = _controller.GetMethod(actionName);
+            var argumentRecognizers = methodInfo.GetArguments()
+                .ToList();
+
+            var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter, Culture);
+            var parsedMethodArguments = parser.Parse(arg);
+            var parsedMethod = Parse(methodInfo, parsedMethodArguments);
+            if (action != null) action(parsedMethod);
             var merged = parsedArguments.Merge(parsedMethod);
             if (!_controller.IgnoreGlobalUnMatchedParameters)
                 merged.AssertFailOnUnMatched();

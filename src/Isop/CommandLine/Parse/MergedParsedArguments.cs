@@ -9,7 +9,7 @@ namespace Isop.CommandLine.Parse
         private readonly ParsedArguments _first;
         private readonly ParsedArguments _second;
         public MergedParsedArguments(ParsedArguments first, ParsedArguments second) 
-            : base(first.Args)
+            : base()
         {
             _first = first;
             _second = second;

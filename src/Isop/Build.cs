@@ -25,8 +25,8 @@ namespace Isop
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
         private readonly TypeContainer _container;
-        private readonly Configuration _configuration=new Configuration();
-        public virtual CultureInfo CultureInfo { get{ return _configuration.CultureInfo;} set{ _configuration.CultureInfo = value;} }
+        private readonly Configuration _configuration = new Configuration();
+        public virtual CultureInfo CultureInfo { get { return _configuration.CultureInfo; } set { _configuration.CultureInfo = value; } }
         public Func<Type, object> Factory
         {
             get
@@ -41,8 +41,8 @@ namespace Isop
 
         public TypeConverterFunc TypeConverter
         {
-            get{ return _configuration.TypeConverter; }
-            set{ _configuration.TypeConverter = value; }
+            get { return _configuration.TypeConverter; }
+            set { _configuration.TypeConverter = value; }
         }
 
         public bool RecognizeHelp
@@ -168,8 +168,9 @@ namespace Isop
                 var controllerRecognizer = recognizers.FirstOrDefault(recognizer => recognizer.Recognize(arg));
                 if (null != controllerRecognizer)
                 {
-                    return controllerRecognizer.ParseArgumentsAndMerge(parsedArguments,
-                                                                       parsedMethod => parsedMethod.Factory = _container.CreateInstance);
+                    return controllerRecognizer.ParseArgumentsAndMerge(arg,
+                        parsedArguments,
+                        parsedMethod => parsedMethod.Factory = _container.CreateInstance);
                 }
             }
             parsedArguments.AssertFailOnUnMatched();
@@ -248,23 +249,24 @@ namespace Isop
 
         public IEnumerable<KeyValuePair<Type, Func<ControllerRecognizer>>> ControllerRecognizers
         {
-            get 
-            { 
-                if (RecognizeHelp && ! _configuration.Recognizes.Any(c=>c.Type==typeof(HelpController)))
+            get
+            {
+                if (RecognizeHelp && !_configuration.Recognizes.Any(c => c.Type == typeof(HelpController)))
                 {
                     Recognize(HelpController(), ignoreGlobalUnMatchedParameters: true);
                 }
 
                 return _configuration.Recognizes.Select(
-                    c=>new KeyValuePair<Type,Func<ControllerRecognizer>>(
+                    c => new KeyValuePair<Type, Func<ControllerRecognizer>>(
                         c.Type,
-                        ()=>new ControllerRecognizer(c, _configuration, _allowInferParameter))); 
+                        () => new ControllerRecognizer(c, _configuration, _allowInferParameter)));
             }
         }
 
         public IEnumerable<ArgumentWithOptions> GlobalParameters
         {
-            get { 
+            get
+            {
                 return _configuration.Properties.Select(p => new ArgumentWithOptions(p.Name, p.Action, p.Required, p.Description, p.Type)).ToList();
             }
         }
@@ -334,7 +336,8 @@ namespace Isop
 
             if (!isopconfigurations.Any())
             {
-                foreach (var item in autoConfiguration.LooksLikeControllers()) {
+                foreach (var item in autoConfiguration.LooksLikeControllers())
+                {
                     this.Recognize(item);
                 }
             }
@@ -351,6 +354,60 @@ namespace Isop
                 _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
             }
             return _helpController;
+        }
+
+        public class ActionControllerExpression
+        {
+            private string controllerName;
+            private string actionName;
+            private Build build;
+
+            public ActionControllerExpression(string controllerName, string actionName, Build build)
+            {
+                // TODO: Complete member initialization
+                this.controllerName = controllerName;
+                this.actionName = actionName;
+                this.build = build;
+            }
+            public ParsedArguments Parameters(Dictionary<string, string> arg)
+            {
+                var argumentParser = new ArgumentParser(build.GlobalParameters, build._allowInferParameter, build.CultureInfo);
+                var parsedArguments = argumentParser.Parse(arg);
+                if (build.ControllerRecognizers.Any())
+                {
+                    var recognizers = build.ControllerRecognizers.Select(cr => cr.Value());
+                    var controllerRecognizer = recognizers.FirstOrDefault(recognizer => recognizer.Recognize(controllerName, actionName));
+                    if (null != controllerRecognizer)
+                    {
+                        return controllerRecognizer.ParseArgumentsAndMerge(actionName, arg,
+                            parsedArguments,
+                            parsedMethod => parsedMethod.Factory = build._container.CreateInstance);
+                    }
+                }
+                parsedArguments.AssertFailOnUnMatched();
+                return parsedArguments;
+            }
+        }
+
+        public class ControllerExpression
+        {
+            private string controllerName;
+            private Build build;
+
+            public ControllerExpression(string controllerName, Build build)
+            {
+                this.controllerName = controllerName;
+                this.build = build;
+            }
+            public ActionControllerExpression Action(string actionName)
+            {
+                return new ActionControllerExpression(controllerName, actionName, build);
+            }
+        }
+
+        public ControllerExpression Controller(string controllerName)
+        {
+            return new ControllerExpression(controllerName, this);
         }
     }
 }
