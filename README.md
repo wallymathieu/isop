@@ -224,6 +224,9 @@ You can invoke your program by (where you have Isop.Cli.exe in the same folder a
 
 Look at the <a href="/wallymathieu/isop/blob/master/Example/Program.cs">Example Cli project</a> for the most recent example of how it is used. 
 
+## Runners
+[Nuget feed for isop project on appveyor](https://ci.appveyor.com/nuget/isop-22q278hpwhwk)
+
 ## Alternative
 
 The alternative for this kind of library is <a href="http://lostechies.com/chadmyers/2011/06/06/cool-stuff-in-fubucore-no-6-command-line/">the framework found in fubucore</a>.
