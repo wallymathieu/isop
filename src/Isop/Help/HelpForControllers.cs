@@ -24,7 +24,7 @@ namespace Isop.Help
             _helpXmlDocumentation = helpXmlDocumentation ?? new HelpXmlDocumentation();
         }
 
-        private string Description(Controller t, Method method = null, bool includeArguments = false)
+        public string Description(Controller t, Method method = null, bool includeArguments = false)
         {
             var description = t.Type.GetMethods().Where(m=>
                 m.ReturnType.Equals( typeof(string))
@@ -58,7 +58,7 @@ namespace Isop.Help
 
             if (!descr.Any())
                 return string.Empty;
-            return "  " + String.Join(" ", descr);
+            return "  " + String.Join(" ", descr).Trim();
         }
 
         private string HelpFor(Controller type, bool simpleDescription)

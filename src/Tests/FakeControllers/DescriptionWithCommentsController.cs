@@ -17,5 +17,13 @@ namespace Isop.Tests.FakeControllers
         public void Action2 ()
         {
         }
+        /// <summary>
+        /// Some description 3
+        /// </summary>
+        /// <param name="param1">description 4</param>
+        /// <param name="param2">description 5</param>
+        public void Action3(int param1, string param2)
+        {
+        }
     }
 }

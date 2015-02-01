@@ -50,13 +50,22 @@ namespace Isop.Server
         {
             public static MethodTreeModel GetMethodTreeModel(Build that)
             {
-                return new MethodTreeModel(globalParameters: new List<Param>(
-                                               that.GlobalParameters
-                                                   .Select(p => new Param(typeof(string), p.Argument.ToString(), p.Required)))
-                                               .ToArray(),
-                                           controllers: that.Recognizes
-                                             .Where(cmr => !cmr.IsHelp())
-                    .Select(cmr => Controller(that, cmr)).ToArray());
+                return new MethodTreeModel(globalParameters: Params(that),
+                                           controllers: Controllers(that));
+            }
+
+            private static Models.Controller[] Controllers(Build that)
+            {
+                return that.Recognizes
+                    .Where(cmr => !cmr.IsHelp())
+                    .Select(cmr => Controller(that, cmr)).ToArray();
+            }
+
+            private static Param[] Params(Build that)
+            {
+                return new List<Param>(that.GlobalParameters
+                       .Select(p => new Param(typeof(string), p.Argument.ToString(), p.Required)))
+                       .ToArray();
             }
 
             private static Isop.Server.Models.Controller Controller(Build that, Isop.Domain.Controller type)
@@ -68,8 +77,7 @@ namespace Isop.Server
             {
                 var @params = m.GetArguments().Select(p => new Param(p.Type, p.Name, p.Required)).ToArray();
 
-                var helpController = that.HelpController();
-                var help = helpController != null ? helpController.Index(type.Name, m.Name) : null;
+                var help = that.Controller(type.Name).Action(m.Name).Help();
 
                 return new Method(m.Name, type.Name, help)
                 {

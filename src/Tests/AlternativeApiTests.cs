@@ -33,6 +33,26 @@ namespace Isop.Tests
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
+        [Test]
+        public void It_can_get_help()
+        {
+            var count = 0;
+            Func<Type, object> factory = (Type t) =>
+            {
+                Assert.That(t, Is.EqualTo(typeof(MyController)));
+                return
+                    (object)
+                    new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
+            };
+            var help = new Build { typeof(MyController) }
+                            .SetCulture(CultureInfo.InvariantCulture)
+                            .SetFactory(factory)
+                            .ShouldRecognizeHelp()
+                            .Controller("My")
+                            .Action("Action")
+                            .Help();
 
+            Assert.That(help, Is.EqualTo("ActionHelp"));
+        }
     }
 }

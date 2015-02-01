@@ -49,10 +49,13 @@ namespace Isop.Gui.ViewModels
             {
                 _Error = value;
                 PropertyChanged.SendPropertyChanged(this, "Error");
-                if (Errors != null)
+                var parameters = Parameters.ToList();
+                foreach (var param in Parameters)
                 {
-                    Result = String.Join(", ", Errors.Select(error => error.Message));//TODO: Fix
+                    var error = (_Error ?? new IErrorMessage[0]).SingleOrDefault(p => p.Argument.Equals(param.Name));
+                    param.Error = error != null ? error.Message : null;
                 }
+                Result = String.Join(", ", (_Error ?? new IErrorMessage[0]).Select(error => error.Message));//TODO: Fix
             }
         }
     }

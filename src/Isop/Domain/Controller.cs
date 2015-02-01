@@ -50,6 +50,11 @@ namespace Isop.Domain
                 ;
         }
 
+        public bool Recognize(string controllerName)
+        {
+            return Name.EqualsIC(controllerName);
+        }
+
         public bool Recognize(string controllerName, string actionName)
         {
             return Name.EqualsIC(controllerName)

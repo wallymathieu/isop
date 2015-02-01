@@ -344,7 +344,7 @@ namespace Isop
             return this;
         }
 
-        public HelpController HelpController()
+        protected internal HelpController HelpController()
         {
             if (_helpController == null && _configuration.RecognizesHelp)
             {
@@ -364,7 +364,6 @@ namespace Isop
 
             public ActionControllerExpression(string controllerName, string actionName, Build build)
             {
-                // TODO: Complete member initialization
                 this.controllerName = controllerName;
                 this.actionName = actionName;
                 this.build = build;
@@ -386,6 +385,20 @@ namespace Isop
                 }
                 parsedArguments.AssertFailOnUnMatched();
                 return parsedArguments;
+            }
+            /// <summary>
+            /// 
+            /// </summary>
+            public string Help()
+            {
+                this.build.HelpController();
+                if (this.build._helpForControllers != null)
+                {
+                    var controller = this.build.Recognizes.Single(c => c.Recognize(controllerName, actionName));
+                    var method = controller.GetMethod(actionName);
+                    return (this.build._helpForControllers.Description(controller, method) ?? String.Empty).Trim();
+                }
+                return null;
             }
         }
 

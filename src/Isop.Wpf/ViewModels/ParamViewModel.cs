@@ -30,10 +30,20 @@ namespace Isop.Gui.ViewModels
                 PropertyChanged.SendPropertyChanged(this, "Value");
             }
         }
+        public string Error
+        {
+            get { return _error; }
+            set
+            {
+                _error = value;
+                PropertyChanged.SendPropertyChanged(this, "Error");
+            }
+        }
 
         private static int counter = 0;
 
         public event PropertyChangedEventHandler PropertyChanged;
+        private string _error;
 
     }
 }

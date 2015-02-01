@@ -15,6 +15,7 @@
                     <Label Content="{Binding Name}" VerticalAlignment="Center"/>
                     <TextBox Width="50" Text="{Binding Value}" Margin="5,0,0,0" VerticalAlignment="Center"/>
                     <Label Content="*" Visibility="{Binding Required, Converter={StaticResource BoolToVisConverter}}" VerticalAlignment="Center"/>
+                    <Label Content="{Binding Error}" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
                 </StackPanel>
             </DataTemplate>
         </ListBox.ItemTemplate>

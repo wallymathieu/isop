@@ -114,7 +114,7 @@ Se 'Kommandonamn' help <kommando> för ytterligare information")));
                 })
                 .HelpFor("my");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"Det finns föjande sub kommandon:My
-  Action   --param1 --param2 --param3 --param4
+  Action  ActionHelp --param1 --param2 --param3 --param4
 
 Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
         }
@@ -137,7 +137,7 @@ Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
                         h.AndTheShortFormIs = "Och kortformen är";
                     })
                 .HelpFor("my","Action");
-            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action
+            Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action   ActionHelp
 Och accepterar följande parametrar:
 --param1, --param2, --param3, --param4
 Och kortformen är:
@@ -173,7 +173,7 @@ Se 'COMMANDNAME' help <command> for more information")));
                                     .HelpFor ("Another");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The sub commands for Another
 
-  Action1   --param1
+  Action1  --param1
   Action2
 
 Se 'COMMANDNAME' help <command> <subcommand> for more information")));
@@ -270,7 +270,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
 
   Action1  Some description 1
   Action2  Some description 2
-
+  Action3  Some description 3 --param1 --param2
 Se 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 

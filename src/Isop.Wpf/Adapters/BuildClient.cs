@@ -84,14 +84,11 @@ namespace Isop.Gui.Adapters
             {
                 var @params = m.GetArguments().Select(p => new Client.Models.Param { Type = typeof(string).FullName, Name = p.Name, Required = p.Required }).ToArray();
 
-                var helpController = that.HelpController();
-                var help = helpController != null ? helpController.Index(type.Name, m.Name) : null;
-
                 return new Client.Models.Method
                 {
                     Name = m.Name,
                     ClassName = type.Name,
-                    Help = help,
+                    Help = that.Controller(type.Name).Action(m.Name).Help(),
                     Parameters = new List<Client.Models.Param>(@params.ToArray())
                 };
             }
