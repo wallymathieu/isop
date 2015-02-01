@@ -84,6 +84,13 @@ task :core_nugetpack => [:build_release] do |nuget|
   end
 end
 
+desc "create the core nuget package"
+task :core_nugetpush do |nuget|
+  cd File.join($dir, "Isop") do
+    NuGet::exec "push "+Dir.glob("Isop.*.nupkg").last
+  end
+end
+
 desc "build nuget packages"
 build :build_nuget_packages => [:install_packages] do |msb|
   msb.prop :configuration, :Release
