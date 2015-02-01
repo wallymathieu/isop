@@ -9,24 +9,24 @@ namespace Isop.Infrastructure
     public class AssemblyScanner
     {
         private readonly Assembly _assembly;
-        public AssemblyScanner (Assembly assembly)
+        public AssemblyScanner(Assembly assembly)
         {
             _assembly = assembly;
         }
 
         public IEnumerable<Type> LooksLikeControllers()
         {
-            return _assembly.GetTypes().Where(t=>
+            return _assembly.GetTypes().Where(t =>
                 t.IsPublic
-                && t.Name.EndsWithIC(Conventions.ControllerName) 
-                && t.GetConstructors().Any(ctor=>ctor.GetParameters().Length==0)
+                && t.Name.EndsWithIC(Conventions.ControllerName)
+                && t.GetConstructors().Any(ctor => ctor.GetParameters().Length == 0)
                 );
         }
 
         public IEnumerable<Object> IsopConfigurations()
         {
             return _assembly.GetTypes()
-                .Where(type => type.Name.EqualsIC(Conventions.ConfigurationName));
+                .Where(type => Conventions.ConfigurationName.Contains(type.Name));
         }
     }
 }
