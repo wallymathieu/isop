@@ -3,14 +3,14 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>Missing argument</title>
+    <title>Errors</title>
 </head>
 <body>
+    {{#each this}}
     <h1>
         {{Message}}
     </h1>
-        {{#each Arguments}}
-        <p>{{this}}</p>
-        {{/each}}
+    <p>{{Argument}}</p>
+    {{/each}}
 </body>
 </html>

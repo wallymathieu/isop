@@ -40,28 +40,19 @@ namespace Isop.Gui.ViewModels
             }
         }
 
-        private string _ErrorMessage;
+        private IErrorMessage[] _Error;
 
-        public string ErrorMessage
-        {
-            get { return _ErrorMessage; }
-            set
-            {
-                _ErrorMessage = value;
-                PropertyChanged.SendPropertyChanged(this, "ErrorMessage");
-                // TODO: better gui
-                Result = _ErrorMessage;
-            }
-        }
-        private IErrorMessage _Error;
-
-        public IErrorMessage Error
+        public IErrorMessage[] Errors
         {
             get { return _Error; }
             set
             {
                 _Error = value;
                 PropertyChanged.SendPropertyChanged(this, "Error");
+                if (Errors != null)
+                {
+                    Result = String.Join(", ", Errors.Select(error => error.Message));//TODO: Fix
+                }
             }
         }
     }

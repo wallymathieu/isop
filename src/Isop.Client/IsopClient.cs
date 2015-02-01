@@ -41,7 +41,7 @@ namespace Isop.Client
         {
             var uri = new Uri(BasePath);
             var url = uri.Scheme + "://" + uri.Host + (uri.IsDefaultPort ? "" : ":" + uri.Port);
-            return await JsonClient.Request(new Request(BasePath + method.Url, r => action(r.Post().Form(form))));
+            return await JsonClient.Request(new Request(url + method.Url, r => action(r.Post().Form(form))));
         }
     }
 }

@@ -41,16 +41,14 @@ namespace Isop.Server
                 {
                     return Negotiate
                        .WithModel(ToModel(e))
-                       .WithView("TypeConversionFailed.html")
-                       .WithHeader("ErrorType", "TypeConversionFailed")
+                       .WithView("Errors.html")
                        .WithStatusCode(400);
                 }
                 catch (MissingArgumentException ex)
                 {
                     return Negotiate
                        .WithModel(ToModel(ex))
-                       .WithView("MissingArgument.html")
-                       .WithHeader("ErrorType", "MissingArgument")
+                       .WithView("Errors.html")
                        .WithStatusCode(400);
                 }
             };
@@ -58,21 +56,23 @@ namespace Isop.Server
 
         private object ToModel(MissingArgumentException ex)
         {
-            return new MissingArgument
+            return ex.Arguments.Select(arg => new MissingArgument
             {
                 Message = "Missing arguments.",
-                Arguments = ex.Arguments.ToArray()
-            };
+                Argument = arg
+            }).ToArray();
         }
 
         private object ToModel(TypeConversionFailedException e)
         {
-            return new TypeConversionFailed
-            {
-                Message = "Type conversion failed.",
-                Argument = e.Argument,
-                Value = e.Value,
-                TargetType = e.TargetType.FullName
+            return new[]{
+                new TypeConversionFailed
+                {
+                    Message = "Type conversion failed.",
+                    Argument = e.Argument,
+                    Value = e.Value,
+                    TargetType = e.TargetType.FullName
+                }
             };
         }
     }

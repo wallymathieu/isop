@@ -26,3 +26,4 @@ using System.Runtime.CompilerServices;
 //[assembly: AssemblyKeyFile("")]
 [assembly: InternalsVisibleTo("Isop.Server")]
 [assembly: InternalsVisibleTo("Tests")]
+[assembly: InternalsVisibleTo("Isop.Server.AspNet")]

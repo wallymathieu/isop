@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Isop.Client.Models;
 namespace Isop.Gui.Adapters
 {
     class BuildClient : IClient
@@ -17,14 +17,34 @@ namespace Isop.Gui.Adapters
         public async System.Threading.Tasks.Task<ViewModels.IReceiveResult> Invoke(Client.Models.Root root, Client.Models.Method method, ViewModels.IReceiveResult result)
         {
             result.Result = "";
-            var parsed = Build.Controller(method.ClassName)
-                           .Action(method.Name)
-                           .Parameters(method.Parameters.ToDictionary(p => p.Name, p => p.Value));
-            var returned = parsed.Invoke();
-
-            foreach (var yielded in returned)
+            try
             {
-                result.Result += yielded;
+                var parsed = Build.Controller(method.ClassName)
+                               .Action(method.Name)
+                               .Parameters(method.Parameters.ToDictionary(p => p.Name, p => p.Value));
+                var returned = parsed.Invoke();
+
+                foreach (var yielded in returned)
+                {
+                    result.Result += yielded;
+                }
+            }
+            catch (TypeConversionFailedException ex)
+            {
+                var errorObject = new TypeConversionFailed
+                {
+                    Message = ex.Message,
+                    Argument = ex.Argument,
+                    TargetType = ex.TargetType.ToString(),
+                    Value = ex.Value
+                };
+                result.Errors = new[] { errorObject };
+            }
+            catch (MissingArgumentException ex)
+            {
+                result.Errors = ex.Arguments
+                    .Select(a => new MissingArgument { Message = ex.Message, Argument = a })
+                    .ToArray();
             }
             return result;
         }

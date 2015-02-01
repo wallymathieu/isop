@@ -159,10 +159,9 @@ namespace Isop.Tests.Server
 
             // Then
             Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("MissingArgument", result.Headers["ErrorType"]);
-            var response = result.Body.DeserializeJson<Isop.Server.Models.MissingArgument>();
+            var response = result.Body.DeserializeJson<Isop.Server.Models.MissingArgument[]>().Single();
 
-            Assert.That(response.Arguments, Is.EquivalentTo(new[] { "param" }));
+            Assert.That(response.Argument, Is.EquivalentTo("param" ));
         }
 
         [Test]
@@ -180,8 +179,7 @@ namespace Isop.Tests.Server
 
             // Then
             Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("TypeConversionFailed", result.Headers["ErrorType"]);
-            var response = result.Body.DeserializeJson<Isop.Server.Models.TypeConversionFailed>();
+            var response = result.Body.DeserializeJson<Isop.Server.Models.TypeConversionFailed[]>().Single();
 
             Assert.That(response.Argument, Is.EqualTo("param"), "Arg");
             Assert.That(response.TargetType, Is.EqualTo("System.Int32"), "TargetType");

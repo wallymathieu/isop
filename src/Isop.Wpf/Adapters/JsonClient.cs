@@ -22,8 +22,7 @@ namespace Isop.Gui.Adapters
             try
             {
                 result.Result = String.Empty;
-                result.Error = null;
-                result.ErrorMessage = String.Empty;
+                result.Errors = null;
                 using (var rstream = await Client.Invoke(root, method, r => r.Stream()))
                 {
                     if (null != rstream.Stream)
@@ -48,11 +47,10 @@ namespace Isop.Gui.Adapters
                 if (aggEx.InnerExceptions.Count == 1 && aggEx.InnerExceptions.Any(e => e is RequestException))
                 {
                     var requestException = (RequestException)aggEx.InnerExceptions.Single();
-                    var errorObject = requestException.ErrorObject();
+                    var errorObject = requestException.ErrorObjects();
                     if (null != errorObject)
                     {
-                        result.Error = errorObject;
-                        result.ErrorMessage = errorObject.Message;
+                        result.Errors = errorObject;
                         return result;
                     }
                 }
@@ -60,11 +58,10 @@ namespace Isop.Gui.Adapters
             }
             catch (RequestException ex)
             {
-                var errorObject = ex.ErrorObject();
+                var errorObject = ex.ErrorObjects();
                 if (null != errorObject)
                 {
-                    result.Error = errorObject;
-                    result.ErrorMessage = errorObject.Message;
+                    result.Errors = errorObject;
                     return result;
                 }
                 throw;

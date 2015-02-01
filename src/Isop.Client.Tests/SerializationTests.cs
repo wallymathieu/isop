@@ -6,7 +6,7 @@ using Isop.Client.Json;
 using Isop.Client;
 using Isop.Client.Models;
 
-namespace Isop.Wpf.ServerIntegration
+namespace Isop.Client.Tests
 {
     [TestFixture]
     public class SerializationTests

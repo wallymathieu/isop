@@ -12,7 +12,7 @@ using Isop.Client;
 using Isop.Client.Json;
 using Isop.Gui.Adapters;
 using Isop.Infrastructure;
-
+using System.Configuration;
 namespace Isop.Gui
 {
     /// <summary>
@@ -35,7 +35,7 @@ namespace Isop.Gui
             paramview.Source = MethodTreeModel.GlobalParameters;
             controllersAndCommands.DataContext = MethodTreeModel.Controllers;
 
-            var conn = new IsopClient(new JsonHttpClient(), "http://localhost:8080/");
+            var conn = new IsopClient(new JsonHttpClient(), ConfigurationManager.AppSettings["server_url"]);
             InitFromClient(new JsonClient(conn), _ =>
             {
                 var assemblies = new LoadAssemblies().LoadFrom(ExecutionAssembly.Path()).ToArray();

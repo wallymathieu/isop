@@ -117,8 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Index.html" />
-    <EmbeddedResource Include="MissingArgument.html" />
-    <EmbeddedResource Include="TypeConversionFailed.html" />
+    <EmbeddedResource Include="Errors.html" />
     <EmbeddedResource Include="Controller.html" />
     <EmbeddedResource Include="ControllerAction.html" />
   </ItemGroup>

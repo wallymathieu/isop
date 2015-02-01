@@ -62,10 +62,10 @@ namespace Isop.Client.Json
                 {
                     var c = reader.ReadToEnd();
                     var resp = ((HttpWebResponse)ex.Response);
-                    return new RequestException(resp.StatusCode, c, resp.Headers["ErrorType"]);
+                    return new RequestException(resp.StatusCode, c);
                 }
             }
-            return new RequestException(HttpStatusCode.InternalServerError, ex.Message, "InternalServerError");
+            return new RequestException(HttpStatusCode.InternalServerError, ex.Message);
         }
     }
 }

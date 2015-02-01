@@ -1,5 +1,9 @@
 version: 1.0.{build}
 configuration: Release
+before_build:
+  - cd src
+  - nuget restore Isop.Wpf.sln
+  - cd ..
 build:
   project: src\Isop.Wpf.sln
   verbosity: minimal

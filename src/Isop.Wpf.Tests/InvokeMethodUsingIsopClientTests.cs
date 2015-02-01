@@ -84,11 +84,11 @@ namespace Isop.Wpf.Tests
             var param1 = treemodel.CurrentMethod.Parameters.Single();
             param1.Value = "new value";
             A.CallTo(() => _jsonHttpClient.Request(A<Request>._))
-                .Throws(new RequestException(System.Net.HttpStatusCode.BadRequest, 
-                    "{\"Message\":\"TypeConversionFailed !!\"}", "TypeConversionFailed"));
+                .Throws(new RequestException(System.Net.HttpStatusCode.BadRequest,
+                    "[{\"ErrorType\":\"TypeConversionFailed\",\"Message\":\"TypeConversionFailed !!\", \"Argument\":\"Arg\"}]"));
 
             var result = treemodel.Execute().Result;
-            Assert.That(result.ErrorMessage, Is.EqualTo("TypeConversionFailed !!"));
+            Assert.That(result.Result, Is.EqualTo("TypeConversionFailed !!"));
         }
 
         [Test]
@@ -99,10 +99,10 @@ namespace Isop.Wpf.Tests
             param1.Value = "new value";
             A.CallTo(() => _jsonHttpClient.Request(A<Request>._))
                 .Throws(new RequestException(System.Net.HttpStatusCode.BadRequest,
-                    "{\"Message\":\"MissingArgument !!\"}", "MissingArgument"));
+                    "[{\"ErrorType\":\"MissingArgument\",\"Message\":\"MissingArgument !!\", \"Argument\":\"Arg\"}]"));
 
             var result = treemodel.Execute().Result;
-            Assert.That(result.ErrorMessage, Is.EqualTo("MissingArgument !!"));
+            Assert.That(result.Result, Is.EqualTo("MissingArgument !!"));
         }
     }
 }

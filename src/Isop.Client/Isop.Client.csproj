@@ -70,6 +70,7 @@
     <Compile Include="Json\JsonResponse.cs" />
     <Compile Include="Json\Request.cs" />
     <Compile Include="Json\RequestException.cs" />
+    <Compile Include="Models\AnyFailure.cs" />
     <Compile Include="Models\Controller.cs" />
     <Compile Include="Models\IErrorMessage.cs" />
     <Compile Include="Models\Method.cs" />
