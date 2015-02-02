@@ -30,3 +30,5 @@ nuget/Isop.Runners/tools/
 *.sublime-workspace
 *.nupkg
 appsettings.config
+# vs2015 preview:
+*.sln.ide/
