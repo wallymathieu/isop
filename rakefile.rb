@@ -77,34 +77,29 @@ task :copy_cli => :build do
   cp File.join($dir,"Example/bin/Debug/Example.exe"), File.join($dir,"Isop.Auto.Cli/bin/Debug")
 end
 
-desc "create the core nuget package"
+desc "create the nuget packages"
+task :nugetpack => [:build_release, :core_nugetpack, :cli_nugetpack, :wpf_nugetpack]
+
 task :core_nugetpack => [:build_release] do |nuget|
   cd File.join($dir, "Isop") do
-    NuGet::exec "pack Isop.nuspec"
+    NuGet::exec "pack Isop.csproj"
   end
 end
 
-desc "create the core nuget package"
+task :cli_nugetpack => [:build_release] do |nuget|
+  cd File.join($dir, "Isop.Auto.Cli") do
+    NuGet::exec "pack Isop.Cli.csproj"
+  end
+end
+
+task :wpf_nugetpack => [:build_release] do |nuget|
+  cd File.join($dir, "Isop.Wpf") do
+    NuGet::exec "pack Isop.Wpf.csproj"
+  end
+end
+
 task :core_nugetpush do |nuget|
   cd File.join($dir, "Isop") do
     NuGet::exec "push "+Dir.glob("Isop.*.nupkg").last
-  end
-end
-
-desc "build nuget packages"
-build :build_nuget_packages => [:install_packages] do |msb|
-  msb.prop :configuration, :Release
-  msb.prop :platform, "Mixed Platforms"
-  if NuGet::os != :windows
-    with_mono_properties msb
-  end
-  msb.prop :RunOctoPack, true
-  msb.target = :Build
-  msb.be_quiet
-  msb.nologo
-  if NuGet::os == :windows
-    msb.sln =File.join($dir, "Isop.Wpf.sln")
-  else
-    msb.sln =File.join($dir, "Isop.sln")
   end
 end
