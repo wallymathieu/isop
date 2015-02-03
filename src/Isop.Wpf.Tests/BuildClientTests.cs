@@ -5,6 +5,7 @@ using System.Linq;
 
 using System.Text;
 using Isop.Gui.Adapters;
+using System.Reflection;
 
 namespace Isop.Wpf.Tests
 {
@@ -18,8 +19,8 @@ namespace Isop.Wpf.Tests
         [SetUp]
         public void SetUp()
         {
-            _validUrl = @"C:\Windows\notepad.exe";
-            _invalidUrl = @"C:\Windows\XXX.exe";
+            _validUrl = Assembly.GetExecutingAssembly().Location;
+            _invalidUrl = @"C:\Unknown\XXX.exe";
             _httpUrl = @"http://www.google.com";
         }
 
