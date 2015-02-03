@@ -87,10 +87,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Isop.Client\Isop.Client.csproj">
-      <Project>{a6f3bf74-a744-4886-9777-b9fd6cfa7f5b}</Project>
-      <Name>Isop.Client</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Isop.Wpf\Isop.Wpf.csproj">
       <Project>{47da4a1c-3fb5-4fee-99b3-ce102bcd349c}</Project>
       <Name>Isop.Wpf</Name>
