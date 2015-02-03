@@ -18,11 +18,12 @@ end
 
 desc "Install missing NuGet packages."
 task :install_packages do
-  package_paths = FileList["src/**/packages.config"]+["src/.nuget/packages.config"]
-
-  package_paths.each.each do |filepath|
-      NuGet::exec("i #{filepath} -o ./src/packages")
+  if NuGet::os == :windows
+    sln =File.join($dir, "Isop.Wpf.sln")
+  else
+    sln =File.join($dir, "Isop.sln")
   end
+  NuGet::exec("restore #{sln}")
 end
 
 desc "build"
