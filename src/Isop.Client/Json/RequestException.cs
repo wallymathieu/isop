@@ -1,4 +1,4 @@
-﻿using Isop.Client.Models;
+﻿using Isop.Client.Transfer;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;

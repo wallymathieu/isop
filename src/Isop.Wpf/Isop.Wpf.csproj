@@ -92,29 +92,29 @@
     <Compile Include="..\Isop.Client\Json\RequestException.cs">
       <Link>Json\RequestException.cs</Link>
     </Compile>
-    <Compile Include="..\Isop.Client\Models\AnyFailure.cs">
-      <Link>Models\AnyFailure.cs</Link>
+    <Compile Include="..\Isop.Client\Transfer\AnyFailure.cs">
+      <Link>Client\Transfer\AnyFailure.cs</Link>
     </Compile>
-    <Compile Include="..\Isop.Client\Models\Controller.cs">
-      <Link>Models\Controller.cs</Link>
+    <Compile Include="..\Isop.Client\Transfer\Controller.cs">
+      <Link>Client\Transfer\Controller.cs</Link>
     </Compile>
-    <Compile Include="..\Isop.Client\Models\IErrorMessage.cs">
-      <Link>Models\IErrorMessage.cs</Link>
+    <Compile Include="..\Isop.Client\Transfer\IErrorMessage.cs">
+      <Link>Client\Transfer\IErrorMessage.cs</Link>
     </Compile>
-    <Compile Include="..\Isop.Client\Models\Method.cs">
-      <Link>Models\Method.cs</Link>
+    <Compile Include="..\Isop.Client\Transfer\Method.cs">
+      <Link>Client\Transfer\Method.cs</Link>
     </Compile>
-    <Compile Include="..\Isop.Client\Models\MissingArgument.cs">
-      <Link>Models\MissingArgument.cs</Link>
+    <Compile Include="..\Isop.Client\Transfer\MissingArgument.cs">
+      <Link>Client\Transfer\MissingArgument.cs</Link>
     </Compile>
-    <Compile Include="..\Isop.Client\Models\Param.cs">
-      <Link>Models\Param.cs</Link>
+    <Compile Include="..\Isop.Client\Transfer\Param.cs">
+      <Link>Client\Transfer\Param.cs</Link>
     </Compile>
-    <Compile Include="..\Isop.Client\Models\Root.cs">
-      <Link>Models\Root.cs</Link>
+    <Compile Include="..\Isop.Client\Transfer\Root.cs">
+      <Link>Client\Transfer\Root.cs</Link>
     </Compile>
-    <Compile Include="..\Isop.Client\Models\TypeConversionFailed.cs">
-      <Link>Models\TypeConversionFailed.cs</Link>
+    <Compile Include="..\Isop.Client\Transfer\TypeConversionFailed.cs">
+      <Link>Client\Transfer\TypeConversionFailed.cs</Link>
     </Compile>
     <Compile Include="Adapters\BuildClient.cs" />
     <Compile Include="Adapters\JsonClient.cs" />

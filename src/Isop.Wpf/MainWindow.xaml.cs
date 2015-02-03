@@ -66,7 +66,7 @@ namespace Isop.Gui
             }
         }
 
-        private void AsyncLoad(Task<Client.Models.Root> model, Action<AggregateException> onfailure = null)
+        private void AsyncLoad(Task<Client.Transfer.Root> model, Action<AggregateException> onfailure = null)
         {
             model.ContinueWith((t) =>
                 {

@@ -80,7 +80,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildClientTests.cs" />
     <Compile Include="InvokeMethodUsingIsopClientTests.cs" />
+    <Compile Include="JsonClientTests.cs" />
     <Compile Include="RootViewModelTests.cs" />
     <Compile Include="SingleScopeOnlyTests.cs" />
     <Compile Include="ParamViewModelTests.cs" />

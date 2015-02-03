@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Isop.Client.Models
+namespace Isop.Client.Transfer
 {
     public class Param 
     {

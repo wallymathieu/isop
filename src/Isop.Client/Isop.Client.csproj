@@ -70,14 +70,14 @@
     <Compile Include="Json\JsonResponse.cs" />
     <Compile Include="Json\Request.cs" />
     <Compile Include="Json\RequestException.cs" />
-    <Compile Include="Models\AnyFailure.cs" />
-    <Compile Include="Models\Controller.cs" />
-    <Compile Include="Models\IErrorMessage.cs" />
-    <Compile Include="Models\Method.cs" />
-    <Compile Include="Models\MissingArgument.cs" />
-    <Compile Include="Models\Param.cs" />
-    <Compile Include="Models\Root.cs" />
-    <Compile Include="Models\TypeConversionFailed.cs" />
+    <Compile Include="Transfer\AnyFailure.cs" />
+    <Compile Include="Transfer\Controller.cs" />
+    <Compile Include="Transfer\IErrorMessage.cs" />
+    <Compile Include="Transfer\Method.cs" />
+    <Compile Include="Transfer\MissingArgument.cs" />
+    <Compile Include="Transfer\Param.cs" />
+    <Compile Include="Transfer\Root.cs" />
+    <Compile Include="Transfer\TypeConversionFailed.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,5 @@
 ﻿using Isop.Client.Json;
-using Isop.Client.Models;
+using Isop.Client.Transfer;
 using System;
 using System.Threading.Tasks;
 

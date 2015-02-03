@@ -4,11 +4,8 @@
         Title="SelectClient" Height="300" Width="300" xmlns:Gui="clr-namespace:Isop.Gui.ViewModels" AllowDrop="True" Drop="Window_Drop">
 
     <StackPanel>
-        <Label>Url:</Label>
-        <TextBox Name="tbxUrl" Height="23" TextWrapping="Wrap" Text="{Binding Path=Url}" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-        <Label>Or</Label>
-        <Label>Path to assembly or exe:</Label>
-        <TextBox Name="tbxPath" Height="23" TextWrapping="Wrap" Text="{Binding Path=Assembly}" VerticalAlignment="Top" HorizontalAlignment="Stretch" MouseDoubleClick="Path_MouseDoubleClick" />
+        <Label>Url or Path to assembly or exe:</Label>
+        <TextBox Name="tbxUrl" Height="23" TextWrapping="Wrap" Text="{Binding Path=Url}" VerticalAlignment="Top" HorizontalAlignment="Stretch" MouseDoubleClick="Path_MouseDoubleClick" />
 		<Button Content="Load" HorizontalAlignment="Right" VerticalAlignment="Top" Width="75" Click="Load"/>
 	</StackPanel>
 </Window>

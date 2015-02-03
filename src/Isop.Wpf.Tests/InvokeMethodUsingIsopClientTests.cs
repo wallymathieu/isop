@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Newtonsoft.Json;
 using System.IO;
-using Isop.Client.Models;
+using Isop.Client.Transfer;
 using Isop.Gui.ViewModels;
 using FakeItEasy;
 using Isop.Client.Json;

@@ -14,12 +14,12 @@ namespace Isop.Gui.ViewModels
 {
     public class RootViewModel
     {
-        public RootViewModel(IClient isopClient = null, Isop.Client.Models.Root root = null)
+        public RootViewModel(IClient isopClient = null, Isop.Client.Transfer.Root root = null)
         {
             this.isopClient = isopClient;
-            this.root = root = root ?? new Isop.Client.Models.Root();
-            GlobalParameters = new ObservableCollection<ParamViewModel>((root.GlobalParameters ?? new Isop.Client.Models.Param[0]).Select(Map));
-            Controllers = new ObservableCollection<ControllerViewModel>((root.Controllers ?? new Isop.Client.Models.Controller[0]).Select(Map));
+            this.root = root = root ?? new Isop.Client.Transfer.Root();
+            GlobalParameters = new ObservableCollection<ParamViewModel>((root.GlobalParameters ?? new Isop.Client.Transfer.Param[0]).Select(Map));
+            Controllers = new ObservableCollection<ControllerViewModel>((root.Controllers ?? new Isop.Client.Transfer.Controller[0]).Select(Map));
             singleEventHandlerScope = new SingleScopeOnly();
             GlobalParameters.RegisterPropertyChanged(globalValueChanged);
         }
@@ -33,7 +33,7 @@ namespace Isop.Gui.ViewModels
         private SingleScopeOnly singleEventHandlerScope;
         private MethodViewModel _currentMethod;
         private IClient isopClient;
-        private Isop.Client.Models.Root root;
+        private Isop.Client.Transfer.Root root;
         public MethodViewModel CurrentMethod
         {
             get { return _currentMethod; }
@@ -73,7 +73,7 @@ namespace Isop.Gui.ViewModels
             });
         }
 
-        public void Accept(Isop.Client.Models.Root res)
+        public void Accept(Isop.Client.Transfer.Root res)
         {
             root = res;
             foreach (var pvm in res.GlobalParameters.Select(Map))
@@ -86,7 +86,7 @@ namespace Isop.Gui.ViewModels
             }
         }
 
-        private ControllerViewModel Map(Isop.Client.Models.Controller c)
+        private ControllerViewModel Map(Isop.Client.Transfer.Controller c)
         {
             return new Isop.Gui.ViewModels.ControllerViewModel()
             {
@@ -96,7 +96,7 @@ namespace Isop.Gui.ViewModels
             };
         }
 
-        private static ParamViewModel Map(Isop.Client.Models.Param p)
+        private static ParamViewModel Map(Isop.Client.Transfer.Param p)
         {
             return new ParamViewModel(p);
         }
@@ -109,7 +109,7 @@ namespace Isop.Gui.ViewModels
 
         private void Clear()
         {
-            this.root = new Isop.Client.Models.Root();
+            this.root = new Isop.Client.Transfer.Root();
             GlobalParameters.Clear();
             Controllers.Clear();
         }

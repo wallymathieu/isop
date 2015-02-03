@@ -3,9 +3,6 @@ using Nancy.Bootstrapper;
 using Nancy.ViewEngines;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Nancy.TinyIoc;
 using Newtonsoft.Json;
 namespace Isop.Server

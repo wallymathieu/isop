@@ -1,5 +1,5 @@
 ﻿
-using Isop.Client.Models;
+using Isop.Client.Transfer;
 using Isop.Gui.ViewModels;
 using System.Threading.Tasks;
 namespace Isop.Gui.Adapters

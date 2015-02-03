@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Isop.Client.Models
+﻿namespace Isop.Client.Transfer
 {
     public class AnyFailure : IErrorMessage
     {

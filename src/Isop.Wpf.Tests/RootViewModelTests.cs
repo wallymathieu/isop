@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Isop.Gui.ViewModels;
 using Isop.Gui;
-using Isop.Client.Models;
+using Isop.Client.Transfer;
 using FakeItEasy;
 using Isop.Client;
 using Isop.Gui.Adapters;

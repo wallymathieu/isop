@@ -1,5 +1,5 @@
 ﻿using Isop.Client.Json;
-using Isop.Client.Models;
+using Isop.Client.Transfer;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,10 +18,10 @@ namespace Isop.Client
             BasePath = basePath;
         }
 
-        public async Task<Isop.Client.Models.Root> GetModel()
+        public async Task<Isop.Client.Transfer.Root> GetModel()
         {
             var response = await JsonClient.Request(new Request(BasePath, r => r.Get()));
-            return JsonConvert.DeserializeObject<Isop.Client.Models.Root>(response.Data);
+            return JsonConvert.DeserializeObject<Isop.Client.Transfer.Root>(response.Data);
         }
 
         public async Task<JsonResponse> Invoke(Root root, Method method, Func<Request.Configure, Request.Configure> action)
@@ -37,7 +37,7 @@ namespace Isop.Client
             return await Invoke(method, form, action);
         }
 
-        private async Task<JsonResponse> Invoke(Isop.Client.Models.Method method, Dictionary<string, string> form, Func<Request.Configure, Request.Configure> action)
+        private async Task<JsonResponse> Invoke(Isop.Client.Transfer.Method method, Dictionary<string, string> form, Func<Request.Configure, Request.Configure> action)
         {
             var uri = new Uri(BasePath);
             var url = uri.Scheme + "://" + uri.Host + (uri.IsDefaultPort ? "" : ":" + uri.Port);

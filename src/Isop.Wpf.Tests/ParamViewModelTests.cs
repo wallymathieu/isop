@@ -11,9 +11,9 @@ namespace Isop.Wpf.Tests
     [TestFixture]
     public class ParamViewModelTests
     {
-        private Isop.Client.Models.Param GetParam()
+        private Isop.Client.Transfer.Param GetParam()
         {
-            return new Isop.Client.Models.Param() { Type = typeof(string).FullName, Name = "name" };
+            return new Isop.Client.Transfer.Param() { Type = typeof(string).FullName, Name = "name" };
         }
 
         [Test]

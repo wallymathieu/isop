@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 
-namespace Isop.Client.Models
+namespace Isop.Client.Transfer
 {
     public class Root
     {

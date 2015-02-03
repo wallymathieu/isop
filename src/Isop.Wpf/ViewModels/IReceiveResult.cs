@@ -1,5 +1,5 @@
 ﻿using System;
-using Isop.Client.Models;
+using Isop.Client.Transfer;
 namespace Isop.Gui.ViewModels
 {
     public interface IReceiveResult

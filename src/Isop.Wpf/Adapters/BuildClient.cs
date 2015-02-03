@@ -1,12 +1,13 @@
-﻿using Isop.Infrastructure;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Isop.Client.Models;
+using Isop.Client.Transfer;
+using System;
+using System.IO;
+
 namespace Isop.Gui.Adapters
 {
-    class BuildClient : IClient
+    public class BuildClient : IClient
     {
         private Build Build;
 
@@ -14,7 +15,7 @@ namespace Isop.Gui.Adapters
         {
             this.Build = build;
         }
-        public async System.Threading.Tasks.Task<ViewModels.IReceiveResult> Invoke(Client.Models.Root root, Client.Models.Method method, ViewModels.IReceiveResult result)
+        public async Task<ViewModels.IReceiveResult> Invoke(Root root, Method method, ViewModels.IReceiveResult result)
         {
             result.Result = "";
             try
@@ -49,21 +50,25 @@ namespace Isop.Gui.Adapters
             return result;
         }
 
+        public static bool CanLoad(string url)
+        {
+            return File.Exists(url);
+        }
 
-        public async Task<Client.Models.Root> GetModel()
+        public async Task<Client.Transfer.Root> GetModel()
         {
             return Map.GetMethodTreeModel(Build);
         }
 
         private class Map
         {
-            public static Client.Models.Root GetMethodTreeModel(Build that)
+            public static Root GetMethodTreeModel(Build that)
             {
-                return new Client.Models.Root
+                return new Root
                 {
-                    GlobalParameters = new List<Client.Models.Param>(
+                    GlobalParameters = new List<Param>(
                      that.GlobalParameters
-                         .Select(p => new Client.Models.Param { Type = typeof(string).FullName, Name = p.Argument.ToString(), Required = p.Required }))
+                         .Select(p => new Param { Type = typeof(string).FullName, Name = p.Argument.ToString(), Required = p.Required }))
                      .ToArray(),
                     Controllers = that.Recognizes
                       .Where(cmr => !cmr.IsHelp())
@@ -71,25 +76,25 @@ namespace Isop.Gui.Adapters
                 };
             }
 
-            private static Client.Models.Controller Controller(Build that, Isop.Domain.Controller type)
+            private static Controller Controller(Build that, Isop.Domain.Controller type)
             {
-                return new Client.Models.Controller
+                return new Controller
                 {
                     Name = type.Name,
                     Methods = type.GetControllerActionMethods().Select(m => Method(that, type, m)).ToArray()
                 };
             }
 
-            private static Client.Models.Method Method(Build that, Isop.Domain.Controller type, Isop.Domain.Method m)
+            private static Method Method(Build that, Isop.Domain.Controller type, Isop.Domain.Method m)
             {
-                var @params = m.GetArguments().Select(p => new Client.Models.Param { Type = typeof(string).FullName, Name = p.Name, Required = p.Required }).ToArray();
+                var @params = m.GetArguments().Select(p => new Param { Type = typeof(string).FullName, Name = p.Name, Required = p.Required }).ToArray();
 
-                return new Client.Models.Method
+                return new Method
                 {
                     Name = m.Name,
                     ClassName = type.Name,
                     Help = that.Controller(type.Name).Action(m.Name).Help(),
-                    Parameters = new List<Client.Models.Param>(@params.ToArray())
+                    Parameters = new List<Param>(@params.ToArray())
                 };
             }
         }

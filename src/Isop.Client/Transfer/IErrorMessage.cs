@@ -1,5 +1,5 @@
 ﻿
-namespace Isop.Client.Models
+namespace Isop.Client.Transfer
 {
     public interface IErrorMessage
     {

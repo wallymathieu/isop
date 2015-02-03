@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Isop.Client.Json;
 using Isop.Client;
-using Isop.Client.Models;
+using Isop.Client.Transfer;
 
 namespace Isop.Client.Tests
 {

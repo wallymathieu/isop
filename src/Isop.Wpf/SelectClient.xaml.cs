@@ -32,7 +32,7 @@ namespace Isop.Gui
             var result = dlg.ShowDialog();
             if (result == true)
             {
-                Source.Assembly = dlg.FileName;
+                Source.Url = dlg.FileName;
             }
         }
 
@@ -43,7 +43,7 @@ namespace Isop.Gui
 
         public void Window_Drop(object sender, DragEventArgs e)
         {
-            Source.Assembly = fromDroppedFile.GetFileName(e);
+            Source.Url = fromDroppedFile.GetFileName(e);
             Source.OnLoad();
         }
 

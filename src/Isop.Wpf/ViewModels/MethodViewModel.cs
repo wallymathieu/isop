@@ -6,18 +6,18 @@ using System.Net;
 using Isop.Gui;
 using System.ComponentModel;
 using Isop.Gui.ViewModels;
-using Isop.Client.Models;
+using Isop.Client.Transfer;
 namespace Isop.Gui.ViewModels
 {
     public class MethodViewModel : INotifyPropertyChanged, IReceiveResult
     {
-        public MethodViewModel(Isop.Client.Models.Method m)
+        public MethodViewModel(Isop.Client.Transfer.Method m)
         {
             Method = m;
             Parameters = m.Parameters.Select(p => new ParamViewModel(p)).ToArray();
         }
 
-        public Isop.Client.Models.Method Method { get; private set; }
+        public Isop.Client.Transfer.Method Method { get; private set; }
         public string Name { get { return Method.Name; } }
         public string ClassName { get { return Method.ClassName; } }
 

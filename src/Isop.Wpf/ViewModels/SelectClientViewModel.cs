@@ -21,17 +21,6 @@ namespace Isop.Gui.ViewModels
             }
         }
 
-        private string _assembly;
-        public string Assembly
-        {
-            get { return _assembly; }
-            set
-            {
-                _assembly = value;
-                PropertyChanged.SendPropertyChanged(this, "Assembly");
-            }
-        }
-
         public event Action Loaded;
         public virtual void OnLoad() 
         {
@@ -43,13 +32,13 @@ namespace Isop.Gui.ViewModels
 
         internal IClient GetClient()
         {
-            if (!String.IsNullOrEmpty(Assembly)) 
+            if (BuildClient.CanLoad(Url)) 
             {
                 var build = new Build();
-                build.ConfigurationFrom(System.Reflection.Assembly.LoadFile(Assembly));
+                build.ConfigurationFrom(System.Reflection.Assembly.LoadFile(Url));
                 return new BuildClient(build);
             }
-            if (!String.IsNullOrEmpty(Url)) 
+            if (JsonClient.CanLoad(Url)) 
             {
                 return new JsonClient(new IsopClient(new JsonHttpClient(), Url));
             }

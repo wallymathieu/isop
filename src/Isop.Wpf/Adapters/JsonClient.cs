@@ -17,7 +17,7 @@ namespace Isop.Gui.Adapters
             this.Client = client;
         }
 
-        public async Task<IReceiveResult> Invoke(Isop.Client.Models.Root root, Isop.Client.Models.Method method, IReceiveResult result)
+        public async Task<IReceiveResult> Invoke(Client.Transfer.Root root, Client.Transfer.Method method, IReceiveResult result)
         {
             try
             {
@@ -68,9 +68,29 @@ namespace Isop.Gui.Adapters
             }
         }
 
-        public async Task<Isop.Client.Models.Root> GetModel()
+        public static bool CanLoad(string url)
         {
-            return await this.Client.GetModel();
+            try
+            {
+                var uri = new Uri(url);
+                switch (uri.Scheme)
+                {
+                    case "http":
+                    case "https":
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<Client.Transfer.Root> GetModel()
+        {
+            return await Client.GetModel();
         }
     }
 }
