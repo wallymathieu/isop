@@ -107,9 +107,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Isop.nuspec" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <ItemGroup />
   <Import Project="..\packages\OctoPack.3.0.41\tools\OctoPack.targets" Condition="Exists('..\packages\OctoPack.3.0.41\tools\OctoPack.targets')" />
   <Target Name="EnsureOctoPackImported" BeforeTargets="BeforeBuild" Condition="'$(OctoPackImported)' == ''">
