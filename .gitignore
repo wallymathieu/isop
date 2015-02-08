@@ -31,4 +31,4 @@ nuget/Isop.Runners/tools/
 *.nupkg
 appsettings.config
 # vs2015 preview:
-*.sln.ide/
+.vs/
