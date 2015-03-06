@@ -175,8 +175,7 @@ namespace Isop
                 if (null != controllerRecognizer)
                 {
                     return controllerRecognizer.ParseArgumentsAndMerge(arg,
-                        parsedArguments,
-                        parsedMethod => parsedMethod.Configuration = _configuration);
+                        parsedArguments);
                 }
             }
             parsedArguments.AssertFailOnUnMatched();
@@ -265,7 +264,7 @@ namespace Isop
                 return _configuration.Recognizes.Select(
                     c => new KeyValuePair<Type, Func<ControllerRecognizer>>(
                         c.Type,
-                        () => new ControllerRecognizer(c, _configuration, _allowInferParameter)));
+                        () => new ControllerRecognizer(c, _configuration, _container, _allowInferParameter)));
             }
         }
 
@@ -385,8 +384,7 @@ namespace Isop
                     if (null != controllerRecognizer)
                     {
                         return controllerRecognizer.ParseArgumentsAndMerge(actionName, arg,
-                            parsedArguments,
-                            parsedMethod => parsedMethod.Configuration = build._configuration);
+                            parsedArguments);
                     }
                 }
                 parsedArguments.AssertFailOnUnMatched();

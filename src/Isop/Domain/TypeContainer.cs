@@ -16,7 +16,7 @@ namespace Isop.Domain
         {
             if (!Instances.ContainsKey(type))
             {
-                var factory = _configuration.Factory ??Activator.CreateInstance;
+                var factory = _configuration.Factory;
                 return factory(type);
             }
             return Instances[type];

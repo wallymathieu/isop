@@ -16,15 +16,18 @@ namespace Isop.CommandLine
         private readonly bool _allowInferParameter;
         private readonly Configuration _configuration;
         private readonly Controller _controller;
+        private readonly TypeContainer _typeContainer;
         /// <summary>
         /// </summary>
         public ControllerRecognizer(Controller controller,
             Configuration configuration,
+            TypeContainer typeContainer,
             bool allowInferParameter = false)
         {
             _controller = controller;
             _configuration = configuration;
             _allowInferParameter = allowInferParameter;
+            _typeContainer = typeContainer; 
         }
 
         public IEnumerable<Argument> GetRecognizers(string methodname)
@@ -92,7 +95,7 @@ namespace Isop.CommandLine
             var recognizedActionParameters = convertArgument.GetParametersForMethod(methodInfo,
                 parsedArguments.RecognizedArgumentsAsKeyValuePairs());
 
-            return new ParsedMethod(parsedArguments)
+            return new ParsedMethod( parsedArguments, _typeContainer, _configuration)
                        {
                            RecognizedAction = methodInfo,
                            RecognizedActionParameters = recognizedActionParameters,
@@ -100,10 +103,9 @@ namespace Isop.CommandLine
                        };
         }
 
-        public ParsedArguments ParseArgumentsAndMerge(IEnumerable<string> arg, ParsedArguments parsedArguments, Action<ParsedMethod> action = null)
+        public ParsedArguments ParseArgumentsAndMerge(IEnumerable<string> arg, ParsedArguments parsedArguments)
         {
             var parsedMethod = Parse(arg);
-            if (action != null) action(parsedMethod);
             // Inferred ordinal arguments should not be recognized twice
             parsedArguments.RecognizedArguments = parsedArguments.RecognizedArguments
                 .Where(argopts =>
@@ -119,7 +121,7 @@ namespace Isop.CommandLine
             return _controller.Recognize(controllerName, actionName);
         }
 
-        public ParsedArguments ParseArgumentsAndMerge(string actionName, Dictionary<string, string> arg, ParsedArguments parsedArguments, Action<ParsedMethod> action)
+        public ParsedArguments ParseArgumentsAndMerge(string actionName, Dictionary<string, string> arg, ParsedArguments parsedArguments)
         {
 
             var methodInfo = _controller.GetMethod(actionName);
@@ -129,7 +131,6 @@ namespace Isop.CommandLine
             var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter, Culture);
             var parsedMethodArguments = parser.Parse(arg);
             var parsedMethod = Parse(methodInfo, parsedMethodArguments);
-            if (action != null) action(parsedMethod);
             var merged = parsedArguments.Merge(parsedMethod);
             if (!_controller.IgnoreGlobalUnMatchedParameters)
                 merged.AssertFailOnUnMatched();

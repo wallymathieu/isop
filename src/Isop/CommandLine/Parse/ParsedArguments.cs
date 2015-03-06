@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Isop.Domain;
+using System;
 namespace Isop.CommandLine.Parse
 {
     public class ParsedArguments
@@ -32,6 +33,10 @@ namespace Isop.CommandLine.Parse
             {
                 cout.WriteLine(item);
             }
+        }
+        public virtual string InvokeToJson()
+        {
+            throw new NotImplementedException();
         }
 
         public virtual IEnumerable<string> Invoke() 

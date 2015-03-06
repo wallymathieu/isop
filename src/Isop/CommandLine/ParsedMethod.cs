@@ -10,11 +10,15 @@ namespace Isop.CommandLine
 {
     public class ParsedMethod : ParsedArguments
     {
-        public ParsedMethod(ParsedArguments parsedArguments)
+        public ParsedMethod(ParsedArguments parsedArguments, TypeContainer typeContainer, Configuration configuration)
             : base(parsedArguments)
         {
+            _typeContainer = typeContainer;
+            _configuration = configuration;
         }
-        public Configuration Configuration { get; set; }
+
+        private TypeContainer _typeContainer;
+        private Configuration _configuration;
 
         public Type RecognizedClass { get; set; }
         public Method RecognizedAction { get; set; }
@@ -23,10 +27,10 @@ namespace Isop.CommandLine
 
         public override IEnumerable<string> Invoke()
         {
-            var instance = Configuration.Factory(RecognizedClass);
+            var instance = _typeContainer.CreateInstance(RecognizedClass);
 
             var retval = RecognizedAction.Invoke(instance, RecognizedActionParameters.ToArray());
-            return Configuration.Formatter.FormatCommandLine(retval);
+            return _configuration.Formatter.FormatCommandLine(retval);
         }
     }
 }
