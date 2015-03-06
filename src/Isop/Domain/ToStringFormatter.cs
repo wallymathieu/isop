@@ -6,9 +6,9 @@ using System.Collections;
 
 namespace Isop.Domain
 {
-	class ToStringFormatter : Formatter
+	class ToStringFormatter 
 	{
-        public IEnumerable<string> FormatCommandLine(object retval)
+        public IEnumerable<string> Format(object retval)
         {
             if (retval != null)
             {

@@ -11,7 +11,7 @@ namespace Isop.Domain
         {
             Recognizes = new List<Controller>();
             Properties = new List<Property>();
-            Formatter = new ToStringFormatter();
+            Formatter = new ToStringFormatter().Format;
             Factory = Activator.CreateInstance;
         }
         public CultureInfo CultureInfo { get; set; }

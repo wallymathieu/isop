@@ -7,9 +7,9 @@ using System.Reflection;
 using System.Linq;
 namespace Isop.Domain
 {
-    class TableFormatter:Formatter
+    class TableFormatter
     {
-        public IEnumerable<string> FormatCommandLine(object retval)
+        public IEnumerable<string> Format(object retval)
         {
             if (retval != null)
             {

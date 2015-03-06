@@ -30,7 +30,7 @@ namespace Isop.CommandLine
             var instance = _typeContainer.CreateInstance(RecognizedClass);
 
             var retval = RecognizedAction.Invoke(instance, RecognizedActionParameters.ToArray());
-            return _configuration.Formatter.FormatCommandLine(retval);
+            return _configuration.Formatter(retval);
         }
     }
 }

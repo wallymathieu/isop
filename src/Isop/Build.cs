@@ -154,7 +154,11 @@ namespace Isop
 
         public Build FormatObjectsAsTable()
         {
-            _configuration.Formatter = new TableFormatter();
+            _configuration.Formatter = new TableFormatter().Format;
+            return this;
+        }
+        public Build SetFormatter(Formatter formatter){
+            _configuration.Formatter = formatter;
             return this;
         }
 

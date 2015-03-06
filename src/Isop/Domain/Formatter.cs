@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace Isop.Domain
 {
-    public interface Formatter
-    {
-        IEnumerable<string> FormatCommandLine(object retval);
-    }
+    public delegate IEnumerable<string> Formatter(object retval);
 }
 

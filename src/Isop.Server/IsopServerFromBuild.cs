@@ -39,6 +39,7 @@ namespace Isop.Server
             using (var build = Build())
             {
                 return build
+                    .SetFormatter(new JsonFormatter().Format)
                     .Controller(method.ClassName)
                     .Action(method.Name)
                     .Parameters(form.ToDictionary(p => p.Key, p => p.Value != null ? p.Value.ToString() : (string)null))
