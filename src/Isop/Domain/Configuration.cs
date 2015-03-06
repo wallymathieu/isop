@@ -11,6 +11,7 @@ namespace Isop.Domain
         {
             Recognizes = new List<Controller>();
             Properties = new List<Property>();
+            Formatter = new ToStringFormatter();
         }
         public CultureInfo CultureInfo { get; set; }
         public IList<Controller> Recognizes { get; private set; }
@@ -21,6 +22,7 @@ namespace Isop.Domain
         public TypeConverterFunc TypeConverter { get; set; }
 
         public bool RecognizesHelp { get; set; }
+        public Formatter Formatter{ get; set;}
     }
 }
 

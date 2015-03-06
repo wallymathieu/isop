@@ -152,6 +152,12 @@ namespace Isop
             return this;
         }
 
+        public Build FormatObjectsAsTable()
+        {
+            _configuration.Formatter = new TableFormatter();
+            return this;
+        }
+
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
             return Parse(arg.ToList());
@@ -170,7 +176,7 @@ namespace Isop
                 {
                     return controllerRecognizer.ParseArgumentsAndMerge(arg,
                         parsedArguments,
-                        parsedMethod => parsedMethod.Factory = _container.CreateInstance);
+                        parsedMethod => parsedMethod.Configuration = _configuration);
                 }
             }
             parsedArguments.AssertFailOnUnMatched();
@@ -380,7 +386,7 @@ namespace Isop
                     {
                         return controllerRecognizer.ParseArgumentsAndMerge(actionName, arg,
                             parsedArguments,
-                            parsedMethod => parsedMethod.Factory = build._container.CreateInstance);
+                            parsedMethod => parsedMethod.Configuration = build._configuration);
                     }
                 }
                 parsedArguments.AssertFailOnUnMatched();

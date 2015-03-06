@@ -14,7 +14,7 @@ namespace Isop.CommandLine
             : base(parsedArguments)
         {
         }
-        public Func<Type, Object> Factory { get; set; }
+        public Configuration Configuration { get; set; }
 
         public Type RecognizedClass { get; set; }
         public Method RecognizedAction { get; set; }
@@ -23,27 +23,10 @@ namespace Isop.CommandLine
 
         public override IEnumerable<string> Invoke()
         {
-            var instance = Factory(RecognizedClass);
+            var instance = Configuration.Factory(RecognizedClass);
 
             var retval = RecognizedAction.Invoke(instance, RecognizedActionParameters.ToArray());
-            if (retval != null)
-            {
-                if (retval is string)
-                {
-                    yield return (retval as string);
-                }
-                else if (retval is IEnumerable)
-                {
-                    foreach (var item in (retval as IEnumerable))
-                    {
-                        yield return (item.ToString());
-                    }
-                }
-                else
-                {
-                    yield return (retval.ToString());
-                }
-            }
+            return Configuration.Formatter.FormatCommandLine(retval);
         }
     }
 }

@@ -108,6 +108,8 @@
     <Compile Include="Server\IsopServerFromBuildTests.cs" />
     <Compile Include="Server\JsonApiTests.cs" />
     <Compile Include="Server\TestBootstrapperWithIsopServer.cs" />
+    <Compile Include="ReturnValueFormatterTests.cs" />
+    <Compile Include="FakeControllers\ObjectController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Isop.Server\Isop.Server.csproj">
