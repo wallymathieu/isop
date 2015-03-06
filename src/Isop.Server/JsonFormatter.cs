@@ -19,21 +19,7 @@ namespace Isop.Server
 
         public IEnumerable<string> Format(object retval)
         {
-            if (retval is string)
-            {
-                yield return (string)retval;
-                yield break;
-            }
-            if (retval is IEnumerable<string>)
-            {
-                foreach (var item in (IEnumerable<string>)retval)
-                {
-                    yield return item;
-                }
-                yield break;
-            }
             yield return _serializer.Serialize(retval);
-            yield break;
         }
 	}
 

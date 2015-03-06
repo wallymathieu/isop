@@ -49,7 +49,7 @@ namespace Isop.Tests
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             var writer = new StringWriter();
             arguments.Invoke(writer);
-            Assert.That(writer.ToString(),Is.EqualTo("First\tSecond\n0\tV0\n"));
+            Assert.That(Split(writer.ToString()),Is.EquivalentTo(Split("First\tSecond\n0\tV0\n")));
         }
 
         [Test]
@@ -72,9 +72,12 @@ namespace Isop.Tests
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             var writer = new StringWriter();
             arguments.Invoke(writer);
-            Assert.That(writer.ToString(),Is.EqualTo("First\tSecond\n0\tV0\n1\tV1\n"));
+            Assert.That(Split(writer.ToString()),Is.EquivalentTo(Split("First\tSecond\n0\tV0\n1\tV1\n")));
         }
-
+		private string[] Split(string value)
+		{
+			return value.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        }
     }
 }
 

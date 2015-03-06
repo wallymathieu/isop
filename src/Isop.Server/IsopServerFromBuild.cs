@@ -69,12 +69,12 @@ namespace Isop.Server
                     .ToArray();
             }
 
-            private static Isop.Server.Models.Controller Controller(Build that, Isop.Domain.Controller type)
+            private static Controller Controller(Build that, Domain.Controller type)
             {
-                return new Isop.Server.Models.Controller(type.Name, type.GetControllerActionMethods().Select(m => Method(that, type, m)).ToArray());
+                return new Controller(type.Name, type.GetControllerActionMethods().Select(m => Method(that, type, m)).ToArray());
             }
 
-            private static Method Method(Build that, Isop.Domain.Controller type, Isop.Domain.Method m)
+            private static Method Method(Build that, Domain.Controller type, Domain.Method m)
             {
                 var @params = m.GetArguments().Select(p => new Param(p.Type, p.Name, p.Required)).ToArray();
 

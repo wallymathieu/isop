@@ -12,12 +12,14 @@ namespace Isop.Tests.Server
         private MyController _controller;
         public class MyController
         {
+			public string ActionValue;
             public string Action(string value)
             {
+				ActionValue = value;
                 return value;
             }
-            public Object Value;
-            public Object ReturnObject()
+            public object Value;
+            public object ReturnObject()
             {
                 return Value;
             }
@@ -36,17 +38,7 @@ namespace Isop.Tests.Server
             var method = _data.GetControllerMethod("My", "Action");
             var value = "value ' 3 ' \"_12 \"sdf";
             var result = _data.InvokeMethod(method, new Dictionary<string, object> { { "value", value } }).Join("\n");
-            Assert.That(result, Is.EqualTo(value));
-        }
-
-        [Test]
-        public void FormatStringAsString()
-        {
-            var method = _data.GetControllerMethod("My", "ReturnObject");
-            var value = "value ' 3 ' \"_12 \"sdf";
-            _controller.Value = value;
-            var result = _data.InvokeMethod(method, Empty()).Join("\n");
-            Assert.That(result, Is.EqualTo(value));
+            Assert.That(_controller.ActionValue, Is.EqualTo(value));
         }
 
         [Test]
