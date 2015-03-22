@@ -2,7 +2,7 @@ language: csharp
 solution: ./src/Isop.sln
 install:
   - nuget restore ./src/Isop.sln
+  - bundle install 
 
 script: 
-  - bundle install 
   - rake test
