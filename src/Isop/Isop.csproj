@@ -111,6 +111,7 @@
     <Compile Include="Domain\Formatter.cs" />
     <Compile Include="Domain\ToStringFormatter.cs" />
     <Compile Include="Domain\TableFormatter.cs" />
+    <Compile Include="Infrastructure\DefaultFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Isop.nuspec" />

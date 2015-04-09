@@ -26,6 +26,14 @@ namespace Isop
         private HelpController _helpController;
         private readonly TypeContainer _container;
         private readonly Configuration _configuration = new Configuration();
+        private readonly DefaultFactory _defaultFactory = new DefaultFactory();
+
+        public Build()
+        {
+            _configuration.Factory = _defaultFactory.Create;
+            _container = new TypeContainer(_configuration);
+        }
+
         public virtual CultureInfo CultureInfo { get { return _configuration.CultureInfo; } set { _configuration.CultureInfo = value; } }
         public Func<Type, object> Factory
         {
@@ -121,11 +129,6 @@ namespace Isop
             get { return _HelpXmlDocumentation; }
         }
 
-        public Build()
-        {
-            _container = new TypeContainer(_configuration);
-        }
-
         public Build Parameter(string argument, Action<string> action = null, bool required = false, string description = null)
         {
             _configuration.Properties.Add(new Property(argument, action, required, description, typeof(string)));
@@ -200,7 +203,7 @@ namespace Isop
         {
             var type = arg.GetType();
             _configuration.Recognizes.Add(new Controller(type, ignoreGlobalUnMatchedParameters));
-            _container.Instances.Add(type, arg);
+            _container.Add(arg);
             return this;
         }
 
@@ -289,6 +292,7 @@ namespace Isop
 
         public void Dispose()
         {
+            _defaultFactory.Dispose();
             foreach (var item in disposables)
             {
                 item.Dispose();

@@ -110,6 +110,8 @@
     <Compile Include="Server\TestBootstrapperWithIsopServer.cs" />
     <Compile Include="ReturnValueFormatterTests.cs" />
     <Compile Include="FakeControllers\ObjectController.cs" />
+    <Compile Include="DisposeTests.cs" />
+    <Compile Include="FakeControllers\DisposeController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Isop.Server\Isop.Server.csproj">
