@@ -32,12 +32,14 @@ namespace Isop.Gui.ViewModels
 
         internal IClient GetClient()
         {
+            #if !PCL // pcl assembly means no reflection 
             if (BuildClient.CanLoad(Url)) 
             {
                 var build = new Build();
                 build.ConfigurationFrom(System.Reflection.Assembly.LoadFile(Url));
                 return new BuildClient(build);
             }
+            #endif
             if (JsonClient.CanLoad(Url)) 
             {
                 return new JsonClient(new IsopClient(new JsonHttpClient(), Url));

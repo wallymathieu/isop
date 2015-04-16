@@ -8,7 +8,11 @@ namespace Isop.Client.Json
 {
     public class JsonHttpClient : IJSonHttpClient
     {
-        public async Task<JsonResponse> Request(Request jsonRequest)
+        public
+        #if !PCL
+        async 
+        #endif
+        Task<JsonResponse> Request(Request jsonRequest)
         {
             try
             {
@@ -22,13 +26,23 @@ namespace Isop.Client.Json
                     {
                         request.ContentType = "application/x-www-form-urlencoded";
                         var bytes = Encoding.UTF8.GetBytes(jsonRequest.Data);
+                        #if !PCL
                         using (var stream = await r.GetRequestStreamAsync())
                         {
                             stream.Write(bytes, 0, bytes.Length);
                         }
+                        #else
+                        r.BeginGetRequestStream(ar=>{
+                            var req = (HttpWebRequest)ar.AsyncState;
+                            using (var stream = req.EndGetRequestStream(ar))
+                            {
+                                stream.Write(bytes, 0, bytes.Length);
+                            }
+                        }, request);
+                        #endif
                     }
                 };
-
+                #if !PCL
                 var response = await request.GetResponseAsync();
                 if (jsonRequest.DoStream)
                 {
@@ -40,6 +54,26 @@ namespace Isop.Client.Json
                     var c = reader.ReadToEnd();
                     return new JsonResponse(((HttpWebResponse)response).StatusCode, c);
                 }
+                #else
+                Task<WebResponse> task= Task.Factory.FromAsync<WebResponse>(
+                    request.BeginGetResponse,
+                    request.EndGetResponse,
+                    request
+                );
+
+                return task.ContinueWith<JsonResponse>(response=>{
+                    if (jsonRequest.DoStream)
+                    {
+                        return new JsonResponse(((HttpWebResponse)response.Result).StatusCode, response.Result.GetResponseStream());
+                    }
+                    using (var rstream = response.Result.GetResponseStream())
+                    using (var reader = new StreamReader(rstream, Encoding.UTF8))
+                    {
+                        var c = reader.ReadToEnd();
+                        return new JsonResponse(((HttpWebResponse)response.Result).StatusCode, c);
+                    }
+                });
+                #endif
             }
             catch (WebException ex)
             {

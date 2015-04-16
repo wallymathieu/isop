@@ -5,7 +5,9 @@ using System.Text;
 
 namespace Isop.Gui
 {
+    #if !PCL
     [Serializable]
+    #endif
     public class MissingArgumentException : Exception
     {
         /// <summary>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{BB4B395B-8969-486C-9233-845AEA301E73}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Isop.Gui.Pcl</RootNamespace>
+    <AssemblyName>Isop.Gui.Pcl</AssemblyName>
+    <TargetFrameworkProfile>Profile78</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG; PCL</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\Isop.Wpf\MissingArgumentException.cs">
+      <Link>MissingArgumentException.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop.Wpf\SingleScopeOnly.cs">
+      <Link>SingleScopeOnly.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop.Wpf\Adapters\IClient.cs">
+      <Link>Adapters\IClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop.Wpf\Adapters\JsonClient.cs">
+      <Link>Adapters\JsonClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop.Wpf\ViewModels\ControllerViewModel.cs">
+      <Link>ViewModels\ControllerViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop.Wpf\ViewModels\EmptyMethodViewModel.cs">
+      <Link>ViewModels\EmptyMethodViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop.Wpf\ViewModels\IReceiveResult.cs">
+      <Link>ViewModels\IReceiveResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop.Wpf\ViewModels\MethodViewModel.cs">
+      <Link>ViewModels\MethodViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop.Wpf\ViewModels\ParamExtension.cs">
+      <Link>ViewModels\ParamExtension.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop.Wpf\ViewModels\ParamViewModel.cs">
+      <Link>ViewModels\ParamViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop.Wpf\ViewModels\RootViewModel.cs">
+      <Link>ViewModels\RootViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Isop.Wpf\ViewModels\SelectClientViewModel.cs">
+      <Link>ViewModels\SelectClientViewModel.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="..\packages\Xamarin.Forms.1.4.1.6349\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\packages\Xamarin.Forms.1.4.1.6349\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
+  <ItemGroup>
+    <ProjectReference Include="..\Isop.Client.Pcl\Isop.Client.Pcl.csproj">
+      <Project>{1C13F700-718E-4DA7-ABC1-D43E8C8713D9}</Project>
+      <Name>Isop.Client.Pcl</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Xamarin.Forms.Core">
+      <HintPath>..\packages\Xamarin.Forms.1.4.1.6349\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Forms.Xaml">
+      <HintPath>..\packages\Xamarin.Forms.1.4.1.6349\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Xaml.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>

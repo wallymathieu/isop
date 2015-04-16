@@ -9,7 +9,7 @@ namespace Isop.Gui.ViewModels
     {
         public static void SetParamValueOnMatching(this IEnumerable<ParamViewModel> that, ParamViewModel updatedParam)
         {
-            foreach (var param in that.Where(p => p.Name.Equals(updatedParam.Name, StringComparison.InvariantCultureIgnoreCase)))
+            foreach (var param in that.Where(p => p.Name.Equals(updatedParam.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 param.Value = updatedParam.Value;
             }
