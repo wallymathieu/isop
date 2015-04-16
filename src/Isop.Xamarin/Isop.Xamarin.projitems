@@ -10,5 +10,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Isop.Xamarin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SettingsPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExecuteCommandPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Adapters\IClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Adapters\JsonClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IReceiveResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SelectControllerPage.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Adapters\" />
   </ItemGroup>
 </Project>

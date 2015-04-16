@@ -136,9 +136,9 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\..\packages\Xamarin.Forms.1.3.1.6296\build\portable-win+net45+wp80+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.1.3.1.6296\build\portable-win+net45+wp80+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
   <ItemGroup>
-    <ProjectReference Include="..\..\Isop.Gui.Pcl\Isop.Gui.Pcl.csproj">
-      <Project>{BB4B395B-8969-486C-9233-845AEA301E73}</Project>
-      <Name>Isop.Gui.Pcl</Name>
+    <ProjectReference Include="..\..\Isop.Client.Pcl\Isop.Client.Pcl.csproj">
+      <Project>{1C13F700-718E-4DA7-ABC1-D43E8C8713D9}</Project>
+      <Name>Isop.Client.Pcl</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

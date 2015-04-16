@@ -7,5 +7,10 @@ namespace Isop.Gui.ViewModels
         public string Name { get; set; }
 
         public IEnumerable<MethodViewModel> Methods { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }
