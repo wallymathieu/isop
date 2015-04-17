@@ -23,6 +23,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\RootViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\SelectClientViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SelectMethodPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SplashPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppNavigation.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Adapters\" />

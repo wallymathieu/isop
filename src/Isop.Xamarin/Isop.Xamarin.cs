@@ -8,8 +8,15 @@ namespace Isop.Xamarin
     {
         public App()
         {
+            //var c = new Isop.Client.IsopClient(new Isop.Client.Json.JsonHttpClient(),"");
+            //new RootViewModel(new JsonClient(c))
             // The root page of your application
-            MainPage = new SelectControllerPage();
+            var appvm = new AppNavigation();
+            var main = new NavigationPage(new SplashPage(appvm));
+            MainPage = main;
+            appvm.NavigationPage = main;
+            this.BindingContext = appvm;
+
         }
 
         protected override void OnStart()

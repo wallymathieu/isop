@@ -29,9 +29,6 @@ namespace Isop.Xamarin
                                 }
                             }
                 };
-            var nameLabel = new Label(){ Text="Name" };
-            nameLabel.SetBinding(Label.TextProperty, 
-                Binding.Create<MethodViewModel>(c=>c.Name));
             // Create the detail page using NamedColorPage and wrap it in a
             // navigation page to provide a NavigationBar and Toggle button
             this.Detail = new NavigationPage(new ExecuteCommandPage());

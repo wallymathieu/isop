@@ -13,10 +13,10 @@ namespace Isop.Xamarin
 {
     public class RootViewModel
     {
-        public RootViewModel(IClient isopClient = null, Isop.Client.Transfer.Root root = null)
+        public RootViewModel(IClient isopClient)
         {
             this.isopClient = isopClient;
-            this.root = root = root ?? new Isop.Client.Transfer.Root();
+            this.root = new Isop.Client.Transfer.Root();
             GlobalParameters = new ObservableCollection<ParamViewModel>((root.GlobalParameters ?? new Isop.Client.Transfer.Param[0]).Select(Map));
             Controllers = new ObservableCollection<ControllerViewModel>((root.Controllers ?? new Isop.Client.Transfer.Controller[0]).Select(Map));
             GlobalParameters.RegisterPropertyChanged(globalValueChanged);
