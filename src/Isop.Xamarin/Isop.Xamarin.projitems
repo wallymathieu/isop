@@ -14,10 +14,18 @@
     <Compile Include="$(MSBuildThisFileDirectory)ExecuteCommandPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Adapters\IClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Adapters\JsonClient.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IReceiveResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SelectControllerPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\ControllerViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\IReceiveResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MethodViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\ParamExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\ParamViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\RootViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\SelectClientViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SelectMethodPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Adapters\" />
+    <Folder Include="$(MSBuildThisFileDirectory)ViewModels\" />
   </ItemGroup>
 </Project>

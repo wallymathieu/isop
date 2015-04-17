@@ -8,4 +8,3 @@ namespace Isop.Xamarin
         IErrorMessage[] Errors { get; set; }
     }
 }
-

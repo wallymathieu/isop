@@ -1,37 +1,22 @@
 ﻿using System;
 using Xamarin.Forms;
-using Isop.Client.Transfer;
 
 namespace Isop.Xamarin
 {
-    public class SelectControllerPage : MasterDetailPage
+    public class SelectMethodPage: MasterDetailPage
     {
-        public SelectControllerPage()
+        public SelectMethodPage()
         {
             Label header = new Label
                 {
-                    Text = "Select controller",
+                    Text = "Select method",
                     HorizontalOptions = LayoutOptions.Center
                 };
-            var controllers = new []{
-                new ControllerViewModel(){
-                    Name="test ",
-                    Methods=new []{
-                        new MethodViewModel(new Method(){Name="test 0"})
-                    },
-                },
-                new ControllerViewModel(){
-                    Name="test 2",
-                    Methods=new []{
-                        new MethodViewModel(new Method(){Name="test -1"})
-                    },
-                }
-            };
             // Create ListView for the master page.
-            ListView controllersView = new ListView
-                {
-                    ItemsSource = controllers
-                };
+            ListView methodsView = new ListView();
+            methodsView.SetBinding(
+                ListView.ItemsSourceProperty,
+                Binding.Create<ControllerViewModel>(c => c.Methods));
             this.Master = new ContentPage
                 {
                     Title = header.Text,
@@ -40,12 +25,16 @@ namespace Isop.Xamarin
                             Children = 
                                 {
                                     header, 
-                                    controllersView
+                                    methodsView
                                 }
-                        }
+                            }
                 };
-            this.Detail = new NavigationPage(new SelectMethodPage());
-
+            var nameLabel = new Label(){ Text="Name" };
+            nameLabel.SetBinding(Label.TextProperty, 
+                Binding.Create<MethodViewModel>(c=>c.Name));
+            // Create the detail page using NamedColorPage and wrap it in a
+            // navigation page to provide a NavigationBar and Toggle button
+            this.Detail = new NavigationPage(new ExecuteCommandPage());
 
             this.IsPresented = true;
             // For Windows Phone, provide a way to get back to the master page.
@@ -54,16 +43,16 @@ namespace Isop.Xamarin
                 (this.Detail as ContentPage).Content.GestureRecognizers.Add(
                     new TapGestureRecognizer
                     {
-                    
+
                         Command = new Command( () => 
-                        {
-                            this.IsPresented = true;
-                        })
-                   });
+                            {
+                                this.IsPresented = true;
+                            })
+                    });
             }
 
             // Define a selected handler for the ListView.
-            controllersView.ItemSelected += (sender, args) =>
+            methodsView.ItemSelected += (sender, args) =>
                 {
                     // Set the BindingContext of the detail page.
                     this.Detail.BindingContext = args.SelectedItem;
@@ -73,12 +62,8 @@ namespace Isop.Xamarin
                 };
 
             // Initialize the ListView selection.
-            controllersView.SelectedItem = new Controller[0];
-
+            methodsView.SelectedItem = new MethodViewModel[0];
         }
     }
-
 }
-
-
 
