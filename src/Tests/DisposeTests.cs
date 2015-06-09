@@ -61,7 +61,7 @@ namespace Isop.Tests
         public void It_will_dispose_types_created_by_default_factory_set_to_be_recognized()
         {
             var count = 0;
-            DisposeController.StaticOnDispose += c => (count++);
+            DisposeController.StaticOnDispose += c => { count++; };
 
             using (var build = new Build()
                 .SetCulture(CultureInfo.InvariantCulture)
