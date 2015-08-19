@@ -2,10 +2,10 @@ version: 1.0.{build}
 configuration: Release
 before_build:
   - cd src
-  - nuget restore Isop.Wpf.sln
+  - nuget restore Isop.sln
   - cd ..
 build:
-  project: src\Isop.Wpf.sln
+  project: src\Isop.sln
   verbosity: minimal
   publish_nuget: true
 nuget:
