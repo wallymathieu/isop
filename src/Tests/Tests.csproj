@@ -103,21 +103,12 @@
     <Compile Include="FakeControllers\MyController.cs" />
     <Compile Include="FakeControllers\SingleIntAction.cs" />
     <Compile Include="FakeControllers\WithIndexController.cs" />
-    <Compile Include="Server\FakeIsopServer.cs" />
-    <Compile Include="Server\HtmlApiTests.cs" />
-    <Compile Include="Server\IsopServerFromBuildTests.cs" />
-    <Compile Include="Server\JsonApiTests.cs" />
-    <Compile Include="Server\TestBootstrapperWithIsopServer.cs" />
     <Compile Include="ReturnValueFormatterTests.cs" />
     <Compile Include="FakeControllers\ObjectController.cs" />
     <Compile Include="DisposeTests.cs" />
     <Compile Include="FakeControllers\DisposeController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Isop.Server\Isop.Server.csproj">
-      <Project>{3F6B64BC-A3CC-430E-A9EF-2A2BDC98FE0A}</Project>
-      <Name>Isop.Server</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Isop\Isop.csproj">
       <Project>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</Project>
       <Name>Isop</Name>
