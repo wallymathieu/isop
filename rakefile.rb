@@ -2,100 +2,61 @@ require 'visual_studio_files.rb'
 require 'albacore'
 
 require 'rbconfig'
-require_relative './src/.nuget/nuget'
-#http://stackoverflow.com/questions/11784109/detecting-operating-systems-in-ruby
+require 'nuget_helper'
 
 $dir = File.join(File.dirname(__FILE__),'src')
-
-def with_mono_properties msb
-  solution_dir = File.join(File.dirname(__FILE__),'src')
-  nuget_tools_path = File.join(solution_dir, '.nuget')
-  msb.prop :SolutionDir, solution_dir
-  msb.prop :NuGetToolsPath, nuget_tools_path
-  msb.prop :NuGetExePath, File.join(nuget_tools_path, 'NuGet.exe')
-  msb.prop :PackagesDir, File.join(solution_dir, 'packages')
-end
+$sln = File.join($dir, "Isop.sln")
 
 desc "Install missing NuGet packages."
-task :install_packages do
-  if NuGet::os == :windows
-    sln =File.join($dir, "Isop.Wpf.sln")
-  else
-    sln =File.join($dir, "Isop.sln")
-  end
-  NuGet::exec("restore #{sln}")
+task :restore do
+  NugetHelper.exec("restore #{$sln}")
 end
 
 desc "build"
-build :build => [:install_packages] do |msb|
+build :build => [:restore] do |msb|
   msb.prop :configuration, :Debug
   msb.prop :platform, "Mixed Platforms"
-  if NuGet::os != :windows
-    with_mono_properties msb
-  end
   msb.target = :Rebuild
   msb.be_quiet
   msb.nologo
-  if NuGet::os == :windows
-    msb.sln =File.join($dir, "Isop.Wpf.sln")
-  else
-    msb.sln =File.join($dir, "Isop.sln")
-  end
+  msb.sln = $sln
 end
 
-build :build_release => [:install_packages] do |msb|
+build :build_release => [:restore] do |msb|
   msb.prop :configuration, :Release
   msb.prop :platform, "Mixed Platforms"
-  if NuGet::os != :windows
-    with_mono_properties msb
-  end
   msb.target = :Rebuild
   msb.be_quiet
   msb.nologo
-  if NuGet::os == :windows
-    msb.sln =File.join($dir, "Isop.Wpf.sln")
-  else
-    msb.sln =File.join($dir, "Isop.sln")
-  end
+  msb.sln = $sln
 end
-
 
 task :default => ['build']
 
 desc "test using nunit console"
 test_runner :test => [:build] do |nunit|
-  nunit.exe = NuGet::nunit_path
-  files = [File.join($dir,"Tests/bin/Debug/Tests.dll"), File.join($dir,"Isop.Client.Tests/bin/Debug/Isop.Client.Tests.dll")]
-  if NuGet::os == :windows
-    files.push Dir.glob(File.join($dir,"Isop.Wpf.Tests/bin/**/Debug/Isop.Wpf.Tests.dll")).first
-  end
+  nunit.exe = NugetHelper.nunit_path
+  files = Dir.glob(File.join($dir, "*Tests", "**", "bin", "Debug", "*Tests.dll"))
   nunit.files = files 
 end
 
 desc "copy example cli to wpf and cli folder"
 task :copy_cli => :build do
-  cp File.join($dir,"Example/bin/Debug/Example.exe"), File.join($dir,"Isop.Server/bin/Debug")
   cp File.join($dir,"Example/bin/Debug/Example.exe"), File.join($dir,"Isop.Auto.Cli/bin/Debug")
 end
 
 desc "create the nuget packages"
-task :nugetpack => [:build_release, :core_nugetpack, :cli_nugetpack, :wpf_nugetpack]
+task :nugetpack => [:build_release, :core_nugetpack, :cli_nugetpack]
 
 task :core_nugetpack => [:build_release] do |nuget|
   cd File.join($dir, "Isop") do
-    NuGet::exec "pack Isop.csproj"
+    NugetHelper::exec "pack Isop.csproj"
   end
 end
 
 task :cli_nugetpack => [:build_release] do |nuget|
   cd File.join($dir, "Isop.Auto.Cli") do
-    NuGet::exec "pack Isop.Cli.csproj"
-  end
-end
-
-task :wpf_nugetpack => [:build_release] do |nuget|
-  cd File.join($dir, "Isop.Wpf") do
-    NuGet::exec "pack Isop.Wpf.csproj"
+    NugetHelper::exec "pack Isop.Cli.csproj"
   end
 end
 
