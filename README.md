@@ -18,6 +18,16 @@ So that the class with the name My or MyController and the method with the name 
 
 This library is intended to be like chocolate pudding mix. Not something that will replace your dinner, but rather something easy to make for dessert. A way of helping you build for instance the essential administrative apps. It's not a replacement for baking cake (building a full blown administrative interface in html, silverlight, wpf ... ). 
 
+## When to use Isop
+
+- Early in your development life cycle (before having tools around for your business app)
+- You want an exe with many different commands organized into categories (here called controllers)
+
+## When not to use Isop
+
+- When your exe only has one command, then a simpler library like ndesc options is preferable.
+- You do not want any magic. Isop tries to help you with binding arguments to method arguments.
+
 ## License
 
 MIT License
