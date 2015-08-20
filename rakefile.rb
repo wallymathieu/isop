@@ -62,6 +62,7 @@ end
 
 task :core_nugetpush do |nuget|
   cd File.join($dir, "Isop") do
-    NuGet::exec "push "+Dir.glob("Isop.*.nupkg").last
+    latest = NugetHelper.last_version(Dir.glob("Isop.*.nupkg"))
+    NugetHelper::exec("push #{latest}")
   end
 end
