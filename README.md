@@ -25,7 +25,6 @@ MIT License
 ## Nuget packages
 
 <a href="http://nuget.org/packages/Isop/">Isop</a>
-<a href="http://nuget.org/packages/Isop.Runners/">Isop.Runners</a>
 
 ## Example
 
