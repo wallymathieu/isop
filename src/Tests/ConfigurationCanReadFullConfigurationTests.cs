@@ -4,7 +4,6 @@ using Isop.Tests.FakeConfigurations;
 using Isop.Tests.FakeControllers;
 using NUnit.Framework;
 using System.Globalization;
-using TypeConverterFunc = System.Func<System.Type, string, System.Globalization.CultureInfo, object>;
 
 namespace Isop.Tests
 {
