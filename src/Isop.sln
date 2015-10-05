@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop", "Isop\Isop.csproj", "{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}"
 EndProject
@@ -35,18 +35,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|Any CPU.Build.0 = Debug|x86
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|x86.ActiveCfg = Debug|x86
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|x86.Build.0 = Debug|x86
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|Any CPU.ActiveCfg = Release|x86
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|Any CPU.Build.0 = Release|x86
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|Mixed Platforms.Build.0 = Release|x86
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|x86.ActiveCfg = Release|x86
-		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|x86.Build.0 = Release|x86
 		{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -71,6 +59,18 @@ Global
 		{55C48544-BD4E-4101-A42C-CCCEB2F92304}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{55C48544-BD4E-4101-A42C-CCCEB2F92304}.Release|x86.ActiveCfg = Release|x86
 		{55C48544-BD4E-4101-A42C-CCCEB2F92304}.Release|x86.Build.0 = Release|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|Any CPU.Build.0 = Debug|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|x86.ActiveCfg = Debug|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Debug|x86.Build.0 = Debug|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|Any CPU.ActiveCfg = Release|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|Any CPU.Build.0 = Release|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|Mixed Platforms.Build.0 = Release|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|x86.ActiveCfg = Release|x86
+		{02596ACA-3C85-4353-8744-5F0A172BA757}.Release|x86.Build.0 = Release|x86
 		{C5008846-A54B-46C3-B144-973E50B8620F}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{C5008846-A54B-46C3-B144-973E50B8620F}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{C5008846-A54B-46C3-B144-973E50B8620F}.Debug|Mixed Platforms.Build.0 = Debug|x86
@@ -83,7 +83,8 @@ Global
 		{C5008846-A54B-46C3-B144-973E50B8620F}.Release|x86.ActiveCfg = Release|x86
 		{C5008846-A54B-46C3-B144-973E50B8620F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -95,8 +96,5 @@ Global
 		$2.TabsToSpaces = False
 		$2.inheritsSet = VisualStudio
 		$2.inheritsScope = text/plain
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

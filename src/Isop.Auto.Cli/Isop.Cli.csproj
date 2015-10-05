@@ -33,13 +33,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Isop, Version=1.2.5543.32990, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Isop.2.0.5\lib\net40\Isop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="Isop">
-      <HintPath>..\packages\Isop.2.0.1\lib\40\Isop.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
