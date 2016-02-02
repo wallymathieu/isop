@@ -3,6 +3,7 @@ using System.Linq;
 using System.Globalization;
 using Isop.Infrastructure;
 using Isop.CommandLine.Parse.Parameters;
+using System.Collections.Generic;
 
 namespace Isop.CommandLine.Parse
 {
@@ -11,10 +12,10 @@ namespace Isop.CommandLine.Parse
     /// </summary>
     public class ArgumentParameter
     {
-        public ArgumentParameter(string prototype, string[] names, string delimiter = null, int? ordinal = null)
+        public ArgumentParameter(string prototype, IEnumerable<string> names, string delimiter = null, int? ordinal = null)
         {
             Prototype = prototype;
-            Aliases = names;
+            Aliases = names.ToArray();
             Delimiter = delimiter;
             Ordinal = ordinal;
         }
@@ -41,15 +42,16 @@ namespace Isop.CommandLine.Parse
             throw new ArgumentOutOfRangeException(value);
         }
 
-        public string[] Aliases { get; protected set; }
+        public ICollection<string> Aliases { get; }
         public string Delimiter { get; protected set; }
         public string Help()
         {
-            return "--" + string.Join(", or ", Aliases)
-                + (string.IsNullOrEmpty(Delimiter)
+            return string.Join(string.Empty, 
+                "--", 
+                string.Join(", or ", Aliases), 
+                (string.IsNullOrEmpty(Delimiter)
                     ? ""
-                    : " " + Delimiter)
-                    ;
+                    : " " + Delimiter));
         }
         public override string ToString()
         {

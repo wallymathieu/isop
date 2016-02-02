@@ -58,7 +58,7 @@ namespace Isop.Help
 
             if (!descr.Any())
                 return string.Empty;
-            return "  " + String.Join(" ", descr).Trim();
+            return string.Format( "  {0}", string.Join(" ", descr).Trim());
         }
 
         private string HelpFor(Controller type, bool simpleDescription)
@@ -67,12 +67,12 @@ namespace Isop.Help
             {
                 return type.Name + Description(type);
             }
-            return type.Name
-                + Environment.NewLine
-                + Environment.NewLine
-                + String.Join(Environment.NewLine,
+            return string.Join("", type.Name,
+                Environment.NewLine,
+                Environment.NewLine,
+                string.Join(Environment.NewLine,
                     type.GetControllerActionMethods()
-                        .Select(m => "  " + m.Name + Description(type, m, includeArguments: true)).ToArray());
+                        .Select(m => string.Format("  {0}{1}", m.Name , Description(type, m, includeArguments: true))).ToArray()));
         }
 
         private string HelpForAction(Controller type, string action)
@@ -97,10 +97,10 @@ namespace Isop.Help
                 {
                     string.Format("{0} {1}", method.Name, Description(type, method)),
                     string.Format("{0}:", AndAcceptTheFollowingParameters),
-                    String.Join(", ", arguments.Select(DescriptionAndHelp)),
+                    string.Join(", ", arguments.Select(DescriptionAndHelp)),
                     string.Format("{0}:", AndTheShortFormIs),
-                    type.Name + " " + method.Name + " " +
-                        String.Join(", ", arguments.Select(arg => arg.Name.ToUpper()))
+                    string.Format("{0} {1} {2}", type.Name, method.Name,
+                        string.Join(", ", arguments.Select(arg => arg.Name.ToUpper())))
                 };
                 return string.Join(Environment.NewLine, lines);
             }
@@ -128,7 +128,7 @@ namespace Isop.Help
                 lines.Add(String.Join(Environment.NewLine,
                            _classAndMethodRecognizers
                     .Where(cmr => !cmr.IsHelp())
-                               .Select(cmr => "  " + HelpFor(cmr, true)).ToArray()));
+                               .Select(cmr =>"  "+ HelpFor(cmr, true)).ToArray()));
                 lines.Add(string.Empty);
                 lines.Add(HelpCommandForMoreInformation);
                 return string.Join(Environment.NewLine, lines);
@@ -137,11 +137,11 @@ namespace Isop.Help
                 type.Name.EqualsIC(val));
             if (string.IsNullOrEmpty(action))
             {
-                return TheSubCommandsFor +
-                       HelpFor(controllerRecognizer, false)
-                       + Environment.NewLine
-                       + Environment.NewLine
-                       + HelpSubCommandForMoreInformation;
+                return string.Join("", TheSubCommandsFor,
+                       HelpFor(controllerRecognizer, false),
+                       Environment.NewLine,
+                       Environment.NewLine,
+                       HelpSubCommandForMoreInformation);
             }
             return HelpForAction(controllerRecognizer, action);
         }

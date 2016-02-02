@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace Isop.Domain
 {
@@ -17,7 +15,7 @@ namespace Isop.Domain
 
         public static string ControllerName{ get; set; }
 
-        public static HashSet<string> ConfigurationName { get; set; }
+        public static HashSet<string> ConfigurationName { get; }
 
         public static string Help{ get; set; }
 

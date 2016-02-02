@@ -13,9 +13,9 @@ namespace Isop.Help
     {
         public HelpTexts()
         {
-            HelpSubCommandForMoreInformation = "Se 'COMMANDNAME' help <command> <subcommand> for more information";
+            HelpSubCommandForMoreInformation = "See 'COMMANDNAME' help <command> <subcommand> for more information";
 
-            HelpCommandForMoreInformation = "Se 'COMMANDNAME' help <command> for more information";
+            HelpCommandForMoreInformation = "See 'COMMANDNAME' help <command> for more information";
             TheCommandsAre = "The commands are:";
             TheSubCommandsFor = "The sub commands for ";
             AndAcceptTheFollowingParameters = "And accept the following parameters";

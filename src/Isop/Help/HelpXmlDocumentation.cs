@@ -54,7 +54,7 @@ namespace Isop.Help
         private static string HelpAt(string path, string filename)
         {
             return Path.Combine(Path.GetDirectoryName(path),
-                                Path.GetFileNameWithoutExtension(filename) + ".xml");
+                                string.Format("{0}.xml", Path.GetFileNameWithoutExtension(filename)));
         }
 
         public string GetKey(MethodInfo method)
@@ -65,18 +65,18 @@ namespace Isop.Help
         public string GetKey(Type t, MethodInfo method)
         {
             if (_getOrSet.IsMatch(method.Name))
-                return "P:" + GetFullName(t) + "." + method.Name.Substring(4);
+                return string.Format("P:{0}.{1}", GetFullName(t), method.Name.Substring(4));
             var parameters = method.GetParameters();
-            return "M:" + GetFullName(t) + "." + method.Name + (parameters.Any() ? "(" + TypeNames(parameters) + ")" : "");
+            return string.Format("M:{0}.{1}{2}", GetFullName(t), method.Name, (parameters.Any() ? string.Format("({0})", TypeNames(parameters)) : ""));
         }
 
         private string TypeNames(ParameterInfo[] parameters)
         {
-            return String.Join(",", parameters.Select(p => p.ParameterType.FullName).ToArray());
+            return string.Join(",", parameters.Select(p => p.ParameterType.FullName).ToArray());
         }
         public string GetKey(Type t)
         {
-            return "T:" + GetFullName(t);
+            return string.Format("T:{0}", GetFullName(t));
         }
         private string GetFullName(Type t)
         {

@@ -53,7 +53,7 @@ namespace Isop.Tests
   My
   Another
 
-Se 'COMMANDNAME' help <command> for more information")));
+See 'COMMANDNAME' help <command> for more information")));
         }
         
         [Test]
@@ -71,7 +71,7 @@ The commands are:
   My
   Another
 
-Se 'COMMANDNAME' help <command> for more information")));
+See 'COMMANDNAME' help <command> for more information")));
         }
   
         [Test]
@@ -160,7 +160,7 @@ My Action PARAM1, PARAM2, PARAM3, PARAM4")));
             Assert.That (LineSplit (cout.ToString()), Is.EquivalentTo (LineSplit (@"The commands are:
   My
 
-Se 'COMMANDNAME' help <command> for more information")));
+See 'COMMANDNAME' help <command> for more information")));
         }
 
         [Test]
@@ -176,7 +176,7 @@ Se 'COMMANDNAME' help <command> for more information")));
   Action1  --param1
   Action2
 
-Se 'COMMANDNAME' help <command> <subcommand> for more information")));
+See 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 
         [Test]
@@ -204,7 +204,7 @@ Another Action1 PARAM1")));
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The commands are:
   Description  Some description
 
-Se 'COMMANDNAME' help <command> for more information")));
+See 'COMMANDNAME' help <command> for more information")));
         }
      
         [Test]
@@ -219,7 +219,7 @@ Se 'COMMANDNAME' help <command> for more information")));
   Action1  Some description 1
   Action2  Some description 2
 
-Se 'COMMANDNAME' help <command> <subcommand> for more information")));
+See 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 
         [Test]
@@ -255,7 +255,7 @@ actionX")));
   Action1  Some description 1
   Action2  Some description 2
 
-Se 'COMMANDNAME' help <command> <subcommand> for more information")));
+See 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 
 
@@ -271,7 +271,7 @@ Se 'COMMANDNAME' help <command> <subcommand> for more information")));
   Action1  Some description 1
   Action2  Some description 2
   Action3  Some description 3 --param1 --param2
-Se 'COMMANDNAME' help <command> <subcommand> for more information")));
+See 'COMMANDNAME' help <command> <subcommand> for more information")));
         }
 
         [Test] public void Can_read_xml_doc()

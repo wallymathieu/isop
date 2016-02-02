@@ -18,26 +18,25 @@ namespace Isop.CommandLine.Help
 
         public string Help(ArgumentWithOptions entity)
         {
-            return entity.Argument.Help()
-                + (String.IsNullOrEmpty(entity.Description)
+            return string.Join(string.Empty, entity.Argument.Help(), (string.IsNullOrEmpty(entity.Description)
                     ? ""
-                    : "\t" + entity.Description);
+                    : "\t"+ entity.Description));
         }
 
-        public string Help(string val=null)
+        public string Help(string val = null)
         {
-         if (string.IsNullOrEmpty(val))
-             return TheArgumentsAre + Environment.NewLine +
-                   String.Join(Environment.NewLine,
-                               _argumentWithOptionses.Select(ar => "  " + Help(ar)).ToArray());
-         return Help(_argumentWithOptionses.First(ar=>ar.Argument.Prototype.Equals(val)));
-     }
+            if (string.IsNullOrEmpty(val))
+                return TheArgumentsAre + Environment.NewLine +
+                      string.Join(Environment.NewLine,
+                                  _argumentWithOptionses.Select(ar => "  "+ Help(ar)).ToArray());
+            return Help(_argumentWithOptionses.First(ar => ar.Argument.Prototype.Equals(val)));
+        }
 
-        public bool CanHelp(string val=null)
+        public bool CanHelp(string val = null)
         {
-            return string.IsNullOrEmpty(val) 
-                ? _argumentWithOptionses.Any() 
-                : _argumentWithOptionses.Any(ar=>ar.Argument.Prototype.Equals(val));
+            return string.IsNullOrEmpty(val)
+                ? _argumentWithOptionses.Any()
+                : _argumentWithOptionses.Any(ar => ar.Argument.Prototype.Equals(val));
         }
     }
 }

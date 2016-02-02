@@ -22,6 +22,23 @@ namespace Isop.CommandLine.Lex
             if (ReferenceEquals(null, obj)) return false;
             return obj is Token && Equals((Token)obj);
         }
+        public static bool operator ==(Token a, Token b)
+        {
+            if (ReferenceEquals(a, b))
+            {
+                return true;
+            }
+            if (ReferenceEquals(a, null))
+            {
+                return false;
+            }
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(Token a, Token b)
+        {
+            return !(a == b);
+        }
 
         public bool Equals(Token other)
         {
