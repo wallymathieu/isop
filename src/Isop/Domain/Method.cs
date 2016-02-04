@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
-using Isop.Infrastructure;
 using System.ComponentModel.DataAnnotations;
 
 namespace Isop.Domain
@@ -45,14 +44,14 @@ namespace Isop.Domain
             return recognizers;
         }
 
-        private Argument GetArgumentWithOptions(Parameter parameterInfo)
+        private static Argument GetArgumentWithOptions(Parameter parameterInfo)
         {
             return new Argument(parameterInfo.Name,
                 required: parameterInfo.LooksRequired(),
                 type: parameterInfo.ParameterType);
         }
 
-        private void AddArgumentWithOptionsForPropertiesOnObject(List<Argument> recognizers, Parameter parameterInfo)
+        private static void AddArgumentWithOptionsForPropertiesOnObject(List<Argument> recognizers, Parameter parameterInfo)
         {
             recognizers.AddRange(parameterInfo.GetPublicInstanceProperties()
                 .Select(prop => 

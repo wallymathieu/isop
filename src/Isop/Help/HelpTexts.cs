@@ -1,12 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Isop.Help;
-using Isop.Infrastructure;
-using Isop.CommandLine.Parse;
-using Isop.Domain;
-
 namespace Isop.Help
 {
     public class HelpTexts

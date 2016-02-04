@@ -13,20 +13,21 @@ namespace Isop.CommandLine.Parse
     {
         private readonly IEnumerable<Argument> _argumentWithOptions;
         private readonly bool _allowInferParameter;
-        private readonly CultureInfo cultureInfo;
+        private readonly CultureInfo _cultureInfo;
 
         public ArgumentParser(IEnumerable<Argument> argumentWithOptions, bool allowInferParameter, CultureInfo cultureInfo)
         {
             _argumentWithOptions = argumentWithOptions;
             _allowInferParameter = allowInferParameter;
-            this.cultureInfo = cultureInfo;
+            this._cultureInfo = cultureInfo;
         }
 
         public ParsedArguments Parse(IEnumerable<string> arguments)
         {
-            var lexed = ArgumentLexer.Lex(arguments).ToList();
-            var parsedArguments = Parse(lexed, arguments);
-            var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
+            var args = arguments.ToArray();
+            var lexed = ArgumentLexer.Lex(args).ToList();
+            var parsedArguments = Parse(lexed, args);
+            var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments().ToArray();
 
             if (unMatchedRequiredArguments.Any())
             {
@@ -124,17 +125,17 @@ namespace Isop.CommandLine.Parse
 
         private bool Accept(Argument argument, int index, string value)
         {
-            if (argument is ArgumentWithOptions)
+            var options = argument as ArgumentWithOptions;
+            if (options != null)
             {
-                return ((ArgumentWithOptions)argument).Argument.Accept(index, value);
+                return options.Argument.Accept(index, value);
             }
-            return ArgumentParameter.Parse(argument.Name, cultureInfo).Accept(index, value);
+            return ArgumentParameter.Parse(argument.Name, _cultureInfo).Accept(index, value);
         }
 
-        private void InferParameter(List<int> recognizedIndexes, IList<RecognizedArgument> recognized, Token current)
+        private void InferParameter(ICollection<int> recognizedIndexes, IList<RecognizedArgument> recognized, Token current)
         {
-            Argument argumentWithOptions;
-            argumentWithOptions = _argumentWithOptions
+            var argumentWithOptions = _argumentWithOptions
                 .Where((argopt, i) => i == current.Index).SingleOrDefault();
             if (null != argumentWithOptions)
             {
@@ -170,7 +171,7 @@ namespace Isop.CommandLine.Parse
                             current.Value));
 
             }
-            return new ParsedArguments()
+            return new ParsedArguments
             {
                 ArgumentWithOptions = _argumentWithOptions.ToArray(),
                 RecognizedArguments = recognized,
@@ -181,11 +182,12 @@ namespace Isop.CommandLine.Parse
 
         private bool Accept(Argument argument, string value)
         {
-            if (argument is ArgumentWithOptions)
+            var options = argument as ArgumentWithOptions;
+            if (options != null)
             {
-                return ((ArgumentWithOptions)argument).Argument.Accept(value);
+                return options.Argument.Accept(value);
             }
-            return ArgumentParameter.Parse(argument.Name, cultureInfo).Accept(value);
+            return ArgumentParameter.Parse(argument.Name, _cultureInfo).Accept(value);
         }
     }
 }

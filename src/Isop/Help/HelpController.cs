@@ -4,15 +4,13 @@ using System.Text.RegularExpressions;
 
 namespace Isop.Help
 {
-    using CommandLine;
     using CommandLine.Help;
-    using Infrastructure;
     using Domain;
 
     public class HelpController
     {
-        readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
-        readonly HelpForControllers _helpForClassAndMethod;
+        private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
+        private readonly HelpForControllers _helpForClassAndMethod;
 
         public HelpController(
             HelpForArgumentWithOptions helpForArgumentWithOptions,
@@ -46,7 +44,7 @@ namespace Isop.Help
             {
                 sb.AppendLine(_helpForArgumentWithOptions.Help(command));
             }
-            if (_helpForClassAndMethod.CanHelp(command, action))
+            if (_helpForClassAndMethod.CanHelp(command))
             {
                 sb.AppendLine(_helpForClassAndMethod.Help(command, action));
             }

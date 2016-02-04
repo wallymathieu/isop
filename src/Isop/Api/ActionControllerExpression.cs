@@ -20,7 +20,7 @@ namespace Isop.Api
         }
         public ParsedArguments Parameters(Dictionary<string, string> arg)
         {
-            var argumentParser = new ArgumentParser(build.GlobalParameters, build._allowInferParameter, build.CultureInfo);
+            var argumentParser = new ArgumentParser(build.GlobalParameters, build.AllowInferParameter, build.CultureInfo);
             var parsedArguments = argumentParser.Parse(arg);
             if (build.ControllerRecognizers.Any())
             {
@@ -41,11 +41,11 @@ namespace Isop.Api
         public string Help()
         {
             this.build.HelpController();
-            if (this.build._helpForControllers != null)
+            if (this.build.HelpForControllers != null)
             {
                 var controller = this.build.Recognizes.Single(c => c.Recognize(controllerName, actionName));
                 var method = controller.GetMethod(actionName);
-                return (this.build._helpForControllers.Description(controller, method) ?? String.Empty).Trim();
+                return (this.build.HelpForControllers.Description(controller, method) ?? String.Empty).Trim();
             }
             return null;
         }

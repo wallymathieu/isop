@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -38,32 +39,32 @@ namespace Isop.Domain
         private static IEnumerable<MethodInfo> GetControllerActionMethods(Type type)
         {
             return GetOwnPublicMethods(type)
-                .Where(m => !m.Name.EqualsIC(Conventions.Help));
+                .Where(m => !m.Name.EqualsIgnoreCase(Conventions.Help));
         }
 
         private static IEnumerable<MethodInfo> GetOwnPublicMethods(Type type)
         {
             return type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(m => !m.DeclaringType.Equals(typeof(Object)))
-                .Where(m => !m.Name.StartsWithIC("get_")
-                    && !m.Name.StartsWithIC("set_"))
+                .Where(m => m.DeclaringType != typeof(Object))
+                .Where(m => !m.Name.StartsWithIgnoreCase("get_")
+                    && !m.Name.StartsWithIgnoreCase("set_"))
                 ;
         }
 
         public bool Recognize(string controllerName)
         {
-            return Name.EqualsIC(controllerName);
+            return Name.EqualsIgnoreCase(controllerName);
         }
 
         public bool Recognize(string controllerName, string actionName)
         {
-            return Name.EqualsIC(controllerName)
+            return Name.EqualsIgnoreCase(controllerName)
                 && GetMethod(actionName) != null;
         }
         
         public Method GetMethod(string name)
         {
-            return GetControllerActionMethods().SingleOrDefault(m => m.Name.EqualsIC(name));
+            return GetControllerActionMethods().SingleOrDefault(m => m.Name.EqualsIgnoreCase(name));
         }
         
         public bool IsHelp()
@@ -73,15 +74,16 @@ namespace Isop.Domain
         
         public override bool Equals(object obj)
         {
-            if (obj is Controller)
+            var controller = obj as Controller;
+            if (controller != null)
             {
-                return Equals((Controller)obj);
+                return Equals(controller);
             }
             return false;
         }
         public bool Equals(Controller obj)
         {
-            return Type.Equals(obj.Type);
+            return Type == obj.Type;
         }
         public override int GetHashCode()
         {
@@ -89,7 +91,7 @@ namespace Isop.Domain
         }
         public override string ToString()
         {
-            return string.Format("[Controller: Type={0}, Name={1}]", Type, Name);
+            return string.Format(CultureInfo.InvariantCulture, "[Controller: Type={0}, Name={1}]", Type, Name);
         }
     }
 }

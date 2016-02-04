@@ -7,7 +7,7 @@ namespace Isop.CommandLine.Help
     using Parse;
     public class HelpForArgumentWithOptions
     {
-        readonly IEnumerable<ArgumentWithOptions> _argumentWithOptionses;
+        private readonly IEnumerable<ArgumentWithOptions> _argumentWithOptionses;
         public string TheArgumentsAre { get; set; }
 
         public HelpForArgumentWithOptions(IEnumerable<ArgumentWithOptions> argumentWithOptionses)
@@ -16,9 +16,9 @@ namespace Isop.CommandLine.Help
             TheArgumentsAre = "The arguments are:";
         }
 
-        public string Help(ArgumentWithOptions entity)
+        private static string Help(ArgumentWithOptions entity)
         {
-            return string.Join(string.Empty, entity.Argument.Help(), (string.IsNullOrEmpty(entity.Description)
+            return string.Concat(entity.Argument.Help(), (string.IsNullOrEmpty(entity.Description)
                     ? ""
                     : "\t"+ entity.Description));
         }

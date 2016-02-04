@@ -34,10 +34,6 @@ namespace Isop.CommandLine.Parse
                 cout.WriteLine(item);
             }
         }
-        public virtual string InvokeToJson()
-        {
-            throw new NotImplementedException();
-        }
 
         public virtual IEnumerable<string> Invoke() 
         {

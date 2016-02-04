@@ -15,7 +15,7 @@ namespace Isop.CommandLine
             //"--command"
             if (tokens.Count() >= 2 
                 && tokens[0].TokenType==TokenType.Argument 
-                && tokens[0].Value.EqualsIC(Conventions.Help)
+                && tokens[0].Value.EqualsIgnoreCase(Conventions.Help)
                 && tokens[1].TokenType==TokenType.Argument)
             {
                 tokens[1] = new Token(tokens[1].Value,TokenType.ParameterValue,tokens[1].Index);

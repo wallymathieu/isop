@@ -45,7 +45,7 @@ namespace Isop.CommandLine
 
         private Method FindMethodInfo(IList<Token> arg)
         {
-            var foundClassName = _controller.Name.EqualsIC(arg.ElementAtOrDefault(0).Value);
+            var foundClassName = _controller.Name.EqualsIgnoreCase(arg.ElementAtOrDefault(0).Value);
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1).Value;
@@ -82,7 +82,7 @@ namespace Isop.CommandLine
 
         public ParsedMethod Parse(Method methodInfo, ParsedArguments parsedArguments)
         {
-            var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments();
+            var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments().ToArray();
             if (unMatchedRequiredArguments.Any())
             {
                 throw new MissingArgumentException("Missing arguments")

@@ -65,6 +65,7 @@ namespace Isop
         /// <summary>
         /// Sets the cultureinfo for the following calls.
         /// </summary>
+        /// <param name="build"></param>
         /// <param name="cultureInfo"></param>
         /// <returns></returns>
         public static Build SetCulture(this Build build, CultureInfo cultureInfo)

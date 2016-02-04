@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Linq;
 using System.IO;
@@ -10,7 +11,7 @@ namespace Isop.Help
 {
     public class HelpXmlDocumentation
     {
-        public IDictionary<string, string> GetSummariesFromText(string text)
+        public static IDictionary<string, string> GetSummariesFromText(string text)
         {
             var xml = new System.Xml.XmlDocument();
             xml.LoadXml(text);
@@ -28,64 +29,65 @@ namespace Isop.Help
             }
             return doc;
         }
-        private Dictionary<Assembly, IDictionary<string, string>> summaries = new Dictionary<Assembly, IDictionary<string, string>>();
-        public IDictionary<string, string> GetSummariesForAssemblyCached(Assembly a)
+        private readonly Dictionary<Assembly, IDictionary<string, string>> _summaries = new Dictionary<Assembly, IDictionary<string, string>>();
+        private IDictionary<string, string> GetAssemblyCachedSummaries(Assembly a)
         {
-            if (summaries.ContainsKey(a)) return summaries[a];
+            if (_summaries.ContainsKey(a)) return _summaries[a];
             else
             {
-                var loc = a.Location;
-                string path = new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
-                var paths = new[] { HelpAt(loc, loc), HelpAt(path, path), HelpAt(path, loc), HelpAt(loc, path) };
-                var file = paths.FirstOrDefault(f => File.Exists(f));
-                if (null != file)
-                {
-                    summaries.Add(a, GetSummariesFromText(File.ReadAllText(file)));
-                }
-                else
-                {
-                    summaries.Add(a, new Dictionary<string, string>()); // 
-                }
+                var file = TryGetAssemblyLocation(a);
+                _summaries.Add(a, null != file
+                    ? GetSummariesFromText(File.ReadAllText(file))
+                    : new Dictionary<string, string>());
 
-                return summaries[a];
+                return _summaries[a];
             }
+        }
+
+        private static string TryGetAssemblyLocation(Assembly a)
+        {
+            var loc = a.Location;
+            string path = new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
+            var paths = new[] {HelpAt(loc, loc), HelpAt(path, path), HelpAt(path, loc), HelpAt(loc, path)};
+            var file = paths.FirstOrDefault(File.Exists);
+            return file;
         }
 
         private static string HelpAt(string path, string filename)
         {
             return Path.Combine(Path.GetDirectoryName(path),
-                                string.Format("{0}.xml", Path.GetFileNameWithoutExtension(filename)));
+                                Path.GetFileNameWithoutExtension(filename) + ".xml");
         }
 
-        public string GetKey(MethodInfo method)
+        public static string GetKey(MethodInfo method)
         {
             return GetKey(method.DeclaringType, method);
         }
-        private static Regex _getOrSet = new Regex("^(get|set)_", RegexOptions.IgnoreCase);
-        public string GetKey(Type t, MethodInfo method)
+        private static readonly Regex GetOrSet = new Regex("^(get|set)_", RegexOptions.IgnoreCase);
+        public static string GetKey(Type t, MethodInfo method)
         {
-            if (_getOrSet.IsMatch(method.Name))
-                return string.Format("P:{0}.{1}", GetFullName(t), method.Name.Substring(4));
+            if (GetOrSet.IsMatch(method.Name))
+                return string.Format(CultureInfo.InvariantCulture, "P:{0}.{1}", GetFullName(t), method.Name.Substring(4));
             var parameters = method.GetParameters();
-            return string.Format("M:{0}.{1}{2}", GetFullName(t), method.Name, (parameters.Any() ? string.Format("({0})", TypeNames(parameters)) : ""));
+            return string.Format(CultureInfo.InvariantCulture, "M:{0}.{1}{2}", GetFullName(t), method.Name, (parameters.Any() ? string.Concat("(", TypeNames(parameters), ")") : ""));
         }
 
-        private string TypeNames(ParameterInfo[] parameters)
+        private static string TypeNames(ParameterInfo[] parameters)
         {
             return string.Join(",", parameters.Select(p => p.ParameterType.FullName).ToArray());
         }
-        public string GetKey(Type t)
+        public static string GetKey(Type t)
         {
-            return string.Format("T:{0}", GetFullName(t));
+            return "T:" + GetFullName(t);
         }
-        private string GetFullName(Type t)
+        private static string GetFullName(Type t)
         {
             return t.FullName.Replace("+", ".");
         }
         public string GetDescriptionForMethod(MethodInfo method)
         {
             var t = method.DeclaringType;
-            var summaries = GetSummariesForAssemblyCached(t.Assembly);
+            var summaries = GetAssemblyCachedSummaries(t.Assembly);
             var key = GetKey(t, method);
             if (summaries.ContainsKey(key))
                 return summaries[key];
@@ -93,7 +95,7 @@ namespace Isop.Help
         }
         public string GetDescriptionForType(Type t)
         {
-            var summaries = GetSummariesForAssemblyCached(t.Assembly);
+            var summaries = GetAssemblyCachedSummaries(t.Assembly);
             var key = GetKey(t);
             if (summaries.ContainsKey(key))
                 return summaries[key];

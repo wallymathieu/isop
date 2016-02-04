@@ -276,17 +276,17 @@ See 'COMMANDNAME' help <command> <subcommand> for more information")));
 
         [Test] public void Can_read_xml_doc()
         {
-            var doc = new HelpXmlDocumentation().GetSummariesFromText (File.ReadAllText("Tests.xml"));
+            var doc = HelpXmlDocumentation.GetSummariesFromText (File.ReadAllText("Tests.xml"));
             Assert.That(doc["P:Isop.Tests.FakeConfigurations.FullConfiguration.Global"],Is.EqualTo("GLOBAL!!"));
         }
         
         [Test] public void Can_get_same_key_as_in_xmldoc()
         {
             var helpXml = new HelpXmlDocumentation();
-            var _global = typeof(FullConfiguration).GetMethods().Single(m=>m.Name.EndsWith("Global") && m.Name.StartsWithIC("set"));
-            Assert.That(helpXml.GetKey(_global), Is.EqualTo("P:Isop.Tests.FakeConfigurations.FullConfiguration.Global"));
+            var _global = typeof(FullConfiguration).GetMethods().Single(m=>m.Name.EndsWith("Global") && m.Name.StartsWithIgnoreCase("set"));
+            Assert.That(HelpXmlDocumentation.GetKey(_global), Is.EqualTo("P:Isop.Tests.FakeConfigurations.FullConfiguration.Global"));
             var action1 = typeof(DescriptionWithCommentsController).GetMethods().Single(m=>m.Name.Equals("Action1"));
-            Assert.That(helpXml.GetKey(action1), Is.EqualTo("M:Isop.Tests.FakeControllers.DescriptionWithCommentsController.Action1"));
+            Assert.That(HelpXmlDocumentation.GetKey(action1), Is.EqualTo("M:Isop.Tests.FakeControllers.DescriptionWithCommentsController.Action1"));
             
         }
     }

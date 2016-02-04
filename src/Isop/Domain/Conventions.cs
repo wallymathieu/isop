@@ -15,7 +15,7 @@ namespace Isop.Domain
 
         public static string ControllerName{ get; set; }
 
-        public static HashSet<string> ConfigurationName { get; }
+        public static HashSet<string> ConfigurationName { get; private set; }
 
         public static string Help{ get; set; }
 

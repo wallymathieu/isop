@@ -18,7 +18,7 @@ namespace Isop.Infrastructure
         {
             return _assembly.GetTypes().Where(t =>
                 t.IsPublic
-                && t.Name.EndsWithIC(Conventions.ControllerName)
+                && t.Name.EndsWithIgnoreCase(Conventions.ControllerName)
                 && t.GetConstructors().Any(ctor => ctor.GetParameters().Length == 0)
                 );
         }

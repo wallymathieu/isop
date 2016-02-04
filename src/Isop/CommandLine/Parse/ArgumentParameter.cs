@@ -42,11 +42,11 @@ namespace Isop.CommandLine.Parse
             throw new ArgumentOutOfRangeException(value);
         }
 
-        public ICollection<string> Aliases { get; }
+        public ICollection<string> Aliases { get; private set; }
         public string Delimiter { get; protected set; }
         public string Help()
         {
-            return string.Join(string.Empty, 
+            return string.Concat( 
                 "--", 
                 string.Join(", or ", Aliases), 
                 (string.IsNullOrEmpty(Delimiter)
@@ -60,7 +60,7 @@ namespace Isop.CommandLine.Parse
 
         public bool HasAlias(string value)
         {
-            return Aliases.Any(alias => value.EqualsIC(alias));
+            return Aliases.Any(value.EqualsIgnoreCase);
         }
 
         public bool Accept(int index, string val)

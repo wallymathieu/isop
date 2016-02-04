@@ -39,24 +39,24 @@ namespace Isop.CommandLine.Parse
                 return false;
             if (ReferenceEquals(obj, this))
                 return true;
-            if (obj is RecognizedArgument)
+            var recognizedArgument = obj as RecognizedArgument;
+            if (recognizedArgument != null)
             {
-                var rec = obj as RecognizedArgument;
-                return RawArgument.Equals(rec.RawArgument)
-                    && Argument.Equals(rec.Argument)
-                    && string.Equals(Value, rec.Value);
+                return RawArgument.Equals(recognizedArgument.RawArgument)
+                    && Argument.Equals(recognizedArgument.Argument)
+                    && string.Equals(Value, recognizedArgument.Value);
             }
             return false;
         }
 
         public bool Matches(Parameter paramInfo)
         {
-            return RawArgument.EqualsIC(paramInfo.Name);
+            return RawArgument.EqualsIgnoreCase(paramInfo.Name);
         }
 
         public bool Matches(PropertyInfo prop)
         {
-            return RawArgument.EqualsIC(prop.Name);
+            return RawArgument.EqualsIgnoreCase(prop.Name);
         }
 
         public KeyValuePair<string,string> AsKeyValuePair(){

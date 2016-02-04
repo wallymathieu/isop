@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Isop.Help;
@@ -24,30 +25,28 @@ namespace Isop.Help
             _helpXmlDocumentation = helpXmlDocumentation ?? new HelpXmlDocumentation();
         }
 
+        private readonly Type[] _onlyStringType = { typeof(string) };
         public string Description(Controller t, Method method = null, bool includeArguments = false)
         {
-            var description = t.Type.GetMethods().Where(m=>
-                m.ReturnType.Equals( typeof(string))
-                && m.Name.EqualsIC( Conventions.Help)
-                && m.GetParameters().Select(p=>p.ParameterType).SequenceEqual( new Type[] { typeof(string) }))
-                .SingleOrDefault();
+            var description = t.Type.GetMethods()
+                .SingleOrDefault(m => m.ReturnType == typeof(string)
+                && m.Name.EqualsIgnoreCase( Conventions.Help)
+                && m.GetParameters().Select(p=>p.ParameterType).SequenceEqual(_onlyStringType));
             var descr = new List<string>();
             if (null == description)
             {
-                if (null == method)
-                {
-                    descr.Add(_helpXmlDocumentation.GetDescriptionForType(t.Type));
-                }
-                else
-                {
-                    descr.Add(_helpXmlDocumentation.GetDescriptionForMethod(method.MethodInfo));
-                }
+                descr.Add(null == method
+                    ? _helpXmlDocumentation.GetDescriptionForType(t.Type)
+                    : _helpXmlDocumentation.GetDescriptionForMethod(method.MethodInfo));
             }
             else
             {
                 var obj = _container.CreateInstance(t.Type);
 
-                descr.Add((string)description.Invoke(obj, new[] { (method != null ? method.Name : null) }));
+                descr.Add((string)description.Invoke(obj, new object[]
+                {
+                    method != null ? method.Name : null
+                }));
             }
 
             if (method != null && includeArguments)
@@ -58,7 +57,7 @@ namespace Isop.Help
 
             if (!descr.Any())
                 return string.Empty;
-            return string.Format( "  {0}", string.Join(" ", descr).Trim());
+            return "  " + String.Join(" ", descr).Trim();
         }
 
         private string HelpFor(Controller type, bool simpleDescription)
@@ -67,12 +66,12 @@ namespace Isop.Help
             {
                 return type.Name + Description(type);
             }
-            return string.Join("", type.Name,
+            return string.Concat(type.Name,
                 Environment.NewLine,
                 Environment.NewLine,
                 string.Join(Environment.NewLine,
                     type.GetControllerActionMethods()
-                        .Select(m => string.Format("  {0}{1}", m.Name , Description(type, m, includeArguments: true))).ToArray()));
+                        .Select(m => "  " + m.Name + Description(type, m, includeArguments: true)).ToArray()));
         }
 
         private string HelpForAction(Controller type, string action)
@@ -80,7 +79,7 @@ namespace Isop.Help
             var method = type.GetMethod(action);
             if (method == null)
             {
-                var lines = new List<string> 
+                var lines = new []
                 {
                     UnknownAction,
                     action
@@ -93,51 +92,54 @@ namespace Isop.Help
                 .ToArray();
             if (arguments.Any())
             {
-                var lines = new List<string>
+                var lines = new[]
                 {
-                    string.Format("{0} {1}", method.Name, Description(type, method)),
-                    string.Format("{0}:", AndAcceptTheFollowingParameters),
+                    string.Concat(method.Name, " ",Description(type, method)),
+                    string.Concat(AndAcceptTheFollowingParameters,":"),
                     string.Join(", ", arguments.Select(DescriptionAndHelp)),
-                    string.Format("{0}:", AndTheShortFormIs),
-                    string.Format("{0} {1} {2}", type.Name, method.Name,
-                        string.Join(", ", arguments.Select(arg => arg.Name.ToUpper())))
+                    string.Concat(AndTheShortFormIs,":"),
+                    string.Join(" ", type.Name, method.Name,
+                        string.Join(", ", arguments.Select(arg => arg.Name.ToUpper(CultureInfo.CurrentCulture))))
                 };
                 return string.Join(Environment.NewLine, lines);
             }
             else
             {
-                return string.Format(@"{0} {1}", method.Name, Description(type, method));
+                return string.Concat(method.Name, " ", Description(type, method));
             }
         }
 
         private string DescriptionAndHelp(Argument argument)
         {
-            if (argument is ArgumentWithOptions)
+            var options = argument as ArgumentWithOptions;
+            if (options != null)
             {
-                return ((ArgumentWithOptions)argument).Argument.Help();
+                return options.Argument.Help();
             }
-            return "--"+argument.Name;
+            return "--" + argument.Name;
         }
 
         public string Help(string val = null, string action = null)
         {
             if (string.IsNullOrEmpty(val))
             {
-                var lines = new List<string>();
-                lines.Add(TheCommandsAre);
-                lines.Add(String.Join(Environment.NewLine,
-                           _classAndMethodRecognizers
-                    .Where(cmr => !cmr.IsHelp())
-                               .Select(cmr =>"  "+ HelpFor(cmr, true)).ToArray()));
-                lines.Add(string.Empty);
-                lines.Add(HelpCommandForMoreInformation);
+                var lines = new []
+                {
+                    TheCommandsAre,
+                    string.Join(Environment.NewLine,
+                        _classAndMethodRecognizers
+                            .Where(cmr => !cmr.IsHelp())
+                            .Select(cmr => "  " + HelpFor(cmr, true)).ToArray()),
+                    string.Empty,
+                    HelpCommandForMoreInformation
+                };
                 return string.Join(Environment.NewLine, lines);
             }
             var controllerRecognizer = _classAndMethodRecognizers.First(type =>
-                type.Name.EqualsIC(val));
+                type.Name.EqualsIgnoreCase(val));
             if (string.IsNullOrEmpty(action))
             {
-                return string.Join("", TheSubCommandsFor,
+                return string.Concat(TheSubCommandsFor,
                        HelpFor(controllerRecognizer, false),
                        Environment.NewLine,
                        Environment.NewLine,
@@ -146,11 +148,11 @@ namespace Isop.Help
             return HelpForAction(controllerRecognizer, action);
         }
 
-        public bool CanHelp(string val = null, string action = null)
+        public bool CanHelp(string val = null)
         {
             return string.IsNullOrEmpty(val)
                 ? _classAndMethodRecognizers.Any(cmr => !cmr.IsHelp())
-                : _classAndMethodRecognizers.Any(cmr => cmr.Name.EqualsIC(val));
+                : _classAndMethodRecognizers.Any(cmr => cmr.Name.EqualsIgnoreCase(val));
         }
     }
 }

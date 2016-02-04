@@ -19,7 +19,7 @@ namespace Isop.Infrastructure
             {
                 return _buffer[_currentIndex];
             }
-            throw new ArgumentOutOfRangeException();
+            throw new InvalidOperationException();
         }
         public bool HasMore() { return _currentIndex+1<_buffer.Count(); }
         public T Next()

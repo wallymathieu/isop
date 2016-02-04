@@ -9,7 +9,7 @@ namespace Isop.Infrastructure
         /// ignore case
         /// </summary>
         /// <returns></returns>
-        public static bool EqualsIC(this string self, string other)
+        public static bool EqualsIgnoreCase(this string self, string other)
         {
             return self.Equals(other, StringComparison.OrdinalIgnoreCase);
         }
@@ -17,7 +17,7 @@ namespace Isop.Infrastructure
         /// ignore case
         /// </summary>
         /// <returns></returns>
-        public static bool StartsWithIC(this string self, string other)
+        public static bool StartsWithIgnoreCase(this string self, string other)
         {
             return self.StartsWith(other, StringComparison.OrdinalIgnoreCase);
         }
@@ -25,7 +25,7 @@ namespace Isop.Infrastructure
         /// ignore case
         /// </summary>
         /// <returns></returns>
-        public static bool EndsWithIC(this string self, string other)
+        public static bool EndsWithIgnoreCase(this string self, string other)
         {
             return self.EndsWith(other, StringComparison.OrdinalIgnoreCase);
         }

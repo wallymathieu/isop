@@ -12,7 +12,7 @@ namespace Isop.CommandLine
         public static Method FindMethod(IEnumerable<Method> methods, String methodName, IEnumerable<Token> lexed)
         {
             var potential = methods
-                .Where(method => method.Name.EqualsIC(methodName));
+                .Where(method => method.Name.EqualsIgnoreCase(methodName));
             var potentialMethod = potential
                 .Where(method => method.GetParameters().Length <= lexed.Count(t => t.TokenType == TokenType.Parameter))
                 .OrderByDescending(method => method.GetParameters().Length)

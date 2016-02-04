@@ -34,7 +34,7 @@ namespace Isop.Domain
                 }
                 else
                 {
-                    var recognizedArgument = parsedArguments.Where(a => a.Key.EqualsIC(paramInfo.Name)).ToArray();
+                    var recognizedArgument = parsedArguments.Where(a => a.Key.EqualsIgnoreCase(paramInfo.Name)).ToArray();
                     parameters.Add(!recognizedArgument.Any()
                         ? paramInfo.DefaultValue
                         : ConvertFrom(recognizedArgument.Single(), paramInfo.ParameterType));
@@ -49,7 +49,7 @@ namespace Isop.Domain
             foreach (
                 PropertyInfo prop in paramInfo.GetPublicInstanceProperties())
             {
-                var recognizedArgument = parsedArguments.First(a => a.Key.EqualsIC(prop.Name));
+                var recognizedArgument = parsedArguments.First(a => a.Key.EqualsIgnoreCase(prop.Name));
                 prop.SetValue(obj, ConvertFrom(recognizedArgument, prop.PropertyType), null);
             }
             return obj;

@@ -22,14 +22,14 @@ namespace Isop
     /// </summary>
     public class Build : IEnumerable<Type>, IDisposable
     {
-        internal HelpForControllers _helpForControllers;
+        internal HelpForControllers HelpForControllers;
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
         private readonly TypeContainer _container;
         private readonly Configuration _configuration = new Configuration();
         private readonly DefaultFactory _defaultFactory = new DefaultFactory();
-        private List<IDisposable> disposables = new List<IDisposable>();
-        internal bool _allowInferParameter = true;
+        private readonly List<IDisposable> _disposables = new List<IDisposable>();
+        internal bool AllowInferParameter = true;
 
         public Build()
         {
@@ -56,7 +56,7 @@ namespace Isop
             set{ _configuration.RecognizesHelp = value; }
         }
 
-        readonly HelpXmlDocumentation _HelpXmlDocumentation = new HelpXmlDocumentation();
+        private readonly HelpXmlDocumentation _helpXmlDocumentation = new HelpXmlDocumentation();
 
         public IEnumerator<Type> GetEnumerator()
         {
@@ -80,7 +80,7 @@ namespace Isop
 
         public HelpXmlDocumentation HelpXmlDocumentation
         {
-            get { return _HelpXmlDocumentation; }
+            get { return _helpXmlDocumentation; }
         }
 
         public Build Parameter(string argument, Action<string> action = null, bool required = false, string description = null)
@@ -107,7 +107,7 @@ namespace Isop
 
         public ParsedArguments Parse(List<string> arg)
         {
-            var argumentParser = new ArgumentParser(GlobalParameters, _allowInferParameter, CultureInfo);
+            var argumentParser = new ArgumentParser(GlobalParameters, AllowInferParameter, CultureInfo);
             var lexed = ArgumentLexer.Lex(arg).ToList();
             var parsedArguments = argumentParser.Parse(lexed, arg);
             if (ControllerRecognizers.Any())
@@ -139,7 +139,7 @@ namespace Isop
 
         public Build DisallowInferParameter()
         {
-            _allowInferParameter = false;
+            AllowInferParameter = false;
             return this;
         }
 
@@ -157,7 +157,7 @@ namespace Isop
         {
             ShouldRecognizeHelp();
             HelpController();
-            var helpForControllers = _helpForControllers;
+            var helpForControllers = HelpForControllers;
             action(helpForControllers);
             return this;
         }
@@ -201,7 +201,7 @@ namespace Isop
                 return _configuration.Recognizes.Select(
                     c => new KeyValuePair<Type, Func<ControllerRecognizer>>(
                         c.Type,
-                        () => new ControllerRecognizer(c, _configuration, _container, _allowInferParameter)));
+                        () => new ControllerRecognizer(c, _configuration, _container, AllowInferParameter)));
             }
         }
 
@@ -227,19 +227,20 @@ namespace Isop
         public void Dispose()
         {
             _defaultFactory.Dispose();
-            foreach (var item in disposables)
+            foreach (var item in _disposables)
             {
                 item.Dispose();
             }
-            disposables.Clear();
+            _disposables.Clear();
         }
 
         internal Build Configuration(Type t, object instance)
         {
-            new ConfigureUsingInstance(_configuration, _HelpXmlDocumentation).Configure(t, instance);
+            new ConfigureUsingInstance(_configuration, _helpXmlDocumentation).Configure(t, instance);
 
-            if (instance is IDisposable)
-                disposables.Add((IDisposable)instance);
+            var disposable = instance as IDisposable;
+            if (disposable != null)
+                _disposables.Add(disposable);
 
             return this;
         }
@@ -248,10 +249,10 @@ namespace Isop
         {
             if (_helpController == null && _configuration.RecognizesHelp)
             {
-                _helpForControllers = new HelpForControllers(_configuration.Recognizes, _container,
+                HelpForControllers = new HelpForControllers(_configuration.Recognizes, _container,
                     HelpXmlDocumentation);
                 _helpForArgumentWithOptions = new HelpForArgumentWithOptions(GlobalParameters);
-                _helpController = new HelpController(_helpForArgumentWithOptions, _helpForControllers);
+                _helpController = new HelpController(_helpForArgumentWithOptions, HelpForControllers);
             }
             return _helpController;
         }

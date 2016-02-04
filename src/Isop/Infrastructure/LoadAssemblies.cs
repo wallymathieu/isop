@@ -15,9 +15,9 @@ namespace Isop.Infrastructure
                 .Where(f =>
                 {
                     var ext = Path.GetExtension(f);
-                    return ext.EqualsIC(".dll") || ext.EqualsIC(".exe");
+                    return ext.EqualsIgnoreCase(".dll") || ext.EqualsIgnoreCase(".exe");
                 })
-                .Where(f => !Path.GetFileNameWithoutExtension(f).StartsWithIC("Isop"));
+                .Where(f => !Path.GetFileNameWithoutExtension(f).StartsWithIgnoreCase("Isop"));
             
             foreach (var file in files)
             {
