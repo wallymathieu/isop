@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Isop.CommandLine.Parse.Parameters
 {
     public class OptionParameter 
     {
+        private static List<char> delimiters = new List<char> { '=', ':' };
         /// <summary>
         /// Note: this may accept invalid patterns.
         /// </summary>
@@ -15,18 +17,11 @@ namespace Isop.CommandLine.Parse.Parameters
             if (value.Contains("|"))
             {
                 var prototype = value;
-                var names = prototype.TrimEnd('=', ':').Split('|');
+                var names = prototype.TrimEnd(delimiters.ToArray()).Split('|');
                 string delimiter = null;
                 var last = prototype.Last();
-                switch (last)
-                {
-                    case '=':
-                    case ':':
-                        delimiter = last.ToString();
-                        break;
-                    default:
-                        break;
-                }
+                if (delimiters.Contains(last))
+                    delimiter = last.ToString();
                 optionParameter = new ArgumentParameter(prototype, names, delimiter);
                 return true;
             }
