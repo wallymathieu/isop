@@ -30,5 +30,8 @@ nuget/Isop.Runners/tools/
 *.sublime-workspace
 *.nupkg
 appsettings.config
-# vs2015 preview:
+# vs2015 
 .vs/
+# project rider
+.idea
+
