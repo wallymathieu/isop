@@ -1,4 +1,4 @@
-#ruby=2.2.0
+#ruby=2.3.1
 source 'http://rubygems.org'
 gem 'rake'
 gem 'albacore'
