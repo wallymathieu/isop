@@ -27,6 +27,7 @@ This library is intended to be like chocolate pudding mix. Not something that wi
 
 - When your exe only has one command, then a simpler library like ndesc options is preferable.
 - You do not want any magic. Isop tries to help you with binding arguments to method arguments.
+- When you have a micro service solution together with [IdentityServer](https://github.com/IdentityServer/) so that you can use [Swagger](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) to fill the same role. Swashbuckle can be configured to use [implicit auth flow](https://gist.github.com/wallymathieu/e149735645232dfc0dd92f8e6fc71f9b).
 
 ## License
 
