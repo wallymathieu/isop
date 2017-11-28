@@ -19,7 +19,9 @@ namespace Isop.Domain
             if (!_instances.ContainsKey(type))
             {
                 var factory = _configuration.Factory;
-                _instances.Add(type, factory(type));
+                var instance = factory(type);
+                if (null==instance)throw new NullReferenceException(type.FullName);
+                _instances.Add(type,instance);
             }
             return _instances[type];
         }

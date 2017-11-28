@@ -22,6 +22,7 @@ namespace Isop.Domain
             return _methodInfo.GetParameters().Select(p => new Parameter(p)).ToArray();
         }
         public object Invoke(object instance, object[] values){
+            if (instance==null) throw new ArgumentNullException(nameof(instance));
             return _methodInfo.Invoke(instance, values);
         }
 
