@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using Isop.Infrastructure;
+#if NETSTANDARD1_6
 using System.Runtime.Loader;
+#endif
 namespace Isop.Infrastructure
 {
     public class LoadAssemblies
@@ -18,10 +20,15 @@ namespace Isop.Infrastructure
                     return ext.EqualsIgnoreCase(".dll") || ext.EqualsIgnoreCase(".exe");
                 })
                 .Where(f => !Path.GetFileNameWithoutExtension(f).StartsWithIgnoreCase("Isop"));
-            
+
             foreach (var file in files)
             {
-                var assembly =  AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
+var assembly = 
+#if NETSTANDARD1_6
+                AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
+#else
+                Assembly.LoadFile(file);
+#endif
                 yield return assembly;
             }
         }
