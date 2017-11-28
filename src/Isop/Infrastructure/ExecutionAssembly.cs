@@ -7,7 +7,7 @@ namespace Isop.Infrastructure
     {
         public static string Path()
         {
-            return Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+            return Directory.GetParent(typeof(ExecutionAssembly).GetTypeInfo().Assembly.Location).FullName;
         }
     }
 }

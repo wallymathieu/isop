@@ -6,6 +6,7 @@ using System.Linq;
 using System.IO;
 using Isop.Infrastructure;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace Isop.Help
 {
@@ -13,16 +14,16 @@ namespace Isop.Help
     {
         public static IDictionary<string, string> GetSummariesFromText(string text)
         {
-            var xml = new System.Xml.XmlDocument();
+            var xml = new XmlDocument();
             xml.LoadXml(text);
             var members = xml.GetElementsByTagName("members");
             var member = members.Item(0).ChildNodes;
             Dictionary<string, string> doc = new Dictionary<string, string>();
-            foreach (System.Xml.XmlNode m in member)
+            foreach (XmlNode m in member)
             {
                 var attr = m.Attributes;
                 var name = attr.GetNamedItem("name");
-                var nodes = m.ChildNodes.Cast<System.Xml.XmlNode>();
+                var nodes = m.ChildNodes.Cast<XmlNode>();
                 var summary = nodes.FirstOrDefault(x => x.Name.Equals("summary"));
                 if (null != summary)
                     doc.Add(name.InnerText, summary.InnerText.Trim());
@@ -47,7 +48,7 @@ namespace Isop.Help
         private static string TryGetAssemblyLocation(Assembly a)
         {
             var loc = a.Location;
-            string path = new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
+            string path = new Uri(a.CodeBase).AbsolutePath;
             var paths = new[] {HelpAt(loc, loc), HelpAt(path, path), HelpAt(path, loc), HelpAt(loc, path)};
             var file = paths.FirstOrDefault(File.Exists);
             return file;
@@ -87,7 +88,7 @@ namespace Isop.Help
         public string GetDescriptionForMethod(MethodInfo method)
         {
             var t = method.DeclaringType;
-            var summaries = GetAssemblyCachedSummaries(t.Assembly);
+            var summaries = GetAssemblyCachedSummaries(t.GetTypeInfo().Assembly);
             var key = GetKey(t, method);
             if (summaries.ContainsKey(key))
                 return summaries[key];
@@ -95,7 +96,7 @@ namespace Isop.Help
         }
         public string GetDescriptionForType(Type t)
         {
-            var summaries = GetAssemblyCachedSummaries(t.Assembly);
+            var summaries = GetAssemblyCachedSummaries(t.GetTypeInfo().Assembly);
             var key = GetKey(t);
             if (summaries.ContainsKey(key))
                 return summaries[key];

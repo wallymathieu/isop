@@ -461,7 +461,7 @@ namespace Isop.Tests
 
                 Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
                 arguments.Invoke(new StringWriter());
-                Assert.That(filename, Is.StringContaining("myfile.txt"));
+                Assert.True(filename.Contains("myfile.txt"));
             }
             finally
             {

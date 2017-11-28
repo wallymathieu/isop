@@ -1,59 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</ProjectGuid>
+    <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition=" '$(VersionSuffix)' == '' ">$(VersionPrefix)</Version>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
     <OutputType>Library</OutputType>
     <RootNamespace>Isop</RootNamespace>
     <AssemblyName>Isop</AssemblyName>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\isop\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <PackagesConfig>$(ProjectDir)/packages.config</PackagesConfig>
     <CodeAnalysisRuleSet>Isop.ruleset</CodeAnalysisRuleSet>
+    <RepositoryUrl>https://github.com/wallymathieu/isop</RepositoryUrl>
+    <Description>Isop is a library to help simplify and structure command line apps. The Isop dll is used if you want to have your own console application. The Isop.Cli.exe and Isop.Wpf.exe (from the Isop.Runners package) if you dont care about implementing a 'Main' method.</Description>
+    <Authors>Oskar Gewalli</Authors>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/wallymathieu/isop</PackageProjectUrl>
+    <PackageTags>CLI</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <LangVersion>5</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+  <!--
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -61,62 +34,6 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Infrastructure\StringExtensions.cs" />
-    <Compile Include="Build.cs" />
-    <Compile Include="Infrastructure\PeekEnumerable.cs" />
-    <Compile Include="MissingArgumentException.cs" />
-    <Compile Include="TypeConversionFailedException.cs" />
-    <Compile Include="Infrastructure\MethodInfoOrProperty.cs" />
-    <Compile Include="Help\HelpXmlDocumentation.cs" />
-    <Compile Include="Infrastructure\LoadAssemblies.cs" />
-    <Compile Include="Infrastructure\ExecutionAssembly.cs" />
-    <Compile Include="Infrastructure\AssemblyScanner.cs" />
-    <Compile Include="Configurations\ConfigureUsingInstance.cs" />
-    <Compile Include="Domain\Configuration.cs" />
-    <Compile Include="Domain\Controller.cs" />
-    <Compile Include="Domain\Method.cs" />
-    <Compile Include="Domain\Parameter.cs" />
-    <Compile Include="Domain\Property.cs" />
-    <Compile Include="Domain\Argument.cs" />
-    <Compile Include="Domain\ConvertArgumentsToParameterValue.cs" />
-    <Compile Include="Domain\DefaultConverter.cs" />
-    <Compile Include="CommandLine\FindMethodAmongLexedTokens.cs" />
-    <Compile Include="CommandLine\ControllerRecognizer.cs" />
-    <Compile Include="CommandLine\RewriteLexedTokensToSupportHelpAndIndex.cs" />
-    <Compile Include="CommandLine\ParsedMethod.cs" />
-    <Compile Include="Domain\TypeContainer.cs" />
-    <Compile Include="Help\HelpForControllers.cs" />
-    <Compile Include="Help\HelpTexts.cs" />
-    <Compile Include="Help\HelpController.cs" />
-    <Compile Include="CommandLine\Help\HelpForArgumentWithOptions.cs" />
-    <Compile Include="CommandLine\Lex\ArgumentLexer.cs" />
-    <Compile Include="CommandLine\Lex\Token.cs" />
-    <Compile Include="CommandLine\Lex\TokenType.cs" />
-    <Compile Include="CommandLine\Parse\ArgumentParameter.cs" />
-    <Compile Include="CommandLine\Parse\ArgumentParser.cs" />
-    <Compile Include="CommandLine\Parse\ArgumentWithOptions.cs" />
-    <Compile Include="CommandLine\Parse\MergedParsedArguments.cs" />
-    <Compile Include="CommandLine\Parse\Parameters\OptionParameter.cs" />
-    <Compile Include="CommandLine\Parse\Parameters\OrdinalParameter.cs" />
-    <Compile Include="CommandLine\Parse\Parameters\VisualStudioParameter.cs" />
-    <Compile Include="CommandLine\Parse\ParsedArguments.cs" />
-    <Compile Include="CommandLine\Parse\RecognizedArgument.cs" />
-    <Compile Include="CommandLine\Parse\UnrecognizedArgument.cs" />
-    <Compile Include="Domain\Conventions.cs" />
-    <Compile Include="Infrastructure\TypeConverterFunc.cs" />
-    <Compile Include="Domain\Formatter.cs" />
-    <Compile Include="Domain\ToStringFormatter.cs" />
-    <Compile Include="Domain\TableFormatter.cs" />
-    <Compile Include="Infrastructure\DefaultFactory.cs" />
-    <Compile Include="Api\ActionControllerExpression.cs" />
-    <Compile Include="Api\ControllerExpression.cs" />
-    <Compile Include="BuildExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Isop.nuspec" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <ItemGroup />
+  -->
+  
 </Project>

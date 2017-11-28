@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using Isop.Infrastructure;
-
+using System.Runtime.Loader;
 namespace Isop.Infrastructure
 {
     public class LoadAssemblies
@@ -21,7 +21,7 @@ namespace Isop.Infrastructure
             
             foreach (var file in files)
             {
-                var assembly = Assembly.LoadFile(file);
+                var assembly =  AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
                 yield return assembly;
             }
         }

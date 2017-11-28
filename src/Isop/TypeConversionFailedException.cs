@@ -1,9 +1,13 @@
 using System;
+#if ! NETSTANDARD1_6
 using System.Runtime.Serialization;
+#endif
 
 namespace Isop
 {
+#if !NETSTANDARD1_6
     [Serializable]
+#endif
     public class TypeConversionFailedException : Exception
     {
         public string Argument { get { return (string)Data["Argument"]; } set { Data["Argument"] = value; } }
@@ -21,9 +25,9 @@ namespace Isop
         {
         }
 
-        protected TypeConversionFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
+#if !NETSTANDARD1_6
+        protected TypeConversionFailedException(SerializationInfo info, StreamingContext context) : base(info, context){}
+#endif
     }
 }
 

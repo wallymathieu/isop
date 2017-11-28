@@ -22,7 +22,7 @@ namespace Isop.Infrastructure
             MethodInfo = methodInfo;
             if (_getOrSet.IsMatch(methodInfo.Name))
             {
-                Property = methodInfo.DeclaringType.GetProperty(_getOrSet.Replace(methodInfo.Name, ""));
+                Property = methodInfo.DeclaringType.GetTypeInfo().GetProperty(_getOrSet.Replace(methodInfo.Name, ""));
             }
         }
 

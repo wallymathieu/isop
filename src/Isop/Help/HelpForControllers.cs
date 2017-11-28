@@ -28,7 +28,7 @@ namespace Isop.Help
         private readonly Type[] _onlyStringType = { typeof(string) };
         public string Description(Controller t, Method method = null, bool includeArguments = false)
         {
-            var description = t.Type.GetMethods()
+            var description = t.Type.GetTypeInfo().GetMethods()
                 .SingleOrDefault(m => m.ReturnType == typeof(string)
                 && m.Name.EqualsIgnoreCase( Conventions.Help)
                 && m.GetParameters().Select(p=>p.ParameterType).SequenceEqual(_onlyStringType));
@@ -99,7 +99,7 @@ namespace Isop.Help
                     string.Join(", ", arguments.Select(DescriptionAndHelp)),
                     string.Concat(AndTheShortFormIs,":"),
                     string.Join(" ", type.Name, method.Name,
-                        string.Join(", ", arguments.Select(arg => arg.Name.ToUpper(CultureInfo.CurrentCulture))))
+                        string.Join(", ", arguments.Select(arg => arg.Name.ToUpperInvariant())))
                 };
                 return string.Join(Environment.NewLine, lines);
             }

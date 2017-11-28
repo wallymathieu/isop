@@ -44,7 +44,7 @@ namespace Isop.Domain
 
         private static IEnumerable<MethodInfo> GetOwnPublicMethods(Type type)
         {
-            return type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            return type.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .Where(m => m.DeclaringType != typeof(Object))
                 .Where(m => !m.Name.StartsWithIgnoreCase("get_")
                     && !m.Name.StartsWithIgnoreCase("set_"))

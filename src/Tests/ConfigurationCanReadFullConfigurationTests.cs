@@ -26,7 +26,7 @@ namespace Isop.Tests
         [Test]
         public void RecognizeCulture()
         {
-            Assert.That(_parserBuilder.CultureInfo, Is.EqualTo(CultureInfo.GetCultureInfo("es-ES")));
+            Assert.That(_parserBuilder.CultureInfo, Is.EqualTo(new CultureInfo("es-ES")));
         }
         [Test]
         public void RecognizeTypeConverter()

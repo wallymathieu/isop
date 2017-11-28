@@ -17,9 +17,9 @@ namespace Isop.Infrastructure
         public IEnumerable<Type> LooksLikeControllers()
         {
             return _assembly.GetTypes().Where(t =>
-                t.IsPublic
+                t.GetTypeInfo().IsPublic
                 && t.Name.EndsWithIgnoreCase(Conventions.ControllerName)
-                && t.GetConstructors().Any(ctor => ctor.GetParameters().Length == 0)
+                && t.GetTypeInfo().GetConstructors().Any(ctor => ctor.GetParameters().Length == 0)
                 );
         }
 
