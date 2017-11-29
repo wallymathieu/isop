@@ -6,18 +6,20 @@ using System.Linq;
 using System.Collections;
 using Isop.CommandLine.Parse;
 using Isop.Domain;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Isop.CommandLine
 {
     public class ParsedMethod : ParsedArguments
     {
-        public ParsedMethod(ParsedArguments parsedArguments, TypeContainer typeContainer, Configuration configuration)
+        public ParsedMethod(ParsedArguments parsedArguments, IServiceCollection typeContainer, Configuration configuration)
             : base(parsedArguments)
         {
             _typeContainer = typeContainer;
             _configuration = configuration;
         }
 
-        private TypeContainer _typeContainer;
+        private IServiceCollection _typeContainer;
         private Configuration _configuration;
 
         public Type RecognizedClass { get; set; }
@@ -27,10 +29,14 @@ namespace Isop.CommandLine
 
         public override IEnumerable<string> Invoke()
         {
-            var instance = _typeContainer.CreateInstance(RecognizedClass);
-
-            var retval = RecognizedAction.Invoke(instance, RecognizedActionParameters.ToArray());
-            return _configuration.Formatter(retval);
+            var svcProvider = _typeContainer.BuildServiceProvider();
+            using (var scope = svcProvider.CreateScope())
+            {
+                var instance = scope.ServiceProvider.GetService(RecognizedClass);
+                if (ReferenceEquals(null, instance)) throw new Exception($"Unable to resolve {RecognizedClass.Name}");
+                var retval = RecognizedAction.Invoke(instance, RecognizedActionParameters.ToArray());
+                return _configuration.Formatter(retval);
+            }
         }
     }
 }

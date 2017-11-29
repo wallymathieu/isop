@@ -10,18 +10,19 @@ namespace Isop.CommandLine
     using Lex;
     using Parse;
     using Domain;
+    using Microsoft.Extensions.DependencyInjection;
 
     public class ControllerRecognizer
     {
         private readonly bool _allowInferParameter;
         private readonly Configuration _configuration;
         private readonly Controller _controller;
-        private readonly TypeContainer _typeContainer;
+        private readonly IServiceCollection _typeContainer;
         /// <summary>
         /// </summary>
         public ControllerRecognizer(Controller controller,
             Configuration configuration,
-            TypeContainer typeContainer,
+            IServiceCollection typeContainer,
             bool allowInferParameter = false)
         {
             _controller = controller;

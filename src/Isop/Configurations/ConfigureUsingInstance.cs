@@ -60,20 +60,6 @@ namespace Isop.Configurations
             return _set.Replace(arg, "");
         }
 
-        void ObjectFactory(object instance, MethodInfo[] methods)
-        {
-            var name = new Regex("(Object)?Factory", RegexOptions.IgnoreCase);
-            var objectFactory = methods.Where(m =>
-                m.ReturnType == typeof(object)
-                && m.GetParameters().Select(p => p.ParameterType).SequenceEqual(new[] { typeof(Type) })
-                && name.IsMatch(m.Name))
-                .SingleOrDefault();
-            if (null != objectFactory)
-            {
-                _configuration.Factory = (Func<Type, object>)objectFactory.CreateDelegate(typeof(Func<Type, object>), instance);
-            }
-        }
-
         void CultureInfo(object instance, MethodInfo[] methods)
         {
             var culture = MatchGet(methods,
@@ -132,8 +118,6 @@ namespace Isop.Configurations
             CultureInfo(instance, methods);
 
             ConfigureRecognizes(t, instance, methods);
-
-            ObjectFactory(instance, methods);
 
             ConfigurationPublicWritableFields(instance, methods);
 

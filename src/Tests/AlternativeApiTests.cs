@@ -6,6 +6,8 @@ using NUnit.Framework;
 using Isop.Tests.FakeControllers;
 using System.Globalization;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Isop.Tests
 {
     [TestFixture]
@@ -15,16 +17,11 @@ namespace Isop.Tests
         public void It_can_parse_and_invoke()
         {
             var count = 0;
-            Func<Type, object> factory = (Type t) =>
-            {
-                Assert.That(t, Is.EqualTo(typeof(MyController)));
-                return
-                    (object)
-                    new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
-            };
-            var arguments = new Build { typeof(MyController) }
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci=>new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
+            var arguments = new Build(sc) { typeof(MyController) }
                             .SetCulture(CultureInfo.InvariantCulture)
-                            .SetFactory(factory)
+                            //.SetFactory(factory)
                             .Controller("My")
                             .Action("Action")
                             .Parameters(new Dictionary<string, string> { { "param1", "value1" }, { "param2", "value2" }, { "param3", "3" }, { "param4", "3.4" } });
@@ -36,17 +33,8 @@ namespace Isop.Tests
         [Test]
         public void It_can_get_help()
         {
-            var count = 0;
-            Func<Type, object> factory = (Type t) =>
-            {
-                Assert.That(t, Is.EqualTo(typeof(MyController)));
-                return
-                    (object)
-                    new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
-            };
-            var help = new Build { typeof(MyController) }
+            var help = new Build() { typeof(MyController) }
                             .SetCulture(CultureInfo.InvariantCulture)
-                            .SetFactory(factory)
                             .ShouldRecognizeHelp()
                             .Controller("My")
                             .Action("Action")
