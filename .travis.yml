@@ -1,6 +1,5 @@
 language: csharp
-dotnet: 2.0.0
-sudo: false  # use the new container-based Travis infrastructure 
+dotnet: 2.1.301
 
 solution: ./src/Isop.sln
 install:
@@ -8,4 +7,4 @@ install:
 
 script: 
   - msbuild src
-  - dotnet test -f netcoreapp1.1 src/Tests/Tests.csproj
+  - dotnet test -f netcoreapp2.1 src/Tests/Tests.csproj
