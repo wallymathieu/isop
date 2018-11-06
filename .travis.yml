@@ -8,3 +8,7 @@ install:
 script: 
   - msbuild src
   - dotnet test -f netcoreapp2.1 src/Tests/Tests.csproj
+branches:
+  only: 
+    - master
+    - isop
