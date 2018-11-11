@@ -31,10 +31,6 @@ namespace Isop.Tests.FakeConfigurations
             get;
             set;
         }
-        public object ObjectFactory(Type type)
-        {
-            return null;
-        }
         public CultureInfo Culture
         {
             get{ return new CultureInfo("es-ES"); }

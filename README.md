@@ -170,7 +170,7 @@ This configuration will have a Global variable (that is, a parameter that can be
 
 Why enter culture code? Isop tries as much as possible to adhere to the user specified culturecode. This have some implications for people using sv-SE or any other culture where the standard date formatting does not fit.
 
-Since Isop does not know your IOC it provides a hook (ObjectFactory) in order to be able to resolve the controllers.
+Isop uses constructor injection of `IServiceCollection` in order to be able to resolve the controllers.
 
 The same configuration class can be consumed by the fluent api: 
 
@@ -185,15 +185,13 @@ static void Main(string[] args)
 }
 ```
 
-You can invoke your program by (where you have Isop.Cli.exe in the same folder as your dll or exe containing the above class)
+You can invoke your program by running [isop.auto.cli](https://www.nuget.org/packages/Isop.Auto.Cli/) in the same folder as your dll or exe containing the above class:
 ```
-Isop.Cli.exe Customer Add --name value
+isop Customer Add --name value
 ```
 
 Look at the [Example Cli project](src/Example/Program.cs) for the most recent example of how it is used. 
 
-## Runners
-[Nuget feed for isop project on appveyor](https://ci.appveyor.com/nuget/isop-22q278hpwhwk)
 
 ## Alternative
 
