@@ -6,13 +6,23 @@ Isop is the swedish name for hyssop. Like any spice it is intended to give flavo
 ## Goal
 
 The goal is to be able to write code like:
-<pre><code>someprogram.exe My Action --argument value</code></pre>
+
+```
+someprogram.exe My Action --argument value
+```
+
 Or if you prefer:
-<pre><code>someprogram.exe My Action /argument value</code></pre>
+```
+someprogram.exe My Action /argument value
+```
 Isop will also figure out what you mean if you write with an equals sign between argument and value:
-<pre><code>someprogram.exe My Action --argument=value</code></pre>
+```
+someprogram.exe My Action --argument=value
+```
 Or if you want to write it shorter you can skip the argument name:
-<pre><code>someprogram.exe My Action value</code></pre>
+```
+someprogram.exe My Action value
+```
 
 So that the class with the name My or MyController and the method with the name Action gets invoked.
 
@@ -27,7 +37,7 @@ This library is intended to be like chocolate pudding mix. Not something that wi
 
 - When your exe only has one command, then a simpler library like ndesc options is preferable.
 - You do not want any magic. Isop tries to help you with binding arguments to method arguments.
-- When you have a micro service solution together with [IdentityServer](https://github.com/IdentityServer/) so that you can use [Swagger](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) to fill the same role. Swashbuckle can be configured to use [implicit auth flow](https://gist.github.com/wallymathieu/e149735645232dfc0dd92f8e6fc71f9b).
+- When you have a micro service solution together with some other authentication mechanism you can use [Swagger](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) to fill the same role.
 
 ## License
 
@@ -35,23 +45,25 @@ MIT License
 
 ## Nuget packages
 
-<a href="http://nuget.org/packages/Isop/">Isop</a>
+[Isop](http://nuget.org/packages/Isop/)
 
 ## Example
 
 ### Having your own Main
 
 You're hooking it up by writing something like:
-<pre><code>static void Main(string[] args)
+```csharp
+static void Main(string[] args)
 {
   new Build()
        .Recognize(typeof(CustomerController))
        .Parse(args)
        .Invoke(Console.Out);
-}</code></pre>
+}
+```
 
 Where your controller looks something like this:
-<pre><code>
+```csharp
 public class MyController
 {
     private readonly CustomerRepository _repository;
@@ -66,65 +78,12 @@ public class MyController
         yield return "Customer inserted";  
     }
 }
-</code></pre>
+```
 When invoked it will output two lines to the command prompt, the yielded lines above.
-
-### Using a configuration class for isop
-
-<pre><code>
-class IsopConfiguration:IDisposable
-{
-...
-    public IEnumerable<Type> Recognizes()
-    {
-        return new[] { typeof(CustomerController) };
-    }
-    public object ObjectFactory(Type type)
-    {
-        return _myIOC.Resolve(type);
-    }
-    public CultureInfo Culture
-    {
-        get{ return CultureInfo.GetCultureInfo("sv-SE"); }
-    }
-    public bool RecognizeHelp{get{return true;}}
-    public void Dispose()
-    {
-        _myIOC.Dispose();
-    }
-}
-class Program
-{
-    static void Main(string[] args)
-    {
-        var configuration = new IsopConfiguration();
-        new Build()
-          .Configuration(configuration)
-          .Parse(args)
-          .Invoke(Console.Out);
-    }
-}</code></pre>
-
-This is equivalent to the following fluent configuration of isop:
-
-<pre><code>
-class Program
-{
-    static void Main(string[] args)
-    {
-        new Build()
-          .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
-          .Recognize(typeof(CustomerController))
-          .SetFactory(_myIOC.Resolve);
-          .ShouldRecognizeHelp()
-          .Parse(args)
-          .Invoke(Console.Out);
-    }
-}</code></pre>
 
 ### Handling errors and unrecognized parameters
 
-<pre><code>
+```csharp
 class Program
 {
     static void Main(string[] args)
@@ -132,7 +91,6 @@ class Program
         var parserBuilder = new Build()
                   .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
                   .Recognize(typeof(CustomerController))
-                  .SetFactory(_myIOC.Resolve);
                   .ShouldRecognizeHelp();
         try
         {
@@ -170,14 +128,16 @@ Did you mean any of these arguments?
         }
 
     }
-}</code></pre>
+}
+```
 
 Why all this code? Mostly it's because I want the programmer to be able to have as much freedom as possible to handle errors and show error messages as he/she sees fit.
 
 ### Using Isop.cli.exe
 
 You're hooking it up by writing something like:
-<pre><code> class IsopConfiguration
+```csharp
+class IsopConfiguration
 {
     public IEnumerable<Type> Recognizes()
     {
@@ -193,10 +153,6 @@ You're hooking it up by writing something like:
         get;
         set;
     }
-    public object ObjectFactory(Type type)
-    {
-        return _myIOC.Resolve(type);
-    }
     public CultureInfo Culture
     {
         get{ return CultureInfo.GetCultureInfo("es-ES"); }
@@ -208,7 +164,7 @@ You're hooking it up by writing something like:
         return TypeConverter;
     }
 }
-</code></pre>
+```
 
 This configuration will have a Global variable (that is, a parameter that can be set for any action). It will have a required global parameter (you must set that parameter in order to run any action). Note that you can insert your own type converter (how the strings will be converted to different values in the controller action parameters).
 
@@ -218,7 +174,7 @@ Since Isop does not know your IOC it provides a hook (ObjectFactory) in order to
 
 The same configuration class can be consumed by the fluent api: 
 
-<pre><code>
+```csharp
 static void Main(string[] args)
 {
     var configuration = new IsopConfiguration();
@@ -227,10 +183,12 @@ static void Main(string[] args)
       .Parse(args)
       .Invoke(Console.Out);
 }
-</code></pre>
+```
 
 You can invoke your program by (where you have Isop.Cli.exe in the same folder as your dll or exe containing the above class)
-<pre><code>Isop.Cli.exe Customer Add --name value</code></pre>
+```
+Isop.Cli.exe Customer Add --name value
+```
 
 Look at the [Example Cli project](src/Example/Program.cs) for the most recent example of how it is used. 
 
