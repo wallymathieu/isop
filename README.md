@@ -133,7 +133,7 @@ Did you mean any of these arguments?
 
 Why all this code? Mostly it's because I want the programmer to be able to have as much freedom as possible to handle errors and show error messages as he/she sees fit.
 
-### Using Isop.cli.exe
+### Using Isop.Auto.Cli.exe
 
 You're hooking it up by writing something like:
 ```csharp
@@ -143,16 +143,9 @@ class IsopConfiguration
     {
         return new[] { typeof(CustomerController) };
     }
-    public string Global {
-        get;
-        set;
-    }
+    public string Global { get; set; }
     [Required]
-    public string GlobalRequired
-    {
-        get;
-        set;
-    }
+    public string GlobalRequired { get; set; }
     public CultureInfo Culture
     {
         get{ return CultureInfo.GetCultureInfo("es-ES"); }
