@@ -10,7 +10,9 @@ namespace Isop.Auto.Cli
 
         static void Main(string[] args)
         {
-            var parserBuilder = new Build().ConfigurationFromAssemblyPath();
+            var parserBuilder = new Build()
+                .ShouldRecognizeHelp()
+                .ConfigurationFrom(Directory.GetCurrentDirectory());
             try
             {
                 var parsedMethod = parserBuilder.Parse(args);
