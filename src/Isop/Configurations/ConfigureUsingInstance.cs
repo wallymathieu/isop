@@ -23,7 +23,7 @@ namespace Isop.Configurations
 
         static MethodInfo[] GetPublicInstanceMethods(Type t)
         {
-            return t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+            return t.GetTypeInfo().GetMethods(BindingFlags.Instance | BindingFlags.Public);
         }
 
         void ConfigureRecognizes(Type t, object instance, MethodInfo[] methods = null)
@@ -47,7 +47,7 @@ namespace Isop.Configurations
             var configurationSetters = FindSet(methods);
             foreach (var methodInfo in configurationSetters)
             {
-                var action = (Action<String>)Delegate.CreateDelegate(typeof(Action<String>), instance, methodInfo.MethodInfo);
+                var action = (Action<String>)methodInfo.MethodInfo.CreateDelegate(typeof(Action<String>), instance);
                 var description = helpXmlDocumentation.GetDescriptionForMethod(methodInfo.MethodInfo);
                 _configuration.Properties.Add(new Property(RemoveSetFromBeginningOfString(methodInfo.Name), action: action, required: methodInfo.Required, description: description, type: typeof(string)));
             }
@@ -58,20 +58,6 @@ namespace Isop.Configurations
         private static string RemoveSetFromBeginningOfString(string arg)
         {
             return _set.Replace(arg, "");
-        }
-
-        void ObjectFactory(object instance, MethodInfo[] methods)
-        {
-            var name = new Regex("(Object)?Factory", RegexOptions.IgnoreCase);
-            var objectFactory = methods.Where(m =>
-                m.ReturnType == typeof(object)
-                && m.GetParameters().Select(p => p.ParameterType).SequenceEqual(new[] { typeof(Type) })
-                && name.IsMatch(m.Name))
-                .SingleOrDefault();
-            if (null != objectFactory)
-            {
-                _configuration.Factory = (Func<Type, object>)Delegate.CreateDelegate(typeof(Func<Type, object>), instance, objectFactory);
-            }
         }
 
         void CultureInfo(object instance, MethodInfo[] methods)
@@ -132,8 +118,6 @@ namespace Isop.Configurations
             CultureInfo(instance, methods);
 
             ConfigureRecognizes(t, instance, methods);
-
-            ObjectFactory(instance, methods);
 
             ConfigurationPublicWritableFields(instance, methods);
 

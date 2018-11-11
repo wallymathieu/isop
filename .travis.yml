@@ -1,9 +1,14 @@
-sudo: false
-language: csharp 
+language: csharp
+dotnet: 2.1.301
+
 solution: ./src/Isop.sln
 install:
-  - nuget restore ./src/Isop.sln
-  - bundle install 
+  - msbuild /t:restore src
 
 script: 
-  - rake test
+  - msbuild src
+  - dotnet test -f netcoreapp2.1 src/Tests/Tests.csproj
+branches:
+  only: 
+    - master
+    - isop

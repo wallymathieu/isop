@@ -37,7 +37,7 @@ namespace Isop.Tests.FakeConfigurations
         }
         public CultureInfo Culture
         {
-            get{ return CultureInfo.GetCultureInfo("es-ES"); }
+            get{ return new CultureInfo("es-ES"); }
         }
         public bool RecognizeHelp{get{return true;}}
         public void Dispose()

@@ -7,6 +7,7 @@ using Isop.Help;
 using Isop.Infrastructure;
 using Isop.CommandLine.Parse;
 using Isop.Domain;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Isop.Help
 {
@@ -14,10 +15,10 @@ namespace Isop.Help
     {
 
         private readonly ICollection<Controller> _classAndMethodRecognizers;
-        private readonly TypeContainer _container;
+        private readonly IServiceCollection _container;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
 
-        public HelpForControllers(ICollection<Controller> classAndMethodRecognizers, TypeContainer container,
+        public HelpForControllers(ICollection<Controller> classAndMethodRecognizers, IServiceCollection container,
             HelpXmlDocumentation helpXmlDocumentation = null)
         {
             _container = container;
@@ -28,7 +29,7 @@ namespace Isop.Help
         private readonly Type[] _onlyStringType = { typeof(string) };
         public string Description(Controller t, Method method = null, bool includeArguments = false)
         {
-            var description = t.Type.GetMethods()
+            var description = t.Type.GetTypeInfo().GetMethods()
                 .SingleOrDefault(m => m.ReturnType == typeof(string)
                 && m.Name.EqualsIgnoreCase( Conventions.Help)
                 && m.GetParameters().Select(p=>p.ParameterType).SequenceEqual(_onlyStringType));
@@ -41,12 +42,16 @@ namespace Isop.Help
             }
             else
             {
-                var obj = _container.CreateInstance(t.Type);
-
-                descr.Add((string)description.Invoke(obj, new object[]
+                var provider = _container.BuildServiceProvider();
+                using (var scope = provider.CreateScope())
                 {
+                    var obj = scope.ServiceProvider.GetService(t.Type);
+                    if (ReferenceEquals(null, obj)) throw new Exception($"Unable to resolve {t.Type}");
+                    descr.Add((string)description.Invoke(obj, new object[]
+                    {
                     method != null ? method.Name : null
-                }));
+                    }));
+                }
             }
 
             if (method != null && includeArguments)
@@ -99,7 +104,7 @@ namespace Isop.Help
                     string.Join(", ", arguments.Select(DescriptionAndHelp)),
                     string.Concat(AndTheShortFormIs,":"),
                     string.Join(" ", type.Name, method.Name,
-                        string.Join(", ", arguments.Select(arg => arg.Name.ToUpper(CultureInfo.CurrentCulture))))
+                        string.Join(", ", arguments.Select(arg => arg.Name.ToUpperInvariant())))
                 };
                 return string.Join(Environment.NewLine, lines);
             }

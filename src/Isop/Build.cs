@@ -5,8 +5,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Isop.Api;
-
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace Isop
 {
     using Infrastructure;
@@ -17,32 +17,29 @@ namespace Isop
     using CommandLine.Help;
     using Configurations;
     using Domain;
+    using Api;
+
     /// <summary>
     /// represents a configuration build
     /// </summary>
-    public class Build : IEnumerable<Type>, IDisposable
+    public class Build : IEnumerable<Type>
     {
         internal HelpForControllers HelpForControllers;
         private HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private HelpController _helpController;
-        private readonly TypeContainer _container;
+
         private readonly Configuration _configuration = new Configuration();
-        private readonly DefaultFactory _defaultFactory = new DefaultFactory();
-        private readonly List<IDisposable> _disposables = new List<IDisposable>();
         internal bool AllowInferParameter = true;
 
-        public Build()
+        public Build():this(new ServiceCollection())
         {
-            _configuration.Factory = _defaultFactory.Create;
-            _container = new TypeContainer(_configuration);
+        }
+        public Build(IServiceCollection collection)
+        {
+            this.Container = collection;
         }
 
         public virtual CultureInfo CultureInfo { get { return _configuration.CultureInfo; } set { _configuration.CultureInfo = value; } }
-        public Func<Type, object> Factory
-        {
-            get { return _configuration.Factory; }
-            set{ _configuration.Factory = value;}
-        }
 
         public TypeConverterFunc TypeConverter
         {
@@ -53,7 +50,7 @@ namespace Isop
         public bool RecognizeHelp
         {
             get { return _configuration.RecognizesHelp; }
-            set{ _configuration.RecognizesHelp = value; }
+            set { _configuration.RecognizesHelp = value; }
         }
 
         private readonly HelpXmlDocumentation _helpXmlDocumentation = new HelpXmlDocumentation();
@@ -88,14 +85,15 @@ namespace Isop
             _configuration.Properties.Add(new Property(argument, action, required, description, typeof(string)));
             return this;
         }
-     
+
         public Build FormatObjectsAsTable()
         {
             _configuration.Formatter = new TableFormatter().Format;
             return this;
         }
 
-        public Build SetFormatter(Formatter formatter){
+        public Build SetFormatter(Formatter formatter)
+        {
             _configuration.Formatter = formatter;
             return this;
         }
@@ -127,13 +125,14 @@ namespace Isop
         public Build Recognize(Type arg, bool ignoreGlobalUnMatchedParameters = false)
         {
             _configuration.Recognizes.Add(new Controller(arg, ignoreGlobalUnMatchedParameters));
+            Container.TryAddSingleton(arg);
             return this;
         }
         public Build Recognize(Object arg, bool ignoreGlobalUnMatchedParameters = false)
         {
             var type = arg.GetType();
             _configuration.Recognizes.Add(new Controller(type, ignoreGlobalUnMatchedParameters));
-            _container.Add(arg);
+            Container.AddSingleton(type, svc => arg);
             return this;
         }
 
@@ -201,7 +200,7 @@ namespace Isop
                 return _configuration.Recognizes.Select(
                     c => new KeyValuePair<Type, Func<ControllerRecognizer>>(
                         c.Type,
-                        () => new ControllerRecognizer(c, _configuration, _container, AllowInferParameter)));
+                        () => new ControllerRecognizer(c, _configuration, Container, AllowInferParameter)));
             }
         }
 
@@ -209,39 +208,21 @@ namespace Isop
         {
             get
             {
-                return _configuration.Properties.Select(p => 
+                return _configuration.Properties.Select(p =>
                     new ArgumentWithOptions(
-                        argument: p.Name, 
-                        action: p.Action, 
-                        required: p.Required, 
-                        description: p.Description, 
+                        argument: p.Name,
+                        action: p.Action,
+                        required: p.Required,
+                        description: p.Description,
                         type: p.Type)).ToList();
             }
         }
 
-        public Func<Type, object> GetFactory()
-        {
-            return _container.CreateInstance;
-        }
-
-        public void Dispose()
-        {
-            _defaultFactory.Dispose();
-            foreach (var item in _disposables)
-            {
-                item.Dispose();
-            }
-            _disposables.Clear();
-        }
+        public IServiceCollection Container { get; }
 
         internal Build Configuration(Type t, object instance)
         {
             new ConfigureUsingInstance(_configuration, _helpXmlDocumentation).Configure(t, instance);
-
-            var disposable = instance as IDisposable;
-            if (disposable != null)
-                _disposables.Add(disposable);
-
             return this;
         }
 
@@ -249,7 +230,7 @@ namespace Isop
         {
             if (_helpController == null && _configuration.RecognizesHelp)
             {
-                HelpForControllers = new HelpForControllers(_configuration.Recognizes, _container,
+                HelpForControllers = new HelpForControllers(_configuration.Recognizes, Container,
                     HelpXmlDocumentation);
                 _helpForArgumentWithOptions = new HelpForArgumentWithOptions(GlobalParameters);
                 _helpController = new HelpController(_helpForArgumentWithOptions, HelpForControllers);

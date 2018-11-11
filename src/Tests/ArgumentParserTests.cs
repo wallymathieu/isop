@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using Isop.CommandLine.Parse;
 using Isop.CommandLine.Parse.Parameters;
 using Isop.Tests.FakeControllers;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace Isop.Tests
@@ -157,16 +158,11 @@ namespace Isop.Tests
         public void It_can_parse_class_and_method_and_execute()
         {
             var count = 0;
-            Func<Type, object> factory = (Type t) =>
-                                            {
-                                                Assert.That(t, Is.EqualTo(typeof(MyController)));
-                                                return
-                                                    (object)
-                                                    new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
-                                            };
-            var arguments = new Build { typeof(MyController) }
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
+
+            var arguments = new Build(sc) { typeof(MyController) }
                                 .SetCulture(CultureInfo.InvariantCulture)
-                                .SetFactory(factory)
                                 .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -178,16 +174,10 @@ namespace Isop.Tests
         public void It_can_parse_class_and_method_and_execute_with_ordinal_syntax()
         {
             var count = 0;
-            Func<Type, object> factory = (Type t) =>
-            {
-                Assert.That(t, Is.EqualTo(typeof(MyController)));
-                return
-                    (object)
-                    new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
-            };
-            var arguments = new Build { typeof(MyController) }
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
+            var arguments = new Build(sc) { typeof(MyController) }
                             .SetCulture(CultureInfo.InvariantCulture)
-                            .SetFactory(factory)
                             .Parse(new[] { "My", "Action", "value1", "value2", "3", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -198,16 +188,11 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_class_and_method_and_knows_whats_required()
         {
-            Func<Type, object> factory = (Type t) =>
-            {
-                Assert.That(t, Is.EqualTo(typeof(MyController)));
-                return
-                    (object)
-                    new MyController() { OnAction = (p1, p2, p3, p4) => "" };
-            };
-            var build = new Build { typeof(MyController) }
-                            .SetCulture(CultureInfo.InvariantCulture)
-                            .SetFactory(factory);
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => "" });
+
+            var build = new Build(sc) { typeof(MyController) }
+                            .SetCulture(CultureInfo.InvariantCulture);
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, True], [param3, True], [param4, True]", Boolean.Parse);
 
             var recognizers = build.ControllerRecognizers.Single().Value().GetRecognizers("Action");
@@ -227,17 +212,12 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_class_and_method_and_knows_whats_not_required()
         {
-            Func<Type, object> factory = (Type t) =>
-            {
-                Assert.That(t, Is.EqualTo(typeof(MyOptionalController)));
-                return
-                    (object)
-                    new MyOptionalController() { OnAction = (p1, p2, p3, p4) => "" };
-            };
-            var build = new Build()
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new MyOptionalController() { OnAction = (p1, p2, p3, p4) => "" });
+
+            var build = new Build(sc)
                             .SetCulture(CultureInfo.InvariantCulture)
-                            .Recognize(typeof(MyOptionalController))
-                            .SetFactory(factory);
+                            .Recognize(typeof(MyOptionalController));
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, False], [param3, False], [param4, False]", Boolean.Parse);
 
             var recognizers = build.ControllerRecognizers.Single().Value().GetRecognizers("Action");
@@ -249,20 +229,12 @@ namespace Isop.Tests
         public void It_can_parse_class_and_method_and_executes_default_with_the_default_values()
         {
             var parameters = new object[0];
-            Func<Type, object> factory = (Type t) =>
-            {
-                Assert.That(t, Is.EqualTo(typeof(MyOptionalController)));
-                return
-                    (object)
-                    new MyOptionalController()
-                    {
-                        OnAction = (p1, p2, p3, p4) =>
-                                       { parameters = new object[] { p1, p2, p3, p4 }; return ""; }
-                    };
-            };
-            var arguments = new Build { typeof(MyOptionalController) }
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
+                { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
+
+            var arguments = new Build(sc) { typeof(MyOptionalController) }
                     .SetCulture(CultureInfo.InvariantCulture)
-                    .SetFactory(factory)
                     .Parse(new[] { "MyOptional", "Action", "--param1", "value1" });
             arguments.Invoke(new StringWriter());
             Assert.That(parameters, Is.EquivalentTo(new object[] { "value1", null, null, 1 }));
@@ -272,20 +244,12 @@ namespace Isop.Tests
         public void It_can_parse_class_and_method_and_executes_default_with_the_default_values_when_using_ordinal_syntax()
         {
             var parameters = new object[0];
-            Func<Type, object> factory = (Type t) =>
-            {
-                Assert.That(t, Is.EqualTo(typeof(MyOptionalController)));
-                return
-                    (object)
-                    new MyOptionalController()
-                    {
-                        OnAction = (p1, p2, p3, p4) =>
-                        { parameters = new object[] { p1, p2, p3, p4 }; return ""; }
-                    };
-            };
-            var arguments = new Build { typeof(MyOptionalController) }
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
+                { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
+
+            var arguments = new Build(sc) { typeof(MyOptionalController) }
                     .SetCulture(CultureInfo.InvariantCulture)
-                    .SetFactory(factory)
                     .Parse(new[] { "MyOptional", "Action", "value1" });
             arguments.Invoke(new StringWriter());
             Assert.That(parameters, Is.EquivalentTo(new object[] { "value1", null, null, 1 }));
@@ -325,18 +289,13 @@ namespace Isop.Tests
         {
             var count = 0;
             var countArg = 0;
-            Func<Type, object> factory = (Type t) =>
-                                            {
-                                                Assert.That(t, Is.EqualTo(typeof(MyController)));
-                                                return
-                                                    (object)
-                                                    new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() };
-                                            };
-            var arguments = new Build()
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
+
+            var arguments = new Build(sc)
                         .SetCulture(CultureInfo.InvariantCulture)
                         .Recognize(typeof(MyController))
                         .Parameter("beta", arg => countArg++)
-                        .SetFactory(factory)
                         .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4", "--beta" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -349,18 +308,12 @@ namespace Isop.Tests
         public void It_can_parse_class_and_default_method_and_execute()
         {
             var count = 0;
-            Func<Type, object> factory = (Type t) =>
-            {
-                Assert.That(t, Is.EqualTo(typeof(WithIndexController)));
-                return
-                    (object)
-                    new WithIndexController() { OnIndex = (p1, p2, p3, p4) => (count++).ToString() };
-            };
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new WithIndexController() { OnIndex = (p1, p2, p3, p4) => (count++).ToString() });
 
-            var arguments = new Build()
+            var arguments = new Build(sc)
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(WithIndexController))
-                                               .SetFactory(factory)
                                                .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -383,42 +336,28 @@ namespace Isop.Tests
         public void It_understands_method_returning_enumerable()
         {
             var count = 0;
-            var createCount = 0;
-            Func<Type, object> factory = (Type t) =>
-            {
-                Assert.That(t, Is.EqualTo(typeof(EnumerableController)));
-                createCount++;
-                return
-                    (object)
-                    new EnumerableController() { Length = 2, OnEnumerate = () => (count++) };
-            };
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new EnumerableController() { Length = 2, OnEnumerate = () => (count++) });
 
-            var arguments = new Build()
+            var arguments = new Build(sc)
                    .Recognize(typeof(EnumerableController))
-                   .SetFactory(factory)
                    .Parse(new[] { "Enumerable", "Return" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(2));
-            Assert.That(createCount, Is.EqualTo(1));
         }
 
         [Test]
         public void It_can_parse_class_and_method_with_object_and_execute()
         {
             var count = 0;
-            Func<Type, object> factory = (Type t) =>
-            {
-                Assert.That(t, Is.EqualTo(typeof(MyObjectController)));
-                return
-                    (object)
-                    new MyObjectController() { OnAction = (p1) => (count++).ToString() };
-            };
-            var arguments = new Build()
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new MyObjectController() { OnAction = (p1) => (count++).ToString() });
+
+            var arguments = new Build(sc)
                                                .SetCulture(CultureInfo.InvariantCulture)
                                                .Recognize(typeof(MyObjectController))
-                                               .SetFactory(factory)
                                                .Parse(new[] { "MyObject", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -430,23 +369,16 @@ namespace Isop.Tests
         public void It_can_handle_file_argument()
         {
             var filename = string.Empty;
-            Func<Type, object> factory = (Type t) =>
-                {
-                    Assert.That(t, Is.EqualTo(typeof(MyFileController)));
-                    return
-                        (object)
-                        new MyFileController()
-                            {
-                                OnAction = (file) => filename = file.Name
-                            };
-                };
+
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new MyFileController() { OnAction = (file) => filename = file.Name });
 
 
             FileStream fileStream = null;
             try
             {
 
-                var arguments = new Build()
+                var arguments = new Build(sc)
                         .SetCulture(CultureInfo.InvariantCulture)
                         .SetTypeConverter((t, s, c) =>
                                               {
@@ -454,14 +386,13 @@ namespace Isop.Tests
                                                   fileStream = new FileStream(s, FileMode.Create);
                                                   return fileStream;
                                               })
-                    //Need to set type converter 
+                        //Need to set type converter 
                         .Recognize(typeof(MyFileController))
-                        .SetFactory(factory)
                         .Parse(new[] { "MyFile", "Action", "--file", "myfile.txt" });
 
                 Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
                 arguments.Invoke(new StringWriter());
-                Assert.That(filename, Is.StringContaining("myfile.txt"));
+                Assert.True(filename.Contains("myfile.txt"));
             }
             finally
             {
@@ -481,37 +412,31 @@ namespace Isop.Tests
         [Test]
         public void It_can_handle_different_casing_for_enum()
         {
-            foreach (var pair in new[] { 
-                new { value = "param1", expected = WithEnumController.WithEnum.Param1 }, 
+            foreach (var pair in new[] {
+                new { value = "param1", expected = WithEnumController.WithEnum.Param1 },
                 new { value = "paramwithcasing", expected = WithEnumController.WithEnum.ParamWithCasing },
             })
             {
                 var parameters = new List<WithEnumController.WithEnum?>();
-                Func<Type, object> factory = (Type t) =>
+                var sc = new ServiceCollection();
+                sc.AddSingleton(ci => new WithEnumController
                 {
-                    Assert.That(t, Is.EqualTo(typeof(WithEnumController)));
-                    return
-                        (object)
-                        new WithEnumController
-                        {
-                            OnIndex = (p1) =>
-                            {
-                                parameters.Add(p1);
-                                return "";
-                            }
-                        };
-                };
+                    OnIndex = (p1) =>
+                    {
+                        parameters.Add(p1);
+                        return "";
+                    }
+                });
 
-                var arguments = new Build()
+                var arguments = new Build(sc)
                                                    .SetCulture(CultureInfo.InvariantCulture)
                                                    .Recognize(typeof(WithEnumController))
-                                                   .SetFactory(factory)
                                                    .Parse(new[] { "WithEnum", /*"Index", */"--value", pair.value });
 
                 Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
                 arguments.Invoke(new StringWriter());
                 Assert.That(parameters, Is.EquivalentTo(new[] { pair.expected }));
-                
+
             }
         }
     }

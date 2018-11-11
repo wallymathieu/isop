@@ -1,120 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{55C48544-BD4E-4101-A42C-CCCEB2F92304}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Isop.Tests</RootNamespace>
-    <AssemblyName>Tests</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\isop\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <PackagesConfig>$(ProjectDir)/packages.config</PackagesConfig>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>1591</NoWarn>
-    <DocumentationFile>bin\Debug\Tests.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Tests.XML</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DocumentationFile>bin\Debug\Tests.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>4</WarningLevel>
+    <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AlternativeApiTests.cs" />
-    <Compile Include="ConfigurationCanReadFullConfigurationTests.cs" />
-    <Compile Include="FakeControllers\DescriptionController.cs" />
-    <Compile Include="FakeControllers\DescriptionWithCommentsController.cs" />
-    <Compile Include="FakeControllers\AnotherController.cs" />
-    <Compile Include="ArgumentParserTests.cs" />
-    <Compile Include="ArgumentLexerTests.cs" />
-    <Compile Include="ConfigurationTests.cs" />
-    <Compile Include="FakeControllers\EnumerableController.cs" />
-    <Compile Include="FakeConfigurations\FullConfiguration.cs" />
-    <Compile Include="FakeControllers\WithEnumController.cs" />
-    <Compile Include="FakeControllers\MyFileController.cs" />
-    <Compile Include="FakeControllers\MyObjectController.cs" />
-    <Compile Include="FakeControllers\MyOptionalController.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="HelpTests.cs" />
-    <Compile Include="FakeControllers\MyController.cs" />
-    <Compile Include="FakeControllers\SingleIntAction.cs" />
-    <Compile Include="FakeControllers\WithIndexController.cs" />
-    <Compile Include="ReturnValueFormatterTests.cs" />
-    <Compile Include="FakeControllers\ObjectController.cs" />
-    <Compile Include="DisposeTests.cs" />
-    <Compile Include="FakeControllers\DisposeController.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Isop\Isop.csproj">
-      <Project>{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB}</Project>
-      <Name>Isop</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Isop\Isop.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
+  <!-- 
+    <Target Name="CopyDocumentationFile" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <ResolvedFileToPublish Include="@(FinalDocFile)" RelativePath="@(FinalDocFile-&gt;'%(Filename)%(Extension)')" />
+    </ItemGroup>
   </Target>
   -->
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.9.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+  </ItemGroup>
 </Project>

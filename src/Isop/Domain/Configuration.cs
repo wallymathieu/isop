@@ -17,8 +17,6 @@ namespace Isop.Domain
         public IList<Controller> Recognizes { get; private set; }
         public IList<Property> Properties { get; private set; }
 
-        public Func<Type, object> Factory { get; set; }
-
         public TypeConverterFunc TypeConverter { get; set; }
 
         public bool RecognizesHelp { get; set; }

@@ -14,15 +14,15 @@ namespace Isop.Domain
             {
                 yield return (retval as string);
             }
-            else if (retval.GetType().IsValueType)
+            else if (retval.GetType().GetTypeInfo().IsValueType)
             {
                 yield return (retval.ToString());
             }
             else if (retval is IEnumerable)
             {
-                var if1 = retval.GetType().GetInterfaces()
-                    .Single(iff => iff.IsGenericType && iff.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-                var type = if1.GetGenericArguments().Single();
+                var if1 = retval.GetType().GetTypeInfo().GetInterfaces()
+                    .Single(iff => iff.GetTypeInfo().IsGenericType && iff.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+                var type = if1.GetTypeInfo().GetGenericArguments().Single();
                 var properties = GetProperties(type);
                 yield return Header(properties);
                 foreach (var item in (retval as IEnumerable))
@@ -40,7 +40,7 @@ namespace Isop.Domain
 
         private static PropertyInfo[] GetProperties(Type t)
         {
-            return t.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetProperty);
+            return t.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetProperty);
         }
         private static string Header(PropertyInfo[] properties)
         {

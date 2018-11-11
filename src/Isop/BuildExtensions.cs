@@ -78,12 +78,6 @@ namespace Isop
             build.TypeConverter = typeconverter; return build;
         }
 
-        public static Build SetFactory(this Build build, Func<Type, Object> factory)
-        {
-            build.Factory = factory;
-            return build;
-        }
-
     }
 }
 

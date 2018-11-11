@@ -1,13 +1,19 @@
 version: 1.0.{build}
+image: Visual Studio 2017
 configuration: Release
 before_build:
-  - bundle install
-  - rake restore
+  - msbuild /t:restore src
 build:
   project: src\Isop.sln
   verbosity: minimal
   publish_nuget: true
+test_script:
+  - dotnet test --configuration Debug src/Tests
 nuget:
   account_feed: false
   project_feed: true
   disable_publish_on_pr: true
+branches:
+  only: 
+    - master
+    - isop

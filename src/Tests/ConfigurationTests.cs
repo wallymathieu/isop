@@ -6,40 +6,13 @@ using System.IO;
 
 namespace Isop.Tests
 {
+    using System.Reflection;
     using Configurations;
     using Infrastructure;
 
     [TestFixture]
     public class ConfigurationTests
     {
-        [Test]
-        public void Can_dispose_of_configuration_after_usage()
-        {
-            var conf = new FullConfiguration();
-            var parserBuilder = new Build().Configuration(conf);
-            parserBuilder.Dispose();
-            Assert.That(conf.DisposeCalled);
-        }
-
-        private string TryGetExamplePath()
-        {
-            return new string[] { "Debug", "Release" }.Select(configuration=>
-                Path.GetFullPath(Path.Combine("..", "..", "..",
-                    Path.Combine("Example", "bin", configuration)))
-            ).FirstOrDefault(path=>Directory.Exists(path));
-        }
-
-        [Test]
-        public void Can_read_configuration_from_example_project()
-        {
-            var path = TryGetExamplePath();
-
-            var parserBuilder = new Build().ConfigurationFrom(path);
-
-            Assert.That(parserBuilder.ControllerRecognizers.Count(),
-                Is.AtLeast(2));
-        }
-
         [Test]
         public void Can_invoke_configure_method_on_configuration()
         {
@@ -63,7 +36,7 @@ namespace Isop.Tests
         [Test]
         public void Can_use_autoconfiguration()
         {
-            var recognizes = new AssemblyScanner(this.GetType().Assembly).LooksLikeControllers().ToArray();
+            var recognizes = new AssemblyScanner(this.GetType().GetTypeInfo().Assembly).LooksLikeControllers().ToArray();
             Assert.That(recognizes, Is.EquivalentTo(new[] { 
                 typeof(MyController), 
                 typeof(ObjectController),

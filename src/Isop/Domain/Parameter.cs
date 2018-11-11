@@ -16,7 +16,7 @@ namespace Isop.Domain
         public bool IsClassAndNotString()
         {
             var t = _parameter.ParameterType;
-            return t.IsClass && t != typeof(String);
+            return t.GetTypeInfo().IsClass && t != typeof(String);
         }
         public string Name{get{ return _parameter.Name;}}
         public Type ParameterType{get{ return _parameter.ParameterType;}}
@@ -26,7 +26,7 @@ namespace Isop.Domain
         }
         public IEnumerable<PropertyInfo> GetPublicInstanceProperties()
         {
-            return _parameter.ParameterType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            return _parameter.ParameterType.GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public);
         }
         public object DefaultValue{get{ return _parameter.DefaultValue; }}
 

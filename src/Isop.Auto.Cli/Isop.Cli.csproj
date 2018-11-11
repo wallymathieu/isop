@@ -1,67 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{C5008846-A54B-46C3-B144-973E50B8620F}</ProjectGuid>
+    <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition=" '$(VersionSuffix)' == '' ">$(VersionPrefix)</Version>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
     <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Isop.Auto.Cli</RootNamespace>
-    <AssemblyName>Isop.Cli</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\isop\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <PackagesConfig>$(ProjectDir)/packages.config</PackagesConfig>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <AssemblyName>Isop.Auto.Cli</AssemblyName>
+    <RepositoryUrl>https://github.com/wallymathieu/isop</RepositoryUrl>
+    <Description>Isop is a library to help simplify and structure command line apps. The Isop.Cli.exe is used if you dont care about implementing a 'Main' method.</Description>
+    <Authors>Oskar Gewalli</Authors>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/wallymathieu/isop</PackageProjectUrl>
+    <PackageTags>CLI</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Isop, Version=1.2.5543.32990, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Isop.2.0.5\lib\net40\Isop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <ProjectReference Include="..\Isop\Isop.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Isop.Cli.nuspec" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <Import Project="..\packages\OctoPack.3.0.41\tools\OctoPack.targets" Condition="Exists('..\packages\OctoPack.3.0.41\tools\OctoPack.targets')" />
-  <Target Name="EnsureOctoPackImported" BeforeTargets="BeforeBuild" Condition="'$(OctoPackImported)' == ''">
-    <Error Condition="!Exists('..\packages\OctoPack.3.0.41\tools\OctoPack.targets') And ('$(RunOctoPack)' != '' And $(RunOctoPack))" Text="You are trying to build with OctoPack, but the NuGet targets file that OctoPack depends on is not available on this computer. This is probably because the OctoPack package has not been committed to source control, or NuGet Package Restore is not enabled. Please enable NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
-    <Error Condition="Exists('..\packages\OctoPack.3.0.41\tools\OctoPack.targets') And ('$(RunOctoPack)' != '' And $(RunOctoPack))" Text="OctoPack cannot be run because NuGet packages were restored prior to the build running, and the targets file was unavailable when the build started. Please build the project again to include these packages in the build. You may also need to make sure that your build server does not delete packages prior to each build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Isop.Help;
 using Isop.Infrastructure;
 using Isop.Tests.FakeConfigurations;
@@ -276,16 +277,17 @@ See 'COMMANDNAME' help <command> <subcommand> for more information")));
 
         [Test] public void Can_read_xml_doc()
         {
-            var doc = HelpXmlDocumentation.GetSummariesFromText (File.ReadAllText("Tests.xml"));
+            var doc = HelpXmlDocumentation.GetSummariesFromText (
+                File.ReadAllText(Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location),"Tests.xml")));
             Assert.That(doc["P:Isop.Tests.FakeConfigurations.FullConfiguration.Global"],Is.EqualTo("GLOBAL!!"));
         }
         
         [Test] public void Can_get_same_key_as_in_xmldoc()
         {
             var helpXml = new HelpXmlDocumentation();
-            var _global = typeof(FullConfiguration).GetMethods().Single(m=>m.Name.EndsWith("Global") && m.Name.StartsWithIgnoreCase("set"));
+            var _global = typeof(FullConfiguration).GetTypeInfo().GetMethods().Single(m=>m.Name.EndsWith("Global") && m.Name.StartsWithIgnoreCase("set"));
             Assert.That(HelpXmlDocumentation.GetKey(_global), Is.EqualTo("P:Isop.Tests.FakeConfigurations.FullConfiguration.Global"));
-            var action1 = typeof(DescriptionWithCommentsController).GetMethods().Single(m=>m.Name.Equals("Action1"));
+            var action1 = typeof(DescriptionWithCommentsController).GetTypeInfo().GetMethods().Single(m=>m.Name.Equals("Action1"));
             Assert.That(HelpXmlDocumentation.GetKey(action1), Is.EqualTo("M:Isop.Tests.FakeControllers.DescriptionWithCommentsController.Action1"));
             
         }
