@@ -230,7 +230,8 @@ namespace Isop.Tests
         {
             var parameters = new object[0];
             var sc = new ServiceCollection();
-            sc.AddSingleton(ci => new MyOptionalController() { OnAction = (p1, p2, p3, p4) => "" });
+            sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
+                { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
 
             var arguments = new Build(sc) { typeof(MyOptionalController) }
                     .SetCulture(CultureInfo.InvariantCulture)
@@ -244,7 +245,8 @@ namespace Isop.Tests
         {
             var parameters = new object[0];
             var sc = new ServiceCollection();
-            sc.AddSingleton(ci => new MyOptionalController() { OnAction = (p1, p2, p3, p4) => "" });
+            sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
+                { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
 
             var arguments = new Build(sc) { typeof(MyOptionalController) }
                     .SetCulture(CultureInfo.InvariantCulture)
