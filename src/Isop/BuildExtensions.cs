@@ -43,11 +43,6 @@ namespace Isop
             return build;
         }
 
-        public static Build ConfigurationFromAssemblyPath(this Build build)
-        {
-            return build.ConfigurationFrom(ExecutionAssembly.Path());
-        }
-
         /// <summary>
         /// Will load all the assemblies in the path in order to scan them.
         /// </summary>

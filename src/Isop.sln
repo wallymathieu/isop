@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.csproj", "{02596ACA-3C85-4353-8744-5F0A172BA757}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop.Cli", "Isop.Auto.Cli\Isop.Cli.csproj", "{C5008846-A54B-46C3-B144-973E50B8620F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop.Cli", "Isop.Auto.Cli\Isop.Auto.Cli.csproj", "{C5008846-A54B-46C3-B144-973E50B8620F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{616AC38F-F483-4A59-A09C-EB817929F7C7}"
 	ProjectSection(SolutionItems) = preProject
