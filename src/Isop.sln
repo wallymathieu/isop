@@ -11,17 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop.Cli", "Isop.Auto.Cli\Isop.Auto.Cli.csproj", "{C5008846-A54B-46C3-B144-973E50B8620F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{616AC38F-F483-4A59-A09C-EB817929F7C7}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\nuget.rb = .nuget\nuget.rb
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{623E4E99-6404-4ED3-ACC4-98BB79C8978B}"
 	ProjectSection(SolutionItems) = preProject
-		..\rakefile.rb = ..\rakefile.rb
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
