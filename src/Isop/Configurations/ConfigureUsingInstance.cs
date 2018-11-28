@@ -12,12 +12,19 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace Isop.Configurations
 {
     using Domain;
-    internal class ConfigureUsingInstance
+    /// <summary>
+    /// Internal class
+    /// </summary>
+    [Obsolete("Should not be used explicitly, will be made internal")]
+    public class ConfigureUsingInstance
     {
         private readonly Configuration _configuration;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
         private readonly IServiceCollection _serviceCollection;
-
+        /// <summary>
+        /// Internal class
+        /// </summary>
+        [Obsolete("Should not be used explicitly, will be made internal")]
         public ConfigureUsingInstance(Configuration configuration, HelpXmlDocumentation helpXmlDocumentation, 
             IServiceCollection serviceCollection)
         {
