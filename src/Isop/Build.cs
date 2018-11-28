@@ -222,7 +222,7 @@ namespace Isop
 
         internal Build Configuration(Type t, object instance)
         {
-            new ConfigureUsingInstance(_configuration, _helpXmlDocumentation).Configure(t, instance);
+            new ConfigureUsingInstance(_configuration, _helpXmlDocumentation, Container).Configure(t, instance);
             return this;
         }
 

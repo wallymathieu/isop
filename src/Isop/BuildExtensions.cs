@@ -6,6 +6,9 @@ using System.Globalization;
 
 namespace Isop
 {
+    /// <summary>
+    /// Extensions of <see cref="Build"/>
+    /// </summary>
     public static class BuildExtensions
     {
         public static Build Recognize<T>(this Build build, bool ignoreGlobalUnMatchedParameters = false)

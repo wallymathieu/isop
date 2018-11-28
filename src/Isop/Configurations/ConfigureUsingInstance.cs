@@ -3,22 +3,27 @@ using System.Collections.Generic;
 using System.Globalization;
 using Isop.Help;
 using Isop.Infrastructure;
-using Isop.CommandLine.Parse;
 using System.Reflection;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Isop.Configurations
 {
     using Domain;
-    public class ConfigureUsingInstance
+    internal class ConfigureUsingInstance
     {
         private readonly Configuration _configuration;
-        private readonly HelpXmlDocumentation helpXmlDocumentation;
-        public ConfigureUsingInstance(Configuration configuration, HelpXmlDocumentation helpXmlDocumentation)
+        private readonly HelpXmlDocumentation _helpXmlDocumentation;
+        private readonly IServiceCollection _serviceCollection;
+
+        public ConfigureUsingInstance(Configuration configuration, HelpXmlDocumentation helpXmlDocumentation, 
+            IServiceCollection serviceCollection)
         {
             _configuration = configuration;
-            this.helpXmlDocumentation = helpXmlDocumentation;
+            _helpXmlDocumentation = helpXmlDocumentation;
+            _serviceCollection = serviceCollection;
         }
 
         static MethodInfo[] GetPublicInstanceMethods(Type t)
@@ -29,16 +34,17 @@ namespace Isop.Configurations
         void ConfigureRecognizes(Type t, object instance, MethodInfo[] methods = null)
         {
             var recognizesMethod = MatchGet((methods ?? GetPublicInstanceMethods(t)),
+                parameters: new Type[0],
                 name: new Regex("Recognizes", RegexOptions.IgnoreCase),
-                returnType: typeof(IEnumerable<Type>),
-                parameters: new Type[0]);
-            if (null != recognizesMethod)
+                returnType: typeof(IEnumerable<Type>)
+                );
+            if (null == recognizesMethod) return; // could not find Recognizes
+            
+            var recognizes = (IEnumerable<Type>)recognizesMethod.Invoke(instance, new object[0]);
+            foreach (var recognized in recognizes)
             {
-                var recognizes = (IEnumerable<Type>)recognizesMethod.Invoke(instance, new object[0]);
-                foreach (var recognized in recognizes)
-                {
-                    _configuration.Recognizes.Add(new Controller(recognized, false));
-                }
+                _configuration.Recognizes.Add(new Controller(recognized, false));
+                _serviceCollection.TryAddSingleton(recognized);
             }
         }
 
@@ -48,7 +54,7 @@ namespace Isop.Configurations
             foreach (var methodInfo in configurationSetters)
             {
                 var action = (Action<String>)methodInfo.MethodInfo.CreateDelegate(typeof(Action<String>), instance);
-                var description = helpXmlDocumentation.GetDescriptionForMethod(methodInfo.MethodInfo);
+                var description = _helpXmlDocumentation.GetDescriptionForMethod(methodInfo.MethodInfo);
                 _configuration.Properties.Add(new Property(RemoveSetFromBeginningOfString(methodInfo.Name), action: action, required: methodInfo.Required, description: description, type: typeof(string)));
             }
         }
