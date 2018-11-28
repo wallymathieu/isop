@@ -41,6 +41,15 @@ namespace Isop.Tests
                 Is.EquivalentTo(new[] { typeof(MyController), typeof(HelpController) }));
         }
         [Test]
+        public void Can_use_recognized_controllers()
+        {
+            _parserBuilder
+                .Parse(new[] {
+                    "My","Action","--param1","1","--param2","2","--param3","3","--param4","4",
+                    "--GlobalRequired","something"})
+                .Invoke();
+        }
+        [Test]
         public void RecognizeGlobalParameters()
         {
             var argumentWithOptionses = _parserBuilder.GlobalParameters
