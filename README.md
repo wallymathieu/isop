@@ -188,6 +188,4 @@ Look at the [Example Cli project](src/Example/Program.cs) for the most recent ex
 
 ## Alternative
 
-The alternative for this kind of library is <a href="http://lostechies.com/chadmyers/2011/06/06/cool-stuff-in-fubucore-no-6-command-line/">the framework found in fubucore</a>.
-
-If you want to have something simpler for simple command line applications then I would recommend using <a href="https://github.com/wallymathieu/ndesk-options-mirror">ndesc options</a>.
+If you want to have something simpler for simple command line applications then I would recommend using [ndesc options](https://github.com/wallymathieu/ndesk-options-mirror) or [commandline](https://github.com/commandlineparser/commandline).
