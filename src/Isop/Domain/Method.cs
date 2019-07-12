@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.ExceptionServices;
 
 namespace Isop.Domain
 {
@@ -23,7 +24,12 @@ namespace Isop.Domain
         }
         public object Invoke(object instance, object[] values){
             if (instance==null) throw new ArgumentNullException(nameof(instance));
-            return _methodInfo.Invoke(instance, values);
+            try{
+                return _methodInfo.Invoke(instance, values);
+            }catch(TargetInvocationException ex){
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                return null;
+            }
         }
 
         public IEnumerable<Argument> GetArguments()

@@ -34,4 +34,4 @@ appsettings.config
 .vs/
 # project rider
 .idea
-
+.ionide
