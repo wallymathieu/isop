@@ -5,7 +5,7 @@ namespace Isop
     /// <summary>
     /// Extensions of <see cref="Build"/>
     /// </summary>
-    public static class BuildExtensions
+    public static class BuilderExtensions
     {
         public static Builder Recognize<T>(this Builder build, bool ignoreGlobalUnMatchedParameters = false)
         {

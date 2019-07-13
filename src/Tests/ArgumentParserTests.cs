@@ -173,7 +173,7 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
 
-            var arguments = Build.Create().Recognize<MyController>()
+            var arguments = Build.Create(sc).Recognize<MyController>()
                                 .Build()
                                 .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
@@ -188,7 +188,7 @@ namespace Isop.Tests
             var count = 0;
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
-            var arguments = Build.Create().Recognize<MyController>()
+            var arguments = Build.Create(sc).Recognize<MyController>()
                             .Build()
                             .Parse(new[] { "My", "Action", "value1", "value2", "3", "3.4" });
 
@@ -202,8 +202,7 @@ namespace Isop.Tests
         {
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => "" });
-
-            var build = Build.Create().Recognize<MyController>()
+            var build = Build.Create(sc).Recognize<MyController>()
                             .Build();
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, True], [param3, True], [param4, True]", Boolean.Parse);
 
@@ -226,14 +225,10 @@ namespace Isop.Tests
         {
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyOptionalController() { OnAction = (p1, p2, p3, p4) => "" });
-
-            var build = Build.Create(sc)
-                .Recognize(typeof(MyOptionalController))
-                            .Build()
-                            ;
+            var build = Build.Create(sc).Recognize(typeof(MyOptionalController)).Build();
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, False], [param3, False], [param4, False]", Boolean.Parse);
 
-            var recognizers = build.Controller("My").Action("Action").GetArguments();
+            var recognizers = build.Controller("MyOptional").Action("Action").GetArguments();
             Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Name, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
@@ -245,8 +240,7 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
                 { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
-
-            var arguments = Build.Create().Recognize<MyOptionalController>()
+            var arguments = Build.Create(sc).Recognize<MyOptionalController>()
                     .Build()
                     .Parse(new[] { "MyOptional", "Action", "--param1", "value1" });
             arguments.Invoke(new StringWriter());
@@ -260,8 +254,7 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
                 { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
-
-            var arguments = Build.Create().Recognize<MyOptionalController>()
+            var arguments = Build.Create(sc).Recognize<MyOptionalController>()
                     .Build()
                     .Parse(new[] { "MyOptional", "Action", "value1" });
             arguments.Invoke(new StringWriter());
@@ -325,9 +318,9 @@ namespace Isop.Tests
             sc.AddSingleton(ci => new WithIndexController() { OnIndex = (p1, p2, p3, p4) => (count++).ToString() });
 
             var arguments = Build.Create(sc)
-                                               .Recognize(typeof(WithIndexController))
-                                               .Build()
-                                               .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+                                .Recognize(typeof(WithIndexController))
+                                .Build()
+                                .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
