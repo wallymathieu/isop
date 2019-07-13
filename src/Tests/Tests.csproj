@@ -10,16 +10,6 @@
     <ProjectReference Include="..\Isop\Isop.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <!-- 
-    <Target Name="CopyDocumentationFile" AfterTargets="ComputeFilesToPublish">
-    <ItemGroup>
-      <ResolvedFileToPublish Include="@(FinalDocFile)" RelativePath="@(FinalDocFile-&gt;'%(Filename)%(Extension)')" />
-    </ItemGroup>
-  </Target>
-  -->
-  <ItemGroup>
     <PackageReference Include="NUnit" Version="3.9.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />

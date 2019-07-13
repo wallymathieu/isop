@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 
 namespace Isop.CommandLine
 {
@@ -10,47 +9,45 @@ namespace Isop.CommandLine
     using Lex;
     using Parse;
     using Domain;
-    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Options;
 
-    public class ControllerRecognizer
+    internal class ControllerRecognizer
     {
         private readonly bool _allowInferParameter;
-        private readonly Configuration _configuration;
-        private readonly Controller _controller;
-        private readonly IServiceCollection _typeContainer;
+        private readonly IOptions<Configuration> _configuration;
+        private readonly IServiceProvider _typeContainer;
+        private readonly ConvertArgumentsToParameterValue convertArgument;
+        private readonly Formatter _formatter;
         /// <summary>
         /// </summary>
-        public ControllerRecognizer(Controller controller,
-            Configuration configuration,
-            IServiceCollection typeContainer,
-            bool allowInferParameter = false)
+        public ControllerRecognizer(
+            IOptions<Configuration> configuration,
+            IServiceProvider typeContainer,
+            TypeConverterFunc typeConverterFunc,
+            Formatter formatter)
         {
-            _controller = controller;
             _configuration = configuration;
-            _allowInferParameter = allowInferParameter;
-            _typeContainer = typeContainer; 
+            _allowInferParameter = ! _configuration.Value.DisableAllowInferParameter;
+            _typeContainer = typeContainer;
+            _formatter = formatter;
+            convertArgument = new ConvertArgumentsToParameterValue(configuration, typeConverterFunc);
         }
 
-        public IEnumerable<Argument> GetRecognizers(string methodname)
-        {//For tests mostly
-            return _controller.GetMethod(methodname).GetArguments();
-        }
+        private CultureInfo Culture { get { return _configuration.Value.CultureInfo ?? CultureInfo.CurrentCulture; } }
 
-        private CultureInfo Culture { get { return _configuration.CultureInfo ?? CultureInfo.CurrentCulture; } }
-
-        public bool Recognize(IEnumerable<string> arg)
+        public bool Recognize(Controller controller, IEnumerable<string> arg)
         {
             var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
-            return null != FindMethodInfo(lexed);
+            return null != FindMethodInfo(controller, lexed);
         }
 
-        private Method FindMethodInfo(IList<Token> arg)
+        private Method FindMethodInfo(Controller controller, IList<Token> arg)
         {
-            var foundClassName = _controller.Name.EqualsIgnoreCase(arg.ElementAtOrDefault(0).Value);
+            var foundClassName = controller.Name.EqualsIgnoreCase(arg.ElementAtOrDefault(0).Value);
             if (foundClassName)
             {
                 var methodName = arg.ElementAtOrDefault(1).Value;
-                var methodInfo = FindMethodAmongLexedTokens.FindMethod(_controller.GetControllerActionMethods(), methodName, arg);
+                var methodInfo = FindMethodAmongLexedTokens.FindMethod(controller.GetControllerActionMethods(), methodName, arg);
                 return methodInfo;
             }
             return null;
@@ -62,26 +59,26 @@ namespace Isop.CommandLine
         /// </summary>
         /// <param name="arg"></param>
         /// <returns></returns>
-        public ParsedMethod Parse(IEnumerable<string> arg)
+        public ParsedMethod Parse(Controller controller, IEnumerable<string> arg)
         {
             var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
 
-            var methodInfo = FindMethodInfo(lexed);
+            var methodInfo = FindMethodInfo(controller, lexed);
 
             var argumentRecognizers = methodInfo.GetArguments()
                 .ToList();
             argumentRecognizers.InsertRange(0, new[] { 
-                new ArgumentWithOptions(ArgumentParameter.Parse("#0" + _controller.Name, Culture), required: true, type: typeof(string)),
+                new ArgumentWithOptions(ArgumentParameter.Parse("#0" + controller.Name, Culture), required: true, type: typeof(string)),
                 new ArgumentWithOptions(ArgumentParameter.Parse("#1" + methodInfo.Name, Culture), required: false, type: typeof(string))
             });
 
             var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter, Culture);
             var parsedArguments = parser.Parse(lexed, arg);
 
-            return Parse(methodInfo, parsedArguments);
+            return Parse(controller, methodInfo, parsedArguments);
         }
 
-        public ParsedMethod Parse(Method methodInfo, ParsedArguments parsedArguments)
+        private ParsedMethod Parse(Controller controller, Method methodInfo, ParsedArguments parsedArguments)
         {
             var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments().ToArray();
             if (unMatchedRequiredArguments.Any())
@@ -92,48 +89,40 @@ namespace Isop.CommandLine
                                 .Select(unmatched => unmatched.Name).ToArray()
                           };
             }
-            var convertArgument = new ConvertArgumentsToParameterValue(_configuration.CultureInfo, _configuration.TypeConverter);
             var recognizedActionParameters = convertArgument.GetParametersForMethod(methodInfo,
                 parsedArguments.RecognizedArgumentsAsKeyValuePairs());
 
-            return new ParsedMethod( parsedArguments, _typeContainer, _configuration)
-                       {
-                           RecognizedAction = methodInfo,
-                           RecognizedActionParameters = recognizedActionParameters,
-                           RecognizedClass = _controller.Type
-                       };
+            return new ParsedMethod( parsedArguments, _typeContainer,
+                recognizedClass: controller.Type,
+                formatter: _formatter,
+                recognizedAction: methodInfo,
+                recognizedActionParameters: recognizedActionParameters);
         }
 
-        public ParsedArguments ParseArgumentsAndMerge(IEnumerable<string> arg, ParsedArguments parsedArguments)
+        public ParsedArguments ParseArgumentsAndMerge(Controller controller, IEnumerable<string> arg, ParsedArguments parsedArguments)
         {
-            var parsedMethod = Parse(arg);
+            var parsedMethod = Parse(controller, arg);
             // Inferred ordinal arguments should not be recognized twice
             parsedArguments.RecognizedArguments = parsedArguments.RecognizedArguments
                 .Where(argopts =>
                     !parsedMethod.RecognizedArguments.Any(pargopt => pargopt.Index == argopts.Index && argopts.InferredOrdinal));
             var merged = parsedArguments.Merge(parsedMethod);
-            if (!_controller.IgnoreGlobalUnMatchedParameters)
+            if (!controller.IgnoreGlobalUnMatchedParameters)
                 merged.AssertFailOnUnMatched();
             return merged;
         }
 
-        public bool Recognize(string controllerName, string actionName)
+        public ParsedArguments ParseArgumentsAndMerge(Controller controller, string actionName, Dictionary<string, string> arg, ParsedArguments parsedArguments)
         {
-            return _controller.Recognize(controllerName, actionName);
-        }
-
-        public ParsedArguments ParseArgumentsAndMerge(string actionName, Dictionary<string, string> arg, ParsedArguments parsedArguments)
-        {
-
-            var methodInfo = _controller.GetMethod(actionName);
+            var methodInfo = controller.GetMethod(actionName);
             var argumentRecognizers = methodInfo.GetArguments()
                 .ToList();
 
             var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter, Culture);
             var parsedMethodArguments = parser.Parse(arg);
-            var parsedMethod = Parse(methodInfo, parsedMethodArguments);
+            var parsedMethod = Parse(controller, methodInfo, parsedMethodArguments);
             var merged = parsedArguments.Merge(parsedMethod);
-            if (!_controller.IgnoreGlobalUnMatchedParameters)
+            if (!controller.IgnoreGlobalUnMatchedParameters)
                 merged.AssertFailOnUnMatched();
             return merged;
         }

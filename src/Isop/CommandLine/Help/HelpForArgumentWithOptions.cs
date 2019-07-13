@@ -4,16 +4,17 @@ using System.Linq;
 
 namespace Isop.CommandLine.Help
 {
+    using Isop.Help;
     using Parse;
-    public class HelpForArgumentWithOptions
+    internal class HelpForArgumentWithOptions
     {
+        private readonly HelpTexts helpTexts;
         private readonly IEnumerable<ArgumentWithOptions> _argumentWithOptionses;
-        public string TheArgumentsAre { get; set; }
 
-        public HelpForArgumentWithOptions(IEnumerable<ArgumentWithOptions> argumentWithOptionses)
+        public HelpForArgumentWithOptions(HelpTexts helpTexts, IEnumerable<ArgumentWithOptions> argumentWithOptionses)
         {
+            this.helpTexts = helpTexts;
             _argumentWithOptionses = argumentWithOptionses;
-            TheArgumentsAre = "The arguments are:";
         }
 
         private static string Help(ArgumentWithOptions entity)
@@ -26,7 +27,7 @@ namespace Isop.CommandLine.Help
         public string Help(string val = null)
         {
             if (string.IsNullOrEmpty(val))
-                return TheArgumentsAre + Environment.NewLine +
+                return helpTexts.TheArgumentsAre + Environment.NewLine +
                       string.Join(Environment.NewLine,
                                   _argumentWithOptionses.Select(ar => "  "+ Help(ar)).ToArray());
             return Help(_argumentWithOptionses.First(ar => ar.Argument.Prototype.Equals(val)));

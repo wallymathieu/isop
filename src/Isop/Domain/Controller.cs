@@ -19,11 +19,7 @@ namespace Isop.Domain
             IgnoreGlobalUnMatchedParameters = ignoreGlobalUnMatchedParameters;
         }
         public bool IgnoreGlobalUnMatchedParameters { get; private set; }
-        public Type Type
-        {
-            get;
-            set;
-        }
+        public Type Type { get; private set; }
         public string Name { get { return ControllerName(Type); } }
 
         private static string ControllerName(Type type)

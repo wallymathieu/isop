@@ -7,7 +7,7 @@ namespace Isop.Help
     using CommandLine.Help;
     using Domain;
 
-    public class HelpController
+    internal class HelpController
     {
         private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private readonly HelpForControllers _helpForClassAndMethod;

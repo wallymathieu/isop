@@ -8,22 +8,23 @@ using Isop.Infrastructure;
 using Isop.CommandLine.Parse;
 using Isop.Domain;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Isop.Help
 {
-    public class HelpForControllers : HelpTexts
+    internal class HelpForControllers
     {
-
         private readonly ICollection<Controller> _classAndMethodRecognizers;
-        private readonly IServiceCollection _container;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
+        private readonly HelpTexts _helpTexts;
 
-        public HelpForControllers(ICollection<Controller> classAndMethodRecognizers, IServiceCollection container,
-            HelpXmlDocumentation helpXmlDocumentation = null)
+        public HelpForControllers(ICollection<Controller> classAndMethodRecognizers, 
+            HelpXmlDocumentation helpXmlDocumentation,
+            IOptions<HelpTexts> helpTexts)
         {
-            _container = container;
             _classAndMethodRecognizers = classAndMethodRecognizers;
-            _helpXmlDocumentation = helpXmlDocumentation ?? new HelpXmlDocumentation();
+            _helpXmlDocumentation = helpXmlDocumentation;
+            _helpTexts = helpTexts.Value;
         }
 
         private readonly Type[] _onlyStringType = { typeof(string) };
@@ -42,6 +43,8 @@ namespace Isop.Help
             }
             else
             {
+                throw new NotImplementedException();
+                /*
                 var provider = _container.BuildServiceProvider();
                 using (var scope = provider.CreateScope())
                 {
@@ -52,6 +55,7 @@ namespace Isop.Help
                     method != null ? method.Name : null
                     }));
                 }
+                */
             }
 
             if (method != null && includeArguments)
@@ -86,7 +90,7 @@ namespace Isop.Help
             {
                 var lines = new []
                 {
-                    UnknownAction,
+                    _helpTexts.UnknownAction,
                     action
                 };
                 return string.Join(Environment.NewLine, lines);
@@ -100,9 +104,9 @@ namespace Isop.Help
                 var lines = new[]
                 {
                     string.Concat(method.Name, " ",Description(type, method)),
-                    string.Concat(AndAcceptTheFollowingParameters,":"),
+                    string.Concat(_helpTexts.AndAcceptTheFollowingParameters,":"),
                     string.Join(", ", arguments.Select(DescriptionAndHelp)),
-                    string.Concat(AndTheShortFormIs,":"),
+                    string.Concat(_helpTexts.AndTheShortFormIs,":"),
                     string.Join(" ", type.Name, method.Name,
                         string.Join(", ", arguments.Select(arg => arg.Name.ToUpperInvariant())))
                 };
@@ -130,13 +134,13 @@ namespace Isop.Help
             {
                 var lines = new []
                 {
-                    TheCommandsAre,
+                    _helpTexts.TheCommandsAre,
                     string.Join(Environment.NewLine,
                         _classAndMethodRecognizers
                             .Where(cmr => !cmr.IsHelp())
                             .Select(cmr => "  " + HelpFor(cmr, true)).ToArray()),
                     string.Empty,
-                    HelpCommandForMoreInformation
+                    _helpTexts.HelpCommandForMoreInformation
                 };
                 return string.Join(Environment.NewLine, lines);
             }
@@ -144,11 +148,11 @@ namespace Isop.Help
                 type.Name.EqualsIgnoreCase(val));
             if (string.IsNullOrEmpty(action))
             {
-                return string.Concat(TheSubCommandsFor,
+                return string.Concat(_helpTexts.TheSubCommandsFor,
                        HelpFor(controllerRecognizer, false),
                        Environment.NewLine,
                        Environment.NewLine,
-                       HelpSubCommandForMoreInformation);
+                       _helpTexts.HelpSubCommandForMoreInformation);
             }
             return HelpForAction(controllerRecognizer, action);
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using Isop;
 
@@ -11,10 +12,13 @@ namespace Example
     {
         static void Main(string[] args)
         {
-            var parserBuilder = new Build()
-                       .ShouldRecognizeHelp()
-                       .Recognize(typeof(MyController))
-                       .Recognize(typeof(CustomerController));
+            var parserBuilder = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
+            .Recognize(typeof(MyController))
+            .Recognize(typeof(CustomerController)).Build();
             try
             {
                 var parsedMethod = parserBuilder.Parse(args);

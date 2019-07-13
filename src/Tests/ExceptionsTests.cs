@@ -18,9 +18,12 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new ObjectController() { OnAction = () => throw new SpecificException() });
 
-            var arguments = new Build(sc) { typeof(ObjectController) }
-                                .SetCulture(CultureInfo.InvariantCulture)
-                                .Parse(new[] { "Object", "Action" });
+            var arguments = Build.Create(sc, new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture
+            }).Recognize<ObjectController>()
+            .Build()
+            .Parse(new[] { "Object", "Action" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             Assert.Throws<SpecificException>(() =>arguments.Invoke(new StringWriter()));

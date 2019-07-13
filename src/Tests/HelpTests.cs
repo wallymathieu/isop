@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,11 +17,15 @@ namespace Isop.Tests
         [Test]
         public void It_can_report_usage_for_simple_parameters ()
         {
-            var usage = new Build()
-                                    .Parameter ("beta", arg => { }, description:"Some description about beta")
-                                    .Parameter ("alpha", arg => { })
-                                    .ShouldRecognizeHelp ()
-                                    .Help ();
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp=true,
+            })
+            .Parameter ("beta", arg => { }, description:"Some description about beta")
+            .Parameter ("alpha", arg => { })
+            .Build()
+            .Help ();
             var tab = '\t';
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The arguments are:
   --beta" + tab + @"Some description about beta
@@ -30,12 +35,18 @@ namespace Isop.Tests
         [Test]
         public void It_can_report_usage_for_simple_parameters_with_different_texts ()
         {
-            var usage = new Build()
-                                    .Parameter ("beta", arg => { }, description:"Beskrivning av beta")
-                                    .Parameter ("alpha", arg => { })
-                                    .ShouldRecognizeHelp ()
-                                    .HelpTextArgumentsAre ("Det finns följande argument:")
-                                    .Help ();
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
+            .Parameter("beta", arg => { }, description: "Beskrivning av beta")
+            .Parameter("alpha", arg => { })
+            .WithHelpTexts(h => {
+                h.TheArgumentsAre = "Det finns följande argument:";
+             })
+            .Build()
+            .Help ();
             var tab = '\t';
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"Det finns följande argument:
   --beta" + tab + @"Beskrivning av beta
@@ -45,11 +56,14 @@ namespace Isop.Tests
         [Test]
         public void It_can_report_usage_for_controllers ()
         {
-            var usage = new Build()
-                                    .Recognize (typeof(MyController))
-                                    .Recognize (typeof(AnotherController))
-                                    .ShouldRecognizeHelp ()
-                                    .Help ();
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
+            .Recognize (typeof(MyController))
+            .Recognize (typeof(AnotherController))
+            .Build().Help ();
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The commands are:
   My
   Another
@@ -60,12 +74,16 @@ See 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_when_having_required_parameters ()
         {
-            var usage = new Build()
-                                    .Parameter("required",required:true)
-                                    .Recognize (typeof(MyController))
-                                    .Recognize (typeof(AnotherController))
-                                    .ShouldRecognizeHelp ()
-                                    .Help ();
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
+            .Parameter("required",required:true)
+            .Recognize (typeof(MyController))
+            .Recognize (typeof(AnotherController))
+            .Build()
+            .Help ();
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The arguments are:
   --required
 The commands are:
@@ -78,18 +96,21 @@ See 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_and_have_a_different_help_text ()
         {
-            var usage = new Build()
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            }).WithHelpTexts(h =>
+            {
+                h.TheCommandsAre = "Det finns följande kommandon:";
+                h.HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information";
+                h.TheSubCommandsFor = "Det finns föjande sub kommandon:";
+                h.HelpSubCommandForMoreInformation =
+                    "Se 'Kommandonamn' help <kommando> <subkommando> för mer information";
+            })
                 .Recognize (typeof(MyController))
                 .Recognize (typeof(AnotherController))
-                .ShouldRecognizeHelp ()
-                .HelpTextCommandsAre (h =>
-                {
-                    h.TheCommandsAre = "Det finns följande kommandon:";
-                    h.HelpCommandForMoreInformation ="Se 'Kommandonamn' help <kommando> för ytterligare information";
-                    h.TheSubCommandsFor = "Det finns föjande sub kommandon:";
-                    h.HelpSubCommandForMoreInformation =
-                        "Se 'Kommandonamn' help <kommando> <subkommando> för mer information";
-                })
+                .Build()
                 .Help ();
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"Det finns följande kommandon:
   My
@@ -101,11 +122,14 @@ Se 'Kommandonamn' help <kommando> för ytterligare information")));
         [Test]
         public void It_can_report_usage_for_a_specific_controller_and_have_a_different_help_text ()
         {
-            var usage = new Build()
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
                 .Recognize (typeof(MyController))
                 .Recognize (typeof(AnotherController))
-                .ShouldRecognizeHelp ()
-                .HelpTextCommandsAre(h =>
+                .WithHelpTexts(h =>
                 {
                     h.TheCommandsAre = "Det finns följande kommandon:";
                     h.HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information";
@@ -113,6 +137,8 @@ Se 'Kommandonamn' help <kommando> för ytterligare information")));
                     h.HelpSubCommandForMoreInformation =
                         "Se 'Kommandonamn' help <kommando> <subkommando> för mer information";
                 })
+                                .Build()
+
                 .HelpFor("my");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"Det finns föjande sub kommandon:My
   Action  ActionHelp --param1 --param2 --param3 --param4
@@ -123,11 +149,14 @@ Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
         [Test]
         public void It_can_report_usage_for_a_specific_controller_and_action_and_have_a_different_help_text()
         {
-            var usage = new Build()
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
                 .Recognize(typeof(MyController))
                 .Recognize(typeof(AnotherController))
-                .ShouldRecognizeHelp()
-                    .HelpTextCommandsAre(h =>
+                    .WithHelpTexts(h =>
                     {
                         h.TheCommandsAre = "Det finns följande kommandon:";
                         h.HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information";
@@ -136,7 +165,7 @@ Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
                             "Se 'Kommandonamn' help <kommando> <subkommando> för mer information";
                         h.AndAcceptTheFollowingParameters = "Och accepterar följande parametrar";
                         h.AndTheShortFormIs = "Och kortformen är";
-                    })
+                    }).Build()
                 .HelpFor("my","Action");
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action   ActionHelp
 Och accepterar följande parametrar:
@@ -154,10 +183,14 @@ My Action PARAM1, PARAM2, PARAM3, PARAM4")));
         public void It_can_report_usage_when_no_parameters_given ()
         {
             var cout = new StringWriter();
-            new Build()
-                                    .ShouldRecognizeHelp ()
-                                    .Recognize (typeof(MyController))
-                                    .Parse (new string[]{}).Invoke (cout);
+            Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
+            .Recognize (typeof(MyController))
+            .Build()
+            .Parse (new string[]{}).Invoke (cout);
             Assert.That (LineSplit (cout.ToString()), Is.EquivalentTo (LineSplit (@"The commands are:
   My
 
@@ -167,10 +200,16 @@ See 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_and_actions ()
         {
-            var usage = new Build()
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
+
                                     .Recognize (typeof(MyController))
                                     .Recognize (typeof(AnotherController))
-                                    .ShouldRecognizeHelp ()
+            .Build()
+
                                     .HelpFor ("Another");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The sub commands for Another
 
@@ -183,10 +222,16 @@ See 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test]
         public void It_can_report_usage_for_controller_and_action()
         {
-            var usage = new Build()
-                                    .Recognize(typeof(MyController))
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
+
+                        .Recognize(typeof(MyController))
                                     .Recognize(typeof(AnotherController))
-                                    .ShouldRecognizeHelp()
+                                                .Build()
+
                                     .HelpFor("Another", "Action1");
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1
 And accept the following parameters:
@@ -198,9 +243,13 @@ Another Action1 PARAM1")));
         [Test]
         public void It_can_report_usage_for_controllers_with_description ()
         {
-            var usage = new Build()
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
                                     .Recognize (typeof(DescriptionController))
-                                    .ShouldRecognizeHelp ()
+                                    .Build()
                                     .Help ();
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The commands are:
   Description  Some description
@@ -211,9 +260,13 @@ See 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_and_actions_with_description ()
         {
-            var usage = new Build()
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
                                     .Recognize (typeof(DescriptionController))
-                                    .ShouldRecognizeHelp ()
+                                    .Build ()
                                     .HelpFor ("Description");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The sub commands for Description
 
@@ -226,9 +279,13 @@ See 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test]
         public void It_can_report_usage_for_actions_with_description()
         {
-            var usage = new Build()
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
                                     .Recognize(typeof(DescriptionController))
-                                    .ShouldRecognizeHelp()
+                                    .Build()
                                     .HelpFor("Description","action1");
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Action1   Some description 1")));
         }
@@ -236,9 +293,13 @@ See 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test]
         public void It_can_report_usage_for_missing_action()
         {
-            var usage = new Build()
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
                                     .Recognize(typeof(DescriptionController))
-                                    .ShouldRecognizeHelp()
+                                    .Build()
                                     .HelpFor("Description", "actionX");
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Unknown action
 actionX")));
@@ -247,9 +308,13 @@ actionX")));
         [Test]
         public void It_can_report_usage_for_controllers_and_actions_with_fullname()
         {
-            var usage = new Build()
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
                                     .Recognize(typeof(DescriptionController))
-                                    .ShouldRecognizeHelp()
+                                    .Build()
                                     .HelpFor("DescriptionController");
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The sub commands for Description
 
@@ -263,9 +328,13 @@ See 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_and_actions_with_description_in_comments ()
         {
-            var usage = new Build()
+            var usage = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            })
                                     .Recognize (typeof(DescriptionWithCommentsController))
-                                    .ShouldRecognizeHelp ()
+                                    .Build ()
                                     .HelpFor ("DescriptionWithComments");
             Assert.That (LineSplit (usage), Is.EquivalentTo (LineSplit (@"The sub commands for DescriptionWithComments
 

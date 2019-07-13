@@ -19,8 +19,9 @@ namespace Isop.Tests
         [Test]
         public void Recognizes_shortform()
         {
-            var parser = new Build()
+            var parser = Build.Create()
                 .Parameter("&argument")
+                .Build()
                 .Parse(new[] { "-a" });
             var arguments = parser.RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -31,8 +32,9 @@ namespace Isop.Tests
         [Test]
         public void Given_several_arguments_Then_the_correct_one_is_recognized()
         {
-            var arguments = new Build()
+            var arguments = Build.Create()
                 .Parameter("&beta")
+                .Build()
                 .Parse(new[] { "-a", "-b" }).RecognizedArguments;
 
             Assert.That(arguments.Count(), Is.EqualTo(1));
@@ -43,8 +45,9 @@ namespace Isop.Tests
         [Test]
         public void Recognizes_longform()
         {
-            var arguments = new Build()
+            var arguments = Build.Create()
                 .Parameter("beta")
+                .Build()
                 .Parse(new[] { "-a", "--beta" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -54,8 +57,9 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_parameter_value()
         {
-            var arguments = new Build()
+            var arguments = Build.Create()
                 .Parameter("beta")
+                .Build()
                 .Parse(new[] { "-a", "--beta", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -71,8 +75,9 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_ordinal_parameter_value()
         {
-            var arguments = new Build()
+            var arguments = Build.Create()
                 .Parameter("#0first")
+                .Build()
                 .Parse(new[] { "first" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -81,8 +86,9 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_parameter_with_equals()
         {
-            var arguments = new Build()
+            var arguments = Build.Create()
                 .Parameter("beta=")
+                .Build()
                 .Parse(new[] { "-a", "--beta=test", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -92,8 +98,9 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_parameter_alias()
         {
-            var arguments = new Build()
+            var arguments = Build.Create()
                 .Parameter("beta|b=")
+                .Build()
                 .Parse(new[] { "-a", "-b=test", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -103,8 +110,9 @@ namespace Isop.Tests
         [Test]
         public void It_can_report_unrecognized_parameters()
         {
-            var unRecognizedArguments = new Build()
+            var unRecognizedArguments = Build.Create()
                .Parameter("beta")
+               .Build()
                .Parse(new[] { "-a", "value", "--beta" }).UnRecognizedArguments;
 
             Assert.That(unRecognizedArguments, Is.EquivalentTo(new[] {
@@ -115,9 +123,10 @@ namespace Isop.Tests
         [Test]
         public void It_can_infer_ordinal_usage_of_named_parameters()
         {
-            var arguments = new Build()
+            var arguments = Build.Create()
                 .Parameter("beta|b=")
                 .Parameter("alpha|a=")
+                .Build()
                 .Parse(new[] { "test", "value" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(2));
             var arg1 = arguments.First();
@@ -128,8 +137,9 @@ namespace Isop.Tests
         [Test]
         public void It_wont_report_matched_parameters()
         {
-            var arguments = new Build()
+            var arguments = Build.Create()
                 .Parameter("beta")
+                .Build()
                 .Parse(new[] { "--beta", "value" }).UnRecognizedArguments;
 
             Assert.That(arguments.Count(), Is.EqualTo(0));
@@ -137,16 +147,18 @@ namespace Isop.Tests
         [Test]
         public void It_will_fail_if_argument_not_supplied_and_it_is_required()
         {
-            Assert.Throws<MissingArgumentException>(() => new Build()
+            Assert.Throws<MissingArgumentException>(() => Build.Create()
                .Parameter("beta", required: true)
+               .Build()
                .Parse(new[] { "-a", "value" }));
 
         }
         [Test]
         public void It_can_recognize_arguments()
         {
-            var arguments = new Build()
+            var arguments = Build.Create()
                 .Parameter("alpha")
+                .Build()
                 .Parse(new[] { "alpha" }).RecognizedArguments;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -161,8 +173,8 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
 
-            var arguments = new Build(sc) { typeof(MyController) }
-                                .SetCulture(CultureInfo.InvariantCulture)
+            var arguments = Build.Create().Recognize<MyController>()
+                                .Build()
                                 .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -176,8 +188,8 @@ namespace Isop.Tests
             var count = 0;
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
-            var arguments = new Build(sc) { typeof(MyController) }
-                            .SetCulture(CultureInfo.InvariantCulture)
+            var arguments = Build.Create().Recognize<MyController>()
+                            .Build()
                             .Parse(new[] { "My", "Action", "value1", "value2", "3", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -191,11 +203,11 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => "" });
 
-            var build = new Build(sc) { typeof(MyController) }
-                            .SetCulture(CultureInfo.InvariantCulture);
+            var build = Build.Create().Recognize<MyController>()
+                            .Build();
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, True], [param3, True], [param4, True]", Boolean.Parse);
 
-            var recognizers = build.ControllerRecognizers.Single().Value().GetRecognizers("Action");
+            var recognizers = build.Controller("My").Action("Action").GetArguments();
             Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Name, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
@@ -215,12 +227,13 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyOptionalController() { OnAction = (p1, p2, p3, p4) => "" });
 
-            var build = new Build(sc)
-                            .SetCulture(CultureInfo.InvariantCulture)
-                            .Recognize(typeof(MyOptionalController));
+            var build = Build.Create(sc)
+                .Recognize(typeof(MyOptionalController))
+                            .Build()
+                            ;
             var expected = DictionaryDescriptionToKv("[param1, True], [param2, False], [param3, False], [param4, False]", Boolean.Parse);
 
-            var recognizers = build.ControllerRecognizers.Single().Value().GetRecognizers("Action");
+            var recognizers = build.Controller("My").Action("Action").GetArguments();
             Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Name, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
@@ -233,8 +246,8 @@ namespace Isop.Tests
             sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
                 { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
 
-            var arguments = new Build(sc) { typeof(MyOptionalController) }
-                    .SetCulture(CultureInfo.InvariantCulture)
+            var arguments = Build.Create().Recognize<MyOptionalController>()
+                    .Build()
                     .Parse(new[] { "MyOptional", "Action", "--param1", "value1" });
             arguments.Invoke(new StringWriter());
             Assert.That(parameters, Is.EquivalentTo(new object[] { "value1", null, null, 1 }));
@@ -248,8 +261,8 @@ namespace Isop.Tests
             sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
                 { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
 
-            var arguments = new Build(sc) { typeof(MyOptionalController) }
-                    .SetCulture(CultureInfo.InvariantCulture)
+            var arguments = Build.Create().Recognize<MyOptionalController>()
+                    .Build()
                     .Parse(new[] { "MyOptional", "Action", "value1" });
             arguments.Invoke(new StringWriter());
             Assert.That(parameters, Is.EquivalentTo(new object[] { "value1", null, null, 1 }));
@@ -259,8 +272,8 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail()
         {
-            var builder = new Build { typeof(MyController) }
-                .SetCulture(CultureInfo.InvariantCulture);
+            var builder = Build.Create().Recognize<MyController>()
+                .Build();
 
             Assert.Throws<MissingArgumentException>(() => builder.Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" }));
         }
@@ -268,8 +281,8 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail_because_of_type_conversion()
         {
-            var builder = new Build { typeof(SingleIntAction) }
-                 .SetCulture(CultureInfo.InvariantCulture);
+            var builder = Build.Create().Recognize<SingleIntAction>()
+                 .Build();
             Assert.Throws<TypeConversionFailedException>(() =>
                 builder.Parse(new[] { "SingleIntAction", "Action", "--param", "value" })
             );
@@ -278,8 +291,8 @@ namespace Isop.Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail_because_no_arguments_given()
         {
-            var builder = new Build { typeof(MyController) }
-                .SetCulture(CultureInfo.InvariantCulture);
+            var builder = Build.Create().Recognize<MyController>()
+                .Build();
 
             Assert.Throws<MissingArgumentException>(() => builder.Parse(new[] { "My", "Action" }));
         }
@@ -292,10 +305,10 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
 
-            var arguments = new Build(sc)
-                        .SetCulture(CultureInfo.InvariantCulture)
+            var arguments = Build.Create(sc)
                         .Recognize(typeof(MyController))
                         .Parameter("beta", arg => countArg++)
+                        .Build()
                         .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4", "--beta" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -311,9 +324,9 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new WithIndexController() { OnIndex = (p1, p2, p3, p4) => (count++).ToString() });
 
-            var arguments = new Build(sc)
-                                               .SetCulture(CultureInfo.InvariantCulture)
+            var arguments = Build.Create(sc)
                                                .Recognize(typeof(WithIndexController))
+                                               .Build()
                                                .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -325,9 +338,10 @@ namespace Isop.Tests
         public void It_can_invoke_recognized()
         {
             var count = 0;
-            new Build()
+            Build.Create()
                            .Parameter("beta", arg => count++)
                            .Parameter("alpha", arg => Assert.Fail())
+                           .Build()
                            .Parse(new[] { "-a", "value", "--beta" }).Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
@@ -339,8 +353,9 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new EnumerableController() { Length = 2, OnEnumerate = () => (count++) });
 
-            var arguments = new Build(sc)
+            var arguments = Build.Create(sc)
                    .Recognize(typeof(EnumerableController))
+                   .Build()
                    .Parse(new[] { "Enumerable", "Return" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -355,9 +370,9 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyObjectController() { OnAction = (p1) => (count++).ToString() });
 
-            var arguments = new Build(sc)
-                                               .SetCulture(CultureInfo.InvariantCulture)
+            var arguments = Build.Create(sc)
                                                .Recognize(typeof(MyObjectController))
+                                               .Build()
                                                .Parse(new[] { "MyObject", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -378,8 +393,8 @@ namespace Isop.Tests
             try
             {
 
-                var arguments = new Build(sc)
-                        .SetCulture(CultureInfo.InvariantCulture)
+                var arguments = Build.Create(sc)
+                        
                         .SetTypeConverter((t, s, c) =>
                                               {
 
@@ -388,6 +403,7 @@ namespace Isop.Tests
                                               })
                         //Need to set type converter 
                         .Recognize(typeof(MyFileController))
+                        .Build()
                         .Parse(new[] { "MyFile", "Action", "--file", "myfile.txt" });
 
                 Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -428,9 +444,9 @@ namespace Isop.Tests
                     }
                 });
 
-                var arguments = new Build(sc)
-                                                   .SetCulture(CultureInfo.InvariantCulture)
+                var arguments = Build.Create(sc)
                                                    .Recognize(typeof(WithEnumController))
+                                                   .Build()
                                                    .Parse(new[] { "WithEnum", /*"Index", */"--value", pair.value });
 
                 Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));

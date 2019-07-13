@@ -12,6 +12,7 @@ namespace Isop.Help
             AndAcceptTheFollowingParameters = "And accept the following parameters";
             AndTheShortFormIs = "And the short form is";
             UnknownAction = "Unknown action";
+            TheArgumentsAre = "The arguments are:";
         }
 
         /// <summary>
@@ -39,6 +40,7 @@ namespace Isop.Help
         /// </summary>
         public string HelpSubCommandForMoreInformation { get; set; }
         public string UnknownAction { get; set; }
+        public string TheArgumentsAre { get; set; }
     }
-    
+
 }

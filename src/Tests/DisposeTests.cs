@@ -17,9 +17,11 @@ namespace Isop.Tests
             var c = new DisposeController();
             c.OnDispose += () => count++;
 
-            var build = new Build()
-                .SetCulture(CultureInfo.InvariantCulture)
-                .Recognize(c);
+            var build = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp = true,
+            }).Recognize(c).Build();
             build
                 .Parse(new[] { "Dispose", "method" })
                 .Invoke(new StringWriter());

@@ -19,12 +19,14 @@ namespace Isop.Tests
             var count = 0;
             var sc = new ServiceCollection();
             sc.AddSingleton(ci=>new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
-            var arguments = new Build(sc) { typeof(MyController) }
-                            .SetCulture(CultureInfo.InvariantCulture)
-                            //.SetFactory(factory)
-                            .Controller("My")
-                            .Action("Action")
-                            .Parameters(new Dictionary<string, string> { { "param1", "value1" }, { "param2", "value2" }, { "param3", "3" }, { "param4", "3.4" } });
+            var arguments = Build.Create(sc,new Configuration {
+                CultureInfo= CultureInfo.InvariantCulture
+            })
+            .Recognize<MyController>()
+            .Build()
+            .Controller("My")
+            .Action("Action")
+            .Parameters(new Dictionary<string, string> { { "param1", "value1" }, { "param2", "value2" }, { "param3", "3" }, { "param4", "3.4" } });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
@@ -33,12 +35,16 @@ namespace Isop.Tests
         [Test]
         public void It_can_get_help()
         {
-            var help = new Build() { typeof(MyController) }
-                            .SetCulture(CultureInfo.InvariantCulture)
-                            .ShouldRecognizeHelp()
-                            .Controller("My")
-                            .Action("Action")
-                            .Help();
+            var help = Build.Create(new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture,
+                RecognizeHelp=true
+            })
+            .Recognize<MyController>()
+            .Build()
+            .Controller("My")
+            .Action("Action")
+            .Help();
 
             Assert.That(help, Is.EqualTo("ActionHelp"));
         }

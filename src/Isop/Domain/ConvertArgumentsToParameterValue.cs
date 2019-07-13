@@ -9,15 +9,16 @@ namespace Isop.Domain
     using Infrastructure;
     using CommandLine.Parse;
     using Domain;
+    using Microsoft.Extensions.Options;
 
     public class ConvertArgumentsToParameterValue
     {
         private readonly TypeConverterFunc _typeConverter;
         private readonly CultureInfo _culture;
-        public ConvertArgumentsToParameterValue(CultureInfo culture, TypeConverterFunc typeConverter)
+        public ConvertArgumentsToParameterValue(IOptions<Configuration> configuration, TypeConverterFunc typeConverter)
         {
-            _culture = culture ?? CultureInfo.CurrentCulture;
-            _typeConverter = typeConverter?? new DefaultConverter().ConvertFrom;
+            _culture = configuration?.Value.CultureInfo ?? CultureInfo.CurrentCulture;
+            _typeConverter = typeConverter?? throw new ArgumentNullException(nameof(typeConverter));
         }
 
         public IEnumerable<object> GetParametersForMethod(Method method,

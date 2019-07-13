@@ -2,6 +2,7 @@ using System;
 using Isop.CommandLine.Parse;
 using System.Collections.Generic;
 using System.Linq;
+using Isop.Domain;
 
 namespace Isop.Api
 {
@@ -10,26 +11,29 @@ namespace Isop.Api
     {
         private string controllerName;
         private string actionName;
-        private Build build;
+        private ParserWithConfiguration build;
 
-        public ActionControllerExpression(string controllerName, string actionName, Build build)
+        internal ActionControllerExpression(string controllerName, string actionName, ParserWithConfiguration build)
         {
             this.controllerName = controllerName;
             this.actionName = actionName;
             this.build = build;
         }
+        internal IEnumerable<Argument> GetArguments() =>
+            build.RecognizesConfiguration.Recognizes.SingleOrDefault(r => r.Recognize(controllerName, actionName))
+                ?.GetMethod(actionName).GetArguments() ?? throw new ArgumentException($"Controller: {controllerName}, method: {actionName}");
+
         public ParsedArguments Parameters(Dictionary<string, string> arg)
         {
             var argumentParser = new ArgumentParser(build.GlobalParameters, build.AllowInferParameter, build.CultureInfo);
             var parsedArguments = argumentParser.Parse(arg);
-            if (build.ControllerRecognizers.Any())
+            if (build.RecognizesConfiguration.Recognizes.Any())
             {
-                var recognizers = build.ControllerRecognizers.Select(cr => cr.Value());
-                var controllerRecognizer = recognizers.FirstOrDefault(recognizer => recognizer.Recognize(controllerName, actionName));
-                if (null != controllerRecognizer)
+                var recognizedController = build.RecognizesConfiguration.Recognizes
+                    .FirstOrDefault(controller => controller.Recognize(controllerName, actionName));
+                if (null != recognizedController)
                 {
-                    return controllerRecognizer.ParseArgumentsAndMerge(actionName, arg,
-                        parsedArguments);
+                    return build.ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, Enumerable.Empty<string>(), parsedArguments);
                 }
             }
             parsedArguments.AssertFailOnUnMatched();
@@ -40,6 +44,8 @@ namespace Isop.Api
         /// </summary>
         public string Help()
         {
+            throw new NotImplementedException();
+/*
             this.build.HelpController();
             if (this.build.HelpForControllers != null)
             {
@@ -48,7 +54,7 @@ namespace Isop.Api
                 return (this.build.HelpForControllers.Description(controller, method) ?? String.Empty).Trim();
             }
             return null;
+            */
         }
-
     }
 }
