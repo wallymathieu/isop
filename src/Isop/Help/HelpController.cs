@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Options;
 
 namespace Isop.Help
 {
@@ -11,13 +12,16 @@ namespace Isop.Help
     {
         private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private readonly HelpForControllers _helpForClassAndMethod;
+        private readonly Configuration _options;
 
         public HelpController(
+            IOptions<Configuration> options,
             HelpForArgumentWithOptions helpForArgumentWithOptions,
             HelpForControllers helpForClassAndMethod)
         {
             _helpForArgumentWithOptions = helpForArgumentWithOptions;
             _helpForClassAndMethod = helpForClassAndMethod;
+            _options = options.Value;
         }
 
         public string Index()

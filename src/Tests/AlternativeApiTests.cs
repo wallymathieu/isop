@@ -37,8 +37,7 @@ namespace Isop.Tests
         {
             var help = Build.Create(new Configuration
             {
-                CultureInfo = CultureInfo.InvariantCulture,
-                RecognizeHelp=true
+                CultureInfo = CultureInfo.InvariantCulture
             })
             .Recognize<MyController>()
             .Build()

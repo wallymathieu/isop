@@ -1,20 +1,21 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 namespace Isop.Api
 {
     using Infrastructure;
     using Domain;
-    using Microsoft.Extensions.Options;
+    using System.Linq;
 
     public class Builder
     {
-        private readonly RecognizesConfiguration recognizes;
+        private readonly RecognizesConfigurationBuilder recognizes;
 
-        public Builder(IServiceCollection collection)
+        public Builder(IServiceCollection container, RecognizesConfigurationBuilder recognizes)
         {
-            this.Container = collection;
-            this.recognizes = new RecognizesConfiguration();
+            this.Container = container;
+            this.recognizes = recognizes;
         }
 
         public Builder SetTypeConverter(TypeConverterFunc typeConverterFunc)
@@ -43,14 +44,14 @@ namespace Isop.Api
 
         public Builder FormatObjectsAsTable()
         {
-            Container.AddSingleton(new TableFormatter().Format);
+            Container.AddSingleton(new Formatter(new TableFormatter().Format));
             return this;
         }
 
 
         public Builder Recognize(Type arg, bool ignoreGlobalUnMatchedParameters = false)
         {
-            Container.TryAddScoped(arg);
+            Container.TryAddSingleton(arg);
             recognizes.Recognizes.Add(new Controller(arg, ignoreGlobalUnMatchedParameters));
             return this;
         }
@@ -63,16 +64,16 @@ namespace Isop.Api
         }
         public IServiceCollection Container { get; }
 
-        public ParserWithConfiguration Build()
+        public AppHost Build()
         {
             var svcProvider= Container.BuildServiceProvider();
             var options = svcProvider.GetRequiredService<IOptions<Configuration>>();
-            return new ParserWithConfiguration(options, svcProvider, recognizes);
+            return new AppHost(options, svcProvider, svcProvider.GetRequiredService<RecognizesConfiguration>());
         }
 
-        public Builder WithHelpTexts(Action<Help.HelpTexts> action)
+        public Builder WithHelpTexts(Action<Localization.Texts> action)
         {
-            var t= new Help.HelpTexts();
+            var t= new Localization.Texts();
             action(t);
             Container.AddSingleton(Options.Create(t));
             return this;

@@ -14,18 +14,20 @@ namespace Isop.Api
     using Microsoft.Extensions.DependencyInjection;
     using System.Globalization;
 
-    public class ParserWithConfiguration
+    public class AppHost
     {
         internal readonly RecognizesConfiguration RecognizesConfiguration;
+        internal readonly IServiceProvider ServiceProvider;
         internal readonly ControllerRecognizer ControllerRecognizer;
         private readonly Configuration _options;
 
-        public ParserWithConfiguration(IOptions<Configuration> options,
+        public AppHost(IOptions<Configuration> options,
             IServiceProvider serviceProvider,
             RecognizesConfiguration recognizesConfiguration)
         {
-            _options = options.Value;
+            _options = options?.Value;
             RecognizesConfiguration = recognizesConfiguration;
+            ServiceProvider = serviceProvider;
             ControllerRecognizer = new ControllerRecognizer(options, serviceProvider,
                 serviceProvider.GetRequiredService<TypeConverterFunc>(),
                 serviceProvider.GetRequiredService<Formatter>());
@@ -60,22 +62,9 @@ namespace Isop.Api
                 .Where(s => !string.IsNullOrEmpty(s))).Invoke(cout);
             return cout.ToString();
         }
-        public bool AllowInferParameter{ get =>!_options.DisableAllowInferParameter; }
-        public CultureInfo CultureInfo { get => _options.CultureInfo; }
-        public IEnumerable<ArgumentWithOptions> GlobalParameters
-        {
-            get
-            {
-                return RecognizesConfiguration.Properties.Select(p =>
-                    new ArgumentWithOptions(
-                        type: p.Type,
-                        argument: p.Name,
-                        action: p.Action,
-                        required: p.Required,
-                        description: p.Description
-                        )).ToList();
-            }
-        }
+        public bool AllowInferParameter{ get =>!(_options?.DisableAllowInferParameter ?? false); }
+        public CultureInfo CultureInfo { get => _options?.CultureInfo; }
+        public IEnumerable<ArgumentWithOptions> GlobalParameters { get=>new GlobalArguments(RecognizesConfiguration).GlobalParameters; } 
 
         public String Help()
         {

@@ -2,10 +2,18 @@
 
 namespace Isop
 {
+    /// <summary>
+    /// Main configuration
+    /// </summary>
     public class Configuration
     {
-        public CultureInfo CultureInfo { get; set; }
-        public bool RecognizeHelp { get; set; }
+        /// <summary>
+        /// The culture info for the console application
+        /// </summary>
+        public CultureInfo CultureInfo { get; set; } = CultureInfo.CurrentCulture;
+        /// <summary>
+        /// If you want to disable infer parameter
+        /// </summary>
         public bool DisableAllowInferParameter { get; set; }
     }
 }

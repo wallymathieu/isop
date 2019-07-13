@@ -3,6 +3,8 @@ using Isop.CommandLine.Parse;
 using System.Collections.Generic;
 using System.Linq;
 using Isop.Domain;
+using Isop.Help;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Isop.Api
 {
@@ -11,9 +13,9 @@ namespace Isop.Api
     {
         private string controllerName;
         private string actionName;
-        private ParserWithConfiguration build;
+        private AppHost build;
 
-        internal ActionControllerExpression(string controllerName, string actionName, ParserWithConfiguration build)
+        internal ActionControllerExpression(string controllerName, string actionName, AppHost build)
         {
             this.controllerName = controllerName;
             this.actionName = actionName;
@@ -33,7 +35,7 @@ namespace Isop.Api
                     .FirstOrDefault(controller => controller.Recognize(controllerName, actionName));
                 if (null != recognizedController)
                 {
-                    return build.ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, Enumerable.Empty<string>(), parsedArguments);
+                    return build.ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, actionName, arg, parsedArguments);
                 }
             }
             parsedArguments.AssertFailOnUnMatched();
@@ -44,17 +46,10 @@ namespace Isop.Api
         /// </summary>
         public string Help()
         {
-            throw new NotImplementedException();
-/*
-            this.build.HelpController();
-            if (this.build.HelpForControllers != null)
-            {
-                var controller = this.build.Recognizes.Single(c => c.Recognize(controllerName, actionName));
-                var method = controller.GetMethod(actionName);
-                return (this.build.HelpForControllers.Description(controller, method) ?? String.Empty).Trim();
-            }
-            return null;
-            */
+            var helpForControllers= build.ServiceProvider.GetRequiredService<HelpForControllers>();
+            var controller = this.build.RecognizesConfiguration.Recognizes.Single(c => c.Recognize(controllerName, actionName));
+            var method = controller.GetMethod(actionName);
+            return (helpForControllers.Description(controller, method) ?? String.Empty).Trim();
         }
     }
 }

@@ -27,13 +27,13 @@ namespace Isop.CommandLine
             Formatter formatter)
         {
             _configuration = configuration;
-            _allowInferParameter = ! _configuration.Value.DisableAllowInferParameter;
+            _allowInferParameter = ! (_configuration?.Value?.DisableAllowInferParameter??false);
             _typeContainer = typeContainer;
             _formatter = formatter;
             convertArgument = new ConvertArgumentsToParameterValue(configuration, typeConverterFunc);
         }
 
-        private CultureInfo Culture { get { return _configuration.Value.CultureInfo ?? CultureInfo.CurrentCulture; } }
+        private CultureInfo Culture { get { return _configuration?.Value.CultureInfo ?? CultureInfo.CurrentCulture; } }
 
         public bool Recognize(Controller controller, IEnumerable<string> arg)
         {
@@ -64,7 +64,10 @@ namespace Isop.CommandLine
             var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
 
             var methodInfo = FindMethodInfo(controller, lexed);
-
+            if (methodInfo == null)
+            {
+                throw new Exception($"Could not find method for {controller.Name} with arguments {string.Join(" ", arg)}");
+            }
             var argumentRecognizers = methodInfo.GetArguments()
                 .ToList();
             argumentRecognizers.InsertRange(0, new[] { 

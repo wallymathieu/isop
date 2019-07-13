@@ -35,3 +35,4 @@ appsettings.config
 # project rider
 .idea
 .ionide
+.vscode

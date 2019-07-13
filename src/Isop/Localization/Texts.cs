@@ -1,8 +1,8 @@
-namespace Isop.Help
+namespace Isop.Localization
 {
-    public class HelpTexts
+    public class Texts
     {
-        public HelpTexts()
+        public Texts()
         {
             HelpSubCommandForMoreInformation = "See 'COMMANDNAME' help <command> <subcommand> for more information";
 

@@ -11,7 +11,7 @@
     <Authors>Oskar Gewalli</Authors>
     <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/wallymathieu/isop</PackageProjectUrl>
-    <PackageTags>CLI</PackageTags>
+    <PackageTags>CLI;command line;commandline;argument;option;parser;parsing;library;syntax;shell</PackageTags>
   </PropertyGroup>
 
   <!-- mono -->

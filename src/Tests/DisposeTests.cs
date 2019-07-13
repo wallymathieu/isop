@@ -19,8 +19,7 @@ namespace Isop.Tests
 
             var build = Build.Create(new Configuration
             {
-                CultureInfo = CultureInfo.InvariantCulture,
-                RecognizeHelp = true,
+                CultureInfo = CultureInfo.InvariantCulture
             }).Recognize(c).Build();
             build
                 .Parse(new[] { "Dispose", "method" })

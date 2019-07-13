@@ -14,13 +14,13 @@ namespace Isop.Help
 {
     internal class HelpForControllers
     {
-        private readonly ICollection<Controller> _classAndMethodRecognizers;
+        private readonly IEnumerable<Controller> _classAndMethodRecognizers;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
-        private readonly HelpTexts _helpTexts;
+        private readonly Localization.Texts _helpTexts;
 
-        public HelpForControllers(ICollection<Controller> classAndMethodRecognizers, 
+        public HelpForControllers(IEnumerable<Controller> classAndMethodRecognizers, 
             HelpXmlDocumentation helpXmlDocumentation,
-            IOptions<HelpTexts> helpTexts)
+            IOptions<Localization.Texts> helpTexts)
         {
             _classAndMethodRecognizers = classAndMethodRecognizers;
             _helpXmlDocumentation = helpXmlDocumentation;

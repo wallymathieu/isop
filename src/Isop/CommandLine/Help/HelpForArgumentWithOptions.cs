@@ -1,19 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 
 namespace Isop.CommandLine.Help
 {
+    using Isop.Domain;
     using Isop.Help;
     using Parse;
     internal class HelpForArgumentWithOptions
     {
-        private readonly HelpTexts helpTexts;
-        private readonly IEnumerable<ArgumentWithOptions> _argumentWithOptionses;
+        private readonly Localization.Texts helpTexts;
+        private readonly GlobalArguments _argumentWithOptionses;
 
-        public HelpForArgumentWithOptions(HelpTexts helpTexts, IEnumerable<ArgumentWithOptions> argumentWithOptionses)
+        public HelpForArgumentWithOptions(IOptions<Localization.Texts> helpTexts, GlobalArguments argumentWithOptionses)
         {
-            this.helpTexts = helpTexts;
+            this.helpTexts = helpTexts.Value;
             _argumentWithOptionses = argumentWithOptionses;
         }
 
@@ -29,15 +31,15 @@ namespace Isop.CommandLine.Help
             if (string.IsNullOrEmpty(val))
                 return helpTexts.TheArgumentsAre + Environment.NewLine +
                       string.Join(Environment.NewLine,
-                                  _argumentWithOptionses.Select(ar => "  "+ Help(ar)).ToArray());
-            return Help(_argumentWithOptionses.First(ar => ar.Argument.Prototype.Equals(val)));
+                                  _argumentWithOptionses.GlobalParameters.Select(ar => "  "+ Help(ar)).ToArray());
+            return Help(_argumentWithOptionses.GlobalParameters.First(ar => ar.Argument.Prototype.Equals(val)));
         }
 
         public bool CanHelp(string val = null)
         {
             return string.IsNullOrEmpty(val)
-                ? _argumentWithOptionses.Any()
-                : _argumentWithOptionses.Any(ar => ar.Argument.Prototype.Equals(val));
+                ? _argumentWithOptionses.GlobalParameters.Any()
+                : _argumentWithOptionses.GlobalParameters.Any(ar => ar.Argument.Prototype.Equals(val));
         }
     }
 }

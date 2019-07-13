@@ -4,13 +4,13 @@ namespace Isop.Domain
 {
     public class RecognizesConfiguration
     {
-        public RecognizesConfiguration()
+        public RecognizesConfiguration(IReadOnlyList<Controller> recognizes,IReadOnlyList<Property> properties)
         {
-            Recognizes = new List<Controller>();
-            Properties = new List<Property>();
+            Recognizes = recognizes;
+            Properties = properties;
         }
-        public IList<Controller> Recognizes { get; private set; }
-        public IList<Property> Properties { get; private set; }
+        public IReadOnlyList<Controller> Recognizes { get; }
+        public IReadOnlyList<Property> Properties { get; }
     }
 }
 
