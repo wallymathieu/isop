@@ -16,14 +16,17 @@ namespace Isop.Help
     {
         private readonly IEnumerable<Controller> _classAndMethodRecognizers;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
+        private readonly IServiceProvider _serviceProvider;
         private readonly Localization.Texts _helpTexts;
 
         public HelpForControllers(RecognizesConfiguration recognizes, 
             HelpXmlDocumentation helpXmlDocumentation,
-            IOptions<Localization.Texts> helpTexts)
+            IOptions<Localization.Texts> helpTexts,
+            IServiceProvider serviceProvider)
         {
             _classAndMethodRecognizers = recognizes.Recognizes;
             _helpXmlDocumentation = helpXmlDocumentation;
+            _serviceProvider = serviceProvider;
             _helpTexts = helpTexts.Value ?? new Localization.Texts();
         }
 
@@ -43,10 +46,7 @@ namespace Isop.Help
             }
             else
             {
-                throw new NotImplementedException();
-                /*
-                var provider = _container.BuildServiceProvider();
-                using (var scope = provider.CreateScope())
+                using (var scope = _serviceProvider.CreateScope())
                 {
                     var obj = scope.ServiceProvider.GetService(t.Type);
                     if (ReferenceEquals(null, obj)) throw new Exception($"Unable to resolve {t.Type}");
@@ -55,7 +55,6 @@ namespace Isop.Help
                     method != null ? method.Name : null
                     }));
                 }
-                */
             }
 
             if (method != null && includeArguments)
