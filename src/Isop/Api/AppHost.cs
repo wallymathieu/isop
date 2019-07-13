@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
+using System.Globalization;
 namespace Isop.Api
 {
-    using Help;
     using CommandLine;
     using CommandLine.Lex;
     using CommandLine.Parse;
     using Domain;
-    using Microsoft.Extensions.Options;
     using Infrastructure;
-    using Microsoft.Extensions.DependencyInjection;
-    using System.Globalization;
-
+    /// <summary>
+    /// AppHost contains the service provider and configuration needed to run a command line app
+    /// </summary>
     public class AppHost
     {
         internal readonly RecognizesConfiguration RecognizesConfiguration;
@@ -21,6 +22,9 @@ namespace Isop.Api
         internal readonly ControllerRecognizer ControllerRecognizer;
         private readonly Configuration _options;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public AppHost(IOptions<Configuration> options,
             IServiceProvider serviceProvider,
             RecognizesConfiguration recognizesConfiguration)
@@ -32,13 +36,15 @@ namespace Isop.Api
                 serviceProvider.GetRequiredService<TypeConverterFunc>(),
                 serviceProvider.GetRequiredService<Formatter>());
         }
-
+        /// <summary>
+        /// Parse command line arguments and return parsed arguments entity
+        /// </summary>
         public ParsedArguments Parse(IEnumerable<string> arg)
         {
             return Parse(arg.ToList());
         }
 
-        public ParsedArguments Parse(List<string> arg)
+        private ParsedArguments Parse(List<string> arg)
         {
             var argumentParser = new ArgumentParser(GlobalParameters, AllowInferParameter, CultureInfo);
             var lexed = ArgumentLexer.Lex(arg).ToList();
@@ -55,24 +61,22 @@ namespace Isop.Api
             parsedArguments.AssertFailOnUnMatched();
             return parsedArguments;
         }
-        public string HelpFor(string controller, string action = null)
-        {
-            var cout = new StringWriter(CultureInfo);
-            Parse(new[] { Conventions.Help, controller, action }
-                .Where(s => !string.IsNullOrEmpty(s))).Invoke(cout);
-            return cout.ToString();
-        }
-        public bool AllowInferParameter{ get =>!(_options?.DisableAllowInferParameter ?? false); }
-        public CultureInfo CultureInfo { get => _options?.CultureInfo; }
-        public IEnumerable<ArgumentWithOptions> GlobalParameters { get=>new GlobalArguments(RecognizesConfiguration).GlobalParameters; } 
-
+        
+        internal bool AllowInferParameter => !(_options?.DisableAllowInferParameter ?? false);
+        internal CultureInfo CultureInfo => _options?.CultureInfo;
+        internal IEnumerable<ArgumentWithOptions> GlobalParameters => new GlobalArguments(RecognizesConfiguration).GlobalParameters;
+        /// <summary>
+        /// Return help-text
+        /// </summary>
         public String Help()
         {
             var cout = new StringWriter(CultureInfo);
             Parse(new[] { Conventions.Help }).Invoke(cout);
             return cout.ToString();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public ControllerExpression Controller(string controllerName)
         {
             return new ControllerExpression(controllerName, this);

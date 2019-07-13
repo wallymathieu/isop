@@ -37,12 +37,12 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new ObjectController() { OnAction = () => new WithTwoProperties(count++) });
 
-            var arguments = Build.Create(sc, new Configuration
+            var arguments = Builder.Create(sc, new Configuration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             }).Recognize( typeof(ObjectController) )
                 .FormatObjectsAsTable()
-                .Build()
+                .BuildAppHost()
                 .Parse(new[] { "Object", "Action" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
@@ -58,12 +58,12 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new ObjectController() { OnAction = () => new[] { new WithTwoProperties(count++), new WithTwoProperties(count++) } });
 
-            var arguments = Build.Create(sc, new Configuration
+            var arguments = Builder.Create(sc, new Configuration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             }).Recognize(typeof(ObjectController))
                 .FormatObjectsAsTable()
-                .Build()
+                .BuildAppHost()
                 .Parse(new[] { "Object", "Action" });
 
             Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));

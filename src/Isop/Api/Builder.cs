@@ -63,7 +63,7 @@ namespace Isop.Api
         }
         public IServiceCollection Container { get; }
 
-        public AppHost Build()
+        public AppHost BuildAppHost()
         {
             var svcProvider= Container.BuildServiceProvider();
             var options = svcProvider.GetRequiredService<IOptions<Configuration>>();

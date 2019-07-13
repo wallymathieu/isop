@@ -17,30 +17,30 @@ namespace Isop.Help
         private readonly IEnumerable<Controller> _classAndMethodRecognizers;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
         private readonly IServiceProvider _serviceProvider;
-        private readonly Localization.Texts _helpTexts;
+        private readonly Localization.Texts _texts;
 
         public HelpForControllers(RecognizesConfiguration recognizes, 
             HelpXmlDocumentation helpXmlDocumentation,
-            IOptions<Localization.Texts> helpTexts,
+            IOptions<Localization.Texts> texts,
             IServiceProvider serviceProvider)
         {
             _classAndMethodRecognizers = recognizes.Recognizes;
             _helpXmlDocumentation = helpXmlDocumentation;
             _serviceProvider = serviceProvider;
-            _helpTexts = helpTexts.Value ?? new Localization.Texts();
+            _texts = texts.Value ?? new Localization.Texts();
         }
 
         private readonly Type[] _onlyStringType = { typeof(string) };
-        public string Description(Controller t, Method method = null, bool includeArguments = false)
+        public string Description(Controller t, Method method, bool includeArguments)
         {
             var description = t.Type.GetTypeInfo().GetMethods()
                 .SingleOrDefault(m => m.ReturnType == typeof(string)
                 && m.Name.EqualsIgnoreCase( Conventions.Help)
                 && m.GetParameters().Select(p=>p.ParameterType).SequenceEqual(_onlyStringType));
-            var descr = new List<string>();
+            var helpText = new List<string>();
             if (null == description)
             {
-                descr.Add(null == method
+                helpText.Add(null == method
                     ? _helpXmlDocumentation.GetDescriptionForType(t.Type)
                     : _helpXmlDocumentation.GetDescriptionForMethod(method.MethodInfo));
             }
@@ -50,29 +50,26 @@ namespace Isop.Help
                 {
                     var obj = scope.ServiceProvider.GetService(t.Type);
                     if (ReferenceEquals(null, obj)) throw new Exception($"Unable to resolve {t.Type}");
-                    descr.Add((string)description.Invoke(obj, new object[]
-                    {
-                    method != null ? method.Name : null
-                    }));
+                    helpText.Add((string)description.Invoke(obj, new object[]{method?.Name}));
                 }
             }
 
             if (method != null && includeArguments)
             {
                 var arguments = method.GetArguments().Select(DescriptionAndHelp);
-                descr.AddRange(arguments);
+                helpText.AddRange(arguments);
             }
 
-            if (!descr.Any())
+            if (!helpText.Any())
                 return string.Empty;
-            return "  " + String.Join(" ", descr).Trim();
+            return "  " + String.Join(" ", helpText).Trim();
         }
 
         private string HelpFor(Controller type, bool simpleDescription)
         {
             if (simpleDescription)
             {
-                return type.Name + Description(type);
+                return type.Name + Description(type, includeArguments:false, method: null);
             }
             return string.Concat(type.Name,
                 Environment.NewLine,
@@ -89,7 +86,7 @@ namespace Isop.Help
             {
                 var lines = new []
                 {
-                    _helpTexts.UnknownAction,
+                    _texts.UnknownAction,
                     action
                 };
                 return string.Join(Environment.NewLine, lines);
@@ -102,10 +99,10 @@ namespace Isop.Help
             {
                 var lines = new[]
                 {
-                    string.Concat(method.Name, " ",Description(type, method)),
-                    string.Concat(_helpTexts.AndAcceptTheFollowingParameters,":"),
+                    string.Concat(method.Name, " ",Description(type, method, false)),
+                    string.Concat(_texts.AndAcceptTheFollowingParameters,":"),
                     string.Join(", ", arguments.Select(DescriptionAndHelp)),
-                    string.Concat(_helpTexts.AndTheShortFormIs,":"),
+                    string.Concat(_texts.AndTheShortFormIs,":"),
                     string.Join(" ", type.Name, method.Name,
                         string.Join(", ", arguments.Select(arg => arg.Name.ToUpperInvariant())))
                 };
@@ -113,7 +110,7 @@ namespace Isop.Help
             }
             else
             {
-                return string.Concat(method.Name, " ", Description(type, method));
+                return string.Concat(method.Name, " ", Description(type, method, false));
             }
         }
 
@@ -133,13 +130,13 @@ namespace Isop.Help
             {
                 var lines = new []
                 {
-                    _helpTexts.TheCommandsAre,
+                    _texts.TheCommandsAre,
                     string.Join(Environment.NewLine,
                         _classAndMethodRecognizers
                             .Where(cmr => !cmr.IsHelp())
                             .Select(cmr => "  " + HelpFor(cmr, true)).ToArray()),
                     string.Empty,
-                    _helpTexts.HelpCommandForMoreInformation
+                    _texts.HelpCommandForMoreInformation
                 };
                 return string.Join(Environment.NewLine, lines);
             }
@@ -147,11 +144,11 @@ namespace Isop.Help
                 type.Name.EqualsIgnoreCase(val));
             if (string.IsNullOrEmpty(action))
             {
-                return string.Concat(_helpTexts.TheSubCommandsFor,
+                return string.Concat(_texts.TheSubCommandsFor,
                        HelpFor(controllerRecognizer, false),
                        Environment.NewLine,
                        Environment.NewLine,
-                       _helpTexts.HelpSubCommandForMoreInformation);
+                       _texts.HelpSubCommandForMoreInformation);
             }
             return HelpForAction(controllerRecognizer, action);
         }

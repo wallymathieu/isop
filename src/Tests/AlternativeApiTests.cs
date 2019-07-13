@@ -19,11 +19,11 @@ namespace Isop.Tests
             var count = 0;
             var sc = new ServiceCollection();
             sc.AddSingleton(ci=>new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
-            var arguments = Build.Create(sc,new Configuration {
+            var arguments = Builder.Create(sc,new Configuration {
                 CultureInfo= CultureInfo.InvariantCulture
             })
             .Recognize<MyController>()
-            .Build()
+            .BuildAppHost()
             .Controller("My")
             .Action("Action")
             .Parameters(new Dictionary<string, string> { { "param1", "value1" }, { "param2", "value2" }, { "param3", "3" }, { "param4", "3.4" } });
@@ -35,12 +35,12 @@ namespace Isop.Tests
         [Test]
         public void It_can_get_help()
         {
-            var help = Build.Create(new Configuration
+            var help = Builder.Create(new Configuration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
             .Recognize<MyController>()
-            .Build()
+            .BuildAppHost()
             .Controller("My")
             .Action("Action")
             .Help();

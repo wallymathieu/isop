@@ -6,29 +6,29 @@ using Isop;
 namespace Example
 {
     /// <summary>
-    /// This is a sample usage of Isop when configuring using ArgumentParser.Build:
+    /// This is a sample usage of Isop when configuring using <see cref=""/> ArgumentParser.Build:
     /// </summary>
     class Program
     {
         static void Main(string[] args)
         {
-            var parserBuilder = Build.Create(new Configuration
-            {
-                CultureInfo = CultureInfo.InvariantCulture
-            })
-            .Recognize(typeof(MyController))
-            .Recognize(typeof(CustomerController)).Build();
+            var appHost = Builder
+                .Create(new Configuration
+                {
+                    CultureInfo = CultureInfo.InvariantCulture
+                })
+                .Recognize(typeof(MyController))
+                .Recognize(typeof(CustomerController))
+                .BuildAppHost();
             try
             {
-                var parsedMethod = parserBuilder.Parse(args);
+                var parsedMethod = appHost.Parse(args);
                 if (parsedMethod.UnRecognizedArguments.Any())//Warning:
                 {
-                    var unRecognizedArgumentsMessage = string.Format(
-@"Unrecognized arguments: 
-{0}
+                    var unRecognizedArgumentsMessage = $@"Unrecognized arguments: 
+{string.Join(",", parsedMethod.UnRecognizedArguments.Select(arg => arg.Value).ToArray())}
 Did you mean any of these arguments?
-{1}", String.Join(",", parsedMethod.UnRecognizedArguments.Select(unrec => unrec.Value).ToArray()),
-      String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Name).ToArray()));
+{string.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Name).ToArray())}";
                     Console.WriteLine(unRecognizedArgumentsMessage);
                 }else
                 {
@@ -38,19 +38,19 @@ Did you mean any of these arguments?
             catch (TypeConversionFailedException ex)
             {
                 
-                 Console.WriteLine(String.Format("Could not convert argument {0} with value {1} to type {2}", 
-                    ex.Argument, ex.Value, ex.TargetType));
+                 Console.WriteLine(
+                     $"Could not convert argument {ex.Argument} with value {ex.Value} to type {ex.TargetType}");
                  if (null!=ex.InnerException)
-                {
-                    Console.WriteLine("Inner exception: ");
-                    Console.WriteLine(ex.InnerException.Message);
-                }
+                 {
+                     Console.WriteLine("Inner exception: ");
+                     Console.WriteLine(ex.InnerException.Message);
+                 }
             }
             catch (MissingArgumentException ex)
             {
-                Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments).ToArray()));
+                Console.WriteLine($"Missing argument(s): {String.Join(", ", ex.Arguments).ToArray()}");
                 
-                Console.WriteLine(parserBuilder.Help());
+                Console.WriteLine(appHost.Help());
             }
         }
     }

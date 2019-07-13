@@ -42,14 +42,12 @@ namespace Isop.Api
             return parsedArguments;
         }
         /// <summary>
-        /// 
+        /// Get help for controller action
         /// </summary>
         public string Help()
         {
-            var helpForControllers= build.ServiceProvider.GetRequiredService<HelpForControllers>();
-            var controller = this.build.RecognizesConfiguration.Recognizes.Single(c => c.Recognize(controllerName, actionName));
-            var method = controller.GetMethod(actionName);
-            return (helpForControllers.Description(controller, method) ?? String.Empty).Trim();
+            var helpController= build.ServiceProvider.GetRequiredService<HelpController>();
+            return (helpController.Index(controllerName, actionName) ?? String.Empty).Trim();
         }
     }
 }

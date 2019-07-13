@@ -10,13 +10,13 @@ namespace Isop
     using Isop.Help;
     using CommandLine.Help;
 
-    public class Build
+    public class Builder
     {
-        public static Builder Create(Configuration configuration=null)
+        public static Api.Builder Create(Configuration configuration=null)
         {
             return Create(configuration: configuration, serviceCollection: null);
         }
-        public static Builder Create(IServiceCollection serviceCollection, Configuration configuration=null)
+        public static Api.Builder Create(IServiceCollection serviceCollection, Configuration configuration=null)
         {
             if (serviceCollection == null)
             {
@@ -41,7 +41,7 @@ namespace Isop
             recognizes.Recognizes.Add(new Controller(
                 ignoreGlobalUnMatchedParameters: true, 
                 type: typeof(HelpController)));
-            return new Builder(serviceCollection, recognizes);
+            return new Api.Builder(serviceCollection, recognizes);
         }
     }
 }

@@ -1,4 +1,8 @@
-﻿using Isop.Domain;
+﻿using System;
+using System.Linq;
+using Isop.Domain;
+using Isop.Help;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Isop.Api
 {
@@ -13,6 +17,14 @@ namespace Isop.Api
         }
         public ActionControllerExpression Action(string actionName) =>
             new ActionControllerExpression(_controllerName, actionName, _build);
+        /// <summary>
+        /// Get help for controller
+        /// </summary>
+        public string Help()
+        {
+            var helpController = _build.ServiceProvider.GetRequiredService<HelpController>();
+            return (helpController.Index(_controllerName, null) ?? String.Empty).Trim();
+        }
     }
 }
 
