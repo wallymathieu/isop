@@ -11,31 +11,34 @@ namespace Isop.Api
     
     public class ActionControllerExpression
     {
-        private string controllerName;
-        private string actionName;
-        private AppHost build;
+        private readonly string _controllerName;
+        private readonly string _actionName;
+        private readonly AppHost _build;
 
         internal ActionControllerExpression(string controllerName, string actionName, AppHost build)
         {
-            this.controllerName = controllerName;
-            this.actionName = actionName;
-            this.build = build;
+            _controllerName = controllerName;
+            _actionName = actionName;
+            _build = build;
         }
-        internal IEnumerable<Argument> GetArguments() =>
-            build.RecognizesConfiguration.Recognizes.SingleOrDefault(r => r.Recognize(controllerName, actionName))
-                ?.GetMethod(actionName).GetArguments() ?? throw new ArgumentException($"Controller: {controllerName}, method: {actionName}");
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<Argument> GetArguments() =>
+            _build.RecognizesConfiguration.Recognizes.SingleOrDefault(r => r.Recognize(_controllerName, _actionName))
+                ?.GetMethod(_actionName).GetArguments() ?? throw new ArgumentException($"Controller: {_controllerName}, method: {_actionName}");
 
         public ParsedArguments Parameters(Dictionary<string, string> arg)
         {
-            var argumentParser = new ArgumentParser(build.GlobalParameters, build.AllowInferParameter, build.CultureInfo);
+            var argumentParser = new ArgumentParser(_build.GlobalParameters, _build.AllowInferParameter, _build.CultureInfo);
             var parsedArguments = argumentParser.Parse(arg);
-            if (build.RecognizesConfiguration.Recognizes.Any())
+            if (_build.RecognizesConfiguration.Recognizes.Any())
             {
-                var recognizedController = build.RecognizesConfiguration.Recognizes
-                    .FirstOrDefault(controller => controller.Recognize(controllerName, actionName));
+                var recognizedController = _build.RecognizesConfiguration.Recognizes
+                    .FirstOrDefault(controller => controller.Recognize(_controllerName, _actionName));
                 if (null != recognizedController)
                 {
-                    return build.ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, actionName, arg, parsedArguments);
+                    return _build.ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, _actionName, arg, parsedArguments);
                 }
             }
             parsedArguments.AssertFailOnUnMatched();
@@ -46,8 +49,8 @@ namespace Isop.Api
         /// </summary>
         public string Help()
         {
-            var helpController= build.ServiceProvider.GetRequiredService<HelpController>();
-            return (helpController.Index(controllerName, actionName) ?? String.Empty).Trim();
+            var helpController= _build.ServiceProvider.GetRequiredService<HelpController>();
+            return (helpController.Index(_controllerName, _actionName) ?? String.Empty).Trim();
         }
     }
 }

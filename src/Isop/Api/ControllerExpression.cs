@@ -15,6 +15,11 @@ namespace Isop.Api
             _controllerName = controllerName;
             _build = build;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="actionName"></param>
+        /// <returns></returns>
         public ActionControllerExpression Action(string actionName) =>
             new ActionControllerExpression(_controllerName, actionName, _build);
         /// <summary>

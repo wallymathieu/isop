@@ -2,19 +2,22 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-namespace Isop.Api
+namespace Isop
 {
     using Infrastructure;
     using Domain;
-
-    public class Builder
+    using Api;
+    /// <summary>
+    /// 
+    /// </summary>
+    public partial class Builder
     {
-        private readonly RecognizesConfigurationBuilder recognizes;
+        private readonly RecognizesConfigurationBuilder _recognizes;
 
         public Builder(IServiceCollection container, RecognizesConfigurationBuilder recognizes)
         {
-            this.Container = container;
-            this.recognizes = recognizes;
+            Container = container;
+            _recognizes = recognizes;
         }
 
         public Builder SetTypeConverter(TypeConverterFunc typeConverterFunc)
@@ -29,39 +32,56 @@ namespace Isop.Api
             return this;
         }
 
-        public void Add(Type item)
-        {
-            Recognize(item);
-        }
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="argument"></param>
+        /// <param name="action"></param>
+        /// <param name="required"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
         public Builder Parameter(string argument, Action<string> action = null, bool required = false, string description = null)
         {
-            recognizes.Properties.Add(new Property(argument, action, required, description, typeof(string)));
+            _recognizes.Properties.Add(new Property(argument, action, required, description, typeof(string)));
             return this;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public Builder FormatObjectsAsTable()
         {
             Container.AddSingleton(new Formatter(new TableFormatter().Format));
             return this;
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <param name="ignoreGlobalUnMatchedParameters"></param>
+        /// <returns></returns>
         public Builder Recognize(Type arg, bool ignoreGlobalUnMatchedParameters = false)
         {
             Container.TryAddSingleton(arg);
-            recognizes.Recognizes.Add(new Controller(arg, ignoreGlobalUnMatchedParameters));
+            _recognizes.Recognizes.Add(new Controller(arg, ignoreGlobalUnMatchedParameters));
             return this;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <param name="ignoreGlobalUnMatchedParameters"></param>
+        /// <returns></returns>
         public Builder Recognize(Object arg, bool ignoreGlobalUnMatchedParameters = false)
         {
             var type = arg.GetType();
             Container.TryAddSingleton(type, svc => arg);
-            recognizes.Recognizes.Add(new Controller(type, ignoreGlobalUnMatchedParameters));
+            _recognizes.Recognizes.Add(new Controller(type, ignoreGlobalUnMatchedParameters));
             return this;
         }
-        public IServiceCollection Container { get; }
+
+        private IServiceCollection Container { get; }
 
         public AppHost BuildAppHost()
         {

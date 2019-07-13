@@ -7,7 +7,7 @@ namespace Isop
     /// </summary>
     public static class BuilderExtensions
     {
-        public static Api.Builder Recognize<T>(this Api.Builder build, bool ignoreGlobalUnMatchedParameters = false)
+        public static Builder Recognize<T>(this Builder build, bool ignoreGlobalUnMatchedParameters = false)
         {
             return build.Recognize(typeof(T), ignoreGlobalUnMatchedParameters);
         }
