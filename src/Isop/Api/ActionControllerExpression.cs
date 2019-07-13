@@ -8,7 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Isop.Api
 {
-    
+    /// <summary>
+    /// 
+    /// </summary>
     public class ActionControllerExpression
     {
         private readonly string _controllerName;
@@ -22,23 +24,25 @@ namespace Isop.Api
             _build = build;
         }
         /// <summary>
-        /// 
+        /// Get arguments for controller action
         /// </summary>
         public IEnumerable<Argument> GetArguments() =>
             _build.RecognizesConfiguration.Recognizes.SingleOrDefault(r => r.Recognize(_controllerName, _actionName))
                 ?.GetMethod(_actionName).GetArguments() ?? throw new ArgumentException($"Controller: {_controllerName}, method: {_actionName}");
-
-        public ParsedArguments Parameters(Dictionary<string, string> arg)
+        /// <summary>
+        /// send parameters to controller actions
+        /// </summary>
+        public ParsedArguments Parameters(Dictionary<string, string> parameters)
         {
             var argumentParser = new ArgumentParser(_build.GlobalParameters, _build.AllowInferParameter, _build.CultureInfo);
-            var parsedArguments = argumentParser.Parse(arg);
+            var parsedArguments = argumentParser.Parse(parameters);
             if (_build.RecognizesConfiguration.Recognizes.Any())
             {
                 var recognizedController = _build.RecognizesConfiguration.Recognizes
                     .FirstOrDefault(controller => controller.Recognize(_controllerName, _actionName));
                 if (null != recognizedController)
                 {
-                    return _build.ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, _actionName, arg, parsedArguments);
+                    return _build.ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, _actionName, parameters, parsedArguments);
                 }
             }
             parsedArguments.AssertFailOnUnMatched();

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 
 namespace Isop.CommandLine
 {
-    public class ParsedMethod : ParsedArguments
+    internal class ParsedMethod : ParsedArguments
     {
         public ParsedMethod(ParsedArguments parsedArguments,
             IServiceProvider typeContainer,
@@ -27,8 +27,8 @@ namespace Isop.CommandLine
 
         private IServiceProvider _typeContainer;
         private readonly Formatter _formatter;
-        public Type RecognizedClass { get; private set; }
-        public Method RecognizedAction { get; private set; }
+        public Type RecognizedClass { get; }
+        public Method RecognizedAction { get; }
 
         public IEnumerable<object> RecognizedActionParameters { get; private set; }
 

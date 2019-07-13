@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Isop.Api
 {
+    ///
     public class ControllerExpression
     {
         private readonly string _controllerName;
@@ -18,10 +19,10 @@ namespace Isop.Api
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="actionName"></param>
+        /// <param name="name">action name</param>
         /// <returns></returns>
-        public ActionControllerExpression Action(string actionName) =>
-            new ActionControllerExpression(_controllerName, actionName, _build);
+        public ActionControllerExpression Action(string name) =>
+            new ActionControllerExpression(_controllerName, name, _build);
         /// <summary>
         /// Get help for controller
         /// </summary>

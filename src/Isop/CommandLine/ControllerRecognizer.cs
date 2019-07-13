@@ -16,7 +16,7 @@ namespace Isop.CommandLine
         private readonly bool _allowInferParameter;
         private readonly IOptions<Configuration> _configuration;
         private readonly IServiceProvider _typeContainer;
-        private readonly ConvertArgumentsToParameterValue convertArgument;
+        private readonly ConvertArgumentsToParameterValue _convertArgument;
         private readonly Formatter _formatter;
         /// <summary>
         /// </summary>
@@ -30,10 +30,10 @@ namespace Isop.CommandLine
             _allowInferParameter = ! (_configuration?.Value?.DisableAllowInferParameter??false);
             _typeContainer = typeContainer;
             _formatter = formatter;
-            convertArgument = new ConvertArgumentsToParameterValue(configuration, typeConverterFunc);
+            _convertArgument = new ConvertArgumentsToParameterValue(configuration, typeConverterFunc);
         }
 
-        private CultureInfo Culture { get { return _configuration?.Value.CultureInfo ?? CultureInfo.CurrentCulture; } }
+        private CultureInfo Culture => _configuration?.Value.CultureInfo ?? CultureInfo.CurrentCulture;
 
         public bool Recognize(Controller controller, IEnumerable<string> arg)
         {
@@ -57,9 +57,7 @@ namespace Isop.CommandLine
         /// Note that in order to register a converter you can use:
         /// TypeDescriptor.AddAttributes(typeof(AType), new TypeConverterAttribute(typeof(ATypeConverter)));
         /// </summary>
-        /// <param name="arg"></param>
-        /// <returns></returns>
-        public ParsedMethod Parse(Controller controller, IEnumerable<string> arg)
+        private ParsedMethod Parse(Controller controller, IEnumerable<string> arg)
         {
             var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
 
@@ -92,7 +90,7 @@ namespace Isop.CommandLine
                                 .Select(unmatched => unmatched.Name).ToArray()
                           };
             }
-            var recognizedActionParameters = convertArgument.GetParametersForMethod(methodInfo,
+            var recognizedActionParameters = _convertArgument.GetParametersForMethod(methodInfo,
                 parsedArguments.RecognizedArgumentsAsKeyValuePairs());
 
             return new ParsedMethod( parsedArguments, _typeContainer,

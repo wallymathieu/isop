@@ -36,7 +36,7 @@ namespace Isop.Tests
             })
             .Parameter("beta", arg => { }, description: "Beskrivning av beta")
             .Parameter("alpha", arg => { })
-            .WithHelpTexts(h =>
+            .WithLocalization(h =>
             {
                 h.TheArgumentsAre = "Det finns följande argument:";
             })
@@ -92,7 +92,7 @@ See 'COMMANDNAME' help <command> for more information")));
             var usage = Builder.Create(new Configuration
             {
                 CultureInfo = CultureInfo.InvariantCulture
-            }).WithHelpTexts(h =>
+            }).WithLocalization(h =>
             {
                 h.TheCommandsAre = "Det finns följande kommandon:";
                 h.HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information";
@@ -120,7 +120,7 @@ Se 'Kommandonamn' help <kommando> för ytterligare information")));
             })
             .Recognize(typeof(MyController))
             .Recognize(typeof(AnotherController))
-            .WithHelpTexts(h =>
+            .WithLocalization(h =>
             {
                 h.TheCommandsAre = "Det finns följande kommandon:";
                 h.HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information";
@@ -146,7 +146,7 @@ Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
             })
             .Recognize(typeof(MyController))
             .Recognize(typeof(AnotherController))
-                .WithHelpTexts(h =>
+                .WithLocalization(h =>
                 {
                     h.TheCommandsAre = "Det finns följande kommandon:";
                     h.HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information";

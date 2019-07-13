@@ -13,19 +13,25 @@ namespace Isop
     public partial class Builder
     {
         private readonly RecognizesConfigurationBuilder _recognizes;
-
+        /// <summary>
+        /// 
+        /// </summary>
         public Builder(IServiceCollection container, RecognizesConfigurationBuilder recognizes)
         {
             Container = container;
             _recognizes = recognizes;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public Builder SetTypeConverter(TypeConverterFunc typeConverterFunc)
         {
             Container.AddSingleton(typeConverterFunc);
             return this;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public Builder SetFormatter(Formatter formatter)
         {
             Container.AddSingleton(formatter);
@@ -45,15 +51,12 @@ namespace Isop
             _recognizes.Properties.Add(new Property(argument, action, required, description, typeof(string)));
             return this;
         }
+
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public Builder FormatObjectsAsTable()
-        {
-            Container.AddSingleton(new Formatter(new TableFormatter().Format));
-            return this;
-        }
+        public Builder FormatObjectsAsTable() => SetFormatter(new TableFormatter().Format);
 
         /// <summary>
         /// 
@@ -73,7 +76,7 @@ namespace Isop
         /// <param name="arg"></param>
         /// <param name="ignoreGlobalUnMatchedParameters"></param>
         /// <returns></returns>
-        public Builder Recognize(Object arg, bool ignoreGlobalUnMatchedParameters = false)
+        public Builder Recognize(object arg, bool ignoreGlobalUnMatchedParameters = false)
         {
             var type = arg.GetType();
             Container.TryAddSingleton(type, svc => arg);
@@ -83,14 +86,21 @@ namespace Isop
 
         private IServiceCollection Container { get; }
 
+        /// <summary>
+        /// Build instance of app host.
+        /// </summary>
         public AppHost BuildAppHost()
         {
             var svcProvider= Container.BuildServiceProvider();
             var options = svcProvider.GetRequiredService<IOptions<Configuration>>();
             return new AppHost(options, svcProvider, svcProvider.GetRequiredService<RecognizesConfiguration>());
         }
-
-        public Builder WithHelpTexts(Action<Localization.Texts> action)
+        /// <summary>
+        /// Configure texts
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public Builder WithLocalization(Action<Localization.Texts> action)
         {
             var t= new Localization.Texts();
             action(t);

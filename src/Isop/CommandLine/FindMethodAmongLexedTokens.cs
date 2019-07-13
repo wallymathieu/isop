@@ -7,7 +7,7 @@ using Isop.CommandLine.Lex;
 using Isop.Domain;
 namespace Isop.CommandLine
 {
-    public class FindMethodAmongLexedTokens
+    internal class FindMethodAmongLexedTokens
     {
         public static Method FindMethod(IEnumerable<Method> methods, String methodName, IEnumerable<Token> lexed)
         {

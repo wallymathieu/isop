@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Isop.CommandLine.Parse
 {
-    public class MergedParsedArguments : ParsedArguments
+    internal class MergedParsedArguments : ParsedArguments
     {
         private readonly ParsedArguments _first;
         private readonly ParsedArguments _second;
