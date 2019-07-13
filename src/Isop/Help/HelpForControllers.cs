@@ -18,13 +18,13 @@ namespace Isop.Help
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
         private readonly Localization.Texts _helpTexts;
 
-        public HelpForControllers(IEnumerable<Controller> classAndMethodRecognizers, 
+        public HelpForControllers(RecognizesConfiguration recognizes, 
             HelpXmlDocumentation helpXmlDocumentation,
             IOptions<Localization.Texts> helpTexts)
         {
-            _classAndMethodRecognizers = classAndMethodRecognizers;
+            _classAndMethodRecognizers = recognizes.Recognizes;
             _helpXmlDocumentation = helpXmlDocumentation;
-            _helpTexts = helpTexts.Value;
+            _helpTexts = helpTexts.Value ?? new Localization.Texts();
         }
 
         private readonly Type[] _onlyStringType = { typeof(string) };

@@ -6,7 +6,6 @@ namespace Isop.Api
 {
     using Infrastructure;
     using Domain;
-    using System.Linq;
 
     public class Builder
     {

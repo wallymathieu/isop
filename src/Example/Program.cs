@@ -14,8 +14,7 @@ namespace Example
         {
             var parserBuilder = Build.Create(new Configuration
             {
-                CultureInfo = CultureInfo.InvariantCulture,
-                RecognizeHelp = true,
+                CultureInfo = CultureInfo.InvariantCulture
             })
             .Recognize(typeof(MyController))
             .Recognize(typeof(CustomerController)).Build();

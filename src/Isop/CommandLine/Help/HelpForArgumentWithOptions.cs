@@ -15,7 +15,7 @@ namespace Isop.CommandLine.Help
 
         public HelpForArgumentWithOptions(IOptions<Localization.Texts> helpTexts, GlobalArguments argumentWithOptionses)
         {
-            this.helpTexts = helpTexts.Value;
+            this.helpTexts = helpTexts.Value ?? new Localization.Texts();
             _argumentWithOptionses = argumentWithOptionses;
         }
 
