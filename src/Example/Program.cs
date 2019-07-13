@@ -6,7 +6,7 @@ using Isop;
 namespace Example
 {
     /// <summary>
-    /// This is a sample usage of Isop when configuring using <see cref=""/> ArgumentParser.Build:
+    /// This is a sample usage of Isop when configuring using <see cref="Builder"/> :
     /// </summary>
     class Program
     {

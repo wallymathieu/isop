@@ -14,10 +14,21 @@ namespace Isop
     /// </summary>
     public partial class Builder
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
         public static Builder Create(Configuration configuration=null)
         {
             return Create(configuration: configuration, serviceCollection: null);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serviceCollection"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
         public static Builder Create(IServiceCollection serviceCollection, Configuration configuration=null)
         {
             if (serviceCollection == null)
