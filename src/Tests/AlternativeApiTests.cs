@@ -45,7 +45,7 @@ namespace Isop.Tests
             .Action("Action")
             .Help();
 
-            Assert.That(help, Is.EqualTo("ActionHelp"));
+            Assert.IsNotEmpty(help);
         }
     }
 }
