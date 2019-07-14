@@ -66,8 +66,8 @@ namespace Isop
                 serviceCollection = new ServiceCollection();
             }
             serviceCollection.AddOptions();
-            serviceCollection.TryAddSingleton<Formatter>(new ToStringFormatter().Format);
-            serviceCollection.TryAddSingleton<TypeConverter>(new DefaultConverter().ConvertFrom);
+            serviceCollection.TryAddSingleton<Formatter>(di=>new ToStringFormatter().Format);
+            serviceCollection.TryAddSingleton<TypeConverter>(di=>new DefaultConverter().ConvertFrom);
             serviceCollection.TryAddSingleton<HelpXmlDocumentation>();
             serviceCollection.TryAddSingleton<HelpForControllers>();
             serviceCollection.TryAddSingleton<HelpForArgumentWithOptions>();

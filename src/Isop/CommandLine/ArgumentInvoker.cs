@@ -15,14 +15,11 @@ namespace Isop.CommandLine
         private readonly IServiceProvider _serviceProvider;
         private Recognizes _recognizes;
         private ILookup<string, ArgumentAction> _recognizesMap;
-        private Recognizes Recognizes => _recognizes ??= _serviceProvider.GetRequiredService<Recognizes>();
+        private Recognizes Recognizes => _recognizes ??(_recognizes= _serviceProvider.GetRequiredService<Recognizes>());
         private ILookup<string,ArgumentAction> RecognizesMap => _recognizesMap 
-            ??= Recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action);
+            ??(_recognizesMap= Recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action));
 
-        public ArgumentInvoker(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
+        public ArgumentInvoker(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
         public async Task<IEnumerable> Invoke(ParsedArguments parsedArguments)
         {
