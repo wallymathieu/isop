@@ -30,13 +30,14 @@ namespace Isop.Domain
 
             foreach (var paramInfo in parameterInfos)
             {
+                var keyValuePairs = parsedArguments as KeyValuePair<string, string>[] ?? parsedArguments.ToArray();
                 if (paramInfo.IsClassAndNotString() && !paramInfo.IsFile())
                 {
-                    parameters.Add(CreateObjectFromArguments(parsedArguments, paramInfo));
+                    parameters.Add(CreateObjectFromArguments(keyValuePairs, paramInfo));
                 }
                 else
                 {
-                    var recognizedArgument = parsedArguments.Where(a => a.Key.EqualsIgnoreCase(paramInfo.Name)).ToArray();
+                    var recognizedArgument = keyValuePairs.Where(a => a.Key.EqualsIgnoreCase(paramInfo.Name)).ToArray();
                     parameters.Add(!recognizedArgument.Any()
                         ? paramInfo.DefaultValue
                         : ConvertFrom(recognizedArgument.Single(), paramInfo.ParameterType));
@@ -45,11 +46,10 @@ namespace Isop.Domain
             return parameters;
         }
 
-        private object CreateObjectFromArguments(IEnumerable<KeyValuePair<string,string>> parsedArguments, Parameter paramInfo)
+        private object CreateObjectFromArguments(ICollection<KeyValuePair<string,string>> parsedArguments, Parameter paramInfo)
         {
             var obj = Activator.CreateInstance(paramInfo.ParameterType);
-            foreach (
-                PropertyInfo prop in paramInfo.GetPublicInstanceProperties())
+            foreach (var prop in paramInfo.GetPublicInstanceProperties())
             {
                 var recognizedArgument = parsedArguments.First(a => a.Key.EqualsIgnoreCase(prop.Name));
                 prop.SetValue(obj, ConvertFrom(recognizedArgument, prop.PropertyType), null);

@@ -7,12 +7,11 @@ namespace Isop.CommandLine
         public ArgumentParameter Parameter { get; }
 
         public string Description { get; }
-        public string Name { get; }
+        public string Name => Parameter.LongAlias();
         public bool Required { get; }
-        public Argument(string name, ArgumentParameter parameter, bool required = false, string description = null)
+        public Argument(ArgumentParameter parameter, bool required = false, string description = null)
         {
             Description = description;
-            Name = name;
             Parameter = parameter;
             Required = required;
         }

@@ -11,7 +11,6 @@ namespace Isop.CommandLine
         {
             var argumentParam= ArgumentParameter.Parse(p.Name, formatProvider);
             return new Argument(
-                name: p.Name,
                 required: p.Required,
                 description: p.Description,
                 parameter: argumentParam

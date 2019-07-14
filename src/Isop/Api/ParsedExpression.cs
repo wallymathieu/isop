@@ -36,7 +36,7 @@ namespace Isop.Api
             var result = await _argumentInvoker.Invoke(_parsedArguments);
             foreach (var item in result)
             {
-                output.Write(_formatter(item));
+                output.Write(_formatter.Invoke(item));
             }
         }
     }

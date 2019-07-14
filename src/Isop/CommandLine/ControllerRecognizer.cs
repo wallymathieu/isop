@@ -65,8 +65,8 @@ namespace Isop.CommandLine
             var argumentRecognizers = methodInfo.GetArguments(Culture)
                 .ToList();
             argumentRecognizers.InsertRange(0, new[] { 
-                new Argument(parameter: ArgumentParameter.Parse("#0" + controller.Name, Culture), required: true, name:controller.Name),
-                new Argument(parameter: ArgumentParameter.Parse("#1" + methodInfo.Name, Culture), required: false, name:methodInfo.Name)
+                new Argument(parameter: ArgumentParameter.Parse("#0" + controller.Name, Culture), required: true),
+                new Argument(parameter: ArgumentParameter.Parse("#1" + methodInfo.Name, Culture), required: false)
             });
 
             var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter, Culture);

@@ -18,9 +18,12 @@ namespace Isop.Domain
                 }
                 else if (retval is IEnumerable)
                 {
-                    foreach (var item in (retval as IEnumerable))
+                    foreach (var item in retval as IEnumerable)
                     {
-                        yield return (item.ToString());
+                        foreach (var formatted in Format(item))
+                        {
+                            yield return formatted;
+                        }
                     }
                 }
                 else

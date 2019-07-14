@@ -75,8 +75,7 @@ namespace Isop.Domain
 
         private static Argument GetArgumentWithOptions(Parameter parameterInfo, IFormatProvider cultureInfo)
         {
-            return new Argument(parameterInfo.Name,
-                required: parameterInfo.LooksRequired(),
+            return new Argument(required: parameterInfo.LooksRequired(),
                 parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo));
         }
 
@@ -85,7 +84,7 @@ namespace Isop.Domain
         {
             recognizers.AddRange(parameterInfo.GetPublicInstanceProperties()
                 .Select(prop => 
-                    new Argument(prop.Name, 
+                    new Argument( 
                         required: parameterInfo.LooksRequired() && IsRequired(prop),
                         parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo))));
         }
