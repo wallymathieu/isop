@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Isop;
 using Isop.Api;
 
@@ -11,7 +12,7 @@ namespace Example
     /// </summary>
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var appHost = Builder
                 .Create(new Configuration
@@ -33,7 +34,7 @@ Did you mean any of these arguments?
                     Console.WriteLine(unRecognizedArgumentsMessage);
                 }else
                 {
-                    parsedMethod.Invoke(Console.Out);
+                    await parsedMethod.InvokeAsync(Console.Out);
                 }
             }
             catch (TypeConversionFailedException ex)

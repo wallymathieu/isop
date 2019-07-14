@@ -60,13 +60,12 @@ MIT License
 You're hooking it up by writing something like:
 
 ```csharp
-static void Main(string[] args)
-{
-  new Build()
+static Task Main(string[] args)=>
+    Builder.Create()
        .Recognize(typeof(CustomerController))
+       .BuildAppHost()
        .Parse(args)
-       .Invoke(Console.Out);
-}
+       .InvokeAsync(Console.Out);
 ```
 
 Where your controller looks something like this:
@@ -95,7 +94,7 @@ When invoked it will output two lines to the command prompt, the yielded lines a
 ```csharp
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         var appHost = Builder
             .Create(new Configuration
@@ -116,7 +115,7 @@ Did you mean any of these arguments?
                 Console.WriteLine(unRecognizedArgumentsMessage);
             }else
             {
-                parsedMethod.Invoke(Console.Out);
+                await parsedMethod.InvokeAsync(Console.Out);
             }
         }
         catch (TypeConversionFailedException ex)
