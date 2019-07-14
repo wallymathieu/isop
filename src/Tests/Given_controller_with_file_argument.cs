@@ -1,14 +1,20 @@
+using System;
 using System.IO;
 using System.Linq;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Tests.FakeControllers;
-namespace Tests.ArgumentParsers
+
+namespace Tests
 {
     [TestFixture]
     public class Given_controller_with_file_argument
     {
+        class MyFileController
+        {
+            public Func<FileStream, string> OnAction { get; set; }
+            public string Action(FileStream file) { return OnAction(file); }
+        }
         [Test]
         public void It_can_handle_file_argument()
         {

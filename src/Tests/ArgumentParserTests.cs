@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -10,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Tests.FakeControllers;
 
-namespace Tests.ArgumentParsers
+namespace Tests
 {
     [TestFixture]
     public class ArgumentParserTests

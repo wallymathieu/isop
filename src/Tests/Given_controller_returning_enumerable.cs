@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Tests.FakeControllers;
-namespace Tests.ArgumentParsers
+
+namespace Tests
 {
     [TestFixture]
     public class Given_controller_returning_enumerable

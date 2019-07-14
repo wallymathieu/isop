@@ -5,14 +5,22 @@ using System.Linq;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Tests.FakeControllers;
+using Tests.ArgumentParsers;
 
-namespace Tests.ArgumentParsers
+namespace Tests
 {
     [TestFixture]
     public class Given_optional_controller_action_parameter
     {
-        
+        class MyOptionalController
+        {
+            public MyOptionalController()
+            {
+                OnAction = (p1, p2, p3, p4) => string.Empty;
+            }
+            public Func<string, string, int?, decimal, string> OnAction { get; set; }
+            public string Action(string param1, string param2 = null, int? param3 = null, decimal param4 = 1) { return OnAction(param1, param2, param3, param4); }
+        }       
         [Test]
         public void It_can_parse_class_and_method_and_knows_whats_not_required()
         {

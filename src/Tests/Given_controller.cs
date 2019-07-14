@@ -5,8 +5,10 @@ using System.Linq;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Tests.ArgumentParsers;
 using Tests.FakeControllers;
-namespace Tests.ArgumentParsers
+
+namespace Tests
 {
     [TestFixture]
     public class Given_controller

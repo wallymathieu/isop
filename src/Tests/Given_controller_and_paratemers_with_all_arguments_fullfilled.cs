@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Tests.FakeControllers;
 
-namespace Tests.ArgumentParsers
+namespace Tests
 {
     [TestFixture]
     public class Given_controller_and_paratemers_with_all_arguments_fullfilled
