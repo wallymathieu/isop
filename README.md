@@ -80,7 +80,7 @@ public class MyController
         _repository = new CustomerRepository();
     }
     public IEnumerable&lt;string&gt; Add(string name)
-    { 
+    {
         yield return "Starting to insert customer";
         _repository.Insert( new Customer{ Name = name } );
         yield return "Customer inserted";  

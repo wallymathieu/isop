@@ -5,53 +5,39 @@ using Isop.Domain;
 using System;
 namespace Isop.CommandLine.Parse
 {
-    public class ParsedArguments
+    public abstract class ParsedArguments
     {
-        public ParsedArguments()
+        private ParsedArguments(IEnumerable<RecognizedArgument> recognizedArguments, IEnumerable<UnrecognizedArgument> unRecognizedArguments, IEnumerable<Argument> argumentWithOptions)
         {
+            RecognizedArguments = recognizedArguments;
+            UnRecognizedArguments = unRecognizedArguments;
+            ArgumentWithOptions = argumentWithOptions;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="parsedArguments"></param>
-        public ParsedArguments(ParsedArguments parsedArguments)
+        private ParsedArguments(ParsedArguments parsedArguments)
         {
-            RecognizedArguments = parsedArguments.RecognizedArguments;
             ArgumentWithOptions = parsedArguments.ArgumentWithOptions;
             UnRecognizedArguments = parsedArguments.UnRecognizedArguments;
+            RecognizedArguments = parsedArguments.RecognizedArguments;
         }
-        public IEnumerable<RecognizedArgument> RecognizedArguments { get; set; }
+        public IEnumerable<RecognizedArgument> RecognizedArguments { get; }
 
-        public IEnumerable<UnrecognizedArgument> UnRecognizedArguments { get; set; }
+        public IEnumerable<UnrecognizedArgument> UnRecognizedArguments { get; }
 
-        public IEnumerable<Argument> ArgumentWithOptions { get; set; }
-
-        public void Invoke(TextWriter cout)
-        {
-            foreach (var item in Invoke())
-            {
-                cout.WriteLine(item);
-            }
-        }
-
-        public virtual IEnumerable<string> Invoke() 
-        {
-            foreach (var argument in RecognizedArguments.Where(argument => null != argument.Argument.Action))
-            {
-                argument.Argument.Action(argument.Value);
-            }
-            return new string[0];
-        }
+        public IEnumerable<Argument> ArgumentWithOptions { get; }
 
         public ParsedArguments Merge(ParsedArguments args)
         {
             return Merge(this, args);
         }
 
-        public static ParsedArguments Merge(ParsedArguments first, ParsedArguments second)
+        private static ParsedArguments Merge(ParsedArguments first, ParsedArguments second)
         {
-            return new MergedParsedArguments(first, second);
+            return new Merged(first, second);
         }
 
         public IEnumerable<Argument> UnMatchedRequiredArguments()
@@ -79,6 +65,85 @@ namespace Isop.CommandLine.Parse
         }
         public IEnumerable<KeyValuePair<string,string>> RecognizedArgumentsAsKeyValuePairs(){
             return RecognizedArguments.Select(a => a.AsKeyValuePair());
+        }
+        
+        /// <summary>
+        /// A combination of two parsed arguments instances
+        /// </summary>
+        public class Merged : ParsedArguments
+        {
+            /// <summary>
+            /// 
+            /// </summary>
+            public readonly ParsedArguments First;
+            /// <summary>
+            /// 
+            /// </summary>
+            public readonly ParsedArguments Second;
+
+            internal Merged(ParsedArguments first, ParsedArguments second) 
+                : base(
+                    argumentWithOptions:first.ArgumentWithOptions.Union(second.ArgumentWithOptions),
+                    recognizedArguments:first.RecognizedArguments.Union(second.RecognizedArguments),
+                    unRecognizedArguments:first.UnRecognizedArguments.Intersect(second.UnRecognizedArguments)
+                )
+            {
+                First = first;
+                Second = second;
+            }
+        }
+        public class Method : ParsedArguments
+        {
+            public Method(ParsedArguments parsedArguments,
+                Type recognizedClass,
+                Domain.Method recognizedAction,
+                IEnumerable<object> recognizedActionParameters)
+                : base(parsedArguments)
+            {
+                RecognizedClass = recognizedClass;
+                RecognizedAction = recognizedAction;
+                RecognizedActionParameters = recognizedActionParameters;
+            }
+
+            public Type RecognizedClass { get; }
+            public Domain.Method RecognizedAction { get; }
+            public IEnumerable<object> RecognizedActionParameters { get; }
+        }
+
+        public class Default : ParsedArguments
+        {
+            public Default(IEnumerable<RecognizedArgument> recognizedArguments, IEnumerable<UnrecognizedArgument> unRecognizedArguments, IEnumerable<Argument> argumentWithOptions) : base(recognizedArguments, unRecognizedArguments, argumentWithOptions)
+            {
+            }
+        }
+
+        public T Map<T>(Func<Method, T> method, Func<Merged, T> merged, Func<Default, T> @default)
+        {
+            switch (this)
+            {
+                case Method pm: return method(pm);
+                case Merged m: return merged(m);
+                case Default d: return @default(d);
+                default:
+                    throw new Exception("Unimplemented switch case");
+            }
+        }
+        public void Switch(Action<Method> method, Action<Merged> merged, Action<Default> @default)
+        {
+            switch (this)
+            {
+                case Method pm: 
+                    method(pm);
+                    return;
+                case Merged m: 
+                    merged(m);
+                    return;
+                case Default d: 
+                    @default(d);
+                    return;
+                default:
+                    throw new Exception("Unimplemented switch case");
+            }
         }
     }
 }

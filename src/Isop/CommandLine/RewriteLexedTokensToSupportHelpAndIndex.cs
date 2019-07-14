@@ -7,7 +7,7 @@ using Isop.CommandLine.Lex;
 namespace Isop.CommandLine
 {
     using Domain;
-    public class RewriteLexedTokensToSupportHelpAndIndex
+    internal class RewriteLexedTokensToSupportHelpAndIndex
     {
         // Arg(ControllerName),Param(..),.. -> Arg(ControllerName),Arg('Index'),... 
         public static IList<Token> Rewrite(IList<Token> tokens)

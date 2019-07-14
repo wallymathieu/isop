@@ -10,7 +10,7 @@ namespace Isop
         /// <summary>
         /// The culture info for the console application
         /// </summary>
-        public CultureInfo CultureInfo { get; set; } = CultureInfo.CurrentCulture;
+        public CultureInfo CultureInfo { get; set; } = CultureInfo.InvariantCulture;
         /// <summary>
         /// If you want to disable infer parameter
         /// </summary>

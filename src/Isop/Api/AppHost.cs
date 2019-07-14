@@ -5,6 +5,8 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
+using Isop.Abstractions;
+
 namespace Isop.Api
 {
     using CommandLine;
@@ -17,7 +19,7 @@ namespace Isop.Api
     /// </summary>
     public class AppHost
     {
-        internal readonly RecognizesConfiguration RecognizesConfiguration;
+        internal readonly Recognizes Recognizes;
         internal readonly IServiceProvider ServiceProvider;
         internal readonly ControllerRecognizer ControllerRecognizer;
         private readonly Configuration _options;
@@ -27,44 +29,39 @@ namespace Isop.Api
         /// </summary>
         public AppHost(IOptions<Configuration> options,
             IServiceProvider serviceProvider,
-            RecognizesConfiguration recognizesConfiguration)
+            Recognizes recognizes)
         {
             _options = options?.Value;
-            RecognizesConfiguration = recognizesConfiguration;
+            Recognizes = recognizes;
             ServiceProvider = serviceProvider;
-            ControllerRecognizer = new ControllerRecognizer(options, serviceProvider,
-                serviceProvider.GetRequiredService<TypeConverterFunc>(),
-                serviceProvider.GetRequiredService<Formatter>());
+            ControllerRecognizer = new ControllerRecognizer(options,
+                serviceProvider.GetRequiredService<TypeConverter>());
         }
         /// <summary>
         /// Parse command line arguments and return parsed arguments entity
         /// </summary>
-        public ParsedArguments Parse(IEnumerable<string> arg)
-        {
-            return Parse(arg.ToList());
-        }
+        public ParsedExpression Parse(IEnumerable<string> arg) => Parse(arg.ToList());
 
-        private ParsedArguments Parse(List<string> arg)
+        private ParsedExpression Parse(List<string> arg)
         {
-            var argumentParser = new ArgumentParser(GlobalParameters, AllowInferParameter, CultureInfo);
+            var argumentParser = new ArgumentParser(Recognizes.Properties.Select(p=>p.ToArgument(_options.CultureInfo)), AllowInferParameter, CultureInfo);
             var lexed = ArgumentLexer.Lex(arg).ToList();
             var parsedArguments = argumentParser.Parse(lexed, arg);
-            if (RecognizesConfiguration.Recognizes.Any())
+            if (Recognizes.Controllers.Any())
             {
-                var recognizedController = RecognizesConfiguration.Recognizes
+                var recognizedController = Recognizes.Controllers
                     .FirstOrDefault(controller => ControllerRecognizer.Recognize(controller, arg));
                 if (null != recognizedController)
                 {
-                    return ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, arg, parsedArguments);
+                    return new ParsedExpression(ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, arg, parsedArguments), this);
                 }
             }
             parsedArguments.AssertFailOnUnMatched();
-            return parsedArguments;
+            return new ParsedExpression(parsedArguments, this);
         }
         
         internal bool AllowInferParameter => !(_options?.DisableAllowInferParameter ?? false);
         internal CultureInfo CultureInfo => _options?.CultureInfo;
-        internal IEnumerable<ArgumentWithOptions> GlobalParameters => new GlobalArguments(RecognizesConfiguration).GlobalParameters;
         /// <summary>
         /// Return help-text
         /// </summary>

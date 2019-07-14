@@ -1,21 +1,20 @@
-﻿using System;
+﻿using Isop.CommandLine.Parse;
 
-namespace Isop.Domain
+namespace Isop.CommandLine
 {
     public class Argument
     {
-        public string Description { get; private set; }
-        public string Name { get; private set; }
-        public Action<string> Action { get; private set; }
-        public bool Required { get; private set; }
-        public Type Type { get; private set; }
-        public Argument(string name, Action<string> action = null, bool required = false, string description = null,Type type=null)
+        public ArgumentParameter Parameter { get; }
+
+        public string Description { get; }
+        public string Name { get; }
+        public bool Required { get; }
+        public Argument(string name, ArgumentParameter parameter, bool required = false, string description = null)
         {
             Description = description;
             Name = name;
-            Action = action;
+            Parameter = parameter;
             Required = required;
-            Type = type;
         }
 
         public override bool Equals(object obj)
@@ -42,6 +41,21 @@ namespace Isop.Domain
                 result = (result*397) ^ Required.GetHashCode();
                 return result;
             }
+        }
+
+        public virtual string Help()
+        {
+            return "--" + Name;
+        }
+
+        public virtual bool Accept(string value)
+        {
+            return Parameter.Accept(value);
+        }
+
+        public virtual bool Accept(int index, string value)
+        {
+            return Parameter.Accept(index, value);
         }
     }
 }

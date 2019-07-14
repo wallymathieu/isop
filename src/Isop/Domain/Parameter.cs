@@ -18,22 +18,17 @@ namespace Isop.Domain
             var t = _parameter.ParameterType;
             return t.GetTypeInfo().IsClass && t != typeof(String);
         }
-        public string Name{get{ return _parameter.Name;}}
-        public Type ParameterType{get{ return _parameter.ParameterType;}}
-        public bool LooksRequired()
-        {
-            return ! _parameter.IsOptional;
-        }
-        public IEnumerable<PropertyInfo> GetPublicInstanceProperties()
-        {
-            return _parameter.ParameterType.GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public);
-        }
-        public object DefaultValue{get{ return _parameter.DefaultValue; }}
+        public string Name => _parameter.Name;
+        public Type ParameterType => _parameter.ParameterType;
 
-        public bool IsFile()
-        {
-            return _parameter.ParameterType == typeof(FileStream);
-        }
+        public bool LooksRequired() => ! _parameter.IsOptional;
+
+        public IEnumerable<PropertyInfo> GetPublicInstanceProperties() => 
+            _parameter.ParameterType.GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+        
+        public object DefaultValue => _parameter.DefaultValue;
+
+        public bool IsFile() => _parameter.ParameterType == typeof(FileStream);
     }
 }
 

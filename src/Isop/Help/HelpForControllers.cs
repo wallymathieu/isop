@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using Isop.CommandLine;
 using Isop.Help;
 using Isop.Infrastructure;
 using Isop.CommandLine.Parse;
@@ -16,16 +17,19 @@ namespace Isop.Help
     {
         private readonly IEnumerable<Controller> _classAndMethodRecognizers;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
+        private readonly Configuration _configration;
         private readonly IServiceProvider _serviceProvider;
         private readonly Localization.Texts _texts;
 
-        public HelpForControllers(RecognizesConfiguration recognizes, 
+        public HelpForControllers(Recognizes recognizes, 
             HelpXmlDocumentation helpXmlDocumentation,
             IOptions<Localization.Texts> texts,
+            IOptions<Configuration> configration,
             IServiceProvider serviceProvider)
         {
-            _classAndMethodRecognizers = recognizes.Recognizes;
+            _classAndMethodRecognizers = recognizes.Controllers;
             _helpXmlDocumentation = helpXmlDocumentation;
+            _configration = configration.Value;
             _serviceProvider = serviceProvider;
             _texts = texts.Value ?? new Localization.Texts();
         }
@@ -56,7 +60,7 @@ namespace Isop.Help
 
             if (method != null && includeArguments)
             {
-                var arguments = method.GetArguments().Select(DescriptionAndHelp);
+                var arguments = method.GetArguments(_configration?.CultureInfo).Select(DescriptionAndHelp);
                 helpText.AddRange(arguments);
             }
 
@@ -93,7 +97,7 @@ namespace Isop.Help
             }
 
             var arguments = method
-                .GetArguments()
+                .GetArguments(_configration?.CultureInfo)
                 .ToArray();
             if (arguments.Any())
             {
@@ -116,12 +120,7 @@ namespace Isop.Help
 
         private string DescriptionAndHelp(Argument argument)
         {
-            var options = argument as ArgumentWithOptions;
-            if (options != null)
-            {
-                return options.Argument.Help();
-            }
-            return "--" + argument.Name;
+            return argument.Help();
         }
 
         public string Help(string val = null, string action = null)

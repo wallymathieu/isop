@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Collections.Generic;
+using Isop.Abstractions;
 
 namespace Isop.Domain
 {
@@ -8,10 +9,10 @@ namespace Isop.Domain
     {
         public string Description { get; private set; }
         public string Name { get; private set; }
-        public Action<string> Action { get; set; }
+        public ArgumentAction Action { get; set; }
         public bool Required { get; set; }
         public Type Type { get; set; }
-        public Property(string name, Action<string> action = null, bool required = false, string description = null,Type type=null)
+        public Property(string name, ArgumentAction action = null, bool required = false, string description = null,Type type=null)
         {
             Name = name;
             Action = action;
@@ -44,5 +45,6 @@ namespace Isop.Domain
                 return result;
             }
         }
+
     }
 }

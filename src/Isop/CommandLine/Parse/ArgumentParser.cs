@@ -115,22 +115,16 @@ namespace Isop.CommandLine.Parse
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
                 .Select(v => new UnrecognizedArgument { Index = v.i, Value = v.value });
 
-            return new ParsedArguments()
-            {
-                ArgumentWithOptions = _argumentWithOptions.ToArray(),
-                RecognizedArguments = recognized,
-                UnRecognizedArguments = unRecognizedArguments
-            };
+            return new ParsedArguments.Default(
+                argumentWithOptions :_argumentWithOptions.ToArray(),
+                recognizedArguments : recognized,
+                unRecognizedArguments : unRecognizedArguments
+            );
         }
 
         private bool Accept(Argument argument, int index, string value)
         {
-            var options = argument as ArgumentWithOptions;
-            if (options != null)
-            {
-                return options.Argument.Accept(index, value);
-            }
-            return ArgumentParameter.Parse(argument.Name, _cultureInfo).Accept(index, value);
+            return argument.Accept(index, value);
         }
 
         private void InferParameter(ICollection<int> recognizedIndexes, IList<RecognizedArgument> recognized, Token current)
@@ -171,23 +165,17 @@ namespace Isop.CommandLine.Parse
                             current.Value));
 
             }
-            return new ParsedArguments
-            {
-                ArgumentWithOptions = _argumentWithOptions.ToArray(),
-                RecognizedArguments = recognized,
-                UnRecognizedArguments = unRecognizedArguments
-            };
+            return new ParsedArguments.Default(
+                argumentWithOptions : _argumentWithOptions.ToArray(),
+                recognizedArguments : recognized,
+                unRecognizedArguments : unRecognizedArguments
+            );
 
         }
 
         private bool Accept(Argument argument, string value)
         {
-            var options = argument as ArgumentWithOptions;
-            if (options != null)
-            {
-                return options.Argument.Accept(value);
-            }
-            return ArgumentParameter.Parse(argument.Name, _cultureInfo).Accept(value);
+            return argument.Accept(value);
         }
     }
 }

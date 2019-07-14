@@ -10,36 +10,41 @@ namespace Isop.CommandLine.Help
     using Parse;
     internal class HelpForArgumentWithOptions
     {
-        private readonly Localization.Texts helpTexts;
-        private readonly GlobalArguments _argumentWithOptionses;
+        private readonly Localization.Texts _texts;
+        private readonly Recognizes _recognizes;
+        private readonly IOptions<Configuration> _config;
 
-        public HelpForArgumentWithOptions(IOptions<Localization.Texts> helpTexts, GlobalArguments argumentWithOptionses)
+        public HelpForArgumentWithOptions(IOptions<Localization.Texts> texts, 
+            Recognizes recognizes,
+            IOptions<Configuration> config)
         {
-            this.helpTexts = helpTexts.Value ?? new Localization.Texts();
-            _argumentWithOptionses = argumentWithOptionses;
+            _texts = texts.Value ?? new Localization.Texts();
+            _recognizes = recognizes;
+            _config = config;
         }
 
-        private static string Help(ArgumentWithOptions entity)
+        private string Help(Property entity)
         {
-            return string.Concat(entity.Argument.Help(), (string.IsNullOrEmpty(entity.Description)
-                    ? ""
-                    : "\t"+ entity.Description));
+            //var arg = entity.AsArgument();
+            return string.Concat(entity.ToArgument(_config?.Value?.CultureInfo).Help(), string.IsNullOrEmpty(entity.Description)
+                ? ""
+                : "\t"+ entity.Description);
         }
 
         public string Help(string val = null)
         {
             if (string.IsNullOrEmpty(val))
-                return helpTexts.TheArgumentsAre + Environment.NewLine +
+                return _texts.TheArgumentsAre + Environment.NewLine +
                       string.Join(Environment.NewLine,
-                                  _argumentWithOptionses.GlobalParameters.Select(ar => "  "+ Help(ar)).ToArray());
-            return Help(_argumentWithOptionses.GlobalParameters.First(ar => ar.Argument.Prototype.Equals(val)));
+                                  _recognizes.Properties.Select(ar => "  "+ Help(ar)).ToArray());
+            return Help(_recognizes.Properties.First(ar => ar.ToArgument(_config?.Value?.CultureInfo).Accept(val)));
         }
 
         public bool CanHelp(string val = null)
         {
             return string.IsNullOrEmpty(val)
-                ? _argumentWithOptionses.GlobalParameters.Any()
-                : _argumentWithOptionses.GlobalParameters.Any(ar => ar.Argument.Prototype.Equals(val));
+                ? _recognizes.Properties.Any()
+                : _recognizes.Properties.Any(ar => ar.ToArgument(_config?.Value?.CultureInfo).Accept(val));
         }
     }
 }

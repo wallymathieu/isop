@@ -3,6 +3,7 @@ using Isop.CommandLine.Parse;
 using System.Collections.Generic;
 using System.Linq;
 using Isop.Domain;
+using Isop.CommandLine;
 using Isop.Help;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,26 +28,26 @@ namespace Isop.Api
         /// Get arguments for controller action
         /// </summary>
         public IEnumerable<Argument> GetArguments() =>
-            _build.RecognizesConfiguration.Recognizes.SingleOrDefault(r => r.Recognize(_controllerName, _actionName))
-                ?.GetMethod(_actionName).GetArguments() ?? throw new ArgumentException($"Controller: {_controllerName}, method: {_actionName}");
+            _build.Recognizes.Controllers.SingleOrDefault(r => r.Recognize(_controllerName, _actionName))
+                ?.GetMethod(_actionName).GetArguments(_build.CultureInfo) ?? throw new ArgumentException($"Controller: {_controllerName}, method: {_actionName}");
         /// <summary>
         /// send parameters to controller actions
         /// </summary>
-        public ParsedArguments Parameters(Dictionary<string, string> parameters)
+        public ParsedExpression Parameters(Dictionary<string, string> parameters)
         {
-            var argumentParser = new ArgumentParser(_build.GlobalParameters, _build.AllowInferParameter, _build.CultureInfo);
+            var argumentParser = new ArgumentParser(_build.Recognizes.Properties.Select(p=>p.ToArgument(_build.CultureInfo)), _build.AllowInferParameter, _build.CultureInfo);
             var parsedArguments = argumentParser.Parse(parameters);
-            if (_build.RecognizesConfiguration.Recognizes.Any())
+            if (_build.Recognizes.Controllers.Any())
             {
-                var recognizedController = _build.RecognizesConfiguration.Recognizes
+                var recognizedController = _build.Recognizes.Controllers
                     .FirstOrDefault(controller => controller.Recognize(_controllerName, _actionName));
                 if (null != recognizedController)
                 {
-                    return _build.ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, _actionName, parameters, parsedArguments);
+                    return new ParsedExpression( _build.ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, _actionName, parameters, parsedArguments), _build);
                 }
             }
             parsedArguments.AssertFailOnUnMatched();
-            return parsedArguments;
+            return new ParsedExpression(parsedArguments, _build);
         }
         /// <summary>
         /// Get help for controller action

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Isop.Abstractions;
 
 namespace Isop.Domain
 {
@@ -11,13 +12,13 @@ namespace Isop.Domain
     using Domain;
     using Microsoft.Extensions.Options;
 
-    public class ConvertArgumentsToParameterValue
+    internal class ConvertArgumentsToParameterValue
     {
-        private readonly TypeConverterFunc _typeConverter;
+        private readonly TypeConverter _typeConverter;
         private readonly CultureInfo _culture;
-        public ConvertArgumentsToParameterValue(IOptions<Configuration> configuration, TypeConverterFunc typeConverter)
+        public ConvertArgumentsToParameterValue(IOptions<Configuration> configuration, TypeConverter typeConverter)
         {
-            _culture = configuration?.Value.CultureInfo ?? CultureInfo.CurrentCulture;
+            _culture = configuration?.Value.CultureInfo;
             _typeConverter = typeConverter?? throw new ArgumentNullException(nameof(typeConverter));
         }
 

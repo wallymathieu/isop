@@ -8,12 +8,12 @@ namespace Isop.CommandLine.Parse
 {
     public class RecognizedArgument
     {
-        public int Index { get; private set; }
+        public int Index { get; }
 
         /// <summary>
         /// the matched value if any, for instance the "value" of the expression "--argument value"
         /// </summary>
-        public string Value { get; private set; }
+        public string Value { get; }
         public Argument Argument { get; private set; }
         /// <summary>
         /// the "argument" of the expression "--argument"

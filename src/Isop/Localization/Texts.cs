@@ -1,46 +1,49 @@
 namespace Isop.Localization
 {
+    /// <summary>
+    /// Localization texts
+    /// </summary>
     public class Texts
     {
-        public Texts()
-        {
-            HelpSubCommandForMoreInformation = "See 'COMMANDNAME' help <command> <subcommand> for more information";
-
-            HelpCommandForMoreInformation = "See 'COMMANDNAME' help <command> for more information";
-            TheCommandsAre = "The commands are:";
-            TheSubCommandsFor = "The sub commands for ";
-            AndAcceptTheFollowingParameters = "And accept the following parameters";
-            AndTheShortFormIs = "And the short form is";
-            UnknownAction = "Unknown action";
-            TheArgumentsAre = "The arguments are:";
-        }
-
         /// <summary>
         /// default: And accept the following parameters
         /// </summary>
-        public string AndAcceptTheFollowingParameters { get; set; }
+        public string AndAcceptTheFollowingParameters { get; set; } = "And accept the following parameters";
+
         /// <summary>
         /// default: And the short form is
         /// </summary>
-        public string AndTheShortFormIs { get; set; }
+        public string AndTheShortFormIs { get; set; } = "And the short form is";
+
         /// <summary>
         /// default: "The commands are:"
         /// </summary>
-        public string TheCommandsAre { get; set; }
+        public string TheCommandsAre { get; set; } = "The commands are:";
+
         /// <summary>
         /// default: The sub commands for 
         /// </summary>
-        public string TheSubCommandsFor { get; set; }
+        public string TheSubCommandsFor { get; set; } = "The sub commands for ";
+
         /// <summary>
-        /// default: "Se 'COMMANDNAME' help command for more information"
+        /// default: "See 'COMMANDNAME' help command for more information"
         /// </summary>
-        public string HelpCommandForMoreInformation { get; set; }
+        public string HelpCommandForMoreInformation { get; set; } = "See 'COMMANDNAME' help <command> for more information";
+
         /// <summary>
-        /// default: Se 'COMMANDNAME' help 'command' 'subcommand' for more information
+        /// default: See 'COMMANDNAME' help &lt;command&gt; &lt;subcommand&gt; for more information
         /// </summary>
-        public string HelpSubCommandForMoreInformation { get; set; }
-        public string UnknownAction { get; set; }
-        public string TheArgumentsAre { get; set; }
+        public string HelpSubCommandForMoreInformation { get; set; } = "See 'COMMANDNAME' help <command> <subcommand> for more information";
+
+        /// <summary>
+        /// default: Unknown action
+        /// </summary>
+        public string UnknownAction { get; set; } = "Unknown action";
+
+        /// <summary>
+        /// default: The arguments are:
+        /// </summary>
+        public string TheArgumentsAre { get; set; } = "The arguments are:";
     }
 
 }

@@ -7,21 +7,18 @@ using Isop.CommandLine.Lex;
 using Isop.Domain;
 namespace Isop.CommandLine
 {
-    internal class FindMethodAmongLexedTokens
+    internal static class FindMethodAmongLexedTokens
     {
         public static Method FindMethod(IEnumerable<Method> methods, String methodName, IEnumerable<Token> lexed)
         {
             var potential = methods
-                .Where(method => method.Name.EqualsIgnoreCase(methodName));
+                .Where(method => method.Name.EqualsIgnoreCase(methodName))
+                .ToArray();
             var potentialMethod = potential
                 .Where(method => method.GetParameters().Length <= lexed.Count(t => t.TokenType == TokenType.Parameter))
                 .OrderByDescending(method => method.GetParameters().Length)
                 .FirstOrDefault();
-            if (potentialMethod != null)
-            {
-                return potentialMethod;
-            }
-            return potential.FirstOrDefault();
+            return potentialMethod ?? potential.FirstOrDefault();
         }
     }
 }

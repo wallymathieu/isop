@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Isop.Abstractions;
 
 namespace Isop.CommandLine
 {
@@ -15,33 +16,28 @@ namespace Isop.CommandLine
     {
         private readonly bool _allowInferParameter;
         private readonly IOptions<Configuration> _configuration;
-        private readonly IServiceProvider _typeContainer;
         private readonly ConvertArgumentsToParameterValue _convertArgument;
-        private readonly Formatter _formatter;
+
         /// <summary>
         /// </summary>
         public ControllerRecognizer(
             IOptions<Configuration> configuration,
-            IServiceProvider typeContainer,
-            TypeConverterFunc typeConverterFunc,
-            Formatter formatter)
+            TypeConverter typeConverterFunc)
         {
             _configuration = configuration;
             _allowInferParameter = ! (_configuration?.Value?.DisableAllowInferParameter??false);
-            _typeContainer = typeContainer;
-            _formatter = formatter;
             _convertArgument = new ConvertArgumentsToParameterValue(configuration, typeConverterFunc);
         }
 
-        private CultureInfo Culture => _configuration?.Value.CultureInfo ?? CultureInfo.CurrentCulture;
+        private CultureInfo Culture => _configuration?.Value.CultureInfo;
 
-        public bool Recognize(Controller controller, IEnumerable<string> arg)
+        public static bool Recognize(Controller controller, IEnumerable<string> arg)
         {
             var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
             return null != FindMethodInfo(controller, lexed);
         }
 
-        private Method FindMethodInfo(Controller controller, IList<Token> arg)
+        private static Method FindMethodInfo(Controller controller, IList<Token> arg)
         {
             var foundClassName = controller.Name.EqualsIgnoreCase(arg.ElementAtOrDefault(0).Value);
             if (foundClassName)
@@ -57,7 +53,7 @@ namespace Isop.CommandLine
         /// Note that in order to register a converter you can use:
         /// TypeDescriptor.AddAttributes(typeof(AType), new TypeConverterAttribute(typeof(ATypeConverter)));
         /// </summary>
-        private ParsedMethod Parse(Controller controller, IEnumerable<string> arg)
+        private ParsedArguments Parse(Controller controller, IEnumerable<string> arg)
         {
             var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
 
@@ -66,11 +62,11 @@ namespace Isop.CommandLine
             {
                 throw new Exception($"Could not find method for {controller.Name} with arguments {string.Join(" ", arg)}");
             }
-            var argumentRecognizers = methodInfo.GetArguments()
+            var argumentRecognizers = methodInfo.GetArguments(Culture)
                 .ToList();
             argumentRecognizers.InsertRange(0, new[] { 
-                new ArgumentWithOptions(ArgumentParameter.Parse("#0" + controller.Name, Culture), required: true, type: typeof(string)),
-                new ArgumentWithOptions(ArgumentParameter.Parse("#1" + methodInfo.Name, Culture), required: false, type: typeof(string))
+                new Argument(parameter: ArgumentParameter.Parse("#0" + controller.Name, Culture), required: true, name:controller.Name),
+                new Argument(parameter: ArgumentParameter.Parse("#1" + methodInfo.Name, Culture), required: false, name:methodInfo.Name)
             });
 
             var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter, Culture);
@@ -79,7 +75,7 @@ namespace Isop.CommandLine
             return Parse(controller, methodInfo, parsedArguments);
         }
 
-        private ParsedMethod Parse(Controller controller, Method methodInfo, ParsedArguments parsedArguments)
+        private ParsedArguments Parse(Controller controller, Method methodInfo, ParsedArguments parsedArguments)
         {
             var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments().ToArray();
             if (unMatchedRequiredArguments.Any())
@@ -93,20 +89,21 @@ namespace Isop.CommandLine
             var recognizedActionParameters = _convertArgument.GetParametersForMethod(methodInfo,
                 parsedArguments.RecognizedArgumentsAsKeyValuePairs());
 
-            return new ParsedMethod( parsedArguments, _typeContainer,
+            return new ParsedArguments.Method( parsedArguments,
+                recognizedActionParameters: recognizedActionParameters,
                 recognizedClass: controller.Type,
-                formatter: _formatter,
-                recognizedAction: methodInfo,
-                recognizedActionParameters: recognizedActionParameters);
+                recognizedAction: methodInfo);
         }
 
         public ParsedArguments ParseArgumentsAndMerge(Controller controller, IEnumerable<string> arg, ParsedArguments parsedArguments)
         {
             var parsedMethod = Parse(controller, arg);
             // Inferred ordinal arguments should not be recognized twice
-            parsedArguments.RecognizedArguments = parsedArguments.RecognizedArguments
+            /* TODO
+             parsedArguments.RecognizedArguments = parsedArguments.RecognizedArguments
                 .Where(argopts =>
                     !parsedMethod.RecognizedArguments.Any(pargopt => pargopt.Index == argopts.Index && argopts.InferredOrdinal));
+                    */
             var merged = parsedArguments.Merge(parsedMethod);
             if (!controller.IgnoreGlobalUnMatchedParameters)
                 merged.AssertFailOnUnMatched();
@@ -116,7 +113,7 @@ namespace Isop.CommandLine
         public ParsedArguments ParseArgumentsAndMerge(Controller controller, string actionName, Dictionary<string, string> arg, ParsedArguments parsedArguments)
         {
             var methodInfo = controller.GetMethod(actionName);
-            var argumentRecognizers = methodInfo.GetArguments()
+            var argumentRecognizers = methodInfo.GetArguments(Culture)
                 .ToList();
 
             var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter, Culture);
