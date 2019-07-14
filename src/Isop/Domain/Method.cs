@@ -31,16 +31,31 @@ namespace Isop.Domain
                 if (result is Task task)
                 {
                     var taskResult = await RunTask(task);
-                    if (taskResult is IEnumerable taskEnumerable)
-                        return taskEnumerable;
-                    return new []{taskResult};
+                    switch (taskResult)
+                    {
+                        case string _:
+                            return new []{taskResult};
+                        case IEnumerable taskEnumerable:
+                            return taskEnumerable;
+                        default:
+                            return new []{taskResult};
+                    }
                 }
-                if (result is IEnumerable enumerable)
-                    return enumerable;
-                return new []{result};
+                switch (result)
+                {
+                    case string _:
+                        return new []{result};
+                    case IEnumerable enumerable:
+                        return enumerable;
+                    default:
+                        return new []{result};
+                }
             }catch(TargetInvocationException ex){
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                return null;
+                if (ex.InnerException != null)
+                {
+                    ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                }
+                throw;
             }
         }
         async Task<object> RunTask(Task task)

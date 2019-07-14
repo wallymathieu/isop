@@ -7,35 +7,56 @@ namespace Isop.Domain
 {
     class TableFormatter
     {
-        public IEnumerable<string> Format(object retval)
+        public IEnumerable<string> Format(object value)
         {
-            if (retval == null) yield break;
-            if (retval is string)
+            if (value == null) yield break;
+            switch (value)
             {
-                yield return (retval as string);
-            }
-            else if (retval.GetType().GetTypeInfo().IsValueType)
-            {
-                yield return (retval.ToString());
-            }
-            else if (retval is IEnumerable)
-            {
-                var if1 = retval.GetType().GetTypeInfo().GetInterfaces()
-                    .Single(iff => iff.GetTypeInfo().IsGenericType && iff.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-                var type = if1.GetTypeInfo().GetGenericArguments().Single();
-                var properties = GetProperties(type);
-                yield return Header(properties);
-                foreach (var item in (retval as IEnumerable))
+                case string s:
+                    yield return s;
+                    break;
+                case IEnumerable enumerable:
                 {
-                    yield return Line(properties, item);
+                    var type = GetIEnumerableTypeParameter(enumerable.GetType());
+                    if (typeof(IEnumerable).IsAssignableFrom(type) && type!=typeof(string))
+                    {
+                        foreach (var item in enumerable)
+                        {
+                            foreach (var formatted in Format(item))
+                            {
+                                yield return formatted;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var properties = GetProperties(type);
+                        yield return Header(properties);
+                        foreach (var item in enumerable)
+                        {
+                            yield return Line(properties, item);
+                        }
+                    }
+
+                    break;
+                }
+
+                default:
+                {
+                    var properties = GetProperties(value.GetType());
+                    yield return Header(properties);
+                    yield return Line(properties, value);
+                    break;
                 }
             }
-            else
-            {
-                var properties = GetProperties(retval.GetType());
-                yield return Header(properties);
-                yield return Line(properties, retval);
-            }
+        }
+
+        private static Type GetIEnumerableTypeParameter(Type iEnumerableType)
+        {
+            var iEnumerableInterface = iEnumerableType.GetTypeInfo().GetInterfaces()
+                .Single(iff => iff.GetTypeInfo().IsGenericType
+                               && iff.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+            return iEnumerableInterface.GetTypeInfo().GetGenericArguments().Single();
         }
 
         private static PropertyInfo[] GetProperties(Type t)

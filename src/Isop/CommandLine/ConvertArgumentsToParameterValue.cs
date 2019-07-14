@@ -51,8 +51,11 @@ namespace Isop.Domain
             var obj = Activator.CreateInstance(paramInfo.ParameterType);
             foreach (var prop in paramInfo.GetPublicInstanceProperties())
             {
-                var recognizedArgument = parsedArguments.First(a => a.Key.EqualsIgnoreCase(prop.Name));
-                prop.SetValue(obj, ConvertFrom(recognizedArgument, prop.PropertyType), null);
+                var recognizedArgument = parsedArguments.FirstOrDefault(a => a.Key.EqualsIgnoreCase(prop.Name));
+                if (recognizedArgument.Key!=null)
+                {
+                    prop.SetValue(obj, ConvertFrom(recognizedArgument, prop.PropertyType), null);
+                }
             }
             return obj;
         }

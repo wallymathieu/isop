@@ -56,7 +56,7 @@ namespace Isop.Tests
         {
             var count = 0;
             var sc = new ServiceCollection();
-            sc.AddSingleton(ci => new ObjectController() { OnAction = () => new[] { new WithTwoProperties(count++), new WithTwoProperties(count++) } });
+            sc.AddSingleton(ci => new ObjectController { OnAction = () => new[] { new WithTwoProperties(count++), new WithTwoProperties(count++) } });
 
             var arguments = Builder.Create(sc, new Configuration
             {

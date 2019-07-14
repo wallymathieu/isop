@@ -8,28 +8,28 @@ namespace Isop.Domain
 {
 	class ToStringFormatter 
 	{
-        public IEnumerable<string> Format(object retval)
+        public IEnumerable<string> Format(object value)
         {
-            if (retval != null)
+            if (value == null) yield break;
+            switch (value)
             {
-                if (retval is string)
+                case string s:
+                    yield return s;
+                    break;
+                case IEnumerable enumerable:
                 {
-                    yield return (retval as string);
-                }
-                else if (retval is IEnumerable)
-                {
-                    foreach (var item in retval as IEnumerable)
+                    foreach (var item in enumerable)
                     {
                         foreach (var formatted in Format(item))
                         {
                             yield return formatted;
                         }
                     }
+                    break;
                 }
-                else
-                {
-                    yield return (retval.ToString());
-                }
+                default:
+                    yield return value.ToString();
+                    break;
             }
         }
     }
