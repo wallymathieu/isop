@@ -17,11 +17,11 @@ namespace Isop.Api
         private readonly AppHost _appHost;
         private ArgumentInvoker _argumentInvoker;
         private Formatter _formatter;
-        public IEnumerable<RecognizedArgument> RecognizedArguments => _parsedArguments.RecognizedArguments;
+        public IReadOnlyCollection<RecognizedArgument> RecognizedArguments => _parsedArguments.RecognizedArguments;
 
-        public IEnumerable<UnrecognizedArgument> UnRecognizedArguments => _parsedArguments.UnRecognizedArguments;
+        public IReadOnlyCollection<UnrecognizedArgument> UnRecognizedArguments => _parsedArguments.UnRecognizedArguments;
 
-        public IEnumerable<Argument> ArgumentWithOptions => _parsedArguments.ArgumentWithOptions;
+        public IReadOnlyCollection<Argument> ArgumentWithOptions => _parsedArguments.ArgumentWithOptions;
 
         public ParsedExpression(ParsedArguments parsedArguments, AppHost appHost)
         {

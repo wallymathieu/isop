@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using Isop.Tests.FakeControllers;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using Isop;
+using Isop.Api;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
+using Tests.FakeControllers;
 
-namespace Isop.Tests
+namespace Tests
 {
     [TestFixture]
     public class AlternativeApiTests

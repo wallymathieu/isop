@@ -7,7 +7,7 @@ namespace Isop.CommandLine.Parse
 {
     public abstract class ParsedArguments
     {
-        private ParsedArguments(IEnumerable<RecognizedArgument> recognizedArguments, IEnumerable<UnrecognizedArgument> unRecognizedArguments, IEnumerable<Argument> argumentWithOptions)
+        private ParsedArguments(IReadOnlyCollection<RecognizedArgument> recognizedArguments, IReadOnlyCollection<UnrecognizedArgument> unRecognizedArguments, IReadOnlyCollection<Argument> argumentWithOptions)
         {
             RecognizedArguments = recognizedArguments;
             UnRecognizedArguments = unRecognizedArguments;
@@ -24,11 +24,11 @@ namespace Isop.CommandLine.Parse
             UnRecognizedArguments = parsedArguments.UnRecognizedArguments;
             RecognizedArguments = parsedArguments.RecognizedArguments;
         }
-        public IEnumerable<RecognizedArgument> RecognizedArguments { get; }
+        public IReadOnlyCollection<RecognizedArgument> RecognizedArguments { get; }
 
-        public IEnumerable<UnrecognizedArgument> UnRecognizedArguments { get; }
+        public IReadOnlyCollection<UnrecognizedArgument> UnRecognizedArguments { get; }
 
-        public IEnumerable<Argument> ArgumentWithOptions { get; }
+        public IReadOnlyCollection<Argument> ArgumentWithOptions { get; }
 
         public ParsedArguments Merge(ParsedArguments args)
         {
@@ -83,9 +83,9 @@ namespace Isop.CommandLine.Parse
 
             internal Merged(ParsedArguments first, ParsedArguments second) 
                 : base(
-                    argumentWithOptions:first.ArgumentWithOptions.Union(second.ArgumentWithOptions),
-                    recognizedArguments:first.RecognizedArguments.Union(second.RecognizedArguments),
-                    unRecognizedArguments:first.UnRecognizedArguments.Intersect(second.UnRecognizedArguments)
+                    argumentWithOptions:first.ArgumentWithOptions.Union(second.ArgumentWithOptions).ToArray(),
+                    recognizedArguments:first.RecognizedArguments.Union(second.RecognizedArguments).ToArray(),
+                    unRecognizedArguments:first.UnRecognizedArguments.Intersect(second.UnRecognizedArguments).ToArray()
                 )
             {
                 First = first;
@@ -102,17 +102,18 @@ namespace Isop.CommandLine.Parse
             {
                 RecognizedClass = recognizedClass;
                 RecognizedAction = recognizedAction;
-                RecognizedActionParameters = recognizedActionParameters;
+                RecognizedActionParameters = recognizedActionParameters.ToArray();
             }
 
             public Type RecognizedClass { get; }
             public Domain.Method RecognizedAction { get; }
-            public IEnumerable<object> RecognizedActionParameters { get; }
+            public IReadOnlyCollection<object> RecognizedActionParameters { get; }
         }
 
         public class Default : ParsedArguments
         {
-            public Default(IEnumerable<RecognizedArgument> recognizedArguments, IEnumerable<UnrecognizedArgument> unRecognizedArguments, IEnumerable<Argument> argumentWithOptions) : base(recognizedArguments, unRecognizedArguments, argumentWithOptions)
+            public Default(IEnumerable<RecognizedArgument> recognizedArguments, IEnumerable<UnrecognizedArgument> unRecognizedArguments, IEnumerable<Argument> argumentWithOptions) 
+                : base(recognizedArguments.ToArray(), unRecognizedArguments.ToArray(), argumentWithOptions.ToArray())
             {
             }
         }

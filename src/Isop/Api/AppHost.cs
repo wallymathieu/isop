@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
-using Isop.Abstractions;
 
 namespace Isop.Api
 {
@@ -13,7 +12,7 @@ namespace Isop.Api
     using CommandLine.Lex;
     using CommandLine.Parse;
     using Domain;
-    using Infrastructure;
+    using Abstractions;
     /// <summary>
     /// AppHost contains the service provider and configuration needed to run a command line app
     /// </summary>
@@ -42,7 +41,7 @@ namespace Isop.Api
         /// </summary>
         public ParsedExpression Parse(IEnumerable<string> arg) => Parse(arg.ToList());
 
-        private ParsedExpression Parse(List<string> arg)
+        private ParsedExpression Parse(IReadOnlyCollection<string> arg)
         {
             var argumentParser = new ArgumentParser(Recognizes.Properties.Select(p=>p.ToArgument(_options.CultureInfo)), AllowInferParameter, CultureInfo);
             var lexed = ArgumentLexer.Lex(arg).ToList();
@@ -67,9 +66,9 @@ namespace Isop.Api
         /// </summary>
         public String Help()
         {
-            var cout = new StringWriter(CultureInfo);
-            Parse(new[] { Conventions.Help }).Invoke(cout);
-            return cout.ToString();
+            var output = new StringWriter(CultureInfo);
+            Parse(new[] { Conventions.Help }).Invoke(output);
+            return output.ToString();
         }
         /// <summary>
         /// 

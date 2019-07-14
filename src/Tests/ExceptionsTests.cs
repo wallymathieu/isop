@@ -1,9 +1,13 @@
 ﻿using System.Globalization;
 using System.IO;
 using System.Linq;
+using Isop;
+using Isop.Api;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-namespace Isop.Tests
+using Tests.FakeControllers;
+
+namespace Tests
 {
     [TestFixture]
     public class ExceptionsTests

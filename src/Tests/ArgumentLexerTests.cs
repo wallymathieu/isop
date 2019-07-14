@@ -1,9 +1,9 @@
 ﻿using System.Linq;
-using Isop.Infrastructure;
 using Isop.CommandLine.Lex;
+using Isop.Infrastructure;
 using NUnit.Framework;
 
-namespace Isop.Tests
+namespace Tests
 {
     [TestFixture]
     public class ArgumentLexerTests

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Isop.Tests.FakeControllers
+namespace Tests.FakeControllers
 {
     class MyFileController
     {

@@ -2,10 +2,12 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Isop.Tests.FakeControllers;
+using Isop;
+using Isop.Api;
 using NUnit.Framework;
+using Tests.FakeControllers;
 
-namespace Isop.Tests
+namespace Tests
 {
     [TestFixture()]
     public class HelpTests

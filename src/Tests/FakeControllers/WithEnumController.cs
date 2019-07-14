@@ -1,6 +1,6 @@
 using System;
 
-namespace Isop.Tests.FakeControllers
+namespace Tests.FakeControllers
 {
     class WithEnumController
     {

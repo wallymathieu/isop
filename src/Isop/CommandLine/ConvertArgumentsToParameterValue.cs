@@ -1,17 +1,14 @@
 using System;
-using System.Globalization;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using Isop.Abstractions;
+using Isop.Domain;
+using Isop.Infrastructure;
+using Microsoft.Extensions.Options;
 
-namespace Isop.Domain
+namespace Isop.CommandLine
 {
-    using Infrastructure;
-    using CommandLine.Parse;
-    using Domain;
-    using Microsoft.Extensions.Options;
-
     internal class ConvertArgumentsToParameterValue
     {
         private readonly TypeConverter _typeConverter;

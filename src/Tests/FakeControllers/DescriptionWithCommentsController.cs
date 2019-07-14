@@ -1,4 +1,4 @@
-namespace Isop.Tests.FakeControllers
+namespace Tests.FakeControllers
 {
     /// <summary>
     /// Some description

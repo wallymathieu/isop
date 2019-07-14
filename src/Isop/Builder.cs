@@ -1,20 +1,18 @@
 ﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Isop.Abstractions;
+using Isop.Api;
+using Isop.CommandLine.Help;
+using Isop.Domain;
+using Isop.Help;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Isop
 {
-    using Infrastructure;
-    using Domain;
-    using Api;
-    using Help;
-    using CommandLine.Help;
-    using System.Collections.Generic;
-
     /// <summary>
     /// Builder that uses 
     /// </summary>
