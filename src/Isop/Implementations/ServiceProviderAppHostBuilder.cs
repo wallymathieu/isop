@@ -2,11 +2,11 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Isop.Abstractions;
-using Isop.Api;
+using Isop.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Isop.Domain
+namespace Isop.Implementations
 {
     internal class ServiceProviderAppHostBuilder : IAppHostBuilder
     {
@@ -66,7 +66,7 @@ namespace Isop.Domain
         /// <summary>
         /// Build instance of app host.
         /// </summary>
-        public AppHost BuildAppHost()
+        public IAppHost BuildAppHost()
         {
             var options = _serviceProvider.GetService<IOptions<Configuration>>();
             return new AppHost(options, 

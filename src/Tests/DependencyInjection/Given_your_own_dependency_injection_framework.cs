@@ -54,9 +54,6 @@ namespace Tests.DependencyInjection
         }
 
         protected override IServiceProvider ServiceProvider => _myOwnContainer.ServiceProvider;
-        protected override void RegisterSingleton<T>(Func<T> factory)
-        {
-            _myOwnContainer.RegisterSingleton(factory);
-        }
+        protected override void RegisterSingleton<T>(Func<T> factory) => _myOwnContainer.RegisterSingleton(factory);
     }
 }

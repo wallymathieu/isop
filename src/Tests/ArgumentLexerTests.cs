@@ -57,7 +57,7 @@ namespace Tests
             Assert.That(tokens, Is.EquivalentTo(new[] { new Token("parameter", TokenType.Parameter, 0), new Token("parametervalue", TokenType.ParameterValue, 1) }));
         }
 
-        [Test]
+        [Test,Ignore("peek")]
         public void It_can_peek_tokenized_value()
         {
             var lexed = new PeekEnumerable<Token>(ArgumentLexer.Lex(new[] { "--parameter=parametervalue", "argument" }));

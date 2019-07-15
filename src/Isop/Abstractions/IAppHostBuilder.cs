@@ -1,5 +1,4 @@
 using System;
-using Isop.Api;
 
 namespace Isop.Abstractions
 {
@@ -57,6 +56,6 @@ namespace Isop.Abstractions
         /// <summary>
         /// Build instance of app host.
         /// </summary>
-        AppHost BuildAppHost();
+        IAppHost BuildAppHost();
     }
 }

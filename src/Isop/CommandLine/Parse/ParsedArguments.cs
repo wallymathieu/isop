@@ -7,11 +7,13 @@ namespace Isop.CommandLine.Parse
 {
     public abstract class ParsedArguments
     {
-        private ParsedArguments(IReadOnlyCollection<RecognizedArgument> recognizedArguments, IReadOnlyCollection<UnrecognizedArgument> unRecognizedArguments, IReadOnlyCollection<Argument> argumentWithOptions)
+        private ParsedArguments(IReadOnlyCollection<RecognizedArgument> recognized, 
+            IReadOnlyCollection<UnrecognizedArgument> unrecognized, 
+            IReadOnlyCollection<Argument> globalArguments)
         {
-            RecognizedArguments = recognizedArguments;
-            UnRecognizedArguments = unRecognizedArguments;
-            ArgumentWithOptions = argumentWithOptions;
+            Recognized = recognized;
+            Unrecognized = unrecognized;
+            GlobalArguments = globalArguments;
         }
 
         /// <summary>
@@ -20,15 +22,21 @@ namespace Isop.CommandLine.Parse
         /// <param name="parsedArguments"></param>
         private ParsedArguments(ParsedArguments parsedArguments)
         {
-            ArgumentWithOptions = parsedArguments.ArgumentWithOptions;
-            UnRecognizedArguments = parsedArguments.UnRecognizedArguments;
-            RecognizedArguments = parsedArguments.RecognizedArguments;
+            GlobalArguments = parsedArguments.GlobalArguments;
+            Unrecognized = parsedArguments.Unrecognized;
+            Recognized = parsedArguments.Recognized;
         }
-        public IReadOnlyCollection<RecognizedArgument> RecognizedArguments { get; }
+        /// <summary>
+        /// Recognized arguments
+        /// </summary>
+        public IReadOnlyCollection<RecognizedArgument> Recognized { get; }
 
-        public IReadOnlyCollection<UnrecognizedArgument> UnRecognizedArguments { get; }
+        /// <summary>
+        /// Unrecognized arguments
+        /// </summary>
+        public IReadOnlyCollection<UnrecognizedArgument> Unrecognized { get; }
 
-        public IReadOnlyCollection<Argument> ArgumentWithOptions { get; }
+        public IReadOnlyCollection<Argument> GlobalArguments { get; }
 
         public ParsedArguments Merge(ParsedArguments args)
         {
@@ -42,9 +50,9 @@ namespace Isop.CommandLine.Parse
 
         public IEnumerable<Argument> UnMatchedRequiredArguments()
         {
-            var unMatchedRequiredArguments = ArgumentWithOptions
+            var unMatchedRequiredArguments = GlobalArguments
                 .Where(argumentWithOptions => argumentWithOptions.Required)
-                .Where(argumentWithOptions => !RecognizedArguments
+                .Where(argumentWithOptions => !Recognized
                                                    .Any(recogn => recogn.Argument.Equals(argumentWithOptions)));
             return unMatchedRequiredArguments;
         }
@@ -63,10 +71,7 @@ namespace Isop.CommandLine.Parse
                           };
             }
         }
-        public IEnumerable<KeyValuePair<string,string>> RecognizedArgumentsAsKeyValuePairs(){
-            return RecognizedArguments.Select(a => a.AsKeyValuePair());
-        }
-        
+
         /// <summary>
         /// A combination of two parsed arguments instances
         /// </summary>
@@ -83,9 +88,9 @@ namespace Isop.CommandLine.Parse
 
             internal Merged(ParsedArguments first, ParsedArguments second) 
                 : base(
-                    argumentWithOptions:first.ArgumentWithOptions.Union(second.ArgumentWithOptions).ToArray(),
-                    recognizedArguments:first.RecognizedArguments.Union(second.RecognizedArguments).ToArray(),
-                    unRecognizedArguments:first.UnRecognizedArguments.Intersect(second.UnRecognizedArguments).ToArray()
+                    globalArguments:first.GlobalArguments.Union(second.GlobalArguments).ToArray(),
+                    recognized:first.Recognized.Union(second.Recognized).ToArray(),
+                    unrecognized:first.Unrecognized.Intersect(second.Unrecognized).ToArray()
                 )
             {
                 First = first;
@@ -112,36 +117,22 @@ namespace Isop.CommandLine.Parse
 
         public class Default : ParsedArguments
         {
-            public Default(IEnumerable<RecognizedArgument> recognizedArguments, IEnumerable<UnrecognizedArgument> unRecognizedArguments, IEnumerable<Argument> argumentWithOptions) 
-                : base(recognizedArguments.ToArray(), unRecognizedArguments.ToArray(), argumentWithOptions.ToArray())
+            public Default(IEnumerable<RecognizedArgument> recognizedArguments, IEnumerable<UnrecognizedArgument> unrecognizedArguments, IEnumerable<Argument> globalArguments) 
+                : base(recognizedArguments.ToArray(), unrecognizedArguments.ToArray(), globalArguments.ToArray())
             {
             }
         }
 
-        public T Map<T>(Func<Method, T> method, Func<Merged, T> merged, Func<Default, T> @default)
+        /// <summary>
+        /// Map from <see cref="ParsedArguments"/> to <see cref="T"/>.
+        /// </summary>
+        public T Select<T>(Func<Method, T> method, Func<Merged, T> merged, Func<Default, T> @default)
         {
             switch (this)
             {
                 case Method pm: return method(pm);
                 case Merged m: return merged(m);
                 case Default d: return @default(d);
-                default:
-                    throw new Exception("Unimplemented switch case");
-            }
-        }
-        public void Switch(Action<Method> method, Action<Merged> merged, Action<Default> @default)
-        {
-            switch (this)
-            {
-                case Method pm: 
-                    method(pm);
-                    return;
-                case Merged m: 
-                    merged(m);
-                    return;
-                case Default d: 
-                    @default(d);
-                    return;
                 default:
                     throw new Exception("Unimplemented switch case");
             }

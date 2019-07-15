@@ -39,10 +39,10 @@ namespace Isop.CommandLine
 
             using (var scope = _serviceProvider.CreateScope())
             {
-                return await parsedArguments.Map<Task<IEnumerable>>(
+                return await parsedArguments.Select<Task<IEnumerable>>(
                     @default: async args =>
                     {
-                        var enumerable = args.RecognizedArguments
+                        var enumerable = args.Recognized
                             .SelectMany(Choose);
                         return await Task.WhenAll(enumerable);
                     },

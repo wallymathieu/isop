@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Isop;
-using Isop.Api;
 
 namespace Example
 {
@@ -25,12 +24,12 @@ namespace Example
             try
             {
                 var parsedMethod = appHost.Parse(args);
-                if (parsedMethod.UnRecognizedArguments.Any())//Warning:
+                if (parsedMethod.Unrecognized.Any())//Warning:
                 {
                     var unRecognizedArgumentsMessage = $@"Unrecognized arguments: 
-{string.Join(",", parsedMethod.UnRecognizedArguments.Select(arg => arg.Value).ToArray())}
+{string.Join(",", parsedMethod.Unrecognized.Select(arg => arg.Value).ToArray())}
 Did you mean any of these arguments?
-{string.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Name).ToArray())}";
+{string.Join(",", parsedMethod.GlobalArguments.Select(rec => rec.Name).ToArray())}";
                     Console.WriteLine(unRecognizedArgumentsMessage);
                 }else
                 {

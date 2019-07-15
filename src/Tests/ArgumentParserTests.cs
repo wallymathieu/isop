@@ -21,7 +21,7 @@ namespace Tests
                 .Parameter("&argument")
                 .BuildAppHost()
                 .Parse(new[] { "-a" });
-            var arguments = parser.RecognizedArguments;
+            var arguments = parser.Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.Argument.Name, Is.EqualTo("argument"));
@@ -33,7 +33,7 @@ namespace Tests
             var arguments = Builder.Create()
                 .Parameter("&beta")
                 .BuildAppHost()
-                .Parse(new[] { "-a", "-b" }).RecognizedArguments;
+                .Parse(new[] { "-a", "-b" }).Recognized;
 
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -46,7 +46,7 @@ namespace Tests
             var arguments = Builder.Create()
                 .Parameter("beta")
                 .BuildAppHost()
-                .Parse(new[] { "-a", "--beta" }).RecognizedArguments;
+                .Parse(new[] { "-a", "--beta" }).Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.RawArgument, Is.EqualTo("beta"));
@@ -58,7 +58,7 @@ namespace Tests
             var arguments = Builder.Create()
                 .Parameter("beta")
                 .BuildAppHost()
-                .Parse(new[] { "-a", "--beta", "value" }).RecognizedArguments;
+                .Parse(new[] { "-a", "--beta", "value" }).Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.RawArgument, Is.EqualTo("beta"));
@@ -76,7 +76,7 @@ namespace Tests
             var arguments = Builder.Create()
                 .Parameter("#0first")
                 .BuildAppHost()
-                .Parse(new[] { "first" }).RecognizedArguments;
+                .Parse(new[] { "first" }).Recognized;
             Assert.That(arguments.Count, Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.RawArgument, Is.EqualTo("first"));
@@ -87,7 +87,7 @@ namespace Tests
             var arguments = Builder.Create()
                 .Parameter("beta=")
                 .BuildAppHost()
-                .Parse(new[] { "-a", "--beta=test", "value" }).RecognizedArguments;
+                .Parse(new[] { "-a", "--beta=test", "value" }).Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.EqualTo("test"));
@@ -99,7 +99,7 @@ namespace Tests
             var arguments = Builder.Create()
                 .Parameter("beta|b=")
                 .BuildAppHost()
-                .Parse(new[] { "-a", "-b=test", "value" }).RecognizedArguments;
+                .Parse(new[] { "-a", "-b=test", "value" }).Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.EqualTo("test"));
@@ -111,7 +111,7 @@ namespace Tests
             var unRecognizedArguments = Builder.Create()
                .Parameter("beta")
                .BuildAppHost()
-               .Parse(new[] { "-a", "value", "--beta" }).UnRecognizedArguments;
+               .Parse(new[] { "-a", "value", "--beta" }).Unrecognized;
 
             Assert.That(unRecognizedArguments, Is.EquivalentTo(new[] {
                 new UnrecognizedArgument {Index = 0,Value = "-a"},
@@ -125,7 +125,7 @@ namespace Tests
                 .Parameter("beta|b=")
                 .Parameter("alpha|a=")
                 .BuildAppHost()
-                .Parse(new[] { "test", "value" }).RecognizedArguments;
+                .Parse(new[] { "test", "value" }).Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(2));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.EqualTo("test"));
@@ -138,7 +138,7 @@ namespace Tests
             var arguments = Builder.Create()
                 .Parameter("beta")
                 .BuildAppHost()
-                .Parse(new[] { "--beta", "value" }).UnRecognizedArguments;
+                .Parse(new[] { "--beta", "value" }).Unrecognized;
 
             Assert.That(arguments.Count(), Is.EqualTo(0));
         }
@@ -155,7 +155,7 @@ namespace Tests
             var arguments = Builder.Create()
                 .Parameter("alpha")
                 .BuildAppHost()
-                .Parse(new[] { "alpha" }).RecognizedArguments;
+                .Parse(new[] { "alpha" }).Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.Null);
@@ -184,7 +184,7 @@ namespace Tests
                                 .BuildAppHost()
                                 .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
-            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
@@ -225,7 +225,7 @@ namespace Tests
                                                    .BuildAppHost()
                                                    .Parse(new[] { "WithEnum", /*"Index", */"--value", pair.value });
 
-                Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+                Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
                 arguments.Invoke(new StringWriter());
                 Assert.That(parameters, Is.EquivalentTo(new[] { pair.expected }));
             }

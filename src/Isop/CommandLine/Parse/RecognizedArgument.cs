@@ -14,11 +14,11 @@ namespace Isop.CommandLine.Parse
         /// the matched value if any, for instance the "value" of the expression "--argument value"
         /// </summary>
         public string Value { get; }
-        public Argument Argument { get; private set; }
+        public Argument Argument { get; }
         /// <summary>
         /// the "argument" of the expression "--argument"
         /// </summary>
-        public string RawArgument { get; private set; }
+        public string RawArgument { get; }
 
         public bool InferredOrdinal { get; set; }
 
@@ -57,10 +57,6 @@ namespace Isop.CommandLine.Parse
         public bool Matches(PropertyInfo prop)
         {
             return RawArgument.EqualsIgnoreCase(prop.Name);
-        }
-
-        public KeyValuePair<string,string> AsKeyValuePair(){
-            return new KeyValuePair<string,string>(RawArgument, Value);
         }
     }
 }

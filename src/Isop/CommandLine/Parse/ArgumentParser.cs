@@ -4,43 +4,22 @@ using System.Collections.Generic;
 using Isop.Infrastructure;
 using Isop.CommandLine.Lex;
 using Isop.Domain;
-using System.Globalization;
 
 
 namespace Isop.CommandLine.Parse
 {
     public class ArgumentParser
     {
-        private readonly IEnumerable<Argument> _argumentWithOptions;
+        private readonly IReadOnlyCollection<Argument> _globalArguments;
         private readonly bool _allowInferParameter;
-        private readonly CultureInfo _cultureInfo;
 
-        public ArgumentParser(IEnumerable<Argument> argumentWithOptions, bool allowInferParameter, CultureInfo cultureInfo)
+        public ArgumentParser(IReadOnlyCollection<Argument> globalArguments, bool allowInferParameter)
         {
-            _argumentWithOptions = argumentWithOptions;
+            _globalArguments = globalArguments;
             _allowInferParameter = allowInferParameter;
-            this._cultureInfo = cultureInfo;
         }
 
-        public ParsedArguments Parse(IEnumerable<string> arguments)
-        {
-            var args = arguments.ToArray();
-            var lexed = ArgumentLexer.Lex(args).ToList();
-            var parsedArguments = Parse(lexed, args);
-            var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments().ToArray();
-
-            if (unMatchedRequiredArguments.Any())
-            {
-                throw new MissingArgumentException("Missing arguments")
-                {
-                    Arguments = unMatchedRequiredArguments
-                        .Select(unmatched => unmatched.Name).ToArray()
-                };
-            }
-            return parsedArguments;
-        }
-
-        public ParsedArguments Parse(IList<Token> lexed, IEnumerable<string> arguments)
+        public ParsedArguments Parse(IList<Token> lexed, IReadOnlyCollection<string> arguments)
         {
             var recognizedIndexes = new List<int>();
             var peekTokens = new PeekEnumerable<Token>(lexed);
@@ -53,7 +32,7 @@ namespace Isop.CommandLine.Parse
                 {
                     case TokenType.Argument:
                         {
-                            var argumentWithOptions = _argumentWithOptions
+                            var argumentWithOptions = _globalArguments
                                .SingleOrDefault(argopt => Accept(argopt, current.Index, current.Value));
 
                             if (null == argumentWithOptions && !encounteredParameter && _allowInferParameter)
@@ -77,7 +56,7 @@ namespace Isop.CommandLine.Parse
                     case TokenType.Parameter:
                         {
                             encounteredParameter = true;
-                            var argumentWithOptions = _argumentWithOptions
+                            var argumentWithOptions = _globalArguments
                                 .SingleOrDefault(argopt => Accept(argopt, current.Index, current.Value));
                             if (null == argumentWithOptions)
                                 continue;
@@ -116,9 +95,9 @@ namespace Isop.CommandLine.Parse
                 .Select(v => new UnrecognizedArgument { Index = v.i, Value = v.value });
 
             return new ParsedArguments.Default(
-                argumentWithOptions :_argumentWithOptions.ToArray(),
+                globalArguments :_globalArguments.ToArray(),
                 recognizedArguments : recognized,
-                unRecognizedArguments : unRecognizedArguments
+                unrecognizedArguments : unRecognizedArguments
             );
         }
 
@@ -129,7 +108,7 @@ namespace Isop.CommandLine.Parse
 
         private void InferParameter(ICollection<int> recognizedIndexes, IList<RecognizedArgument> recognized, Token current)
         {
-            var argumentWithOptions = _argumentWithOptions
+            var argumentWithOptions = _globalArguments
                 .Where((argopt, i) => i == current.Index).SingleOrDefault();
             if (null != argumentWithOptions)
             {
@@ -149,7 +128,7 @@ namespace Isop.CommandLine.Parse
             var index = 0;
             foreach (var current in arg)
             {
-                var argumentWithOptions = _argumentWithOptions
+                var argumentWithOptions = _globalArguments
                         .SingleOrDefault(argopt => Accept(argopt, current.Key));
 
 
@@ -166,9 +145,9 @@ namespace Isop.CommandLine.Parse
 
             }
             return new ParsedArguments.Default(
-                argumentWithOptions : _argumentWithOptions.ToArray(),
+                globalArguments : _globalArguments.ToArray(),
                 recognizedArguments : recognized,
-                unRecognizedArguments : unRecognizedArguments
+                unrecognizedArguments : unRecognizedArguments
             );
 
         }

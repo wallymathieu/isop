@@ -7,11 +7,11 @@ namespace Isop.Domain
 {
     public class Property
     {
-        public string Description { get; private set; }
-        public string Name { get; private set; }
-        public ArgumentAction Action { get; set; }
-        public bool Required { get; set; }
-        public Type Type { get; set; }
+        public string Description { get; }
+        public string Name { get; }
+        public ArgumentAction Action { get; }
+        public bool Required { get; }
+        public Type Type { get; }
         public Property(string name, ArgumentAction action = null, bool required = false, string description = null,Type type=null)
         {
             Name = name;

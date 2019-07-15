@@ -22,7 +22,7 @@ namespace Tests
                 .BuildAppHost()
                 .Parse(new[] { "Enumerable", "Return" });
 
-            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(2));
         }

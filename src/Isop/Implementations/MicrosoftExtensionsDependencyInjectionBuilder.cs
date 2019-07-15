@@ -2,12 +2,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Isop.Abstractions;
-using Isop.Api;
+using Isop.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Isop.Domain
+namespace Isop.Implementations
 {
     internal class MicrosoftExtensionsDependencyInjectionBuilder : IAppHostBuilder
     {
@@ -64,7 +64,7 @@ namespace Isop.Domain
             _recognizes.Recognizes.Add(new Controller(type, ignoreGlobalUnMatchedParameters));
             return this;
         }
-        public AppHost BuildAppHost()
+        public IAppHost BuildAppHost()
         {
             var svcProvider= _serviceCollection.BuildServiceProvider();
             var options = svcProvider.GetService<IOptions<Configuration>>();

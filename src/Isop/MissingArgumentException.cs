@@ -15,7 +15,7 @@ namespace Isop
         /// <summary>
         /// The arguments that are missing
         /// </summary>
-        public IEnumerable<string> Arguments { get => (IEnumerable<string>)Data["Arguments"];
+        public IReadOnlyCollection<string> Arguments { get => (IReadOnlyCollection<string>)Data["Arguments"];
             set => Data["Arguments"] = value;
         }
         ///

@@ -1,6 +1,6 @@
 using System.IO;
 using Isop;
-using Isop.Api;
+using Isop.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Tests.FakeControllers;
@@ -12,7 +12,7 @@ namespace Tests
     {
         private int count;
         private int countArg;
-        private ParsedExpression parsed;
+        private IParsedExpression parsed;
         string[] args= { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4", "--beta" };
 
         [SetUp]
@@ -33,7 +33,7 @@ namespace Tests
         [Test]
         public void There_are_no_unrecognized_arguments()
         {
-            Assert.That(parsed.UnRecognizedArguments.Count, Is.EqualTo(0));
+            Assert.That(parsed.Unrecognized.Count, Is.EqualTo(0));
         }
         [Test]
         public void It_will_execute_action_once()

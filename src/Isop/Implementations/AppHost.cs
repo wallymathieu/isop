@@ -1,24 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.DependencyInjection;
-using System.Globalization;
+using Isop.Abstractions;
+using Isop.CommandLine;
+using Isop.CommandLine.Lex;
+using Isop.CommandLine.Parse;
+using Isop.Domain;
 using Isop.Help;
 using Isop.Localization;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
-namespace Isop.Api
+namespace Isop.Implementations
 {
-    using CommandLine;
-    using CommandLine.Lex;
-    using CommandLine.Parse;
-    using Domain;
-    using Abstractions;
-    /// <summary>
-    /// AppHost contains the service provider and configuration needed to run a command line app
-    /// </summary>
-    public class AppHost
+    internal class AppHost : IAppHost
     {
         internal readonly Formatter Formatter;
         internal readonly Recognizes Recognizes;
@@ -26,7 +23,7 @@ namespace Isop.Api
         internal readonly ControllerRecognizer ControllerRecognizer;
         private readonly IOptions<Configuration> _options;
         private HelpController _helpController;
-        private IOptions<Texts> _texts;
+        private readonly IOptions<Texts> _texts;
 
         internal HelpController HelpController =>
             _helpController??(_helpController = ServiceProvider.GetService<HelpController>() ?? 
@@ -57,11 +54,13 @@ namespace Isop.Api
         /// <summary>
         /// Parse command line arguments and return parsed arguments entity
         /// </summary>
-        public ParsedExpression Parse(IEnumerable<string> arg) => Parse(arg.ToList());
+        public IParsedExpression Parse(IEnumerable<string> arg) => Parse(arg.ToList());
 
-        private ParsedExpression Parse(IReadOnlyCollection<string> arg)
+        private IParsedExpression Parse(IReadOnlyCollection<string> arg)
         {
-            var argumentParser = new ArgumentParser(Recognizes.Properties.Select(p=>p.ToArgument(_options.Value.CultureInfo)), AllowInferParameter, CultureInfo);
+            var argumentParser = new ArgumentParser(
+                Recognizes.Properties.Select(p=>p.ToArgument(_options.Value.CultureInfo)).ToArray(),
+                AllowInferParameter);
             var lexed = ArgumentLexer.Lex(arg).ToList();
             var parsedArguments = argumentParser.Parse(lexed, arg);
             if (Recognizes.Controllers.Any())
@@ -91,7 +90,7 @@ namespace Isop.Api
         /// <summary>
         /// 
         /// </summary>
-        public ControllerExpression Controller(string controllerName)
+        public IControllerExpression Controller(string controllerName)
         {
             return new ControllerExpression(controllerName, this);
         }

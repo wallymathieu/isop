@@ -25,7 +25,7 @@ namespace Tests
                                 .BuildAppHost()
                                 .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
-            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
@@ -40,7 +40,7 @@ namespace Tests
                             .BuildAppHost()
                             .Parse(new[] { "My", "Action", "value1", "value2", "3", "3.4" });
 
-            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }

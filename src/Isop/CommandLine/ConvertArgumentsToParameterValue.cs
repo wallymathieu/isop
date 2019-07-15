@@ -20,21 +20,20 @@ namespace Isop.CommandLine
         }
 
         public IEnumerable<object> GetParametersForMethod(Method method,
-            IEnumerable<KeyValuePair<string,string>> parsedArguments)
+            IReadOnlyCollection<KeyValuePair<string,string>> parsedArguments)
         {
             var parameterInfos = method.GetParameters();
             var parameters = new List<object>();
 
             foreach (var paramInfo in parameterInfos)
             {
-                var keyValuePairs = parsedArguments as KeyValuePair<string, string>[] ?? parsedArguments.ToArray();
                 if (paramInfo.IsClassAndNotString() && !paramInfo.IsFile())
                 {
-                    parameters.Add(CreateObjectFromArguments(keyValuePairs, paramInfo));
+                    parameters.Add(CreateObjectFromArguments(parsedArguments, paramInfo));
                 }
                 else
                 {
-                    var recognizedArgument = keyValuePairs.Where(a => a.Key.EqualsIgnoreCase(paramInfo.Name)).ToArray();
+                    var recognizedArgument = parsedArguments.Where(a => a.Key.EqualsIgnoreCase(paramInfo.Name)).ToArray();
                     parameters.Add(!recognizedArgument.Any()
                         ? paramInfo.DefaultValue
                         : ConvertFrom(recognizedArgument.Single(), paramInfo.ParameterType));
@@ -43,7 +42,7 @@ namespace Isop.CommandLine
             return parameters;
         }
 
-        private object CreateObjectFromArguments(ICollection<KeyValuePair<string,string>> parsedArguments, Parameter paramInfo)
+        private object CreateObjectFromArguments(IReadOnlyCollection<KeyValuePair<string,string>> parsedArguments, Parameter paramInfo)
         {
             var obj = Activator.CreateInstance(paramInfo.ParameterType);
             foreach (var prop in paramInfo.GetPublicInstanceProperties())
