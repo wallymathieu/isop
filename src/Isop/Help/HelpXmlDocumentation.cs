@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Linq;
 using System.IO;
-using Isop.Infrastructure;
 using System.Text.RegularExpressions;
 using System.Xml;
 

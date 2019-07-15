@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Isop.Domain;
 
 namespace Isop.Implementations
 {
+    using Domain;
     internal class RecognizesBuilder
     {
         public RecognizesBuilder()

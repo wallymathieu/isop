@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Isop.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace Isop.CommandLine
 {
@@ -10,7 +10,7 @@ namespace Isop.CommandLine
     using Lex;
     using Parse;
     using Domain;
-    using Microsoft.Extensions.Options;
+    using Abstractions;
 
     internal class ControllerRecognizer
     {

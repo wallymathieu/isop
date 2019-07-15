@@ -1,10 +1,6 @@
-using System;
-using System.Globalization;
-using System.Collections.Generic;
-using Isop.Abstractions;
-
 namespace Isop.Domain
 {
+    using Abstractions;
     public class Property
     {
         public string Description { get; }

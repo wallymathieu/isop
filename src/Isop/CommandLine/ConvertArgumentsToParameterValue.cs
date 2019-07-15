@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Isop.Abstractions;
-using Isop.Domain;
-using Isop.Infrastructure;
 using Microsoft.Extensions.Options;
 
 namespace Isop.CommandLine
 {
+    using Abstractions;
+    using Domain;
+    using Infrastructure;
     internal class ConvertArgumentsToParameterValue
     {
         private readonly TypeConverter _typeConverter;

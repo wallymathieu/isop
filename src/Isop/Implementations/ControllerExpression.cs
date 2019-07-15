@@ -1,8 +1,8 @@
 ﻿using System;
-using Isop.Abstractions;
 
 namespace Isop.Implementations
 {
+    using Abstractions;
     ///
     internal class ControllerExpression:IControllerExpression
     {

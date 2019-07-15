@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Isop.Infrastructure;
-using Isop.CommandLine.Lex;
 
 namespace Isop.CommandLine
 {
+    using Infrastructure;
+    using Lex;
+
     using Domain;
     internal class RewriteLexedTokensToSupportHelpAndIndex
     {

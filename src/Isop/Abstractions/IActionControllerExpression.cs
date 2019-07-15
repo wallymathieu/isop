@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Isop.CommandLine;
 
 namespace Isop.Abstractions
 {
+    using CommandLine;
     /// <summary>
     /// 
     /// </summary>

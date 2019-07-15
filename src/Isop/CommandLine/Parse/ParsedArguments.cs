@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Isop.Domain;
 using System;
 namespace Isop.CommandLine.Parse
 {

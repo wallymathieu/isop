@@ -1,9 +1,9 @@
 using System;
-using Isop.CommandLine.Parse;
-using Isop.Domain;
 
 namespace Isop.CommandLine
 {
+    using Parse;
+    using Domain;
     internal static class PropertyExtensions
     {
         [Obsolete("Temporary")]

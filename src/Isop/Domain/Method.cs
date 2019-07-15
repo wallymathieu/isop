@@ -6,11 +6,11 @@ using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
-using Isop.CommandLine;
-using Isop.CommandLine.Parse;
 
 namespace Isop.Domain
 {
+    using CommandLine;
+    using CommandLine.Parse;
     public class Method
     {
         private readonly MethodInfo _methodInfo;

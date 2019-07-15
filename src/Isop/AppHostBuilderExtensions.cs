@@ -1,12 +1,12 @@
 using System;
 using System.IO;
 using System.Runtime.ExceptionServices;
-using Isop.Abstractions;
-using Isop.CommandLine.Views;
-using Isop.Domain;
 
 namespace Isop
 {
+    using Abstractions;
+    using CommandLine.Views;
+
     /// <summary>
     /// Extensions of <see cref="IAppHostBuilder"/>
     /// </summary>

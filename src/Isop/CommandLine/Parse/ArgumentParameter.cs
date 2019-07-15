@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
-using System.Globalization;
-using Isop.Infrastructure;
-using Isop.CommandLine.Parse.Parameters;
 using System.Collections.Generic;
 
 namespace Isop.CommandLine.Parse
 {
+    using Infrastructure;
+    using Parameters;
+
     /// <summary>
     /// Represents the parameter. For instance "file" of the commandline argument --file. 
     /// </summary>

@@ -1,11 +1,11 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
-using Isop.Localization;
 using Microsoft.Extensions.Options;
 
 namespace Isop.Help
 {
+    using Localization;
     using CommandLine.Help;
     using Domain;
 

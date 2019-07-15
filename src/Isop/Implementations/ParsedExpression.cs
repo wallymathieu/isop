@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Isop.Abstractions;
-using Isop.CommandLine;
-using Isop.CommandLine.Parse;
 
 namespace Isop.Implementations
 {
+    using Abstractions;
+    using CommandLine;
+    using CommandLine.Parse;
+
     internal class ParsedExpression:IParsedExpression
     {
         private readonly ParsedArguments _parsedArguments;

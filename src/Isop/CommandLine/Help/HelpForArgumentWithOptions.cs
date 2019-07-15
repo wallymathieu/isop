@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
 
 namespace Isop.CommandLine.Help
 {
-    using Isop.Domain;
-    using Isop.Help;
-    using Parse;
+    using Domain;
+
     internal class HelpForArgumentWithOptions
     {
         private readonly Localization.Texts _texts;

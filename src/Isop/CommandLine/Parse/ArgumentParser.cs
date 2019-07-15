@@ -1,13 +1,12 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Isop.Infrastructure;
-using Isop.CommandLine.Lex;
-using Isop.Domain;
-
 
 namespace Isop.CommandLine.Parse
 {
+    using Infrastructure;
+    using Lex;
+
     public class ArgumentParser
     {
         private readonly IReadOnlyCollection<Argument> _globalArguments;

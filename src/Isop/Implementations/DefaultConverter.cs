@@ -1,9 +1,9 @@
 using System;
-using System.IO;
-using System.Globalization;
 using System.ComponentModel;
+using System.Globalization;
+using System.IO;
 
-namespace Isop.Domain
+namespace Isop.Implementations
 {
     internal class DefaultConverter
     {

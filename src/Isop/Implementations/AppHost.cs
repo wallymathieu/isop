@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Isop.Abstractions;
-using Isop.CommandLine;
-using Isop.CommandLine.Lex;
-using Isop.CommandLine.Parse;
-using Isop.CommandLine.Views;
-using Isop.Domain;
-using Isop.Help;
-using Isop.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Isop.Implementations
 {
+    using Abstractions;
+    using CommandLine;
+    using CommandLine.Lex;
+    using CommandLine.Parse;
+    using CommandLine.Views;
+    using Domain;
+    using Help;
+    using Localization;
+
     internal class AppHost : IAppHost
     {
         internal readonly Formatter Formatter;

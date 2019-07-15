@@ -1,11 +1,10 @@
 using System.Reflection;
-using Isop.Domain;
-using Isop.Infrastructure;
-using System.Collections.Generic;
-
 
 namespace Isop.CommandLine.Parse
 {
+    using Domain;
+    using Infrastructure;
+
     public class RecognizedArgument
     {
         public int Index { get; }

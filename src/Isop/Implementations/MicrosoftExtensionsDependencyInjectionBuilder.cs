@@ -1,15 +1,15 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Isop.Abstractions;
-using Isop.CommandLine.Views;
-using Isop.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Isop.Implementations
 {
+    using Abstractions;
+    using CommandLine.Views;
+    using Domain;
     internal class MicrosoftExtensionsDependencyInjectionBuilder : IAppHostBuilder
     {
         private readonly RecognizesBuilder _recognizes;

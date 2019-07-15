@@ -1,8 +1,8 @@
 using System;
-using Isop.CommandLine.Views;
 
 namespace Isop.Abstractions
 {
+    using CommandLine.Views;
     /// <summary>
     /// 
     /// </summary>

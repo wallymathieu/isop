@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Isop.CommandLine;
-using Isop.CommandLine.Parse;
 
 namespace Isop.Abstractions
 {
+    using CommandLine;
+    using CommandLine.Parse;
     /// <summary>
     /// Parsed expression with what's recognized and what's not
     /// </summary>

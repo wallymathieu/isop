@@ -1,7 +1,6 @@
-﻿using Isop.CommandLine.Parse;
-
-namespace Isop.CommandLine
+﻿namespace Isop.CommandLine
 {
+    using Parse;
     public class Argument
     {
         public ArgumentParameter Parameter { get; }

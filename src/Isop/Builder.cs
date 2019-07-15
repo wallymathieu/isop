@@ -1,13 +1,13 @@
 ﻿using System;
-using Isop.Abstractions;
-using Isop.Domain;
-using Isop.Help;
-using Isop.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Isop
 {
+    using Abstractions;
+    using Domain;
+    using Help;
+    using Implementations;
     /// <summary>
     /// Utility methods to create builders
     /// </summary>

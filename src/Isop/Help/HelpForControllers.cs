@@ -1,35 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using Isop.CommandLine;
-using Isop.Help;
-using Isop.Infrastructure;
-using Isop.CommandLine.Parse;
-using Isop.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Isop.Help
 {
+    using CommandLine;
+    using Infrastructure;
+    using Domain;
     internal class HelpForControllers
     {
         private readonly IEnumerable<Controller> _classAndMethodRecognizers;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
-        private readonly Configuration _configration;
+        private readonly Configuration _configuration;
         private readonly IServiceProvider _serviceProvider;
         private readonly Localization.Texts _texts;
 
         public HelpForControllers(Recognizes recognizes, 
             HelpXmlDocumentation helpXmlDocumentation,
             IOptions<Localization.Texts> texts,
-            IOptions<Configuration> configration,
+            IOptions<Configuration> configuration,
             IServiceProvider serviceProvider)
         {
             _classAndMethodRecognizers = recognizes.Controllers;
             _helpXmlDocumentation = helpXmlDocumentation;
-            _configration = configration.Value;
+            _configuration = configuration?.Value;
             _serviceProvider = serviceProvider;
             _texts = texts.Value ?? new Localization.Texts();
         }
@@ -60,7 +57,7 @@ namespace Isop.Help
 
             if (method != null && includeArguments)
             {
-                var arguments = method.GetArguments(_configration?.CultureInfo).Select(DescriptionAndHelp);
+                var arguments = method.GetArguments(_configuration?.CultureInfo).Select(DescriptionAndHelp);
                 helpText.AddRange(arguments);
             }
 
@@ -97,7 +94,7 @@ namespace Isop.Help
             }
 
             var arguments = method
-                .GetArguments(_configration?.CultureInfo)
+                .GetArguments(_configuration?.CultureInfo)
                 .ToArray();
             if (arguments.Any())
             {

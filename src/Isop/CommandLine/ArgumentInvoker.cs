@@ -3,14 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Isop.Abstractions;
-using Isop.CommandLine.Parse;
-using Isop.Domain;
-using Isop.Help;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Isop.CommandLine
 {
+    using Abstractions;
+    using Parse;
+    using Domain;
+    using Isop.Help;
+    
     public class ArgumentInvoker
     {
         private readonly IServiceProvider _serviceProvider;
