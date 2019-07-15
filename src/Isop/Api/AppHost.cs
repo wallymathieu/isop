@@ -47,12 +47,12 @@ namespace Isop.Api
             IOptions<Texts> texts)
         {
             Formatter = formatter;
-            _options = options;
+            _options = options ?? Options.Create(new Configuration());
             Recognizes = recognizes;
             ServiceProvider = serviceProvider;
             ControllerRecognizer = new ControllerRecognizer(options,
                 typeConverter);
-            _texts = texts;
+            _texts = texts ?? Options.Create(new Texts());
         }
         /// <summary>
         /// Parse command line arguments and return parsed arguments entity
