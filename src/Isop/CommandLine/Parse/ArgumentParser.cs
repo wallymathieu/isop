@@ -19,7 +19,7 @@ namespace Isop.CommandLine.Parse
             _allowInferParameter = allowInferParameter;
         }
 
-        public ParsedArguments Parse(IList<Token> lexed, IReadOnlyCollection<string> arguments)
+        public ParsedArguments Parse(IReadOnlyList<Token> lexed, IReadOnlyCollection<string> arguments)
         {
             var recognizedIndexes = new List<int>();
             var peekTokens = new PeekEnumerable<Token>(lexed);

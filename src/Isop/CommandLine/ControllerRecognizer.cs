@@ -52,7 +52,7 @@ namespace Isop.CommandLine
         /// </summary>
         private ParsedArguments Parse(Controller controller, IReadOnlyCollection<string> arg)
         {
-            var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
+            var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList()).ToList();
 
             var methodInfo = FindMethodInfo(controller, lexed);
             if (methodInfo == null)

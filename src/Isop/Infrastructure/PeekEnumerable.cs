@@ -5,14 +5,14 @@ using System.Linq;
 
 namespace Isop.Infrastructure
 {
-    public class PeekEnumerable<T>:IEnumerable<T>
+    internal class PeekEnumerable<T>:IEnumerable<T>
     {
-        public PeekEnumerable(IEnumerable<T> enumerable)
+        public PeekEnumerable(IReadOnlyList<T> buffer)
         {
-            _buffer = enumerable.ToList();
+            _buffer = buffer;
         }
         private int _currentIndex = -1;
-        private readonly List<T> _buffer;
+        private readonly IReadOnlyList<T> _buffer;
         public T Current()
         {
             if (_currentIndex < _buffer.Count())
@@ -21,7 +21,7 @@ namespace Isop.Infrastructure
             }
             throw new InvalidOperationException();
         }
-        public bool HasMore() { return _currentIndex+1<_buffer.Count(); }
+        public bool HasMore() { return _currentIndex+1<_buffer.Count; }
         public T Next()
         {
             _currentIndex++;
@@ -31,7 +31,7 @@ namespace Isop.Infrastructure
         public T Peek()
         {
              var idx = _currentIndex+1; 
-             return idx<_buffer.Count() ? _buffer[idx] : default(T);
+             return idx<_buffer.Count ? _buffer[idx] : default;
         }
         public IEnumerator<T> GetEnumerator()
         {
