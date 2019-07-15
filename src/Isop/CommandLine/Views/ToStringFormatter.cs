@@ -1,10 +1,7 @@
-using System;
-using System.Globalization;
-using System.Collections.Generic;
-using Isop.Infrastructure;
 using System.Collections;
+using System.Collections.Generic;
 
-namespace Isop.Domain
+namespace Isop.CommandLine.Views
 {
 	class ToStringFormatter 
 	{

@@ -11,14 +11,12 @@ namespace Isop.Domain
         public string Name { get; }
         public ArgumentAction Action { get; }
         public bool Required { get; }
-        public Type Type { get; }
-        public Property(string name, ArgumentAction action = null, bool required = false, string description = null,Type type=null)
+        public Property(string name, ArgumentAction action = null, bool required = false, string description = null)
         {
             Name = name;
             Action = action;
             Required = required;
             Description = description;
-            Type = type;
         }
         public override bool Equals(object obj)
         {

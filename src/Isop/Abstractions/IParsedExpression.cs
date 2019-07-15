@@ -7,7 +7,7 @@ using Isop.CommandLine.Parse;
 namespace Isop.Abstractions
 {
     /// <summary>
-    /// 
+    /// Parsed expression with what's recognized and what's not
     /// </summary>
     public interface IParsedExpression
     {

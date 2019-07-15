@@ -1,9 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Collections;
-using System.Reflection;
+using System.Collections.Generic;
 using System.Linq;
-namespace Isop.Domain
+using System.Reflection;
+
+namespace Isop.CommandLine.Views
 {
     class TableFormatter
     {

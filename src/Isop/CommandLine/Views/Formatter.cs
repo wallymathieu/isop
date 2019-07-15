@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Isop.Abstractions
+namespace Isop.CommandLine.Views
 {
     /// <summary>
     /// Format value as string 

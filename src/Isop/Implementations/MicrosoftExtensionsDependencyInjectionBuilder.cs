@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Isop.Abstractions;
+using Isop.CommandLine.Views;
 using Isop.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -35,7 +36,7 @@ namespace Isop.Implementations
         }
         public IAppHostBuilder Parameter(string argument, ArgumentAction action = null, bool required = false, string description = null)
         {
-            _recognizes.Properties.Add(new Property(argument, action, required, description, typeof(string)));
+            _recognizes.Properties.Add(new Property(argument, action, required, description));
             return this;
         }
         public IAppHostBuilder Parameter(string argument, Action<string> action, bool required = false, string description = null)
@@ -47,7 +48,7 @@ namespace Isop.Implementations
                     return Task.FromResult<object>(null);
                 })
                 : null;
-            _recognizes.Properties.Add(new Property(argument, argumentAction, required, description, typeof(string)));
+            _recognizes.Properties.Add(new Property(argument, argumentAction, required, description));
             return this;
         }
 

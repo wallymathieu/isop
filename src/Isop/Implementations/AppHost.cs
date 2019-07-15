@@ -7,6 +7,7 @@ using Isop.Abstractions;
 using Isop.CommandLine;
 using Isop.CommandLine.Lex;
 using Isop.CommandLine.Parse;
+using Isop.CommandLine.Views;
 using Isop.Domain;
 using Isop.Help;
 using Isop.Localization;

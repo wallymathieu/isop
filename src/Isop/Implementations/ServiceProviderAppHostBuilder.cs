@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Isop.Abstractions;
+using Isop.CommandLine.Views;
 using Isop.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -35,7 +36,7 @@ namespace Isop.Implementations
 
         public IAppHostBuilder Parameter(string argument, ArgumentAction action = null, bool required = false, string description = null)
         {
-            _recognizes.Properties.Add(new Property(argument, action, required, description, typeof(string)));
+            _recognizes.Properties.Add(new Property(argument, action, required, description));
             return this;
         }
         public IAppHostBuilder Parameter(string argument, Action<string> action, bool required = false, string description = null)
@@ -47,7 +48,7 @@ namespace Isop.Implementations
                     return Task.FromResult<object>(null);
                 })
                 : null;
-            _recognizes.Properties.Add(new Property(argument, argumentAction, required, description, typeof(string)));
+            _recognizes.Properties.Add(new Property(argument, argumentAction, required, description));
             return this;
         }
 
@@ -71,7 +72,7 @@ namespace Isop.Implementations
             var options = _serviceProvider.GetService<IOptions<Configuration>>();
             return new AppHost(options, 
                 _serviceProvider, 
-                new Recognizes(this._recognizes.Recognizes.ToArray(), this._recognizes.Properties.ToArray()),
+                new Recognizes(_recognizes.Recognizes.ToArray(), _recognizes.Properties.ToArray()),
                 _typeConverter,
                 _formatter, 
                 _serviceProvider.GetService<IOptions<Localization.Texts>>());

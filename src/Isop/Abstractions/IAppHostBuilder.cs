@@ -1,4 +1,5 @@
 using System;
+using Isop.CommandLine.Views;
 
 namespace Isop.Abstractions
 {
