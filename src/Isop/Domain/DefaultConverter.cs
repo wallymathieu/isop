@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace Isop.Domain
 {
-    public class DefaultConverter
+    internal class DefaultConverter
     {
         public object ConvertFrom(Type type, string s, CultureInfo cultureInfo)
         {
