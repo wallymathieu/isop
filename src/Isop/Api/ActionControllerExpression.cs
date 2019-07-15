@@ -2,10 +2,7 @@ using System;
 using Isop.CommandLine.Parse;
 using System.Collections.Generic;
 using System.Linq;
-using Isop.Domain;
 using Isop.CommandLine;
-using Isop.Help;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Isop.Api
 {
@@ -54,7 +51,7 @@ namespace Isop.Api
         /// </summary>
         public string Help()
         {
-            var helpController= _build.ServiceProvider.GetRequiredService<HelpController>();
+            var helpController= _build.HelpController;
             return (helpController.Index(_controllerName, _actionName) ?? String.Empty).Trim();
         }
     }

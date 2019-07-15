@@ -10,7 +10,7 @@ using System.Xml;
 
 namespace Isop.Help
 {
-    public class HelpXmlDocumentation
+    internal class HelpXmlDocumentation
     {
         public static IDictionary<string, string> GetSummariesFromText(string text)
         {

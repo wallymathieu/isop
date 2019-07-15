@@ -28,7 +28,7 @@ namespace Isop.Api
         /// </summary>
         public string Help()
         {
-            var helpController = _build.ServiceProvider.GetRequiredService<HelpController>();
+            var helpController = _build.HelpController;
             return (helpController.Index(_controllerName, null) ?? String.Empty).Trim();
         }
     }

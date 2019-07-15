@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Isop.Abstractions;
 using Isop.CommandLine.Parse;
 using Isop.Domain;
+using Isop.Help;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Isop.CommandLine
@@ -13,13 +14,19 @@ namespace Isop.CommandLine
     public class ArgumentInvoker
     {
         private readonly IServiceProvider _serviceProvider;
-        private Recognizes _recognizes;
+        private readonly Recognizes _recognizes;
+        private readonly HelpController _helpController;
         private ILookup<string, ArgumentAction> _recognizesMap;
-        private Recognizes Recognizes => _recognizes ??(_recognizes= _serviceProvider.GetRequiredService<Recognizes>());
+        
         private ILookup<string,ArgumentAction> RecognizesMap => _recognizesMap 
-            ??(_recognizesMap= Recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action));
+            ??(_recognizesMap= _recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action));
 
-        public ArgumentInvoker(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+        public ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recognizes, HelpController helpController)
+        {
+            _serviceProvider = serviceProvider;
+            _recognizes = recognizes;
+            _helpController = helpController;
+        }
 
         public async Task<IEnumerable> Invoke(ParsedArguments parsedArguments)
         {
@@ -44,6 +51,11 @@ namespace Isop.CommandLine
                     method: method =>
                     {
                         var instance = scope.ServiceProvider.GetService(method.RecognizedClass);
+                        if (instance==null && method.RecognizedClass == typeof(HelpController))
+                        {
+                            instance = _helpController;
+                        }
+                        
                         if (ReferenceEquals(null, instance))
                             throw new Exception($"Unable to resolve {method.RecognizedClass.Name}");
                         return method.RecognizedAction.Invoke(instance,

@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using Isop.Localization;
 using Microsoft.Extensions.Options;
 
 namespace Isop.Help
@@ -8,20 +9,16 @@ namespace Isop.Help
     using CommandLine.Help;
     using Domain;
 
-    internal class HelpController
+    public class HelpController
     {
         private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private readonly HelpForControllers _helpForClassAndMethod;
-        private readonly Configuration _options;
 
-        public HelpController(
-            IOptions<Configuration> options,
-            HelpForArgumentWithOptions helpForArgumentWithOptions,
-            HelpForControllers helpForClassAndMethod)
+        public HelpController(IOptions<Texts> texts, Recognizes recognizes,
+            IOptions<Configuration> config, IServiceProvider serviceProvider)
         {
-            _helpForArgumentWithOptions = helpForArgumentWithOptions;
-            _helpForClassAndMethod = helpForClassAndMethod;
-            _options = options.Value;
+            _helpForArgumentWithOptions = new HelpForArgumentWithOptions(texts, recognizes, config);
+            _helpForClassAndMethod = new HelpForControllers(recognizes, new HelpXmlDocumentation(), texts, config, serviceProvider);
         }
 
         public string Index()

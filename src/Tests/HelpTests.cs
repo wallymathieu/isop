@@ -4,8 +4,12 @@ using System.IO;
 using System.Linq;
 using Isop;
 using Isop.Api;
+using Isop.Localization;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Tests.FakeControllers;
+using With;
 
 namespace Tests
 {
@@ -32,16 +36,16 @@ namespace Tests
         [Test]
         public void It_can_report_usage_for_simple_parameters_with_different_texts()
         {
-            var usage = Builder.Create(new Configuration
-            {
-                CultureInfo = CultureInfo.InvariantCulture
-            })
+            var usage = Builder.Create(
+                    new ServiceCollection()
+                        .Tap(s=>s.AddSingleton(Options.Create(
+                            new Texts {TheArgumentsAre = "Det finns följande argument:"})))
+                    ,new Configuration
+                    {
+                        CultureInfo = CultureInfo.InvariantCulture
+                    })
             .Parameter("beta", arg => { }, description: "Beskrivning av beta")
             .Parameter("alpha", arg => { })
-            .WithLocalization(h =>
-            {
-                h.TheArgumentsAre = "Det finns följande argument:";
-            })
             .BuildAppHost()
             .Help();
             var tab = '\t';
@@ -91,17 +95,20 @@ See 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_and_have_a_different_help_text()
         {
-            var usage = Builder.Create(new Configuration
-            {
-                CultureInfo = CultureInfo.InvariantCulture
-            }).WithLocalization(h =>
-            {
-                h.TheCommandsAre = "Det finns följande kommandon:";
-                h.HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information";
-                h.TheSubCommandsFor = "Det finns föjande sub kommandon:";
-                h.HelpSubCommandForMoreInformation =
-                    "Se 'Kommandonamn' help <kommando> <subkommando> för mer information";
-            })
+            var usage = Builder.Create(
+                    new ServiceCollection().Tap(s=>s.AddSingleton(
+                        Options.Create(new Texts()
+                        {
+                            TheCommandsAre = "Det finns följande kommandon:",
+                            HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information",
+                            TheSubCommandsFor = "Det finns föjande sub kommandon:",
+                            HelpSubCommandForMoreInformation =
+                            "Se 'Kommandonamn' help <kommando> <subkommando> för mer information"
+                        }))),
+                    new Configuration
+                    {
+                        CultureInfo = CultureInfo.InvariantCulture
+                    })
             .Recognize(typeof(MyController))
             .Recognize(typeof(AnotherController))
             .BuildAppHost()
@@ -116,20 +123,22 @@ Se 'Kommandonamn' help <kommando> för ytterligare information")));
         [Test]
         public void It_can_report_usage_for_a_specific_controller_and_have_a_different_help_text()
         {
-            var usage = Builder.Create(new Configuration
-            {
-                CultureInfo = CultureInfo.InvariantCulture
-            })
+            var usage = Builder.Create(
+                    new ServiceCollection().Tap(s=>s.AddSingleton(Options.Create(new Texts()
+                    {
+                        TheCommandsAre = "Det finns följande kommandon:",
+                        HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information",
+                        TheSubCommandsFor = "Det finns föjande sub kommandon:",
+                        HelpSubCommandForMoreInformation =
+                        "Se 'Kommandonamn' help <kommando> <subkommando> för mer information"
+                    }))),
+                    new Configuration
+                    {
+                        CultureInfo = CultureInfo.InvariantCulture
+                    })
             .Recognize(typeof(MyController))
             .Recognize(typeof(AnotherController))
-            .WithLocalization(h =>
-            {
-                h.TheCommandsAre = "Det finns följande kommandon:";
-                h.HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information";
-                h.TheSubCommandsFor = "Det finns föjande sub kommandon:";
-                h.HelpSubCommandForMoreInformation =
-                    "Se 'Kommandonamn' help <kommando> <subkommando> för mer information";
-            })
+            
             .BuildAppHost()
             .Controller("my")
             .Help();
@@ -142,22 +151,24 @@ Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
         [Test]
         public void It_can_report_usage_for_a_specific_controller_and_action_and_have_a_different_help_text()
         {
-            var usage = Builder.Create(new Configuration
-            {
-                CultureInfo = CultureInfo.InvariantCulture
-            })
+            var usage = Builder.Create(
+                    new ServiceCollection().Tap(s=>s.AddSingleton(Options.Create(new Texts
+                    {
+                        TheCommandsAre = "Det finns följande kommandon:",
+                        HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information",
+                        TheSubCommandsFor = "Det finns föjande sub kommandon:",
+                        HelpSubCommandForMoreInformation =
+                        "Se 'Kommandonamn' help <kommando> <subkommando> för mer information",
+                        AndAcceptTheFollowingParameters = "Och accepterar följande parametrar",
+                        AndTheShortFormIs = "Och kortformen är"
+                    }))),
+                    new Configuration
+                    {
+                        CultureInfo = CultureInfo.InvariantCulture
+                    })
             .Recognize(typeof(MyController))
             .Recognize(typeof(AnotherController))
-                .WithLocalization(h =>
-                {
-                    h.TheCommandsAre = "Det finns följande kommandon:";
-                    h.HelpCommandForMoreInformation = "Se 'Kommandonamn' help <kommando> för ytterligare information";
-                    h.TheSubCommandsFor = "Det finns föjande sub kommandon:";
-                    h.HelpSubCommandForMoreInformation =
-                        "Se 'Kommandonamn' help <kommando> <subkommando> för mer information";
-                    h.AndAcceptTheFollowingParameters = "Och accepterar följande parametrar";
-                    h.AndTheShortFormIs = "Och kortformen är";
-                }).BuildAppHost()
+            .BuildAppHost()
             .Controller("my")
             .Action("Action")
             .Help();

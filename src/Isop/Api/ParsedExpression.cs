@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
-using Isop.Abstractions;
 using Isop.CommandLine;
 using Isop.CommandLine.Parse;
-using Isop.Domain;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Isop.Api
 {
@@ -15,8 +12,7 @@ namespace Isop.Api
     {
         private readonly ParsedArguments _parsedArguments;
         private readonly AppHost _appHost;
-        private ArgumentInvoker _argumentInvoker;
-        private Formatter _formatter;
+        private readonly ArgumentInvoker _argumentInvoker;
         public IReadOnlyCollection<RecognizedArgument> RecognizedArguments => _parsedArguments.RecognizedArguments;
 
         public IReadOnlyCollection<UnrecognizedArgument> UnRecognizedArguments => _parsedArguments.UnRecognizedArguments;
@@ -27,8 +23,7 @@ namespace Isop.Api
         {
             _parsedArguments = parsedArguments;
             _appHost = appHost;
-            _argumentInvoker = new ArgumentInvoker(_appHost.ServiceProvider);
-            _formatter = _appHost.ServiceProvider.GetRequiredService<Formatter>();
+            _argumentInvoker = new ArgumentInvoker(_appHost.ServiceProvider, _appHost.Recognizes, _appHost.HelpController);
         }
 
         public void Invoke(TextWriter output)
@@ -52,7 +47,7 @@ namespace Isop.Api
             var result = await _argumentInvoker.Invoke(_parsedArguments);
             foreach (var item in result)
             {
-                var formatted = _formatter.Invoke(item);
+                var formatted = _appHost.Formatter.Invoke(item);
                 foreach (var str in formatted)
                 {
                     await output.WriteLineAsync(str);
