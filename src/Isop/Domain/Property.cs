@@ -18,8 +18,7 @@ namespace Isop.Domain
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (Property)) return false;
-            return Equals((Property) obj);
+            return obj is Property property && Equals(property);
         }
 
         public bool Equals(Property other)

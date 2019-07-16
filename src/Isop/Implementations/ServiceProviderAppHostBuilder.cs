@@ -70,12 +70,16 @@ namespace Isop.Implementations
         public IAppHost BuildAppHost()
         {
             var options = _serviceProvider.GetService<IOptions<Configuration>>();
+            var conventions = _serviceProvider.GetService<IOptions<Conventions>>();
+            var texts = _serviceProvider.GetService<IOptions<Localization.Texts>>();
+
             return new AppHost(options, 
                 _serviceProvider, 
                 new Recognizes(_recognizes.Recognizes.ToArray(), _recognizes.Properties.ToArray()),
                 _typeConverter,
                 _formatter, 
-                _serviceProvider.GetService<IOptions<Localization.Texts>>());
+                texts,
+                conventions);
         }
     }
 }

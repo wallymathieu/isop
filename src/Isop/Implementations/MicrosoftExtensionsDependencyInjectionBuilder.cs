@@ -69,12 +69,15 @@ namespace Isop.Implementations
         {
             var svcProvider= _serviceCollection.BuildServiceProvider();
             var options = svcProvider.GetService<IOptions<Configuration>>();
+            var conventions = svcProvider.GetService<IOptions<Conventions>>();
+            var texts = svcProvider.GetService<IOptions<Localization.Texts>>();
             return new AppHost(options, 
                 svcProvider, 
-                new Recognizes(this._recognizes.Recognizes.ToArray(), this._recognizes.Properties.ToArray()),
+                new Recognizes(_recognizes.Recognizes.ToArray(), _recognizes.Properties.ToArray()),
                 _typeConverter,
                 _formatter, 
-                svcProvider.GetService<IOptions<Localization.Texts>>());
+                texts,
+                conventions);
         }
     }
 }

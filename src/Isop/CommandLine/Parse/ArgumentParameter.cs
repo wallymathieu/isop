@@ -41,12 +41,8 @@ namespace Isop.CommandLine.Parse
         public string Delimiter { get; }
         public string Help()
         {
-            return string.Concat( 
-                "--", 
-                string.Join(", or ", Aliases), 
-                (string.IsNullOrEmpty(Delimiter)
-                    ? ""
-                    : " " + Delimiter));
+            return
+                $"--{string.Join(", or ", Aliases)}{(string.IsNullOrEmpty(Delimiter) ? "" : " " + Delimiter)}";
         }
         public override string ToString()
         {

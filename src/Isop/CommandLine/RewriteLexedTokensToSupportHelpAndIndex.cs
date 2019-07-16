@@ -10,12 +10,12 @@ namespace Isop.CommandLine
     internal class RewriteLexedTokensToSupportHelpAndIndex
     {
         // Arg(ControllerName),Param(..),.. -> Arg(ControllerName),Arg('Index'),... 
-        public static IList<Token> Rewrite(IList<Token> tokens)
+        public static IList<Token> Rewrite(Conventions conventions, IList<Token> tokens)
         {
             //"--command"
             if (tokens.Count() >= 2 
                 && tokens[0].TokenType==TokenType.Argument 
-                && tokens[0].Value.EqualsIgnoreCase(Conventions.Help)
+                && tokens[0].Value.EqualsIgnoreCase(conventions.Help)
                 && tokens[1].TokenType==TokenType.Argument)
             {
                 tokens[1] = new Token(tokens[1].Value,TokenType.ParameterValue,tokens[1].Index);
@@ -25,13 +25,13 @@ namespace Isop.CommandLine
                 tokens.Insert(3, new Token("action", TokenType.Parameter, 2));
             }
             //help maps to index (should have routing here)
-            if (tokens.Count() == 0)
+            if (!tokens.Any())
             {
-                tokens.Add(new Token(Conventions.Help,TokenType.Argument,0));
+                tokens.Add(new Token(conventions.Help,TokenType.Argument,0));
             }
 
             //Index rewrite:
-            var indexToken= new Token(Conventions.Index, TokenType.Argument,1);
+            var indexToken= new Token(conventions.Index, TokenType.Argument,1);
             if (tokens.Count()>=2 
                 && tokens[1].TokenType!=TokenType.Argument 
                 && tokens[0].TokenType==TokenType.Argument)

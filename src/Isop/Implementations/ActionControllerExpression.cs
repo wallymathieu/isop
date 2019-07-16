@@ -21,8 +21,8 @@ namespace Isop.Implementations
             _appHost = appHost;
         }
         public IReadOnlyCollection<Argument> GetArguments() =>
-            _appHost.Recognizes.Controllers.SingleOrDefault(r => r.Recognize(_controllerName, _actionName))
-                ?.GetMethod(_actionName).GetArguments(_appHost.CultureInfo).ToArray() ?? throw new ArgumentException($"Controller: {_controllerName}, method: {_actionName}");
+            _appHost.Recognizes.Controllers.SingleOrDefault(r => r.Recognize(_appHost.Conventions.Value, _controllerName, _actionName))
+                ?.GetMethod(_appHost.Conventions.Value,_actionName).GetArguments(_appHost.CultureInfo).ToArray() ?? throw new ArgumentException($"Controller: {_controllerName}, method: {_actionName}");
         public IParsedExpression Parameters(Dictionary<string, string> parameters)
         {
             var argumentParser = new ArgumentParser(_appHost.Recognizes.Properties
@@ -31,7 +31,7 @@ namespace Isop.Implementations
             if (_appHost.Recognizes.Controllers.Any())
             {
                 var recognizedController = _appHost.Recognizes.Controllers
-                    .FirstOrDefault(controller => controller.Recognize(_controllerName, _actionName));
+                    .FirstOrDefault(controller => controller.Recognize(_appHost.Conventions.Value, _controllerName, _actionName));
                 if (null != recognizedController)
                 {
                     return new ParsedExpression( _appHost.ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, _actionName, parameters, parsedArguments), _appHost);

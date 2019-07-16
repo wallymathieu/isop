@@ -11,14 +11,18 @@ namespace Isop.Help
 
     public class HelpController
     {
+        private readonly Conventions _conventions;
         private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private readonly HelpForControllers _helpForClassAndMethod;
 
         public HelpController(IOptions<Texts> texts, Recognizes recognizes,
-            IOptions<Configuration> config, IServiceProvider serviceProvider)
+            IOptions<Configuration> config, IServiceProvider serviceProvider,
+            IOptions<Conventions> conventions)
         {
+            _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
             _helpForArgumentWithOptions = new HelpForArgumentWithOptions(texts, recognizes, config);
-            _helpForClassAndMethod = new HelpForControllers(recognizes, new HelpXmlDocumentation(), texts, config, serviceProvider);
+            _helpForClassAndMethod = new HelpForControllers(recognizes, 
+                new HelpXmlDocumentation(), texts, config, serviceProvider, conventions);
         }
 
         public string Index()
@@ -40,7 +44,7 @@ namespace Isop.Help
             if (String.IsNullOrEmpty(command))
                 return Index();
             var sb = new StringBuilder();
-            command = Regex.Replace(command, Conventions.ControllerName+"$", "", RegexOptions.IgnoreCase);
+            command = Regex.Replace(command, _conventions.ControllerName+"$", "", RegexOptions.IgnoreCase);
             if (_helpForArgumentWithOptions.CanHelp(command))
             {
                 sb.AppendLine(_helpForArgumentWithOptions.Help(command));

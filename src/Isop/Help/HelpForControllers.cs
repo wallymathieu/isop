@@ -15,6 +15,7 @@ namespace Isop.Help
         private readonly IEnumerable<Controller> _classAndMethodRecognizers;
         private readonly HelpXmlDocumentation _helpXmlDocumentation;
         private readonly Configuration _configuration;
+        private readonly Conventions _conventions;
         private readonly IServiceProvider _serviceProvider;
         private readonly Localization.Texts _texts;
 
@@ -22,12 +23,14 @@ namespace Isop.Help
             HelpXmlDocumentation helpXmlDocumentation,
             IOptions<Localization.Texts> texts,
             IOptions<Configuration> configuration,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IOptions<Conventions> conventions)
         {
             _classAndMethodRecognizers = recognizes.Controllers;
             _helpXmlDocumentation = helpXmlDocumentation;
             _configuration = configuration?.Value;
             _serviceProvider = serviceProvider;
+            _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
             _texts = texts.Value ?? new Localization.Texts();
         }
 
@@ -36,7 +39,7 @@ namespace Isop.Help
         {
             var description = t.Type.GetTypeInfo().GetMethods()
                 .SingleOrDefault(m => m.ReturnType == typeof(string)
-                && m.Name.EqualsIgnoreCase( Conventions.Help)
+                && m.Name.EqualsIgnoreCase( _conventions.Help)
                 && m.GetParameters().Select(p=>p.ParameterType).SequenceEqual(_onlyStringType));
             var helpText = new List<string>();
             if (null == description)
@@ -70,19 +73,19 @@ namespace Isop.Help
         {
             if (simpleDescription)
             {
-                return type.Name + Description(type, includeArguments:false, method: null);
+                return type.GetName(_conventions) + Description(type, includeArguments:false, method: null);
             }
-            return string.Concat(type.Name,
+            return string.Concat(type.GetName(_conventions),
                 Environment.NewLine,
                 Environment.NewLine,
                 string.Join(Environment.NewLine,
-                    type.GetControllerActionMethods()
+                    type.GetControllerActionMethods(_conventions)
                         .Select(m => "  " + m.Name + Description(type, m, includeArguments: true)).ToArray()));
         }
 
         private string HelpForAction(Controller type, string action)
         {
-            var method = type.GetMethod(action);
+            var method = type.GetMethod(_conventions, action);
             if (method == null)
             {
                 var lines = new []
@@ -100,18 +103,18 @@ namespace Isop.Help
             {
                 var lines = new[]
                 {
-                    string.Concat(method.Name, " ",Description(type, method, false)),
-                    string.Concat(_texts.AndAcceptTheFollowingParameters,":"),
+                    $"{method.Name} {Description(type, method, false)}",
+                    $"{_texts.AndAcceptTheFollowingParameters}:",
                     string.Join(", ", arguments.Select(DescriptionAndHelp)),
-                    string.Concat(_texts.AndTheShortFormIs,":"),
-                    string.Join(" ", type.Name, method.Name,
+                    $"{_texts.AndTheShortFormIs}:",
+                    string.Join(" ", type.GetName(_conventions), method.Name,
                         string.Join(", ", arguments.Select(arg => arg.Name.ToUpperInvariant())))
                 };
                 return string.Join(Environment.NewLine, lines);
             }
             else
             {
-                return string.Concat(method.Name, " ", Description(type, method, false));
+                return $"{method.Name} {Description(type, method, false)}";
             }
         }
 
@@ -137,7 +140,7 @@ namespace Isop.Help
                 return string.Join(Environment.NewLine, lines);
             }
             var controllerRecognizer = _classAndMethodRecognizers.First(type =>
-                type.Name.EqualsIgnoreCase(val));
+                type.GetName(_conventions).EqualsIgnoreCase(val));
             if (string.IsNullOrEmpty(action))
             {
                 return string.Concat(_texts.TheSubCommandsFor,
@@ -153,7 +156,7 @@ namespace Isop.Help
         {
             return string.IsNullOrEmpty(val)
                 ? _classAndMethodRecognizers.Any(cmr => !cmr.IsHelp())
-                : _classAndMethodRecognizers.Any(cmr => cmr.Name.EqualsIgnoreCase(val));
+                : _classAndMethodRecognizers.Any(cmr => cmr.GetName(_conventions).EqualsIgnoreCase(val));
         }
     }
 }

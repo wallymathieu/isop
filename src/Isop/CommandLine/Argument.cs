@@ -1,7 +1,7 @@
 ﻿namespace Isop.CommandLine
 {
     using Parse;
-    public class Argument
+    public sealed class Argument
     {
         public ArgumentParameter Parameter { get; }
 
@@ -19,8 +19,7 @@
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (Argument)) return false;
-            return Equals((Argument) obj);
+            return obj is Argument argument && Equals(argument);
         }
 
         public bool Equals(Argument other)
@@ -41,20 +40,11 @@
             }
         }
 
-        public virtual string Help()
-        {
-            return "--" + Name;
-        }
+        public string Help() => Parameter.Help();
 
-        public virtual bool Accept(string value)
-        {
-            return Parameter.Accept(value);
-        }
+        public bool Accept(string value) => Parameter.Accept(value);
 
-        public virtual bool Accept(int index, string value)
-        {
-            return Parameter.Accept(index, value);
-        }
+        public bool Accept(int index, string value) => Parameter.Accept(index, value);
     }
 }
 

@@ -16,33 +16,36 @@ namespace Isop.CommandLine
     {
         private readonly bool _allowInferParameter;
         private readonly IOptions<Configuration> _configuration;
+        private readonly Conventions _conventions;
         private readonly ConvertArgumentsToParameterValue _convertArgument;
 
         /// <summary>
         /// </summary>
         public ControllerRecognizer(
             IOptions<Configuration> configuration,
-            TypeConverter typeConverterFunc)
+            TypeConverter typeConverterFunc, 
+            IOptions<Conventions> conventions)
         {
             _configuration = configuration;
+            _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
             _allowInferParameter = ! (_configuration?.Value?.DisableAllowInferParameter??false);
             _convertArgument = new ConvertArgumentsToParameterValue(configuration, typeConverterFunc);
         }
 
         private CultureInfo Culture => _configuration?.Value?.CultureInfo;
 
-        public static bool Recognize(Controller controller, IEnumerable<string> arg)
+        public bool Recognize(Controller controller, IEnumerable<string> arg)
         {
-            var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
+            var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(_conventions,ArgumentLexer.Lex(arg).ToList());
             return null != FindMethodInfo(controller, lexed);
         }
 
-        private static Method FindMethodInfo(Controller controller, IList<Token> arg)
+        private Method FindMethodInfo(Controller controller, IList<Token> arg)
         {
-            var foundClassName = controller.Name.EqualsIgnoreCase(arg.ElementAtOrDefault(0).Value);
+            var foundClassName = controller.GetName(_conventions).EqualsIgnoreCase(arg.ElementAtOrDefault(0).Value);
             if (!foundClassName) return null;
             var methodName = arg.ElementAtOrDefault(1).Value;
-            var methodInfo = FindMethodAmongLexedTokens.FindMethod(controller.GetControllerActionMethods(), methodName, arg);
+            var methodInfo = FindMethodAmongLexedTokens.FindMethod(controller.GetControllerActionMethods(_conventions), methodName, arg);
             return methodInfo;
         }
 
@@ -52,17 +55,17 @@ namespace Isop.CommandLine
         /// </summary>
         private ParsedArguments Parse(Controller controller, IReadOnlyCollection<string> arg)
         {
-            var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList()).ToList();
+            var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(_conventions,ArgumentLexer.Lex(arg).ToList()).ToList();
 
             var methodInfo = FindMethodInfo(controller, lexed);
             if (methodInfo == null)
             {
-                throw new Exception($"Could not find method for {controller.Name} with arguments {string.Join(" ", arg)}");
+                throw new Exception($"Could not find method for {controller.GetName(_conventions)} with arguments {string.Join(" ", arg)}");
             }
             var argumentRecognizers = methodInfo.GetArguments(Culture)
                 .ToList();
             argumentRecognizers.InsertRange(0, new[] { 
-                new Argument(parameter: ArgumentParameter.Parse("#0" + controller.Name, Culture), required: true),
+                new Argument(parameter: ArgumentParameter.Parse("#0" + controller.GetName(_conventions), Culture), required: true),
                 new Argument(parameter: ArgumentParameter.Parse("#1" + methodInfo.Name, Culture), required: false)
             });
 
@@ -111,7 +114,7 @@ namespace Isop.CommandLine
 
         public ParsedArguments ParseArgumentsAndMerge(Controller controller, string actionName, Dictionary<string, string> arg, ParsedArguments parsedArguments)
         {
-            var methodInfo = controller.GetMethod(actionName);
+            var methodInfo = controller.GetMethod(_conventions, actionName);
             var argumentRecognizers = methodInfo.GetArguments(Culture)
                 .ToList();
 

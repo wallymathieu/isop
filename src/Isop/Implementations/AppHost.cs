@@ -23,17 +23,19 @@ namespace Isop.Implementations
         internal readonly Recognizes Recognizes;
         internal readonly IServiceProvider ServiceProvider;
         internal readonly ControllerRecognizer ControllerRecognizer;
+        internal readonly IOptions<Conventions> Conventions;
         private readonly IOptions<Configuration> _options;
         private HelpController _helpController;
         private readonly IOptions<Texts> _texts;
-
+        
         internal HelpController HelpController =>
             _helpController??(_helpController = ServiceProvider.GetService<HelpController>() ?? 
                                                 new HelpController(
                                                     _texts,
                                                     Recognizes,
                                                     _options,
-                                                    ServiceProvider));
+                                                    ServiceProvider,
+                                                    Conventions));
 
         /// <summary>
         /// 
@@ -43,14 +45,16 @@ namespace Isop.Implementations
             Recognizes recognizes,
             TypeConverter typeConverter, 
             Formatter formatter, 
-            IOptions<Texts> texts)
+            IOptions<Texts> texts,
+            IOptions<Conventions> conventions)
         {
             Formatter = formatter;
             _options = options ?? Options.Create(new Configuration());
             Recognizes = recognizes;
             ServiceProvider = serviceProvider;
+            Conventions = conventions?? Options.Create(new Conventions());
             ControllerRecognizer = new ControllerRecognizer(options,
-                typeConverter);
+                typeConverter, Conventions);
             _texts = texts ?? Options.Create(new Texts());
         }
         /// <summary>
@@ -86,7 +90,7 @@ namespace Isop.Implementations
         public String Help()
         {
             var output = new StringWriter(CultureInfo);
-            Parse(new[] { Conventions.Help }).Invoke(output);
+            Parse(new[] { Conventions.Value.Help }).Invoke(output);
             return output.ToString();
         }
         /// <summary>

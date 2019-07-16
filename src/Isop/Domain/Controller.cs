@@ -13,29 +13,30 @@ namespace Isop.Domain
 
     public class Controller
     {
+
         public Controller(Type type, bool ignoreGlobalUnMatchedParameters)
         {
             Type = type;
             IgnoreGlobalUnMatchedParameters = ignoreGlobalUnMatchedParameters;
         }
-        public bool IgnoreGlobalUnMatchedParameters { get; private set; }
-        public Type Type { get; private set; }
-        public string Name { get { return ControllerName(Type); } }
+        public bool IgnoreGlobalUnMatchedParameters { get; }
+        public Type Type { get; }
+        public string GetName(Conventions conventions) => ControllerName(conventions,Type);
 
-        private static string ControllerName(Type type)
+        private string ControllerName(Conventions conventions, Type type)
         {
-            return Regex.Replace(type.Name, Conventions.ControllerName + "$", "", RegexOptions.IgnoreCase);
+            return Regex.Replace(type.Name, conventions.ControllerName + "$", "", RegexOptions.IgnoreCase);
         }
 
-        public IEnumerable<Method> GetControllerActionMethods()
+        public IEnumerable<Method> GetControllerActionMethods(Conventions conventions)
         {
-            return GetControllerActionMethods(Type).Select(m => new Method(m) { Controller = this });
+            return GetControllerActionMethods(conventions, Type).Select(m => new Method(m) { Controller = this });
         }
 
-        private static IEnumerable<MethodInfo> GetControllerActionMethods(Type type)
+        private static IEnumerable<MethodInfo> GetControllerActionMethods(Conventions conventions, Type type)
         {
             return GetOwnPublicMethods(type)
-                .Where(m => !m.Name.EqualsIgnoreCase(Conventions.Help));
+                .Where(m => !m.Name.EqualsIgnoreCase(conventions.Help));
         }
 
         private static IEnumerable<MethodInfo> GetOwnPublicMethods(Type type)
@@ -47,20 +48,20 @@ namespace Isop.Domain
                 ;
         }
 
-        public bool Recognize(string controllerName)
+        public bool Recognize(Conventions conventions, string controllerName)
         {
-            return Name.EqualsIgnoreCase(controllerName);
+            return GetName(conventions).EqualsIgnoreCase(controllerName);
         }
 
-        public bool Recognize(string controllerName, string actionName)
+        public bool Recognize(Conventions conventions, string controllerName, string actionName)
         {
-            return Name.EqualsIgnoreCase(controllerName)
-                && GetMethod(actionName) != null;
+            return GetName(conventions).EqualsIgnoreCase(controllerName)
+                && GetMethod(conventions, actionName) != null;
         }
         
-        public Method GetMethod(string name)
+        public Method GetMethod(Conventions conventions, string name)
         {
-            return GetControllerActionMethods().SingleOrDefault(m => m.Name.EqualsIgnoreCase(name));
+            return GetControllerActionMethods(conventions).SingleOrDefault(m => m.Name.EqualsIgnoreCase(name));
         }
         
         public bool IsHelp()
@@ -70,25 +71,17 @@ namespace Isop.Domain
         
         public override bool Equals(object obj)
         {
-            var controller = obj as Controller;
-            if (controller != null)
+            if (obj is Controller controller)
             {
                 return Equals(controller);
             }
             return false;
         }
-        public bool Equals(Controller obj)
-        {
-            return Type == obj.Type;
-        }
-        public override int GetHashCode()
-        {
-            return Type.GetHashCode();
-        }
-        public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture, "[Controller: Type={0}, Name={1}]", Type, Name);
-        }
+        public bool Equals(Controller obj) => Type == obj?.Type;
+
+        public override int GetHashCode() => Type.GetHashCode();
+
+        public override string ToString() => $"[Controller: Type={Type}]";
     }
 }
 
