@@ -52,18 +52,11 @@ namespace Isop.Implementations
             return this;
         }
 
-        public IAppHostBuilder Recognize(Type arg, bool ignoreGlobalUnMatchedParameters = false)
+        public IAppHostBuilder Recognize(Type arg)
         {
-            _recognizes.Recognizes.Add(new Controller(arg, ignoreGlobalUnMatchedParameters));
+            _recognizes.Recognizes.Add(new Controller(arg));
             return this;
         }
-        public IAppHostBuilder Recognize(object arg, bool ignoreGlobalUnMatchedParameters = false)
-        {
-            var type = arg.GetType();
-            _recognizes.Recognizes.Add(new Controller(type, ignoreGlobalUnMatchedParameters));
-            return this;
-        }
-
         /// <summary>
         /// Build instance of app host.
         /// </summary>

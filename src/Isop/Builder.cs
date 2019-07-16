@@ -40,9 +40,7 @@ namespace Isop
                 serviceCollection.AddSingleton(Options.Create(configuration));
             }
             var recognizes = new RecognizesBuilder();
-            recognizes.Recognizes.Add(new Controller(
-                ignoreGlobalUnMatchedParameters: true, 
-                type: typeof(HelpController)));
+            recognizes.Recognizes.Add(new Controller(type: typeof(HelpController)));
             return new MicrosoftExtensionsDependencyInjectionBuilder(serviceCollection, recognizes);
         }
 
@@ -61,9 +59,7 @@ namespace Isop
         public static IAppHostBuilder Create(IServiceProvider serviceProvider)
         {
             var recognizes = new RecognizesBuilder();
-            recognizes.Recognizes.Add(new Controller(
-                ignoreGlobalUnMatchedParameters: true, 
-                type: typeof(HelpController)));
+            recognizes.Recognizes.Add(new Controller(type: typeof(HelpController)));
             return new ServiceProviderAppHostBuilder(serviceProvider, recognizes);
         }
     }

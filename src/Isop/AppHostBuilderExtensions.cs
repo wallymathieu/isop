@@ -9,15 +9,14 @@ namespace Isop
     public static class AppHostBuilderExtensions
     {
         /// <summary>
-        /// Add 
+        /// Recognize <see cref="T"/> as controller
         /// </summary>
         /// <param name="build"></param>
-        /// <param name="ignoreGlobalUnMatchedParameters"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static IAppHostBuilder Recognize<T>(this IAppHostBuilder build, bool ignoreGlobalUnMatchedParameters = false)
+        public static IAppHostBuilder Recognize<T>(this IAppHostBuilder build)
         {
-            return build.Recognize(typeof(T), ignoreGlobalUnMatchedParameters);
+            return build.Recognize(typeof(T));
         }
         /// <summary>
         /// 

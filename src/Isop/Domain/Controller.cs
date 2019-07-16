@@ -13,11 +13,9 @@ namespace Isop.Domain
 
     public class Controller
     {
-
-        public Controller(Type type, bool ignoreGlobalUnMatchedParameters)
+        public Controller(Type type)
         {
             Type = type;
-            IgnoreGlobalUnMatchedParameters = ignoreGlobalUnMatchedParameters;
         }
         public bool IgnoreGlobalUnMatchedParameters { get; }
         public Type Type { get; }

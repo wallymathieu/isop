@@ -42,17 +42,8 @@ namespace Isop.Abstractions
         /// 
         /// </summary>
         /// <param name="arg"></param>
-        /// <param name="ignoreGlobalUnMatchedParameters"></param>
         /// <returns></returns>
-        IAppHostBuilder Recognize(Type arg, bool ignoreGlobalUnMatchedParameters = false);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="arg"></param>
-        /// <param name="ignoreGlobalUnMatchedParameters"></param>
-        /// <returns></returns>
-        IAppHostBuilder Recognize(object arg, bool ignoreGlobalUnMatchedParameters = false);
+        IAppHostBuilder Recognize(Type arg);
 
         /// <summary>
         /// Build instance of app host.
