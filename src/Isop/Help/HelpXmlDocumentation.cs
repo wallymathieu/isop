@@ -11,7 +11,7 @@ namespace Isop.Help
 {
     internal class HelpXmlDocumentation
     {
-        public static IDictionary<string, string> GetSummariesFromText(string text)
+        private static IDictionary<string, string> GetSummariesFromText(string text)
         {
             var xml = new XmlDocument();
             xml.LoadXml(text);
@@ -64,7 +64,8 @@ namespace Isop.Help
             return GetKey(method.DeclaringType, method);
         }
         private static readonly Regex GetOrSet = new Regex("^(get|set)_", RegexOptions.IgnoreCase);
-        public static string GetKey(Type t, MethodInfo method)
+
+        private static string GetKey(Type t, MethodInfo method)
         {
             if (GetOrSet.IsMatch(method.Name))
                 return string.Format(CultureInfo.InvariantCulture, "P:{0}.{1}", GetFullName(t), method.Name.Substring(4));
@@ -76,7 +77,8 @@ namespace Isop.Help
         {
             return string.Join(",", parameters.Select(p => p.ParameterType.FullName).ToArray());
         }
-        public static string GetKey(Type t)
+
+        private static string GetKey(Type t)
         {
             return "T:" + GetFullName(t);
         }

@@ -35,7 +35,8 @@ namespace Isop.Help
         }
 
         private readonly Type[] _onlyStringType = { typeof(string) };
-        public string Description(Controller t, Method method, bool includeArguments)
+
+        private string Description(Controller t, Method method, bool includeArguments)
         {
             var description = t.Type.GetTypeInfo().GetMethods()
                 .SingleOrDefault(m => m.ReturnType == typeof(string)

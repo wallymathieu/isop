@@ -15,8 +15,10 @@ namespace Isop.Help
         private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
         private readonly HelpForControllers _helpForClassAndMethod;
 
-        public HelpController(IOptions<Texts> texts, Recognizes recognizes,
-            IOptions<Configuration> config, IServiceProvider serviceProvider,
+        public HelpController(IOptions<Texts> texts, 
+            Recognizes recognizes,
+            IOptions<Configuration> config, 
+            IServiceProvider serviceProvider,
             IOptions<Conventions> conventions)
         {
             _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
