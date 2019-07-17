@@ -6,24 +6,12 @@ namespace Isop.CommandLine.Parse
     public abstract class ParsedArguments
     {
         private ParsedArguments(IReadOnlyCollection<RecognizedArgument> recognized, 
-            IReadOnlyCollection<UnrecognizedArgument> unrecognized, 
-            IReadOnlyCollection<Argument> globalArguments)
+            IReadOnlyCollection<UnrecognizedArgument> unrecognized)
         {
             Recognized = recognized;
             Unrecognized = unrecognized;
-            GlobalArguments = globalArguments;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="parsedArguments"></param>
-        private ParsedArguments(ParsedArguments parsedArguments)
-        {
-            GlobalArguments = parsedArguments.GlobalArguments;
-            Unrecognized = parsedArguments.Unrecognized;
-            Recognized = parsedArguments.Recognized;
-        }
         /// <summary>
         /// Recognized arguments
         /// </summary>
@@ -33,9 +21,7 @@ namespace Isop.CommandLine.Parse
         /// Unrecognized arguments
         /// </summary>
         public IReadOnlyCollection<UnrecognizedArgument> Unrecognized { get; }
-
-        public IReadOnlyCollection<Argument> GlobalArguments { get; }
-
+        
         public ParsedArguments Merge(ParsedArguments args)
         {
             return Merge(this, args);
@@ -46,29 +32,6 @@ namespace Isop.CommandLine.Parse
             return new Merged(first, second);
         }
 
-        public IEnumerable<Argument> UnMatchedRequiredArguments()
-        {
-            var unMatchedRequiredArguments = GlobalArguments
-                .Where(argumentWithOptions => argumentWithOptions.Required)
-                .Where(argumentWithOptions => !Recognized
-                                                   .Any(recogn => recogn.Argument.Equals(argumentWithOptions)));
-            return unMatchedRequiredArguments;
-        }
-
-        public void AssertFailOnUnMatched()
-        {
-            var unMatchedRequiredArguments = UnMatchedRequiredArguments();
-
-            if (unMatchedRequiredArguments.Any())
-            {
-                throw new MissingArgumentException("Missing arguments")
-                          {
-                              Arguments = unMatchedRequiredArguments
-                                  .Select(unmatched =>unmatched.Name)
-                                  .ToArray()
-                          };
-            }
-        }
 
         /// <summary>
         /// A combination of two parsed arguments instances
@@ -86,9 +49,8 @@ namespace Isop.CommandLine.Parse
 
             internal Merged(ParsedArguments first, ParsedArguments second) 
                 : base(
-                    globalArguments:first.GlobalArguments.Union(second.GlobalArguments).ToArray(),
-                    recognized:first.Recognized.Union(second.Recognized).ToArray(),
-                    unrecognized:first.Unrecognized.Intersect(second.Unrecognized).ToArray()
+                    unrecognized:first.Unrecognized.Intersect(second.Unrecognized).ToArray(),
+                    recognized:first.Recognized.Union(second.Recognized).ToArray()
                 )
             {
                 First = first;
@@ -97,11 +59,10 @@ namespace Isop.CommandLine.Parse
         }
         public class Method : ParsedArguments
         {
-            public Method(ParsedArguments parsedArguments,
-                Type recognizedClass,
+            public Method(Type recognizedClass,
                 Domain.Method recognizedAction,
                 IEnumerable<object> recognizedActionParameters)
-                : base(parsedArguments)
+                : base(new RecognizedArgument[0],new UnrecognizedArgument[0])
             {
                 RecognizedClass = recognizedClass;
                 RecognizedAction = recognizedAction;
@@ -115,8 +76,8 @@ namespace Isop.CommandLine.Parse
 
         public class Default : ParsedArguments
         {
-            public Default(IEnumerable<RecognizedArgument> recognizedArguments, IEnumerable<UnrecognizedArgument> unrecognizedArguments, IEnumerable<Argument> globalArguments) 
-                : base(recognizedArguments.ToArray(), unrecognizedArguments.ToArray(), globalArguments.ToArray())
+            public Default(IEnumerable<RecognizedArgument> recognizedArguments, IEnumerable<UnrecognizedArgument> unrecognizedArguments) 
+                : base(recognizedArguments.ToArray(), unrecognizedArguments.ToArray())
             {
             }
         }

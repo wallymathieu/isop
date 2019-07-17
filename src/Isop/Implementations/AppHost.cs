@@ -24,16 +24,18 @@ namespace Isop.Implementations
         internal readonly IServiceProvider ServiceProvider;
         internal readonly ControllerRecognizer ControllerRecognizer;
         internal readonly IOptions<Conventions> Conventions;
-        private readonly IOptions<Configuration> _options;
+        internal readonly IOptions<Configuration> Configuration;
+        internal readonly TypeConverter TypeConverter;
         private HelpController _helpController;
         private readonly IOptions<Texts> _texts;
         
+
         internal HelpController HelpController =>
             _helpController??(_helpController = ServiceProvider.GetService<HelpController>() ?? 
                                                 new HelpController(
                                                     _texts,
                                                     Recognizes,
-                                                    _options,
+                                                    Configuration,
                                                     ServiceProvider,
                                                     Conventions));
 
@@ -49,14 +51,17 @@ namespace Isop.Implementations
             IOptions<Conventions> conventions)
         {
             Formatter = formatter;
-            _options = options ?? Options.Create(new Configuration());
+            Configuration = options ?? Options.Create(new Configuration());
             Recognizes = recognizes;
             ServiceProvider = serviceProvider;
             Conventions = conventions?? Options.Create(new Conventions());
+            TypeConverter = typeConverter;
             ControllerRecognizer = new ControllerRecognizer(options,
-                typeConverter, Conventions);
+                typeConverter, Conventions, Recognizes);
             _texts = texts ?? Options.Create(new Texts());
         }
+
+
         /// <summary>
         /// Parse command line arguments and return parsed arguments entity
         /// </summary>
@@ -65,25 +70,21 @@ namespace Isop.Implementations
         private IParsedExpression Parse(IReadOnlyCollection<string> arg)
         {
             var argumentParser = new ArgumentParser(
-                Recognizes.Properties.Select(p=>p.ToArgument(_options.Value.CultureInfo)).ToArray(),
+                Recognizes.Properties.Select(p=>p.ToArgument(Configuration.Value.CultureInfo)).ToArray(),
                 AllowInferParameter);
             var lexed = ArgumentLexer.Lex(arg).ToList();
             var parsedArguments = argumentParser.Parse(lexed, arg);
-            if (Recognizes.Controllers.Any())
+            if (ControllerRecognizer.TryRecognize(arg, out var controllerAndMethodAndTokens))
             {
-                var recognizedController = Recognizes.Controllers
-                    .FirstOrDefault(controller => ControllerRecognizer.Recognize(controller, arg));
-                if (null != recognizedController)
-                {
-                    return new ParsedExpression(ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, arg, parsedArguments), this);
-                }
+                var (controller, method, lexedForController) = controllerAndMethodAndTokens;
+                return new ParsedExpression(parsedArguments.Merge(ControllerRecognizer.Parse(controller, method, lexedForController, arg)), this);
             }
-            parsedArguments.AssertFailOnUnMatched();
+            //TODO: parsedArguments.AssertFailOnUnMatched();
             return new ParsedExpression(parsedArguments, this);
         }
         
-        internal bool AllowInferParameter => !(_options.Value?.DisableAllowInferParameter ?? false);
-        internal CultureInfo CultureInfo => _options.Value?.CultureInfo;
+        internal bool AllowInferParameter => !(Configuration.Value?.DisableAllowInferParameter ?? false);
+        internal CultureInfo CultureInfo => Configuration.Value?.CultureInfo;
         /// <summary>
         /// Return help-text
         /// </summary>

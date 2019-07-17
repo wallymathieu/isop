@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -147,7 +148,7 @@ namespace Tests
             Assert.Throws<MissingArgumentException>(() => Builder.Create()
                 .Parameter("beta", required: true)
                 .BuildAppHost()
-                .Parse(new[] { "-a", "value" }));
+                .Parse(new[] { "-a", "value" }).Invoke(Console.Out));
 
         [Test]
         public void It_can_recognize_arguments()

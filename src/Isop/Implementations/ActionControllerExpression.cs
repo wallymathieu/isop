@@ -1,49 +1,74 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Isop.Infrastructure;
 
 namespace Isop.Implementations
 {
     using Abstractions;
     using CommandLine;
     using CommandLine.Parse;
+    using Infrastructure;
 
     internal class ActionControllerExpression:IActionControllerExpression
     {
         private readonly string _controllerName;
         private readonly string _actionName;
         private readonly AppHost _appHost;
+        private readonly ConvertArgumentsToParameterValue _convertArguments;
 
         internal ActionControllerExpression(string controllerName, string actionName, AppHost appHost)
         {
             _controllerName = controllerName;
             _actionName = actionName;
             _appHost = appHost;
+            _convertArguments = new ConvertArgumentsToParameterValue(_appHost.Configuration,_appHost.TypeConverter);
         }
+
         public IReadOnlyCollection<Argument> GetArguments() =>
-            _appHost.Recognizes.Controllers.SingleOrDefault(r => r.Recognize(_appHost.Conventions.Value, _controllerName, _actionName))
-                ?.GetMethod(_appHost.Conventions.Value,_actionName).GetArguments(_appHost.CultureInfo).ToArray() ?? throw new ArgumentException($"Controller: {_controllerName}, method: {_actionName}");
+            _appHost.ControllerRecognizer.TryFind(_controllerName, _actionName, out var controllerAndMethod)
+                ? controllerAndMethod.Item2.GetArguments(_appHost.CultureInfo).ToArray()
+                : throw new ArgumentException($"Controller: {_controllerName}, method: {_actionName}");
         public IParsedExpression Parameters(Dictionary<string, string> parameters)
         {
-            var argumentParser = new ArgumentParser(_appHost.Recognizes.Properties
-                .Select(p=>p.ToArgument(_appHost.CultureInfo)).ToArray(), _appHost.AllowInferParameter);
-            var parsedArguments = argumentParser.Parse(parameters);
-            if (_appHost.Recognizes.Controllers.Any())
+            var valuePairs = parameters.ToArray();
+            var unrecognizedArguments = new List<UnrecognizedArgument>();
+            var recognizedArguments = new List<RecognizedArgument>();
+            for (int index = 0; index < valuePairs.Length; index++)
             {
-                var recognizedController = _appHost.Recognizes.Controllers
-                    .FirstOrDefault(controller => controller.Recognize(_appHost.Conventions.Value, _controllerName, _actionName));
-                if (null != recognizedController)
+                var current = valuePairs[index];
+                var prop = _appHost.Recognizes.Properties.FirstOrDefault(p => p.Name.EqualsIgnoreCase(current.Key));
+                if (prop != null)
                 {
-                    return new ParsedExpression( _appHost.ControllerRecognizer.ParseArgumentsAndMerge(recognizedController, _actionName, parameters, parsedArguments), _appHost);
+                    recognizedArguments.Add(new RecognizedArgument(
+                        prop.ToArgument(_appHost.CultureInfo),
+                        index,
+                        current.Key,
+                        current.Value));
+                }
+                else
+                {
+                    unrecognizedArguments.Add(new UnrecognizedArgument
+                    {
+                        Value = current.Key, Index = index
+                    });
                 }
             }
-            parsedArguments.AssertFailOnUnMatched();
-            return new ParsedExpression(parsedArguments, _appHost);
+            
+            var parsedArguments = new ParsedArguments.Default(
+                unrecognizedArguments: unrecognizedArguments,
+                recognizedArguments: recognizedArguments
+            );
+            if (!_appHost.ControllerRecognizer.TryFind(_controllerName, _actionName, out var controllerAndMethod))
+                return new ParsedExpression(parsedArguments, _appHost);
+            var (controller, method) = controllerAndMethod;
+            var parametersForMethod = _convertArguments.GetParametersForMethod(method, parameters);
+            var parsedMethod = new ParsedArguments.Method(controller.Type, method, parametersForMethod);
+            return new ParsedExpression(
+                parsedMethod, _appHost);
+
         }
-        public string Help()
-        {
-            var helpController= _appHost.HelpController;
-            return (helpController.Index(_controllerName, _actionName) ?? String.Empty).Trim();
-        }
+        public string Help() => 
+            (_appHost.HelpController.Index(_controllerName, _actionName) ?? String.Empty).Trim();
     }
 }

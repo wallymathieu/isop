@@ -94,9 +94,8 @@ namespace Isop.CommandLine.Parse
                 .Select(v => new UnrecognizedArgument { Index = v.i, Value = v.value });
 
             return new ParsedArguments.Default(
-                globalArguments :_globalArguments.ToArray(),
-                recognizedArguments : recognized,
-                unrecognizedArguments : unRecognizedArguments
+                unrecognizedArguments : unRecognizedArguments,
+                recognizedArguments : recognized
             );
         }
 
@@ -144,9 +143,8 @@ namespace Isop.CommandLine.Parse
 
             }
             return new ParsedArguments.Default(
-                globalArguments : _globalArguments.ToArray(),
-                recognizedArguments : recognized,
-                unrecognizedArguments : unRecognizedArguments
+                unrecognizedArguments : unRecognizedArguments,
+                recognizedArguments : recognized
             );
 
         }

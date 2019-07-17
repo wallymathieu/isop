@@ -27,7 +27,7 @@ namespace Tests
             public Func<Argument, string> OnAction { get; set; }
             public string Action(Argument a) { return OnAction(a); }
         }
-        [Test,Ignore("Brown")]
+        [Test]
         public void It_can_parse_class_and_method_with_object_and_execute()
         {
             var count = 0;

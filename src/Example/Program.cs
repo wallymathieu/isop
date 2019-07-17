@@ -11,7 +11,7 @@ namespace Example
     /// </summary>
     class Program
     {
-        static async Task Main(string[] args)
+        static async Task<int> Main(string[] args)
         {
             var appHost = Builder
                 .Create(new Configuration
@@ -23,36 +23,44 @@ namespace Example
                 .BuildAppHost();
             try
             {
-                var parsedMethod = appHost.Parse(args);
-                if (parsedMethod.Unrecognized.Any())//Warning:
+                var parsed = appHost.Parse(args);
+                if (parsed.Unrecognized.Any()) //Warning:
                 {
-                    var unRecognizedArgumentsMessage = $@"Unrecognized arguments: 
-{string.Join(",", parsedMethod.Unrecognized.Select(arg => arg.Value).ToArray())}
+                    await Console.Error.WriteLineAsync($@"Unrecognized arguments: 
+{string.Join(",", parsed.Unrecognized.Select(arg => arg.Value).ToArray())}
 Did you mean any of these arguments?
-{string.Join(",", parsedMethod.GlobalArguments.Select(rec => rec.Name).ToArray())}";
-                    Console.WriteLine(unRecognizedArgumentsMessage);
-                }else
-                {
-                    await parsedMethod.InvokeAsync(Console.Out);
+{string.Join(",", parsed.PotentialArguments.Select(a => a.Name).ToArray())}");
                 }
+
+                await parsed.InvokeAsync(Console.Out);
             }
             catch (TypeConversionFailedException ex)
             {
-                
-                 Console.WriteLine(
-                     $"Could not convert argument {ex.Argument} with value {ex.Value} to type {ex.TargetType}");
-                 if (null!=ex.InnerException)
-                 {
-                     Console.WriteLine("Inner exception: ");
-                     Console.WriteLine(ex.InnerException.Message);
-                 }
+
+                await Console.Error.WriteLineAsync(
+                    $"Could not convert argument {ex.Argument} with value {ex.Value} to type {ex.TargetType}");
+                if (null != ex.InnerException)
+                {
+                    await Console.Error.WriteLineAsync("Inner exception: ");
+                    await Console.Error.WriteLineAsync(ex.InnerException.Message);
+                }
+
+                return 400;
             }
             catch (MissingArgumentException ex)
             {
-                Console.WriteLine($"Missing argument(s): {String.Join(", ", ex.Arguments).ToArray()}");
-                
-                Console.WriteLine(appHost.Help());
+                await Console.Error.WriteLineAsync($"Missing argument(s): {String.Join(", ", ex.Arguments).ToArray()}");
+
+                await Console.Error.WriteLineAsync(appHost.Help());
+                return 400;
             }
+            catch (Exception ex)
+            {
+                await Console.Error.WriteLineAsync(ex.Message);
+                return 500;
+            }
+
+            return 0;
         }
     }
 }

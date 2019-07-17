@@ -8,11 +8,10 @@ namespace Isop.CommandLine
     using Domain;
     internal static class FindMethodAmongLexedTokens
     {
-        public static Method FindMethod(IEnumerable<Method> methods, String methodName, IEnumerable<Token> lexed)
+        public static Method FindMethod(ILookup<string, Method> methods, String methodName, IEnumerable<Token> lexed)
         {
-            var potential = methods
-                .Where(method => method.Name.EqualsIgnoreCase(methodName))
-                .ToArray();
+            if (!methods.Contains(methodName)) return null;
+            var potential = methods[methodName].ToArray();
             var potentialMethod = potential
                 .Where(method => method.GetParameters().Length <= lexed.Count(t => t.TokenType == TokenType.Parameter))
                 .OrderByDescending(method => method.GetParameters().Length)

@@ -21,7 +21,6 @@ namespace Isop.Domain
         }
         public string Name => _methodInfo.Name;
         public MethodInfo MethodInfo => _methodInfo;
-        public Controller Controller{ get; internal set;}
         public Parameter[] GetParameters() => _methodInfo.GetParameters().Select(p => new Parameter(p)).ToArray();
         public async Task<IEnumerable> Invoke(object instance, object[] values){
             if (instance==null) throw new ArgumentNullException(nameof(instance));

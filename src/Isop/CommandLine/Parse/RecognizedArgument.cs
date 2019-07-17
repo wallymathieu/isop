@@ -21,12 +21,12 @@ namespace Isop.CommandLine.Parse
 
         public bool InferredOrdinal { get; set; }
 
-        public RecognizedArgument(Argument argumentWithOptions, int index, string argument, string value = null)
+        public RecognizedArgument(Argument argument, int index, string rawArgument, string value = null)
         {
             Index = index;
             Value = value;
-            Argument = argumentWithOptions;
-            RawArgument = argument;
+            Argument = argument;
+            RawArgument = rawArgument;
         }
         public override int GetHashCode()
         {

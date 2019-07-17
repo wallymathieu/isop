@@ -21,9 +21,9 @@ namespace Isop.Abstractions
         /// </summary>
         IReadOnlyCollection<UnrecognizedArgument> Unrecognized { get; }
         /// <summary>
-        /// Global arguments
+        /// Potential arguments
         /// </summary>
-        IReadOnlyCollection<Argument> GlobalArguments { get; }
+        IReadOnlyCollection<Argument> PotentialArguments { get; }
         /// <summary>
         /// Invoke using parameters
         /// </summary>
