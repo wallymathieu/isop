@@ -27,9 +27,7 @@ namespace Example
                 if (parsed.Unrecognized.Any()) //Warning:
                 {
                     await Console.Error.WriteLineAsync($@"Unrecognized arguments: 
-{string.Join(",", parsed.Unrecognized.Select(arg => arg.Value).ToArray())}
-Did you mean any of these arguments?
-{string.Join(",", parsed.PotentialArguments.Select(a => a.Name).ToArray())}");
+{string.Join(",", parsed.Unrecognized.Select(arg => arg.Value).ToArray())}");
                 }
 
                 await parsed.InvokeAsync(Console.Out);

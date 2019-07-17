@@ -20,20 +20,20 @@ namespace Isop.Implementations
 
         public IReadOnlyCollection<UnrecognizedArgument> Unrecognized => _parsedArguments.Unrecognized;
         
-        public IReadOnlyCollection<Argument> PotentialArguments=>new Argument[0];//todo: Fix
-        
         public ParsedExpression(ParsedArguments parsedArguments, AppHost appHost)
         {
             _parsedArguments = parsedArguments;
             _appHost = appHost;
             _argumentInvoker = new ArgumentInvoker(_appHost.ServiceProvider, _appHost.Recognizes, _appHost.HelpController);
         }
-        private IEnumerable<Property> UnMatchedRequiredArguments()
+        private IEnumerable<string> UnMatchedRequiredArguments()
         {
             var unMatchedRequiredArguments = _appHost.Recognizes.Properties
-                .Where(argumentWithOptions => argumentWithOptions.Required)
-                .Where(argumentWithOptions => !Recognized
-                    .Any(recognizedArgument => recognizedArgument.Argument.Name.EqualsIgnoreCase(argumentWithOptions.Name)));
+                .Where(property => property.Required)
+                .Where(property => !Recognized
+                    .Any(recognizedArgument => recognizedArgument.Argument.Name.EqualsIgnoreCase(property.Name)))
+                .Select(unmatched =>unmatched.Name);
+            // TODO: Controller methods
             return unMatchedRequiredArguments;
         }
 
@@ -46,8 +46,6 @@ namespace Isop.Implementations
                 throw new MissingArgumentException("Missing arguments")
                 {
                     Arguments = unMatchedRequiredArguments
-                        .Select(unmatched =>unmatched.Name)
-                        .ToArray()
                 };
             }
         }

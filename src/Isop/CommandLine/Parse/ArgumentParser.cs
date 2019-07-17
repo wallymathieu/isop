@@ -86,7 +86,7 @@ namespace Isop.CommandLine.Parse
                 }
             }
 
-            var argumentList = arguments.ToList();
+            var argumentList = arguments.ToList(); //TODO: Should use lexed
 
             var unRecognizedArguments = argumentList
                 .Select((value, i) => new { i, value })
@@ -117,36 +117,6 @@ namespace Isop.CommandLine.Parse
                                    argumentWithOptions.Name,
                                    current.Value) { InferredOrdinal = true });
             }
-        }
-
-        public ParsedArguments Parse(Dictionary<string, string> arg)
-        {
-            var recognized = new List<RecognizedArgument>();
-            var unRecognizedArguments = new List<UnrecognizedArgument>();
-            var index = 0;
-            foreach (var current in arg)
-            {
-                var argumentWithOptions = _globalArguments
-                        .SingleOrDefault(argopt => Accept(argopt, current.Key));
-
-
-                if (null == argumentWithOptions)
-                {
-                    unRecognizedArguments.Add(new UnrecognizedArgument { Value = current.Key, Index = index++ });
-                    continue;
-                }
-                recognized.Add(new RecognizedArgument(
-                            argumentWithOptions,
-                            index++,
-                            current.Key,
-                            current.Value));
-
-            }
-            return new ParsedArguments.Default(
-                unrecognizedArguments : unRecognizedArguments,
-                recognizedArguments : recognized
-            );
-
         }
 
         private bool Accept(Argument argument, string value)

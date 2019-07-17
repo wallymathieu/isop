@@ -66,7 +66,6 @@ namespace Isop.Implementations
             var parsedMethod = new ParsedArguments.Method(controller.Type, method, parametersForMethod);
             return new ParsedExpression(
                 parsedMethod, _appHost);
-
         }
         public string Help() => 
             (_appHost.HelpController.Index(_controllerName, _actionName) ?? String.Empty).Trim();

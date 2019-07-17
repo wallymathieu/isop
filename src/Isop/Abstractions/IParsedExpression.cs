@@ -20,10 +20,7 @@ namespace Isop.Abstractions
         /// Unrecognized arguments
         /// </summary>
         IReadOnlyCollection<UnrecognizedArgument> Unrecognized { get; }
-        /// <summary>
-        /// Potential arguments
-        /// </summary>
-        IReadOnlyCollection<Argument> PotentialArguments { get; }
+        // TODO: IReadOnlyCollection<Argument> PotentialArguments { get; }
         /// <summary>
         /// Invoke using parameters
         /// </summary>
