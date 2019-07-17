@@ -41,7 +41,7 @@ namespace Tests
                     .BuildAppHost()
                     .Parse(new[] { "MyFile", "Action", "--file", "myfile.txt" });
 
-                Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
+                Assert.That(arguments.Unrecognized.Select(u=>u.Value).ToArray(), Is.Empty);
                 arguments.Invoke(new StringWriter());
                 Assert.True(filename.Contains("myfile.txt"));
             }

@@ -178,14 +178,14 @@ namespace Tests
         {
             var count = 0;
             var sc = new ServiceCollection();
-            sc.AddSingleton(ci => new WithIndexController() { OnIndex = (p1, p2, p3, p4) => (count++).ToString() });
+            sc.AddSingleton(ci => new WithIndexController { OnIndex = (p1, p2, p3, p4) => (count++).ToString() });
 
             var arguments = Builder.Create(sc)
                                 .Recognize(typeof(WithIndexController))
                                 .BuildAppHost()
                                 .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
-            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
+            Assert.That(arguments.Unrecognized.Select(u=>u.Value), Is.Empty);
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
@@ -226,7 +226,7 @@ namespace Tests
                                                    .BuildAppHost()
                                                    .Parse(new[] { "WithEnum", /*"Index", */"--value", pair.value });
 
-                Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
+                Assert.That(arguments.Unrecognized.Select(u=>u.Value), Is.Empty);
                 arguments.Invoke(new StringWriter());
                 Assert.That(parameters, Is.EquivalentTo(new[] { pair.expected }));
             }

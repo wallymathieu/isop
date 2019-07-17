@@ -7,7 +7,7 @@ namespace Isop.CommandLine.Parse
 
     public class RecognizedArgument
     {
-        public int Index { get; }
+        public int[] Index { get; }
 
         /// <summary>
         /// the matched value if any, for instance the "value" of the expression "--argument value"
@@ -21,7 +21,7 @@ namespace Isop.CommandLine.Parse
 
         public bool InferredOrdinal { get; set; }
 
-        public RecognizedArgument(Argument argument, int index, string rawArgument, string value = null)
+        public RecognizedArgument(Argument argument, int[] index, string rawArgument, string value = null)
         {
             Index = index;
             Value = value;

@@ -29,6 +29,8 @@ namespace Isop.Domain
         public object DefaultValue => _parameter.DefaultValue;
 
         public bool IsFile() => _parameter.ParameterType == typeof(FileStream);
+
+        internal bool HasDefaultValue() => _parameter.HasDefaultValue;
     }
 }
 

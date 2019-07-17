@@ -19,13 +19,13 @@ namespace Tests
         {
             var count = 0;
             var sc = new ServiceCollection();
-            sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
+            sc.AddSingleton(ci => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
 
             var arguments = Builder.Create(sc).Recognize<MyController>()
                                 .BuildAppHost()
                                 .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
-            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
+            Assert.That(arguments.Unrecognized.Count, Is.EqualTo(0));
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
@@ -35,7 +35,7 @@ namespace Tests
         {
             var count = 0;
             var sc = new ServiceCollection();
-            sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
+            sc.AddSingleton(ci => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
             var arguments = Builder.Create(sc).Recognize<MyController>()
                             .BuildAppHost()
                             .Parse(new[] { "My", "Action", "value1", "value2", "3", "3.4" });
@@ -65,7 +65,9 @@ namespace Tests
             var builder = Builder.Create().Recognize<MyController>()
                 .BuildAppHost();
 
-            Assert.Throws<MissingArgumentException>(() => builder.Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" }));
+            Assert.Throws<MissingArgumentException>(() => builder
+                .Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" })
+                .Invoke(Console.Out));
         }
 
         [Test]
@@ -74,7 +76,9 @@ namespace Tests
             var builder = Builder.Create().Recognize<MyController>()
                 .BuildAppHost();
 
-            Assert.Throws<MissingArgumentException>(() => builder.Parse(new[] { "My", "Action" }));
+            Assert.Throws<MissingArgumentException>(() => builder
+                .Parse(new[] { "My", "Action" })
+                .Invoke(Console.Out));
         }
     }
 }

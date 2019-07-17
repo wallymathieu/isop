@@ -73,14 +73,13 @@ namespace Isop.Implementations
                 Recognizes.Properties.Select(p=>p.ToArgument(Configuration.Value.CultureInfo)).ToArray(),
                 AllowInferParameter);
             var lexed = ArgumentLexer.Lex(arg).ToList();
-            var parsedArguments = argumentParser.Parse(lexed, arg);
-            if (ControllerRecognizer.TryRecognize(arg, out var controllerAndMethodAndTokens))
-            {
-                var (controller, method, lexedForController) = controllerAndMethodAndTokens;
-                return new ParsedExpression(parsedArguments.Merge(ControllerRecognizer.Parse(controller, method, lexedForController, arg)), this);
-            }
-            //TODO: parsedArguments.AssertFailOnUnMatched();
-            return new ParsedExpression(parsedArguments, this);
+            var parsedGlobalArgs = argumentParser.Parse(lexed, arg);
+            if (!ControllerRecognizer.TryRecognize(arg, out var controllerAndMethodAndTokens))
+                return new ParsedExpression(parsedGlobalArgs, this);
+            
+            var (controller, method) = controllerAndMethodAndTokens;
+            return new ParsedExpression(parsedGlobalArgs.Merge(
+                ControllerRecognizer.Parse(controller, method, arg)), this);
         }
         
         internal bool AllowInferParameter => !(Configuration.Value?.DisableAllowInferParameter ?? false);

@@ -19,27 +19,37 @@ namespace Isop.CommandLine
             _typeConverter = typeConverter?? throw new ArgumentNullException(nameof(typeConverter));
         }
 
-        public IEnumerable<object> GetParametersForMethod(Method method,
-            IReadOnlyCollection<KeyValuePair<string,string>> parsedArguments)
+        public bool TryGetParametersForMethod(Method method,
+            IReadOnlyCollection<KeyValuePair<string,string>> parsedArguments, out IReadOnlyCollection<object> parameters, out IReadOnlyCollection<string> missingParameters)
         {
             var parameterInfos = method.GetParameters();
-            var parameters = new List<object>();
-
+            var _parameters = new List<object>();
+            var missing = new List<string>();
             foreach (var paramInfo in parameterInfos)
             {
                 if (paramInfo.IsClassAndNotString() && !paramInfo.IsFile())
                 {
-                    parameters.Add(CreateObjectFromArguments(parsedArguments, paramInfo));
+                    _parameters.Add(CreateObjectFromArguments(parsedArguments, paramInfo));
                 }
                 else
                 {
                     var recognizedArgument = parsedArguments.Where(a => a.Key.EqualsIgnoreCase(paramInfo.Name)).ToArray();
-                    parameters.Add(!recognizedArgument.Any()
-                        ? paramInfo.DefaultValue
-                        : ConvertFrom(recognizedArgument.Single(), paramInfo.ParameterType));
+                    if (!recognizedArgument.Any() && !paramInfo.HasDefaultValue())
+                    {
+                        missing.Add(paramInfo.Name);
+                    }
+                    else
+                    {
+                        _parameters.Add(!recognizedArgument.Any()
+                            ? paramInfo.DefaultValue
+                            : ConvertFrom(recognizedArgument.Single(), paramInfo.ParameterType));
+                    }
                 }
             }
-            return parameters;
+
+            parameters = missing.Any() ? null: _parameters;
+            missingParameters = missing.Any() ? missing : null;
+            return !missing.Any();
         }
 
         private object CreateObjectFromArguments(IReadOnlyCollection<KeyValuePair<string,string>> parsedArguments, Parameter paramInfo)

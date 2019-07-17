@@ -44,7 +44,7 @@ namespace Isop.CommandLine
 
         private CultureInfo Culture => _configuration?.Value?.CultureInfo;
 
-        public bool TryRecognize(IEnumerable<string> arg, out (Controller,Method,IReadOnlyList<Token>) controllerAndMethodAndToken)
+        public bool TryRecognize(IEnumerable<string> arg, out (Controller,Method) controllerAndMethod)
         {
             var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(_conventions,ArgumentLexer.Lex(arg).ToList());
             if (_controllerActionMap.TryGetValue(lexed.ElementAtOrDefault(0).Value,
@@ -54,11 +54,11 @@ namespace Isop.CommandLine
                 var method = FindMethodAmongLexedTokens.FindMethod(methodMap, lexed.ElementAtOrDefault(1).Value, lexed);
                 if (method != null)
                 {
-                    controllerAndMethodAndToken = (controller, method, lexed);
+                    controllerAndMethod = (controller, method);
                     return true;
                 }
             }
-            controllerAndMethodAndToken = default;
+            controllerAndMethod = default;
             return false;
         }
 
@@ -80,7 +80,7 @@ namespace Isop.CommandLine
             return false;
         }
 
-        public ParsedArguments Parse(Controller controller, Method method, IReadOnlyList<Token> controllerLexed, IReadOnlyCollection<string> arg)
+        public ParsedArguments Parse(Controller controller, Method method, IReadOnlyCollection<string> arg)
         {
             var argumentRecognizers = method.GetArguments(Culture)
                 .ToList();
@@ -88,17 +88,21 @@ namespace Isop.CommandLine
                 new Argument(parameter: ArgumentParameter.Parse("#0" + controller.GetName(_conventions), Culture), required: true),
                 new Argument(parameter: ArgumentParameter.Parse("#1" + method.Name, Culture), required: false)
             });
-
+            var controllerLexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(_conventions,ArgumentLexer.Lex(arg).ToList());
             var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter);
             var parsedArguments = parser.Parse(controllerLexed, arg);
 
-            var recognizedActionParameters = _convertArgument.GetParametersForMethod(method,
+            if (! _convertArgument.TryGetParametersForMethod(method, 
                 parsedArguments.Recognized
-                .Select(a => new KeyValuePair<string,string>(a.RawArgument, a.Value))
-                .ToArray());
-
+                    .Select(a => new KeyValuePair<string,string>(a.RawArgument, a.Value))
+                    .ToArray(), out var recognizedActionParameters, out var missingParameters))
+                return new ParsedArguments.MethodMissingArguments(
+                    missingParameters: missingParameters,
+                    recognizedClass: controller.Type,
+                    recognizedAction: method);
             return new ParsedArguments.Method(
-                recognizedActionParameters: recognizedActionParameters,
+                recognizedActionParameters: recognizedActionParameters, 
+                recognized: parsedArguments.Recognized,
                 recognizedClass: controller.Type,
                 recognizedAction: method);
         }

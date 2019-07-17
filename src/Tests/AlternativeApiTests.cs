@@ -27,7 +27,7 @@ namespace Tests
             .Action("Action")
             .Parameters(new Dictionary<string, string> { { "param1", "value1" }, { "param2", "value2" }, { "param3", "3" }, { "param4", "3.4" } });
 
-            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
+            Assert.That(arguments.Unrecognized.Select(u=>u.Value), Is.Empty);
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }

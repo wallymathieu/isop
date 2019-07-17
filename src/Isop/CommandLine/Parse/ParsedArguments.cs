@@ -5,33 +5,10 @@ namespace Isop.CommandLine.Parse
 {
     public abstract class ParsedArguments
     {
-        private ParsedArguments(IReadOnlyCollection<RecognizedArgument> recognized, 
-            IReadOnlyCollection<UnrecognizedArgument> unrecognized)
-        {
-            Recognized = recognized;
-            Unrecognized = unrecognized;
-        }
-
-        /// <summary>
-        /// Recognized arguments
-        /// </summary>
-        public IReadOnlyCollection<RecognizedArgument> Recognized { get; }
-
-        /// <summary>
-        /// Unrecognized arguments
-        /// </summary>
-        public IReadOnlyCollection<UnrecognizedArgument> Unrecognized { get; }
-        
         public ParsedArguments Merge(ParsedArguments args)
         {
-            return Merge(this, args);
+            return new Merged(this, args);
         }
-
-        private static ParsedArguments Merge(ParsedArguments first, ParsedArguments second)
-        {
-            return new Merged(first, second);
-        }
-
 
         /// <summary>
         /// A combination of two parsed arguments instances
@@ -48,54 +25,82 @@ namespace Isop.CommandLine.Parse
             public readonly ParsedArguments Second;
 
             internal Merged(ParsedArguments first, ParsedArguments second) 
-                : base(
-                    unrecognized:first.Unrecognized.Intersect(second.Unrecognized).ToArray(),
-                    recognized:first.Recognized.Union(second.Recognized).ToArray()
-                )
             {
                 First = first;
                 Second = second;
             }
         }
+
+        public class MethodMissingArguments : ParsedArguments
+        {
+            public Type RecognizedClass { get; }
+            public Domain.Method RecognizedAction { get; }
+            public IReadOnlyCollection<string> MissingParameters { get; }
+
+            public MethodMissingArguments(Type recognizedClass,
+                Domain.Method recognizedAction,
+                IReadOnlyCollection<string> missingParameters)
+            {
+                RecognizedClass = recognizedClass;
+                RecognizedAction = recognizedAction;
+                MissingParameters = missingParameters;
+            }
+        }
+
         public class Method : ParsedArguments
         {
             public Method(Type recognizedClass,
                 Domain.Method recognizedAction,
-                IEnumerable<object> recognizedActionParameters)
-                : base(new RecognizedArgument[0],new UnrecognizedArgument[0])
+                IEnumerable<object> recognizedActionParameters,
+                IEnumerable<RecognizedArgument> recognized)
             {
                 RecognizedClass = recognizedClass;
                 RecognizedAction = recognizedAction;
+                Recognized = recognized;
                 RecognizedActionParameters = recognizedActionParameters.ToArray();
             }
 
             public Type RecognizedClass { get; }
             public Domain.Method RecognizedAction { get; }
+            public IEnumerable<RecognizedArgument> Recognized { get; }
             public IReadOnlyCollection<object> RecognizedActionParameters { get; }
         }
 
-        public class Default : ParsedArguments
+        public class Properties : ParsedArguments
         {
-            public Default(IEnumerable<RecognizedArgument> recognizedArguments, IEnumerable<UnrecognizedArgument> unrecognizedArguments) 
-                : base(recognizedArguments.ToArray(), unrecognizedArguments.ToArray())
+            /// <summary>
+            /// Recognized arguments
+            /// </summary>
+            public IReadOnlyCollection<RecognizedArgument> Recognized { get; }
+
+            /// <summary>
+            /// Unrecognized arguments
+            /// </summary>
+            public IReadOnlyCollection<UnrecognizedArgument> Unrecognized { get; }
+            public Properties(IReadOnlyCollection<RecognizedArgument> recognized, 
+                IReadOnlyCollection<UnrecognizedArgument> unrecognized)
             {
+                Recognized = recognized;
+                Unrecognized = unrecognized;
             }
         }
 
         /// <summary>
         /// Map from <see cref="ParsedArguments"/> to <see cref="T"/>.
         /// </summary>
-        public T Select<T>(Func<Method, T> method, Func<Merged, T> merged, Func<Default, T> @default)
+        public T Select<T>(Func<Method, T> method, Func<Merged, T> merged, Func<Properties, T> properties, Func<MethodMissingArguments,T> methodMissingArguments)
         {
             switch (this)
             {
                 case Method pm: return method(pm);
                 case Merged m: return merged(m);
-                case Default d: return @default(d);
+                case Properties d: return properties(d);
+                case MethodMissingArguments e: return methodMissingArguments(e);
                 default:
                     throw new Exception("Unimplemented switch case");
             }
         }
+
     }
 }
 

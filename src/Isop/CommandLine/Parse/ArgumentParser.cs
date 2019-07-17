@@ -18,7 +18,7 @@ namespace Isop.CommandLine.Parse
             _allowInferParameter = allowInferParameter;
         }
 
-        public ParsedArguments Parse(IReadOnlyList<Token> lexed, IReadOnlyCollection<string> arguments)
+        public ParsedArguments.Properties Parse(IReadOnlyList<Token> lexed, IReadOnlyCollection<string> arguments)
         {
             var recognizedIndexes = new List<int>();
             var peekTokens = new PeekEnumerable<Token>(lexed);
@@ -48,7 +48,7 @@ namespace Isop.CommandLine.Parse
                             recognizedIndexes.Add(current.Index);
                             recognized.Add(new RecognizedArgument(
                                         argumentWithOptions,
-                                        current.Index,
+                                        new []{current.Index},
                                         current.Value));
                         }
                         break;
@@ -60,10 +60,12 @@ namespace Isop.CommandLine.Parse
                             if (null == argumentWithOptions)
                                 continue;
                             string value;
+                            var indexes = new List<int>(){current.Index};
                             recognizedIndexes.Add(current.Index);
                             if (peekTokens.Peek().TokenType == TokenType.ParameterValue)
                             {
                                 var paramValue = peekTokens.Next();
+                                indexes.Add(paramValue.Index);
                                 recognizedIndexes.Add(paramValue.Index);
                                 value = paramValue.Value;
                             }
@@ -74,7 +76,7 @@ namespace Isop.CommandLine.Parse
 
                             recognized.Add(new RecognizedArgument(
                                         argumentWithOptions,
-                                        current.Index,
+                                        indexes.ToArray(),
                                         current.Value,
                                         value));
                         }
@@ -93,9 +95,9 @@ namespace Isop.CommandLine.Parse
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
                 .Select(v => new UnrecognizedArgument { Index = v.i, Value = v.value });
 
-            return new ParsedArguments.Default(
-                unrecognizedArguments : unRecognizedArguments,
-                recognizedArguments : recognized
+            return new ParsedArguments.Properties(
+                unrecognized: unRecognizedArguments.ToArray(),
+                recognized : recognized.ToArray()
             );
         }
 
@@ -113,7 +115,7 @@ namespace Isop.CommandLine.Parse
                 recognizedIndexes.Add(current.Index);
                 recognized.Add(new RecognizedArgument(
                                    argumentWithOptions,
-                                   current.Index,
+                                   new []{current.Index},
                                    argumentWithOptions.Name,
                                    current.Value) { InferredOrdinal = true });
             }

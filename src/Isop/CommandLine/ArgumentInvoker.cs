@@ -41,7 +41,8 @@ namespace Isop.CommandLine
             using (var scope = _serviceProvider.CreateScope())
             {
                 return await parsedArguments.Select<Task<IEnumerable>>(
-                    @default: async args =>
+                    methodMissingArguments: empty=>Task.FromResult<IEnumerable>(Enumerable.Empty<object>()),
+                    properties: async args =>
                     {
                         var enumerable = args.Recognized
                             .SelectMany(Choose);

@@ -16,9 +16,42 @@ namespace Isop.Implementations
         private readonly ParsedArguments _parsedArguments;
         private readonly AppHost _appHost;
         private readonly ArgumentInvoker _argumentInvoker;
-        public IReadOnlyCollection<RecognizedArgument> Recognized => _parsedArguments.Recognized;
+        public IReadOnlyCollection<RecognizedArgument> Recognized
+        {
+            get
+            {
+                IReadOnlyCollection<RecognizedArgument> Recognized(ParsedArguments parsedArguments)
+                {
+                    return parsedArguments.Select(
+                        properties: properties => properties.Recognized,
+                        merged: merged => Recognized(merged.First).Union(Recognized(merged.Second)).ToArray(),
+                        method: method => method.Recognized.ToArray(),
+                        methodMissingArguments: methodMissingArgs=>new RecognizedArgument[0]
+                    );
+                }
+                
+                return Recognized(_parsedArguments);
+            }
+        }
 
-        public IReadOnlyCollection<UnrecognizedArgument> Unrecognized => _parsedArguments.Unrecognized;
+        public IReadOnlyCollection<UnrecognizedArgument> Unrecognized {
+            get
+            {
+                IReadOnlyCollection<UnrecognizedArgument> GetPotentiallyUnrecognized(ParsedArguments parsedArguments)
+                {
+                    return parsedArguments.Select(
+                        properties: properties => properties.Unrecognized,
+                        merged: merged => GetPotentiallyUnrecognized(merged.First).Union(GetPotentiallyUnrecognized(merged.Second)).ToArray(),
+                        method: method => new UnrecognizedArgument[0],
+                        methodMissingArguments: missingArgs=>new UnrecognizedArgument[0]
+                    );
+                }
+
+                var potentiallyUnrecognized = GetPotentiallyUnrecognized(_parsedArguments);
+                var recognized = new HashSet<int>(Recognized.SelectMany(r=>r.Index)); 
+                return potentiallyUnrecognized.Where(unrecognized => !recognized.Contains(unrecognized.Index)).ToArray();
+            }
+        }
         
         public ParsedExpression(ParsedArguments parsedArguments, AppHost appHost)
         {
