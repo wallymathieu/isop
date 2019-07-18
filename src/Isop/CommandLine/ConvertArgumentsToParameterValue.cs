@@ -23,13 +23,13 @@ namespace Isop.CommandLine
             IReadOnlyCollection<KeyValuePair<string,string>> parsedArguments, out IReadOnlyCollection<object> parameters, out IReadOnlyCollection<string> missingParameters)
         {
             var parameterInfos = method.GetParameters();
-            var _parameters = new List<object>();
+            var parameterValues = new List<object>();
             var missing = new List<string>();
             foreach (var paramInfo in parameterInfos)
             {
                 if (paramInfo.IsClassAndNotString() && !paramInfo.IsFile())
                 {
-                    _parameters.Add(CreateObjectFromArguments(parsedArguments, paramInfo));
+                    parameterValues.Add(CreateObjectFromArguments(parsedArguments, paramInfo));
                 }
                 else
                 {
@@ -40,14 +40,14 @@ namespace Isop.CommandLine
                     }
                     else
                     {
-                        _parameters.Add(!recognizedArgument.Any()
+                        parameterValues.Add(!recognizedArgument.Any()
                             ? paramInfo.DefaultValue
                             : ConvertFrom(recognizedArgument.Single(), paramInfo.ParameterType));
                     }
                 }
             }
 
-            parameters = missing.Any() ? null: _parameters;
+            parameters = missing.Any() ? null: parameterValues;
             missingParameters = missing.Any() ? missing : null;
             return !missing.Any();
         }

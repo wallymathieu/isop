@@ -93,7 +93,7 @@ namespace Isop.CommandLine.Parse
             var unRecognizedArguments = argumentList
                 .Select((value, i) => new { i, value })
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
-                .Select(v => new UnrecognizedArgument { Index = v.i, Value = v.value });
+                .Select(v => new UnrecognizedArgument(v.i, v.value));
 
             return new ParsedArguments.Properties(
                 unrecognized: unRecognizedArguments.ToArray(),

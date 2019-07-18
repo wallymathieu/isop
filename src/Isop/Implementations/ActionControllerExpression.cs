@@ -49,10 +49,7 @@ namespace Isop.Implementations
                 }
                 else
                 {
-                    unrecognizedArguments.Add(new UnrecognizedArgument
-                    {
-                        Value = current.Key, Index = index
-                    });
+                    unrecognizedArguments.Add(new UnrecognizedArgument(index, current.Key));
                 }
             }
             

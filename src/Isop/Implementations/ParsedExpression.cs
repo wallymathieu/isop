@@ -59,32 +59,37 @@ namespace Isop.Implementations
             _appHost = appHost;
             _argumentInvoker = new ArgumentInvoker(_appHost.ServiceProvider, _appHost.Recognizes, _appHost.HelpController);
         }
-        private IEnumerable<string> UnMatchedRequiredArguments()
+        private IEnumerable<string> MissingRequiredArguments()
         {
-            var unMatchedRequiredArguments = _appHost.Recognizes.Properties
+            var missingRequiredArguments = _appHost.Recognizes.Properties
                 .Where(property => property.Required)
                 .Where(property => !Recognized
                     .Any(recognizedArgument => recognizedArgument.Argument.Name.EqualsIgnoreCase(property.Name)))
-                .Select(unmatched =>unmatched.Name);
-            // TODO: Controller methods
-            return unMatchedRequiredArguments;
+                .Select(property =>property.Name);
+            IReadOnlyCollection<string> GetMissing(ParsedArguments parsedArguments)
+            {
+                return parsedArguments.Select(
+                    properties: properties => new string[0],
+                    merged: merged => GetMissing(merged.First).Union(GetMissing(merged.Second)).ToArray(),
+                    method: method => new string[0],
+                    methodMissingArguments: missingArgs=>missingArgs.MissingParameters
+                );
+            }
+            return missingRequiredArguments.Union(GetMissing(_parsedArguments));
         }
 
-        private void AssertFailOnUnMatched()
+        private void AssertFailOnMissing()
         {
-            var unMatchedRequiredArguments = UnMatchedRequiredArguments().ToArray();
-
-            if (unMatchedRequiredArguments.Any())
-            {
+            var missing = MissingRequiredArguments().ToArray();
+            if (missing.Any())
                 throw new MissingArgumentException("Missing arguments")
                 {
-                    Arguments = unMatchedRequiredArguments
+                    Arguments = missing
                 };
-            }
         }
         public async Task InvokeAsync(TextWriter output)
         {
-            AssertFailOnUnMatched();
+            AssertFailOnMissing();
             
             var result = await _argumentInvoker.Invoke(_parsedArguments);
             foreach (var item in result)

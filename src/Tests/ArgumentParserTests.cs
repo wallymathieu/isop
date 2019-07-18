@@ -115,8 +115,8 @@ namespace Tests
                .Parse(new[] { "-a", "value", "--beta" }).Unrecognized;
 
             Assert.That(unRecognizedArguments, Is.EquivalentTo(new[] {
-                new UnrecognizedArgument {Index = 0,Value = "-a"},
-                new UnrecognizedArgument {Index = 1,Value = "value" }
+                new UnrecognizedArgument(0,"-a"),
+                new UnrecognizedArgument(1,"value" )
             }));
         }
         [Test]
