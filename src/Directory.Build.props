@@ -6,7 +6,7 @@
     <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
     <FileVersion>$(VersionPrefix).0</FileVersion>
     <RepositoryUrl>https://github.com/wallymathieu/isop</RepositoryUrl>
-    <Description>Isop is a library to help simplify and structure command line apps. The Isop dll is used if you want to have your own console application. The Isop.Cli.exe and Isop.Wpf.exe (from the Isop.Runners package) if you dont care about implementing a 'Main' method.</Description>
+    <Description>Isop is a library to help simplify and structure command line apps.</Description>
     <Authors>Oskar Gewalli</Authors>
     <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/wallymathieu/isop</PackageProjectUrl>
