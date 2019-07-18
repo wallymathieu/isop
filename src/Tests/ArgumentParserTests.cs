@@ -114,9 +114,9 @@ namespace Tests
                .BuildAppHost()
                .Parse(new[] { "-a", "value", "--beta" }).Unrecognized;
 
-            Assert.That(unRecognizedArguments, Is.EquivalentTo(new[] {
-                new UnrecognizedArgument(0,"-a"),
-                new UnrecognizedArgument(1,"value" )
+            Assert.That(unRecognizedArguments.Select(unrecognized=>Tuple.Create(unrecognized.Index,unrecognized.Value)), Is.EquivalentTo(new[] {
+                Tuple.Create(0,"-a"),
+                Tuple.Create(1,"value" )
             }));
         }
         [Test]

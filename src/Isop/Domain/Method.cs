@@ -14,15 +14,12 @@ namespace Isop.Domain
     public class Method
     {
         private readonly MethodInfo _methodInfo;
-
-        public Method(MethodInfo methodInfo)
-        {
-            _methodInfo = methodInfo;
-        }
+        public Method(MethodInfo methodInfo) => _methodInfo = methodInfo;
         public string Name => _methodInfo.Name;
         public MethodInfo MethodInfo => _methodInfo;
         public Parameter[] GetParameters() => _methodInfo.GetParameters().Select(p => new Parameter(p)).ToArray();
-        public async Task<IEnumerable> Invoke(object instance, object[] values){
+        public async Task<IEnumerable> Invoke(object instance, object[] values)
+        {
             if (instance==null) throw new ArgumentNullException(nameof(instance));
             try
             {
@@ -76,33 +73,28 @@ namespace Isop.Domain
             {
                 if (parameterInfo.IsClassAndNotString() && !parameterInfo.IsFile())
                 {
-                    AddArgumentWithOptionsForPropertiesOnObject(recognizers, parameterInfo, cultureInfo);
+                    recognizers.AddRange(CreateArgumentsForInstanceProperties(parameterInfo, cultureInfo));
                 }
                 else
                 {
-                    var arg = GetArgumentWithOptions(parameterInfo, cultureInfo);
-                    recognizers.Add(arg);
+                    recognizers.Add(CreateArgument(parameterInfo, cultureInfo));
                 }
             }
             return recognizers;
         }
 
-        private static Argument GetArgumentWithOptions(Parameter parameterInfo, IFormatProvider cultureInfo)
-        {
-            return new Argument(required: parameterInfo.LooksRequired(),
+        private static Argument CreateArgument(Parameter parameterInfo, IFormatProvider cultureInfo) =>
+            new Argument(required: parameterInfo.LooksRequired(),
                 parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo));
-        }
 
-        private static void AddArgumentWithOptionsForPropertiesOnObject(List<Argument> recognizers,
-            Parameter parameterInfo, IFormatProvider cultureInfo)
-        {
-            recognizers.AddRange(parameterInfo.GetPublicInstanceProperties()
+        private static IEnumerable<Argument> CreateArgumentsForInstanceProperties(Parameter parameterInfo, IFormatProvider cultureInfo) =>
+            parameterInfo.GetPublicInstanceProperties()
                 .Select(prop => 
                     new Argument( 
                         required: parameterInfo.LooksRequired() && IsRequired(prop),
-                        parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo))));
-        }
-        public static bool IsRequired(PropertyInfo propertyInfo)
+                        parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo)));
+
+        private static bool IsRequired(PropertyInfo propertyInfo)
         {
             return propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();
         }

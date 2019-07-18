@@ -9,15 +9,11 @@ namespace Isop.Domain
     public class Parameter
     {
         private readonly ParameterInfo _parameter;
-        public Parameter(ParameterInfo parameter)
-        {
-            _parameter = parameter;
-        }
-        public bool IsClassAndNotString()
-        {
-            var t = _parameter.ParameterType;
-            return t.GetTypeInfo().IsClass && t != typeof(String);
-        }
+        public Parameter(ParameterInfo parameter) => _parameter = parameter;
+
+        public bool IsClassAndNotString() => 
+            _parameter.ParameterType.GetTypeInfo().IsClass && _parameter.ParameterType != typeof(string);
+
         public string Name => _parameter.Name;
         public Type ParameterType => _parameter.ParameterType;
 

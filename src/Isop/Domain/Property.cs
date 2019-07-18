@@ -7,37 +7,12 @@ namespace Isop.Domain
         public string Name { get; }
         public ArgumentAction Action { get; }
         public bool Required { get; }
-        public Property(string name, ArgumentAction action = null, bool required = false, string description = null)
+        public Property(string name, ArgumentAction action, bool required, string description)
         {
             Name = name;
             Action = action;
             Required = required;
             Description = description;
         }
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj is Property property && Equals(property);
-        }
-
-        public bool Equals(Property other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Equals(other.Description, Description) && Equals(other.Name, Name) && other.Required.Equals(Required);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int result = (Description != null ? Description.GetHashCode() : 0);
-                result = (result*397) ^ (Name != null ? Name.GetHashCode() : 0);
-                result = (result*397) ^ Required.GetHashCode();
-                return result;
-            }
-        }
-
     }
 }

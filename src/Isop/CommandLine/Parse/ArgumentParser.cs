@@ -117,13 +117,9 @@ namespace Isop.CommandLine.Parse
                                    argumentWithOptions,
                                    new []{current.Index},
                                    argumentWithOptions.Name,
-                                   current.Value) { InferredOrdinal = true });
+                                   current.Value,
+                                   inferredOrdinal:true));
             }
-        }
-
-        private bool Accept(Argument argument, string value)
-        {
-            return argument.Accept(value);
         }
     }
 }

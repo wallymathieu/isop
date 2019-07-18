@@ -1,10 +1,5 @@
-using System.Reflection;
-
 namespace Isop.CommandLine.Parse
 {
-    using Domain;
-    using Infrastructure;
-
     public class RecognizedArgument
     {
         public int[] Index { get; }
@@ -19,43 +14,15 @@ namespace Isop.CommandLine.Parse
         /// </summary>
         public string RawArgument { get; }
 
-        public bool InferredOrdinal { get; set; }
+        public bool InferredOrdinal { get; }
 
-        public RecognizedArgument(Argument argument, int[] index, string rawArgument, string value = null)
+        public RecognizedArgument(Argument argument, int[] index, string rawArgument, string value = null, bool inferredOrdinal =false)
         {
             Index = index;
             Value = value;
             Argument = argument;
             RawArgument = rawArgument;
-        }
-        public override int GetHashCode()
-        {
-            return RawArgument.GetHashCode() + Argument.GetHashCode() + (Value ?? "").GetHashCode() + 1794;
-        }
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(obj, null))
-                return false;
-            if (ReferenceEquals(obj, this))
-                return true;
-            var recognizedArgument = obj as RecognizedArgument;
-            if (recognizedArgument != null)
-            {
-                return RawArgument.Equals(recognizedArgument.RawArgument)
-                    && Argument.Equals(recognizedArgument.Argument)
-                    && string.Equals(Value, recognizedArgument.Value);
-            }
-            return false;
-        }
-
-        public bool Matches(Parameter paramInfo)
-        {
-            return RawArgument.EqualsIgnoreCase(paramInfo.Name);
-        }
-
-        public bool Matches(PropertyInfo prop)
-        {
-            return RawArgument.EqualsIgnoreCase(prop.Name);
+            InferredOrdinal = inferredOrdinal;
         }
     }
 }
