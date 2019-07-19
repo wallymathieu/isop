@@ -20,7 +20,6 @@ namespace Isop.CommandLine.Parse
 
         public ParsedArguments.Properties Parse(IReadOnlyList<Token> lexed, IReadOnlyCollection<string> arguments)
         {
-            var recognizedIndexes = new List<int>();
             var peekTokens = new PeekEnumerable<Token>(lexed);
             var encounteredParameter = false;
             IList<RecognizedArgument> recognized = new List<RecognizedArgument>();
@@ -31,23 +30,22 @@ namespace Isop.CommandLine.Parse
                 {
                     case TokenType.Argument:
                         {
-                            var argumentWithOptions = _globalArguments
-                               .SingleOrDefault(argopt => Accept(argopt, current.Index, current.Value));
+                            var argument = _globalArguments
+                               .SingleOrDefault(arg => Accept(arg, current.Index, current.Value));
 
-                            if (null == argumentWithOptions && !encounteredParameter && _allowInferParameter)
+                            if (null == argument && !encounteredParameter && _allowInferParameter)
                             {
-                                InferParameter(recognizedIndexes, recognized, current);
+                                InferParameter(recognized, current);
                                 continue;
                             }
 
-                            if (null == argumentWithOptions)
+                            if (null == argument)
                             {
                                 continue;
                             }
 
-                            recognizedIndexes.Add(current.Index);
                             recognized.Add(new RecognizedArgument(
-                                        argumentWithOptions,
+                                        argument,
                                         new []{current.Index},
                                         current.Value));
                         }
@@ -60,13 +58,11 @@ namespace Isop.CommandLine.Parse
                             if (null == argumentWithOptions)
                                 continue;
                             string value;
-                            var indexes = new List<int>(){current.Index};
-                            recognizedIndexes.Add(current.Index);
+                            var indexes = new List<int> {current.Index};
                             if (peekTokens.Peek().TokenType == TokenType.ParameterValue)
                             {
                                 var paramValue = peekTokens.Next();
                                 indexes.Add(paramValue.Index);
-                                recognizedIndexes.Add(paramValue.Index);
                                 value = paramValue.Value;
                             }
                             else
@@ -88,16 +84,25 @@ namespace Isop.CommandLine.Parse
                 }
             }
 
-            var argumentList = arguments.ToList(); //TODO: Should use lexed
+            // Inferred ordinal arguments should not be recognized twice
+            var minusDuplicates=
+                recognized
+                    .Where(argument =>
+                        !recognized.Any(otherArgument =>
+                            argument.InferredOrdinal &&
+                            !ReferenceEquals(argument, otherArgument) 
+                            && otherArgument.RawArgument.Equals(argument.RawArgument)))
+                .ToList();
+            var recognizedIndexes = minusDuplicates.SelectMany(token=>token.Index).ToList();
 
-            var unRecognizedArguments = argumentList
+            var unRecognizedArguments = arguments
                 .Select((value, i) => new { i, value })
                 .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
                 .Select(v => new UnrecognizedArgument(v.i, v.value));
 
             return new ParsedArguments.Properties(
                 unrecognized: unRecognizedArguments.ToArray(),
-                recognized : recognized.ToArray()
+                recognized : minusDuplicates.ToArray()
             );
         }
 
@@ -106,13 +111,12 @@ namespace Isop.CommandLine.Parse
             return argument.Accept(index, value);
         }
 
-        private void InferParameter(ICollection<int> recognizedIndexes, IList<RecognizedArgument> recognized, Token current)
+        private void InferParameter(IList<RecognizedArgument> recognized, Token current)
         {
             var argumentWithOptions = _globalArguments
                 .Where((argopt, i) => i == current.Index).SingleOrDefault();
             if (null != argumentWithOptions)
             {
-                recognizedIndexes.Add(current.Index);
                 recognized.Add(new RecognizedArgument(
                                    argumentWithOptions,
                                    new []{current.Index},

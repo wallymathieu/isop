@@ -47,7 +47,7 @@ namespace Tests
             parsed.Invoke(new StringWriter());
             Assert.That(countArg, Is.AtLeast(1));
         }
-        [Test,Ignore("Brown")]
+        [Test]
         public void It_will_only_execute_parameter_exactly_once()
         {
             parsed.Invoke(new StringWriter());

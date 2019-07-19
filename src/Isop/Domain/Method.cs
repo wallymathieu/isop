@@ -24,21 +24,21 @@ namespace Isop.Domain
             try
             {
                 var result = _methodInfo.Invoke(instance, values);
-                if (result is Task task)
-                {
-                    var taskResult = await RunTask(task);
-                    switch (taskResult)
-                    {
-                        case string _:
-                            return new []{taskResult};
-                        case IEnumerable taskEnumerable:
-                            return taskEnumerable;
-                        default:
-                            return new []{taskResult};
-                    }
-                }
                 switch (result)
                 {
+                    case Task task:
+                    {
+                        var taskResult = await RunTask(task);
+                        switch (taskResult)
+                        {
+                            case string _:
+                                return new []{taskResult};
+                            case IEnumerable taskEnumerable:
+                                return taskEnumerable;
+                            default:
+                                return new []{taskResult};
+                        }
+                    }
                     case string _:
                         return new []{result};
                     case IEnumerable enumerable:
@@ -52,7 +52,13 @@ namespace Isop.Domain
                     ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
                 }
                 throw;
-            }
+            }/*catch(AggregateException aex){ // perhaps?
+                if (aex.InnerException != null && aex.InnerExceptions.Count == 1)
+                {
+                    ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
+                }
+                throw;
+            }*/
         }
         async Task<object> RunTask(Task task)
         {
