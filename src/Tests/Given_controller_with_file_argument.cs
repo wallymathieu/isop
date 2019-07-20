@@ -45,6 +45,7 @@ namespace Tests
                         Console.Error.WriteLine($"Tried to delete file {ex.Message}");
                     }
                 }
+                files.Clear();
             }
         }
         
