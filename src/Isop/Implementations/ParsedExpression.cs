@@ -90,11 +90,15 @@ namespace Isop.Implementations
         public async Task InvokeAsync(TextWriter output)
         {
             AssertFailOnMissing();
-            
-            var result = await _argumentInvoker.Invoke(_parsedArguments);
-            foreach (var item in result)
+            foreach (var result in _argumentInvoker.Invoke(_parsedArguments))
             {
-                var formatted = _appHost.Formatter.Invoke(item);
+                var item = (Result)await result;
+                var formatted = await item.Select(
+                    argument: arg => Task.FromResult(_appHost.Formatter(arg.Result)),
+                    asyncControllerAction: async ca => _appHost.Formatter(await ca.Task),
+                    controllerAction: ca => Task.FromResult(_appHost.Formatter(ca.Result)),
+                    empty: e => Task.FromResult(Enumerable.Empty<string>())
+                );
                 foreach (var str in formatted) await output.WriteLineAsync(str);
             }
         }

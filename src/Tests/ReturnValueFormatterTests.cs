@@ -53,7 +53,7 @@ namespace Tests
             Assert.That(Split(writer.ToString()), Is.EquivalentTo(Split("First\tSecond\n0\tV0\n")));
         }
 
-        [Test, Ignore("Brown")]
+        [Test]
         public void It_can_format_ienumerable_objects_as_table()
         {
             var count = 0;

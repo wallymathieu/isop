@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Isop.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Isop.CommandLine
@@ -11,6 +12,7 @@ namespace Isop.CommandLine
     using Parse;
     using Domain;
     using Isop.Help;
+    using Infrastructure;
     
     public class ArgumentInvoker
     {
@@ -29,52 +31,53 @@ namespace Isop.CommandLine
             _helpController = helpController;
         }
 
-        public async Task<IEnumerable> Invoke(ParsedArguments parsedArguments)
+        public IEnumerable<Task<IResult>> Invoke(ParsedArguments parsedArguments)
         {
-            IEnumerable<Task<object>> Choose(RecognizedArgument arg)
+            IEnumerable<Task<IResult>> ChooseArgument(RecognizedArgument arg)
             {
                 return RecognizesMap.Contains(arg.Argument.Name) 
-                    ? RecognizesMap[arg.Argument.Name].Select(action => action(arg.Value)) 
-                    : Enumerable.Empty<Task<object>>();
+                    ? RecognizesMap[arg.Argument.Name].Select(async action => 
+                        (IResult)new Result.Argument( await action(arg.Value)))
+                    : Enumerable.Empty<Task<IResult>>();
             }
-
+            async Task<object> RunTask(Task task)
+            {
+                await task;
+                var type = task.GetType();
+                if (!type.IsGenericType)
+                {
+                    return null;
+                }
+                return type.GetProperty("Result")?.GetValue(task) ;
+            }
             using (var scope = _serviceProvider.CreateScope())
             {
-                return await parsedArguments.Select<Task<IEnumerable>>(
-                    methodMissingArguments: empty=>Task.FromResult<IEnumerable>(Enumerable.Empty<object>()),
-                    properties: async args =>
+                var tasks = parsedArguments.Select(
+                    methodMissingArguments: empty=>new[]{Task.FromResult<IResult>(new Result.Empty())},
+                    properties: args =>
                     {
                         var enumerable = args.Recognized
-                            .SelectMany(Choose);
-                        return await Task.WhenAll(enumerable);
+                            .SelectMany(ChooseArgument);
+                        return enumerable;
                     },
-                    merged: async merged => 
-                        Join(await Invoke(merged.First), await Invoke(merged.Second)),
-                    method: method =>
-                    {
-                        var instance = scope.ServiceProvider.GetService(method.RecognizedClass);
-                        if (instance==null && method.RecognizedClass == typeof(HelpController))
-                        {
-                            instance = _helpController;
-                        }
+                    merged: merged => Invoke(merged.First).Concat(Invoke(merged.Second)),
+                            method: method =>
+                            {
+                                var instance = scope.ServiceProvider.GetService(method.RecognizedClass);
+                                if (instance==null && method.RecognizedClass == typeof(HelpController))
+                                {
+                                    instance = _helpController;
+                                }
                         
-                        if (ReferenceEquals(null, instance))
-                            throw new Exception($"Unable to resolve {method.RecognizedClass.Name}");
-                        return method.RecognizedAction.Invoke(instance,
-                            method.RecognizedActionParameters.ToArray());
-                    });
-            }
-        }
-
-        private static IEnumerable Join(IEnumerable first, IEnumerable second)
-        {
-            foreach (var item in first)
-            {
-                yield return item;
-            }
-            foreach (var item in second)
-            {
-                yield return item;
+                                if (ReferenceEquals(null, instance))
+                                    throw new Exception($"Unable to resolve {method.RecognizedClass.Name}");
+                                var result = method.RecognizedAction.Invoke(instance,
+                                    method.RecognizedActionParameters.ToArray());
+                                return new []{ Task.FromResult(result is Task task 
+                                    ? (IResult)new Result.AsyncControllerAction(RunTask(task))
+                                    : new Result.ControllerAction(result)) };
+                            });
+                return tasks;
             }
         }
     }

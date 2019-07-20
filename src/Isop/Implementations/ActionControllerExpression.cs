@@ -63,12 +63,12 @@ namespace Isop.Implementations
             if (!_convertArguments.TryGetParametersForMethod(method, parameters, out var parametersForMethod, out var missingParameters))
                 return new ParsedExpression(parsedArguments.Merge(new ParsedArguments.MethodMissingArguments(controller.Type,method,missingParameters)), _appHost);
             var paramMap = valuePairs
-                .Select(Tuple.Create<KeyValuePair<string, string>, int>)
-                .ToDictionary(t => t.Item1.Key, vp => vp);
+                .Select( (value,index)=>(value,index))
+                .ToDictionary(t => t.value.Key, vp => vp);
             var recognized = method.GetArguments(_appHost.CultureInfo)
                 .SelectMany(arg=> paramMap.TryGetValue(arg.Name, out var value) 
                     ? new[] {(arg, value)} 
-                    : new (Argument,Tuple<KeyValuePair<string,string>,int>)[0])
+                    : new (Argument,(KeyValuePair<string,string>,int))[0])
                 .Select(chosen=>
                 {
                     var (arg, value) = chosen;

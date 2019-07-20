@@ -8,7 +8,7 @@
     <RepositoryUrl>https://github.com/wallymathieu/isop</RepositoryUrl>
     <Description>Isop is a library to help simplify and structure command line apps.</Description>
     <Authors>Oskar Gewalli</Authors>
-    <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/wallymathieu/isop</PackageProjectUrl>
     <PackageTags>CLI;command line;commandline;argument;option;parser;parsing;library;syntax;shell</PackageTags>
   </PropertyGroup>

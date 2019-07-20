@@ -96,9 +96,9 @@ namespace Isop.CommandLine.Parse
             var recognizedIndexes = minusDuplicates.SelectMany(token=>token.Index).ToList();
 
             var unRecognizedArguments = arguments
-                .Select((value, i) => new { i, value })
-                .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
-                .Select(v => new UnrecognizedArgument(v.i, v.value));
+                .Select((value, i) => new { Index = i, Value = value })
+                .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.Index))
+                .Select(v => new UnrecognizedArgument(v.Index, v.Value));
 
             return new ParsedArguments.Properties(
                 unrecognized: unRecognizedArguments.ToArray(),
