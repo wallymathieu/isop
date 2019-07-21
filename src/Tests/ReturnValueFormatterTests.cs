@@ -1,11 +1,13 @@
 ﻿using System;
-using NUnit.Framework;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Isop;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
+using Tests.FakeControllers;
 
-namespace Isop.Tests
+namespace Tests
 {
     [TestFixture]
     public class ReturnValueFormatterTests
@@ -37,12 +39,15 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new ObjectController() { OnAction = () => new WithTwoProperties(count++) });
 
-            var arguments = new Build(sc) { typeof(ObjectController) }
-                .SetCulture(CultureInfo.InvariantCulture)
+            var arguments = Builder.Create(sc, new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture
+            }).Recognize( typeof(ObjectController) )
                 .FormatObjectsAsTable()
+                .BuildAppHost()
                 .Parse(new[] { "Object", "Action" });
 
-            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
             var writer = new StringWriter();
             arguments.Invoke(writer);
             Assert.That(Split(writer.ToString()), Is.EquivalentTo(Split("First\tSecond\n0\tV0\n")));
@@ -53,14 +58,17 @@ namespace Isop.Tests
         {
             var count = 0;
             var sc = new ServiceCollection();
-            sc.AddSingleton(ci => new ObjectController() { OnAction = () => new[] { new WithTwoProperties(count++), new WithTwoProperties(count++) } });
+            sc.AddSingleton(ci => new ObjectController { OnAction = () => new[] { new WithTwoProperties(count++), new WithTwoProperties(count++) } });
 
-            var arguments = new Build(sc) { typeof(ObjectController) }
-                .SetCulture(CultureInfo.InvariantCulture)
+            var arguments = Builder.Create(sc, new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture
+            }).Recognize(typeof(ObjectController))
                 .FormatObjectsAsTable()
+                .BuildAppHost()
                 .Parse(new[] { "Object", "Action" });
 
-            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
             var writer = new StringWriter();
             arguments.Invoke(writer);
             Assert.That(Split(writer.ToString()), Is.EquivalentTo(Split("First\tSecond\n0\tV0\n1\tV1\n")));

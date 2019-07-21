@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
+using Microsoft.Extensions.Options;
 
 namespace Isop.CommandLine
 {
@@ -10,132 +11,100 @@ namespace Isop.CommandLine
     using Lex;
     using Parse;
     using Domain;
-    using Microsoft.Extensions.DependencyInjection;
+    using Abstractions;
 
-    public class ControllerRecognizer
+    internal class ControllerRecognizer
     {
         private readonly bool _allowInferParameter;
-        private readonly Configuration _configuration;
-        private readonly Controller _controller;
-        private readonly IServiceCollection _typeContainer;
+        private readonly IOptions<Configuration> _configuration;
+        private readonly Conventions _conventions;
+        private readonly ConvertArgumentsToParameterValue _convertArgument;
         /// <summary>
+        /// controller name -> controller, action name -> action
         /// </summary>
-        public ControllerRecognizer(Controller controller,
-            Configuration configuration,
-            IServiceCollection typeContainer,
-            bool allowInferParameter = false)
+        private IDictionary<string, (Controller, ILookup<string, Method>)> _controllerActionMap;
+        
+        public ControllerRecognizer(
+            IOptions<Configuration> configuration,
+            TypeConverter typeConverterFunc, 
+            IOptions<Conventions> conventions,
+            Recognizes recognizes)
         {
-            _controller = controller;
             _configuration = configuration;
-            _allowInferParameter = allowInferParameter;
-            _typeContainer = typeContainer; 
+            _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
+            _allowInferParameter = ! (_configuration?.Value?.DisableAllowInferParameter??false);
+            _convertArgument = new ConvertArgumentsToParameterValue(configuration, typeConverterFunc);
+            _controllerActionMap = recognizes.Controllers
+                .ToDictionary(
+                    c => c.GetName(_conventions), 
+                    c => (c, c.GetControllerActionMethods(_conventions)
+                                    .ToLookup(m => m.Name, m => m, StringComparer.OrdinalIgnoreCase)), 
+                    StringComparer.OrdinalIgnoreCase);
         }
 
-        public IEnumerable<Argument> GetRecognizers(string methodname)
-        {//For tests mostly
-            return _controller.GetMethod(methodname).GetArguments();
-        }
+        private CultureInfo Culture => _configuration?.Value?.CultureInfo;
 
-        private CultureInfo Culture { get { return _configuration.CultureInfo ?? CultureInfo.CurrentCulture; } }
-
-        public bool Recognize(IEnumerable<string> arg)
+        public bool TryRecognize(IEnumerable<string> arg, out (Controller,Method) controllerAndMethod)
         {
-            var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
-            return null != FindMethodInfo(lexed);
-        }
-
-        private Method FindMethodInfo(IList<Token> arg)
-        {
-            var foundClassName = _controller.Name.EqualsIgnoreCase(arg.ElementAtOrDefault(0).Value);
-            if (foundClassName)
+            var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(_conventions,ArgumentLexer.Lex(arg).ToList());
+            if (_controllerActionMap.TryGetValue(lexed.ElementAtOrDefault(0).Value,
+                out var controllerAndMap))
             {
-                var methodName = arg.ElementAtOrDefault(1).Value;
-                var methodInfo = FindMethodAmongLexedTokens.FindMethod(_controller.GetControllerActionMethods(), methodName, arg);
-                return methodInfo;
+                var (controller,methodMap)= controllerAndMap;
+                var method = FindMethodAmongLexedTokens.FindMethod(methodMap, lexed.ElementAtOrDefault(1).Value, lexed);
+                if (method != null)
+                {
+                    controllerAndMethod = (controller, method);
+                    return true;
+                }
             }
-            return null;
+            controllerAndMethod = default;
+            return false;
         }
 
-        /// <summary>
-        /// Note that in order to register a converter you can use:
-        /// TypeDescriptor.AddAttributes(typeof(AType), new TypeConverterAttribute(typeof(ATypeConverter)));
-        /// </summary>
-        /// <param name="arg"></param>
-        /// <returns></returns>
-        public ParsedMethod Parse(IEnumerable<string> arg)
+        public bool TryFind(string controllerName, string actionName,
+            out (Controller, Method) controllerAndMethod)
         {
-            var lexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(ArgumentLexer.Lex(arg).ToList());
+            if (_controllerActionMap.TryGetValue(controllerName,
+                out var controllerAndMap))
+            {
+                var (controller,methodMap)= controllerAndMap;
+                var method = FindMethodAmongLexedTokens.FindMethod(methodMap, actionName, new Token[0]);
+                if (method != null)
+                {
+                    controllerAndMethod = (controller, method);
+                    return true;
+                }
+            }
+            controllerAndMethod = default;
+            return false;
+        }
 
-            var methodInfo = FindMethodInfo(lexed);
-
-            var argumentRecognizers = methodInfo.GetArguments()
+        public ParsedArguments Parse(Controller controller, Method method, IReadOnlyCollection<string> arg)
+        {
+            var argumentRecognizers = method.GetArguments(Culture)
                 .ToList();
             argumentRecognizers.InsertRange(0, new[] { 
-                new ArgumentWithOptions(ArgumentParameter.Parse("#0" + _controller.Name, Culture), required: true, type: typeof(string)),
-                new ArgumentWithOptions(ArgumentParameter.Parse("#1" + methodInfo.Name, Culture), required: false, type: typeof(string))
+                new Argument(parameter: ArgumentParameter.Parse("#0" + controller.GetName(_conventions), Culture), required: true),
+                new Argument(parameter: ArgumentParameter.Parse("#1" + method.Name, Culture), required: false)
             });
+            var controllerLexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(_conventions,ArgumentLexer.Lex(arg).ToList());
+            var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter);
+            var parsedArguments = parser.Parse(controllerLexed, arg);
 
-            var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter, Culture);
-            var parsedArguments = parser.Parse(lexed, arg);
-
-            return Parse(methodInfo, parsedArguments);
-        }
-
-        public ParsedMethod Parse(Method methodInfo, ParsedArguments parsedArguments)
-        {
-            var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments().ToArray();
-            if (unMatchedRequiredArguments.Any())
-            {
-                throw new MissingArgumentException("Missing arguments")
-                          {
-                              Arguments = unMatchedRequiredArguments
-                                .Select(unmatched => unmatched.Name).ToArray()
-                          };
-            }
-            var convertArgument = new ConvertArgumentsToParameterValue(_configuration.CultureInfo, _configuration.TypeConverter);
-            var recognizedActionParameters = convertArgument.GetParametersForMethod(methodInfo,
-                parsedArguments.RecognizedArgumentsAsKeyValuePairs());
-
-            return new ParsedMethod( parsedArguments, _typeContainer, _configuration)
-                       {
-                           RecognizedAction = methodInfo,
-                           RecognizedActionParameters = recognizedActionParameters,
-                           RecognizedClass = _controller.Type
-                       };
-        }
-
-        public ParsedArguments ParseArgumentsAndMerge(IEnumerable<string> arg, ParsedArguments parsedArguments)
-        {
-            var parsedMethod = Parse(arg);
-            // Inferred ordinal arguments should not be recognized twice
-            parsedArguments.RecognizedArguments = parsedArguments.RecognizedArguments
-                .Where(argopts =>
-                    !parsedMethod.RecognizedArguments.Any(pargopt => pargopt.Index == argopts.Index && argopts.InferredOrdinal));
-            var merged = parsedArguments.Merge(parsedMethod);
-            if (!_controller.IgnoreGlobalUnMatchedParameters)
-                merged.AssertFailOnUnMatched();
-            return merged;
-        }
-
-        public bool Recognize(string controllerName, string actionName)
-        {
-            return _controller.Recognize(controllerName, actionName);
-        }
-
-        public ParsedArguments ParseArgumentsAndMerge(string actionName, Dictionary<string, string> arg, ParsedArguments parsedArguments)
-        {
-
-            var methodInfo = _controller.GetMethod(actionName);
-            var argumentRecognizers = methodInfo.GetArguments()
-                .ToList();
-
-            var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter, Culture);
-            var parsedMethodArguments = parser.Parse(arg);
-            var parsedMethod = Parse(methodInfo, parsedMethodArguments);
-            var merged = parsedArguments.Merge(parsedMethod);
-            if (!_controller.IgnoreGlobalUnMatchedParameters)
-                merged.AssertFailOnUnMatched();
-            return merged;
+            if (! _convertArgument.TryGetParametersForMethod(method, 
+                parsedArguments.Recognized
+                    .Select(a => new KeyValuePair<string,string>(a.RawArgument, a.Value))
+                    .ToArray(), out var recognizedActionParameters, out var missingParameters))
+                return new ParsedArguments.MethodMissingArguments(
+                    missingParameters: missingParameters,
+                    recognizedClass: controller.Type,
+                    recognizedAction: method);
+            return new ParsedArguments.Method(
+                recognizedActionParameters: recognizedActionParameters, 
+                recognized: parsedArguments.Recognized,
+                recognizedClass: controller.Type,
+                recognizedAction: method);
         }
     }
 }

@@ -1,38 +1,38 @@
 ﻿using System;
+using System.Collections;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
 
 namespace Isop.Domain
 {
+    using CommandLine;
+    using CommandLine.Parse;
     public class Method
     {
         private readonly MethodInfo _methodInfo;
-
-        public Method(MethodInfo methodInfo)
+        public Method(MethodInfo methodInfo) => _methodInfo = methodInfo;
+        public string Name => _methodInfo.Name;
+        public MethodInfo MethodInfo => _methodInfo;
+        public Parameter[] GetParameters() => _methodInfo.GetParameters().Select(p => new Parameter(p)).ToArray();
+        public object Invoke(object instance, object[] values)
         {
-            _methodInfo = methodInfo;
-        }
-        public string Name{get{ return _methodInfo.Name;}}
-        public MethodInfo MethodInfo{get{ return _methodInfo;}}
-        public Controller Controller{ get; internal set;}
-        public Type ReturnType{get{ return _methodInfo.ReturnType;}}
-        public Parameter[] GetParameters(){
-            return _methodInfo.GetParameters().Select(p => new Parameter(p)).ToArray();
-        }
-        public object Invoke(object instance, object[] values){
             if (instance==null) throw new ArgumentNullException(nameof(instance));
-            try{
+            try
+            {
                 return _methodInfo.Invoke(instance, values);
             }catch(TargetInvocationException ex){
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                return null;
+                if (ex.InnerException != null)
+                {
+                    ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                }
+                throw;
             }
         }
-
-        public IEnumerable<Argument> GetArguments()
+        public IEnumerable<Argument> GetArguments(IFormatProvider cultureInfo)
         {
             var parameterInfos = GetParameters();
             var recognizers = new List<Argument>();
@@ -40,36 +40,29 @@ namespace Isop.Domain
             {
                 if (parameterInfo.IsClassAndNotString() && !parameterInfo.IsFile())
                 {
-                    AddArgumentWithOptionsForPropertiesOnObject(recognizers, parameterInfo);
+                    recognizers.AddRange(CreateArgumentsForInstanceProperties(parameterInfo, cultureInfo));
                 }
                 else
                 {
-                    var arg = GetArgumentWithOptions(parameterInfo);
-                    recognizers.Add(arg);
+                    recognizers.Add(CreateArgument(parameterInfo, cultureInfo));
                 }
             }
             return recognizers;
         }
 
-        private static Argument GetArgumentWithOptions(Parameter parameterInfo)
-        {
-            return new Argument(parameterInfo.Name,
-                required: parameterInfo.LooksRequired(),
-                type: parameterInfo.ParameterType);
-        }
+        private static Argument CreateArgument(Parameter parameterInfo, IFormatProvider cultureInfo) =>
+            new Argument(required: parameterInfo.LooksRequired(),
+                parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo));
 
-        private static void AddArgumentWithOptionsForPropertiesOnObject(List<Argument> recognizers, Parameter parameterInfo)
-        {
-            recognizers.AddRange(parameterInfo.GetPublicInstanceProperties()
+        private static IEnumerable<Argument> CreateArgumentsForInstanceProperties(Parameter parameterInfo, IFormatProvider cultureInfo) =>
+            parameterInfo.GetPublicInstanceProperties()
                 .Select(prop => 
-                    new Argument(prop.Name, 
-                        required: parameterInfo.LooksRequired() && IsRequired(prop), 
-                        type: prop.PropertyType)));
-        }
-        public static bool IsRequired(PropertyInfo propertyInfo)
-        {
-            return propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();
-        }
+                    new Argument( 
+                        required: parameterInfo.LooksRequired() && IsRequired(prop),
+                        parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo)));
+
+        private static bool IsRequired(PropertyInfo propertyInfo) => 
+            propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();
     }
 }
 

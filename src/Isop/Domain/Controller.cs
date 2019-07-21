@@ -13,86 +13,38 @@ namespace Isop.Domain
 
     public class Controller
     {
-        public Controller(Type type, bool ignoreGlobalUnMatchedParameters)
+        public Controller(Type type)
         {
             Type = type;
-            IgnoreGlobalUnMatchedParameters = ignoreGlobalUnMatchedParameters;
         }
-        public bool IgnoreGlobalUnMatchedParameters { get; private set; }
-        public Type Type
-        {
-            get;
-            set;
-        }
-        public string Name { get { return ControllerName(Type); } }
+        public Type Type { get; }
+        public string GetName(Conventions conventions) => 
+            Regex.Replace(Type.Name, conventions.ControllerName + "$", "", RegexOptions.IgnoreCase);
 
-        private static string ControllerName(Type type)
-        {
-            return Regex.Replace(type.Name, Conventions.ControllerName + "$", "", RegexOptions.IgnoreCase);
-        }
+        public IEnumerable<Method> GetControllerActionMethods(Conventions conventions) => 
+            GetControllerActionMethods(conventions, Type).Select(m => new Method(m));
 
-        public IEnumerable<Method> GetControllerActionMethods()
-        {
-            return GetControllerActionMethods(Type).Select(m => new Method(m) { Controller = this });
-        }
+        private static IEnumerable<MethodInfo> GetControllerActionMethods(Conventions conventions, Type type) =>
+            GetOwnPublicMethods(type)
+                .Where(m => !m.Name.EqualsIgnoreCase(conventions.Help));
 
-        private static IEnumerable<MethodInfo> GetControllerActionMethods(Type type)
-        {
-            return GetOwnPublicMethods(type)
-                .Where(m => !m.Name.EqualsIgnoreCase(Conventions.Help));
-        }
-
-        private static IEnumerable<MethodInfo> GetOwnPublicMethods(Type type)
-        {
-            return type.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+        private static IEnumerable<MethodInfo> GetOwnPublicMethods(Type type) =>
+            type.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .Where(m => m.DeclaringType != typeof(Object))
                 .Where(m => !m.Name.StartsWithIgnoreCase("get_")
-                    && !m.Name.StartsWithIgnoreCase("set_"))
-                ;
-        }
+                            && !m.Name.StartsWithIgnoreCase("set_"));
 
-        public bool Recognize(string controllerName)
-        {
-            return Name.EqualsIgnoreCase(controllerName);
-        }
+        public Method GetMethod(Conventions conventions, string name) => 
+            GetControllerActionMethods(conventions).SingleOrDefault(m => m.Name.EqualsIgnoreCase(name));
 
-        public bool Recognize(string controllerName, string actionName)
-        {
-            return Name.EqualsIgnoreCase(controllerName)
-                && GetMethod(actionName) != null;
-        }
-        
-        public Method GetMethod(string name)
-        {
-            return GetControllerActionMethods().SingleOrDefault(m => m.Name.EqualsIgnoreCase(name));
-        }
-        
-        public bool IsHelp()
-        {
-            return Type == typeof(HelpController); // Is there a better way to do this? 
-        }
-        
-        public override bool Equals(object obj)
-        {
-            var controller = obj as Controller;
-            if (controller != null)
-            {
-                return Equals(controller);
-            }
-            return false;
-        }
-        public bool Equals(Controller obj)
-        {
-            return Type == obj.Type;
-        }
-        public override int GetHashCode()
-        {
-            return Type.GetHashCode();
-        }
-        public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture, "[Controller: Type={0}, Name={1}]", Type, Name);
-        }
+        public bool IsHelp() => Type == typeof(HelpController);
+
+        public override bool Equals(object obj) => obj is Controller controller && Equals(controller);
+        public bool Equals(Controller obj) => Type == obj?.Type;
+
+        public override int GetHashCode() => Type.GetHashCode();
+
+        public override string ToString() => $"[Controller: Type={Type}]";
     }
 }
 

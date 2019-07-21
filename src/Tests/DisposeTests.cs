@@ -1,10 +1,11 @@
-using System;
 using System.Globalization;
 using System.IO;
-using Isop.Tests.FakeControllers;
+using Isop;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Tests.FakeControllers;
 
-namespace Isop.Tests
+namespace Tests
 {
 
     [TestFixture]
@@ -16,10 +17,12 @@ namespace Isop.Tests
             var count = 0;
             var c = new DisposeController();
             c.OnDispose += () => count++;
-
-            var build = new Build()
-                .SetCulture(CultureInfo.InvariantCulture)
-                .Recognize(c);
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton(c);
+            var build = Builder.Create(serviceCollection,new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture
+            }).Recognize(typeof(DisposeController)).BuildAppHost();
             build
                 .Parse(new[] { "Dispose", "method" })
                 .Invoke(new StringWriter());

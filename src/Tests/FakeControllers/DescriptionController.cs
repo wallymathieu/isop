@@ -1,4 +1,4 @@
-namespace Isop.Tests.FakeControllers
+namespace Tests.FakeControllers
 {
     internal class DescriptionController
     {

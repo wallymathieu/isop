@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
-using System.Globalization;
-using Isop.Infrastructure;
-using Isop.CommandLine.Parse.Parameters;
 using System.Collections.Generic;
 
 namespace Isop.CommandLine.Parse
 {
+    using Infrastructure;
+    using Parameters;
+
     /// <summary>
     /// Represents the parameter. For instance "file" of the commandline argument --file. 
     /// </summary>
@@ -20,13 +20,8 @@ namespace Isop.CommandLine.Parse
             Ordinal = ordinal;
         }
 
-        public string Prototype { get; protected set; }
-        public int? Ordinal { get; protected set; }
-
-        public static implicit operator ArgumentParameter(string value)
-        {
-            return Parse(value, CultureInfo.CurrentCulture);
-        }
+        public string Prototype { get; }
+        public int? Ordinal { get; }
 
         public static ArgumentParameter Parse(string value, IFormatProvider formatProvider)
         {
@@ -42,16 +37,12 @@ namespace Isop.CommandLine.Parse
             throw new ArgumentOutOfRangeException(value);
         }
 
-        public ICollection<string> Aliases { get; private set; }
-        public string Delimiter { get; protected set; }
+        public ICollection<string> Aliases { get; }
+        public string Delimiter { get; }
         public string Help()
         {
-            return string.Concat( 
-                "--", 
-                string.Join(", or ", Aliases), 
-                (string.IsNullOrEmpty(Delimiter)
-                    ? ""
-                    : " " + Delimiter));
+            return
+                $"--{string.Join(", or ", Aliases)}{(string.IsNullOrEmpty(Delimiter) ? "" : " " + Delimiter)}";
         }
         public override string ToString()
         {

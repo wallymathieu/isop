@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Isop.CommandLine.Parse.Parameters
 {
+    /// <summary>
+    /// Visual studio style parameter
+    /// </summary>
     public class VisualStudioParameter
     {
         /// <summary>

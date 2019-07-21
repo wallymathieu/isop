@@ -1,4 +1,5 @@
 # Isop [![Build Status](https://travis-ci.org/wallymathieu/isop.png?branch=isop)](https://travis-ci.org/wallymathieu/isop) [![Build status](https://ci.appveyor.com/api/projects/status/r4fbt9onjg3yfojv/branch/isop?svg=true)](https://ci.appveyor.com/project/wallymathieu/isop/branch/isop)
+
 ## The name
 
 Isop is the swedish name for hyssop. Like any spice it is intended to give flavor to the development of command line apps in .net. 
@@ -7,20 +8,25 @@ Isop is the swedish name for hyssop. Like any spice it is intended to give flavo
 
 The goal is to be able to write code like:
 
-```
+```powershell
 someprogram.exe My Action --argument value
 ```
 
 Or if you prefer:
-```
+
+```powershell
 someprogram.exe My Action /argument value
 ```
+
 Isop will also figure out what you mean if you write with an equals sign between argument and value:
-```
+
+```powershell
 someprogram.exe My Action --argument=value
 ```
+
 Or if you want to write it shorter you can skip the argument name:
-```
+
+```powershell
 someprogram.exe My Action value
 ```
 
@@ -52,17 +58,18 @@ MIT License
 ### Having your own Main
 
 You're hooking it up by writing something like:
+
 ```csharp
-static void Main(string[] args)
-{
-  new Build()
+static Task Main(string[] args)=>
+    Builder.Create()
        .Recognize(typeof(CustomerController))
+       .BuildAppHost()
        .Parse(args)
-       .Invoke(Console.Out);
-}
+       .InvokeAsync(Console.Out);
 ```
 
 Where your controller looks something like this:
+
 ```csharp
 public class MyController
 {
@@ -72,13 +79,14 @@ public class MyController
         _repository = new CustomerRepository();
     }
     public IEnumerable&lt;string&gt; Add(string name)
-    { 
+    {
         yield return "Starting to insert customer";
         _repository.Insert( new Customer{ Name = name } );
         yield return "Customer inserted";  
     }
 }
 ```
+
 When invoked it will output two lines to the command prompt, the yielded lines above.
 
 ### Handling errors and unrecognized parameters
@@ -86,35 +94,35 @@ When invoked it will output two lines to the command prompt, the yielded lines a
 ```csharp
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        var parserBuilder = new Build()
-                  .SetCulture(CultureInfo.GetCultureInfo("sv-SE"))
-                  .Recognize(typeof(CustomerController))
-                  .ShouldRecognizeHelp();
+        var appHost = Builder
+            .Create(new Configuration
+            {
+                CultureInfo = CultureInfo.GetCultureInfo("sv-SE")
+            })
+            .Recognize(typeof(CustomerController))
+            .BuildAppHost();
         try
         {
-            var parsedMethod = parserBuilder.Parse(args);
+            var parsedMethod = appHost.Parse(args);
             if (parsedMethod.UnRecognizedArguments.Any())//Warning:
             {
-                var unRecognizedArgumentsMessage = string.Format(
-@"Unrecognized arguments: 
-{0}
+                var unRecognizedArgumentsMessage = $@"Unrecognized arguments: 
+{string.Join(",", parsedMethod.UnRecognizedArguments.Select(arg => arg.Value).ToArray())}
 Did you mean any of these arguments?
-{1}", String.Join(",", parsedMethod.UnRecognizedArguments.Select(unrec => unrec.Value).ToArray()),
-  String.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Argument.ToString()).ToArray()));
+{string.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Name).ToArray())}";
                 Console.WriteLine(unRecognizedArgumentsMessage);
             }else
             {
-                parsedMethod.Invoke(Console.Out);
+                await parsedMethod.InvokeAsync(Console.Out);
             }
         }
         catch (TypeConversionFailedException ex)
         {
-            
-             Console.WriteLine(String.Format("Could not convert argument {0} with value {1} to type {2}", 
-                ex.Argument, ex.Value, ex.TargetType));
-             if (null!=ex.InnerException)
+            Console.WriteLine(
+                $"Could not convert argument {ex.Argument} with value {ex.Value} to type {ex.TargetType}");
+            if (null!=ex.InnerException)
             {
                 Console.WriteLine("Inner exception: ");
                 Console.WriteLine(ex.InnerException.Message);
@@ -122,69 +130,14 @@ Did you mean any of these arguments?
         }
         catch (MissingArgumentException ex)
         {
-            Console.WriteLine(String.Format("Missing argument(s): {0}",String.Join(", ",ex.Arguments.Select(a=>String.Format("{0}: {1}",a.Key,a.Value)).ToArray())));
-            
-            Console.WriteLine(parserBuilder.Help());
+            Console.WriteLine($"Missing argument(s): {String.Join(", ", ex.Arguments).ToArray()}");
+            Console.WriteLine(appHost.Help());
         }
-
     }
 }
 ```
 
 Why all this code? Mostly it's because I want the programmer to be able to have as much freedom as possible to handle errors and show error messages as he/she sees fit.
-
-### Using Isop.Auto.Cli.exe
-
-You're hooking it up by writing something like:
-```csharp
-class IsopConfiguration
-{
-    public IEnumerable<Type> Recognizes()
-    {
-        return new[] { typeof(CustomerController) };
-    }
-    public string Global { get; set; }
-    [Required]
-    public string GlobalRequired { get; set; }
-    public CultureInfo Culture
-    {
-        get{ return CultureInfo.GetCultureInfo("es-ES"); }
-    }
-    public bool RecognizeHelp{get{return true;}}
-    
-    public Func<Type, string, CultureInfo, object> GetTypeconverter()
-    {
-        return TypeConverter;
-    }
-}
-```
-
-This configuration will have a Global variable (that is, a parameter that can be set for any action). It will have a required global parameter (you must set that parameter in order to run any action). Note that you can insert your own type converter (how the strings will be converted to different values in the controller action parameters).
-
-Why enter culture code? Isop tries as much as possible to adhere to the user specified culturecode. This have some implications for people using sv-SE or any other culture where the standard date formatting does not fit.
-
-Isop uses constructor injection of `IServiceCollection` in order to be able to resolve the controllers.
-
-The same configuration class can be consumed by the fluent api: 
-
-```csharp
-static void Main(string[] args)
-{
-    var configuration = new IsopConfiguration();
-    new Build()
-      .Configuration(configuration)
-      .Parse(args)
-      .Invoke(Console.Out);
-}
-```
-
-You can invoke your program by running [isop.auto.cli](https://www.nuget.org/packages/Isop.Auto.Cli/) in the same folder as your dll or exe containing the above class:
-```
-isop Customer Add --name value
-```
-
-Look at the [Example Cli project](src/Example/Program.cs) for the most recent example of how it is used. 
-
 
 ## Alternative
 

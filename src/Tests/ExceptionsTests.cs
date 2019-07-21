@@ -1,9 +1,12 @@
 ﻿using System.Globalization;
 using System.IO;
 using System.Linq;
+using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-namespace Isop.Tests
+using Tests.FakeControllers;
+
+namespace Tests
 {
     [TestFixture]
     public class ExceptionsTests
@@ -18,11 +21,14 @@ namespace Isop.Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new ObjectController() { OnAction = () => throw new SpecificException() });
 
-            var arguments = new Build(sc) { typeof(ObjectController) }
-                                .SetCulture(CultureInfo.InvariantCulture)
-                                .Parse(new[] { "Object", "Action" });
+            var arguments = Builder.Create(sc, new Configuration
+            {
+                CultureInfo = CultureInfo.InvariantCulture
+            }).Recognize<ObjectController>()
+            .BuildAppHost()
+            .Parse(new[] { "Object", "Action" });
 
-            Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
+            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
             Assert.Throws<SpecificException>(() =>arguments.Invoke(new StringWriter()));
         }
     }

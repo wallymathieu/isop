@@ -1,42 +1,48 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 
 namespace Isop.CommandLine.Help
 {
-    using Parse;
-    public class HelpForArgumentWithOptions
-    {
-        private readonly IEnumerable<ArgumentWithOptions> _argumentWithOptionses;
-        public string TheArgumentsAre { get; set; }
+    using Domain;
 
-        public HelpForArgumentWithOptions(IEnumerable<ArgumentWithOptions> argumentWithOptionses)
+    internal class HelpForArgumentWithOptions
+    {
+        private readonly Localization.Texts _texts;
+        private readonly Recognizes _recognizes;
+        private readonly IOptions<Configuration> _config;
+
+        public HelpForArgumentWithOptions(IOptions<Localization.Texts> texts, 
+            Recognizes recognizes,
+            IOptions<Configuration> config)
         {
-            _argumentWithOptionses = argumentWithOptionses;
-            TheArgumentsAre = "The arguments are:";
+            _texts = texts.Value ?? new Localization.Texts();
+            _recognizes = recognizes;
+            _config = config;
         }
 
-        private static string Help(ArgumentWithOptions entity)
+        private string Help(Property entity)
         {
-            return string.Concat(entity.Argument.Help(), (string.IsNullOrEmpty(entity.Description)
-                    ? ""
-                    : "\t"+ entity.Description));
+            //var arg = entity.AsArgument();
+            return string.Concat(entity.ToArgument(_config?.Value?.CultureInfo).Help(), string.IsNullOrEmpty(entity.Description)
+                ? ""
+                : "\t"+ entity.Description);
         }
 
         public string Help(string val = null)
         {
             if (string.IsNullOrEmpty(val))
-                return TheArgumentsAre + Environment.NewLine +
+                return _texts.TheArgumentsAre + Environment.NewLine +
                       string.Join(Environment.NewLine,
-                                  _argumentWithOptionses.Select(ar => "  "+ Help(ar)).ToArray());
-            return Help(_argumentWithOptionses.First(ar => ar.Argument.Prototype.Equals(val)));
+                                  _recognizes.Properties.Select(ar => "  "+ Help(ar)).ToArray());
+            return Help(_recognizes.Properties.First(ar => ar.ToArgument(_config?.Value?.CultureInfo).Accept(val)));
         }
 
         public bool CanHelp(string val = null)
         {
             return string.IsNullOrEmpty(val)
-                ? _argumentWithOptionses.Any()
-                : _argumentWithOptionses.Any(ar => ar.Argument.Prototype.Equals(val));
+                ? _recognizes.Properties.Any()
+                : _recognizes.Properties.Any(ar => ar.ToArgument(_config?.Value?.CultureInfo).Accept(val));
         }
     }
 }

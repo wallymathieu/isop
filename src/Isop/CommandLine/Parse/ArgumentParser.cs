@@ -1,48 +1,25 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Isop.Infrastructure;
-using Isop.CommandLine.Lex;
-using Isop.Domain;
-using System.Globalization;
-
 
 namespace Isop.CommandLine.Parse
 {
+    using Infrastructure;
+    using Lex;
+
     public class ArgumentParser
     {
-        private readonly IEnumerable<Argument> _argumentWithOptions;
+        private readonly IReadOnlyCollection<Argument> _globalArguments;
         private readonly bool _allowInferParameter;
-        private readonly CultureInfo _cultureInfo;
 
-        public ArgumentParser(IEnumerable<Argument> argumentWithOptions, bool allowInferParameter, CultureInfo cultureInfo)
+        public ArgumentParser(IReadOnlyCollection<Argument> globalArguments, bool allowInferParameter)
         {
-            _argumentWithOptions = argumentWithOptions;
+            _globalArguments = globalArguments;
             _allowInferParameter = allowInferParameter;
-            this._cultureInfo = cultureInfo;
         }
 
-        public ParsedArguments Parse(IEnumerable<string> arguments)
+        public ParsedArguments.Properties Parse(IReadOnlyList<Token> lexed, IReadOnlyCollection<string> arguments)
         {
-            var args = arguments.ToArray();
-            var lexed = ArgumentLexer.Lex(args).ToList();
-            var parsedArguments = Parse(lexed, args);
-            var unMatchedRequiredArguments = parsedArguments.UnMatchedRequiredArguments().ToArray();
-
-            if (unMatchedRequiredArguments.Any())
-            {
-                throw new MissingArgumentException("Missing arguments")
-                {
-                    Arguments = unMatchedRequiredArguments
-                        .Select(unmatched => unmatched.Name).ToArray()
-                };
-            }
-            return parsedArguments;
-        }
-
-        public ParsedArguments Parse(IList<Token> lexed, IEnumerable<string> arguments)
-        {
-            var recognizedIndexes = new List<int>();
             var peekTokens = new PeekEnumerable<Token>(lexed);
             var encounteredParameter = false;
             IList<RecognizedArgument> recognized = new List<RecognizedArgument>();
@@ -53,40 +30,39 @@ namespace Isop.CommandLine.Parse
                 {
                     case TokenType.Argument:
                         {
-                            var argumentWithOptions = _argumentWithOptions
-                               .SingleOrDefault(argopt => Accept(argopt, current.Index, current.Value));
+                            var argument = _globalArguments
+                               .SingleOrDefault(arg => Accept(arg, current.Index, current.Value));
 
-                            if (null == argumentWithOptions && !encounteredParameter && _allowInferParameter)
+                            if (null == argument && !encounteredParameter && _allowInferParameter)
                             {
-                                InferParameter(recognizedIndexes, recognized, current);
+                                InferParameter(recognized, current);
                                 continue;
                             }
 
-                            if (null == argumentWithOptions)
+                            if (null == argument)
                             {
                                 continue;
                             }
 
-                            recognizedIndexes.Add(current.Index);
                             recognized.Add(new RecognizedArgument(
-                                        argumentWithOptions,
-                                        current.Index,
+                                        argument,
+                                        new []{current.Index},
                                         current.Value));
                         }
                         break;
                     case TokenType.Parameter:
                         {
                             encounteredParameter = true;
-                            var argumentWithOptions = _argumentWithOptions
+                            var argumentWithOptions = _globalArguments
                                 .SingleOrDefault(argopt => Accept(argopt, current.Index, current.Value));
                             if (null == argumentWithOptions)
                                 continue;
                             string value;
-                            recognizedIndexes.Add(current.Index);
+                            var indexes = new List<int> {current.Index};
                             if (peekTokens.Peek().TokenType == TokenType.ParameterValue)
                             {
                                 var paramValue = peekTokens.Next();
-                                recognizedIndexes.Add(paramValue.Index);
+                                indexes.Add(paramValue.Index);
                                 value = paramValue.Value;
                             }
                             else
@@ -96,7 +72,7 @@ namespace Isop.CommandLine.Parse
 
                             recognized.Add(new RecognizedArgument(
                                         argumentWithOptions,
-                                        current.Index,
+                                        indexes.ToArray(),
                                         current.Value,
                                         value));
                         }
@@ -108,86 +84,46 @@ namespace Isop.CommandLine.Parse
                 }
             }
 
-            var argumentList = arguments.ToList();
+            // Inferred ordinal arguments should not be recognized twice
+            var minusDuplicates=
+                recognized
+                    .Where(argument =>
+                        !recognized.Any(otherArgument =>
+                            argument.InferredOrdinal &&
+                            !ReferenceEquals(argument, otherArgument) 
+                            && otherArgument.RawArgument.Equals(argument.RawArgument)))
+                .ToList();
+            var recognizedIndexes = minusDuplicates.SelectMany(token=>token.Index).ToList();
 
-            var unRecognizedArguments = argumentList
-                .Select((value, i) => new { i, value })
-                .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.i))
-                .Select(v => new UnrecognizedArgument { Index = v.i, Value = v.value });
+            var unRecognizedArguments = arguments
+                .Select((value, i) => new { Index = i, Value = value })
+                .Where(indexAndValue => !recognizedIndexes.Contains(indexAndValue.Index))
+                .Select(v => new UnrecognizedArgument(v.Index, v.Value));
 
-            return new ParsedArguments()
-            {
-                ArgumentWithOptions = _argumentWithOptions.ToArray(),
-                RecognizedArguments = recognized,
-                UnRecognizedArguments = unRecognizedArguments
-            };
+            return new ParsedArguments.Properties(
+                unrecognized: unRecognizedArguments.ToArray(),
+                recognized : minusDuplicates.ToArray()
+            );
         }
 
         private bool Accept(Argument argument, int index, string value)
         {
-            var options = argument as ArgumentWithOptions;
-            if (options != null)
-            {
-                return options.Argument.Accept(index, value);
-            }
-            return ArgumentParameter.Parse(argument.Name, _cultureInfo).Accept(index, value);
+            return argument.Accept(index, value);
         }
 
-        private void InferParameter(ICollection<int> recognizedIndexes, IList<RecognizedArgument> recognized, Token current)
+        private void InferParameter(IList<RecognizedArgument> recognized, Token current)
         {
-            var argumentWithOptions = _argumentWithOptions
+            var argumentWithOptions = _globalArguments
                 .Where((argopt, i) => i == current.Index).SingleOrDefault();
             if (null != argumentWithOptions)
             {
-                recognizedIndexes.Add(current.Index);
                 recognized.Add(new RecognizedArgument(
                                    argumentWithOptions,
-                                   current.Index,
+                                   new []{current.Index},
                                    argumentWithOptions.Name,
-                                   current.Value) { InferredOrdinal = true });
+                                   current.Value,
+                                   inferredOrdinal:true));
             }
-        }
-
-        public ParsedArguments Parse(Dictionary<string, string> arg)
-        {
-            var recognized = new List<RecognizedArgument>();
-            var unRecognizedArguments = new List<UnrecognizedArgument>();
-            var index = 0;
-            foreach (var current in arg)
-            {
-                var argumentWithOptions = _argumentWithOptions
-                        .SingleOrDefault(argopt => Accept(argopt, current.Key));
-
-
-                if (null == argumentWithOptions)
-                {
-                    unRecognizedArguments.Add(new UnrecognizedArgument { Value = current.Key, Index = index++ });
-                    continue;
-                }
-                recognized.Add(new RecognizedArgument(
-                            argumentWithOptions,
-                            index++,
-                            current.Key,
-                            current.Value));
-
-            }
-            return new ParsedArguments
-            {
-                ArgumentWithOptions = _argumentWithOptions.ToArray(),
-                RecognizedArguments = recognized,
-                UnRecognizedArguments = unRecognizedArguments
-            };
-
-        }
-
-        private bool Accept(Argument argument, string value)
-        {
-            var options = argument as ArgumentWithOptions;
-            if (options != null)
-            {
-                return options.Argument.Accept(value);
-            }
-            return ArgumentParameter.Parse(argument.Name, _cultureInfo).Accept(value);
         }
     }
 }

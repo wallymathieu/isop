@@ -1,85 +1,106 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Isop.Domain;
 using System;
 namespace Isop.CommandLine.Parse
 {
-    public class ParsedArguments
+    public abstract class ParsedArguments
     {
-        public ParsedArguments()
+        public ParsedArguments Merge(ParsedArguments args)
         {
+            return new Merged(this, args);
         }
 
         /// <summary>
-        /// 
+        /// A combination of two parsed arguments instances
         /// </summary>
-        /// <param name="parsedArguments"></param>
-        public ParsedArguments(ParsedArguments parsedArguments)
+        public class Merged : ParsedArguments
         {
-            RecognizedArguments = parsedArguments.RecognizedArguments;
-            ArgumentWithOptions = parsedArguments.ArgumentWithOptions;
-            UnRecognizedArguments = parsedArguments.UnRecognizedArguments;
-        }
-        public IEnumerable<RecognizedArgument> RecognizedArguments { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
+            public readonly ParsedArguments First;
+            /// <summary>
+            /// 
+            /// </summary>
+            public readonly ParsedArguments Second;
 
-        public IEnumerable<UnrecognizedArgument> UnRecognizedArguments { get; set; }
-
-        public IEnumerable<Argument> ArgumentWithOptions { get; set; }
-
-        public void Invoke(TextWriter cout)
-        {
-            foreach (var item in Invoke())
+            internal Merged(ParsedArguments first, ParsedArguments second) 
             {
-                cout.WriteLine(item);
+                First = first;
+                Second = second;
             }
         }
 
-        public virtual IEnumerable<string> Invoke() 
+        public class MethodMissingArguments : ParsedArguments
         {
-            foreach (var argument in RecognizedArguments.Where(argument => null != argument.Argument.Action))
+            public Type RecognizedClass { get; }
+            public Domain.Method RecognizedAction { get; }
+            public IReadOnlyCollection<string> MissingParameters { get; }
+
+            public MethodMissingArguments(Type recognizedClass,
+                Domain.Method recognizedAction,
+                IReadOnlyCollection<string> missingParameters)
             {
-                argument.Argument.Action(argument.Value);
-            }
-            return new string[0];
-        }
-
-        public ParsedArguments Merge(ParsedArguments args)
-        {
-            return Merge(this, args);
-        }
-
-        public static ParsedArguments Merge(ParsedArguments first, ParsedArguments second)
-        {
-            return new MergedParsedArguments(first, second);
-        }
-
-        public IEnumerable<Argument> UnMatchedRequiredArguments()
-        {
-            var unMatchedRequiredArguments = ArgumentWithOptions
-                .Where(argumentWithOptions => argumentWithOptions.Required)
-                .Where(argumentWithOptions => !RecognizedArguments
-                                                   .Any(recogn => recogn.Argument.Equals(argumentWithOptions)));
-            return unMatchedRequiredArguments;
-        }
-
-        public void AssertFailOnUnMatched()
-        {
-            var unMatchedRequiredArguments = UnMatchedRequiredArguments();
-
-            if (unMatchedRequiredArguments.Any())
-            {
-                throw new MissingArgumentException("Missing arguments")
-                          {
-                              Arguments = unMatchedRequiredArguments
-                                  .Select(unmatched =>unmatched.Name)
-                                  .ToArray()
-                          };
+                RecognizedClass = recognizedClass;
+                RecognizedAction = recognizedAction;
+                MissingParameters = missingParameters;
             }
         }
-        public IEnumerable<KeyValuePair<string,string>> RecognizedArgumentsAsKeyValuePairs(){
-            return RecognizedArguments.Select(a => a.AsKeyValuePair());
+
+        public class Method : ParsedArguments
+        {
+            public Method(Type recognizedClass,
+                Domain.Method recognizedAction,
+                IEnumerable<object> recognizedActionParameters,
+                IEnumerable<RecognizedArgument> recognized)
+            {
+                RecognizedClass = recognizedClass;
+                RecognizedAction = recognizedAction;
+                Recognized = recognized;
+                RecognizedActionParameters = recognizedActionParameters.ToArray();
+            }
+
+            public Type RecognizedClass { get; }
+            public Domain.Method RecognizedAction { get; }
+            public IEnumerable<RecognizedArgument> Recognized { get; }
+            public IReadOnlyCollection<object> RecognizedActionParameters { get; }
         }
+
+        public class Properties : ParsedArguments
+        {
+            /// <summary>
+            /// Recognized arguments
+            /// </summary>
+            public IReadOnlyCollection<RecognizedArgument> Recognized { get; }
+
+            /// <summary>
+            /// Unrecognized arguments
+            /// </summary>
+            public IReadOnlyCollection<UnrecognizedArgument> Unrecognized { get; }
+            public Properties(IReadOnlyCollection<RecognizedArgument> recognized, 
+                IReadOnlyCollection<UnrecognizedArgument> unrecognized)
+            {
+                Recognized = recognized;
+                Unrecognized = unrecognized;
+            }
+        }
+
+        /// <summary>
+        /// Map from <see cref="ParsedArguments"/> to <see cref="T"/>.
+        /// </summary>
+        public T Select<T>(Func<Method, T> method, Func<Merged, T> merged, Func<Properties, T> properties, Func<MethodMissingArguments,T> methodMissingArguments)
+        {
+            switch (this)
+            {
+                case Method pm: return method(pm);
+                case Merged m: return merged(m);
+                case Properties d: return properties(d);
+                case MethodMissingArguments e: return methodMissingArguments(e);
+                default:
+                    throw new Exception("Unimplemented switch case");
+            }
+        }
+
     }
 }
 
