@@ -20,7 +20,8 @@ namespace Isop.Domain
         public bool LooksRequired() => ! _parameter.IsOptional;
 
         public IEnumerable<PropertyInfo> GetPublicInstanceProperties() => 
-            _parameter.ParameterType.GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            _parameter.ParameterType.GetTypeInfo()
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public);
         
         public object DefaultValue => _parameter.DefaultValue;
 

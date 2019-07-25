@@ -54,7 +54,7 @@ namespace Isop.Implementations
 
         public IAppHostBuilder Recognize(Type arg)
         {
-            _recognizes.Recognizes.Add(new Controller(arg));
+            _recognizes.Recognizes.Add(new Domain.Controller(arg));
             return this;
         }
         /// <summary>

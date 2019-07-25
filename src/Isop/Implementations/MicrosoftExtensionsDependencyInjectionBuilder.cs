@@ -55,7 +55,7 @@ namespace Isop.Implementations
         public IAppHostBuilder Recognize(Type arg)
         {
             _serviceCollection.TryAddSingleton(arg);
-            _recognizes.Recognizes.Add(new Controller(arg));
+            _recognizes.Recognizes.Add(new Domain.Controller(arg));
             return this;
         }
         public IAppHost BuildAppHost()

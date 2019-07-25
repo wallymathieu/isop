@@ -7,10 +7,10 @@ namespace Isop.Implementations
     {
         public RecognizesBuilder()
         {
-            Recognizes = new List<Controller>();
+            Recognizes = new List<Domain.Controller>();
             Properties = new List<Property>();
         }
-        public IList<Controller> Recognizes { get; }
+        public IList<Domain.Controller> Recognizes { get; }
         public IList<Property> Properties { get; }
     }
 }

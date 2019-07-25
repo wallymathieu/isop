@@ -11,7 +11,7 @@ namespace Isop.Implementations
     using CommandLine.Parse;
     using Domain;
 
-    internal class ParsedExpression:IParsedExpression
+    internal class ParsedExpression:IParsed
     {
         private readonly ParsedArguments _parsedArguments;
         private readonly AppHost _appHost;
@@ -92,7 +92,7 @@ namespace Isop.Implementations
             AssertFailOnMissing();
             foreach (var result in _argumentInvoker.Invoke(_parsedArguments))
             {
-                var item = (Result)await result;
+                var item = await result;
                 var formatted = await item.Select(
                     argument: arg => Task.FromResult(_appHost.Formatter(arg.Result)),
                     asyncControllerAction: async ca => _appHost.Formatter(await ca.Task),
@@ -101,6 +101,11 @@ namespace Isop.Implementations
                 );
                 foreach (var str in formatted) await output.WriteLineAsync(str);
             }
+        }
+        public async Task<IEnumerable<InvokeResult>> InvokeAsync()
+        {
+            AssertFailOnMissing();
+            return await Task.WhenAll( _argumentInvoker.Invoke(_parsedArguments));
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Isop.CommandLine
         /// <summary>
         /// controller name -> controller, action name -> action
         /// </summary>
-        private IDictionary<string, (Controller, ILookup<string, Method>)> _controllerActionMap;
+        private readonly IDictionary<string, (Controller, ILookup<string, Method>)> _controllerActionMap;
         
         public ControllerRecognizer(
             IOptions<Configuration> configuration,
@@ -51,7 +51,7 @@ namespace Isop.CommandLine
                 out var controllerAndMap))
             {
                 var (controller,methodMap)= controllerAndMap;
-                var method = FindMethodAmongLexedTokens.FindMethod(methodMap, lexed.ElementAtOrDefault(1).Value, lexed);
+                var method = MethodQueries.FindMethod(methodMap, lexed.ElementAtOrDefault(1).Value, lexed.Count(t => t.TokenType == TokenType.Parameter));
                 if (method != null)
                 {
                     controllerAndMethod = (controller, method);
@@ -68,8 +68,8 @@ namespace Isop.CommandLine
             if (_controllerActionMap.TryGetValue(controllerName,
                 out var controllerAndMap))
             {
-                var (controller,methodMap)= controllerAndMap;
-                var method = FindMethodAmongLexedTokens.FindMethod(methodMap, actionName, new Token[0]);
+                var (controller, methodMap)= controllerAndMap;
+                var method = MethodQueries.FindMethod(methodMap, actionName);
                 if (method != null)
                 {
                     controllerAndMethod = (controller, method);
@@ -105,6 +105,19 @@ namespace Isop.CommandLine
                 recognized: parsedArguments.Recognized,
                 recognizedClass: controller.Type,
                 recognizedAction: method);
+        }
+
+        public bool TryFindController(string name, out Controller controller)
+        {
+            if (_controllerActionMap.TryGetValue(name,
+                out var controllerAndMap))
+            {
+                var (foundController, _) = controllerAndMap;
+                controller = foundController;
+                return true;
+            }
+            controller = default;
+            return false;
         }
     }
 }

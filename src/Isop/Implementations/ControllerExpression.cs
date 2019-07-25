@@ -1,24 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Isop.Domain;
 
 namespace Isop.Implementations
 {
     using Abstractions;
     ///
-    internal class ControllerExpression:IControllerExpression
+    internal class ControllerExpression:IController
     {
-        private readonly string _controllerName;
         private readonly AppHost _appHost;
-        internal ControllerExpression(string controllerName, AppHost appHost)
+        private readonly Controller _controller;
+
+        internal ControllerExpression(string controllerName, AppHost appHost, Controller controller)
         {
-            _controllerName = controllerName;
+            Name = controllerName;
             _appHost = appHost;
+            _controller = controller;
         }
-        public IActionControllerExpression Action(string name) =>
-            new ActionControllerExpression(_controllerName, name, _appHost);
+        public IActionOnController Action(string name) =>
+            new ActionControllerExpression(Name, name, _appHost);
+
+        public IReadOnlyCollection<IActionOnController> Actions =>
+            _controller.GetControllerActionMethods(_appHost.Conventions.Value).Select(action =>
+                new ActionControllerExpression(Name, action.Name, _appHost)).ToArray();
+
+        public string Name { get; }
+
         public string Help()
         {
             var helpController = _appHost.HelpController;
-            return (helpController.Index(_controllerName, null) ?? String.Empty).Trim();
+            return (helpController.Index(Name, null) ?? String.Empty).Trim();
         }
     }
 }

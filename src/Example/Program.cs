@@ -7,13 +7,13 @@ using Isop;
 namespace Example
 {
     /// <summary>
-    /// This is a sample usage of Isop when configuring using <see cref="Builder"/> :
+    /// This is a sample usage of Isop when configuring using <see cref="AppHostBuilder"/> :
     /// </summary>
     class Program
     {
         static async Task<int> Main(string[] args)
         {
-            var appHost = Builder
+            var appHost = AppHostBuilder
                 .Create(new Configuration
                 {
                     CultureInfo = CultureInfo.InvariantCulture

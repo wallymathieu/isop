@@ -61,7 +61,7 @@ You're hooking it up by writing something like:
 
 ```csharp
 static Task Main(string[] args)=>
-    Builder.Create()
+    AppHostBuilder.Create()
        .Recognize(typeof(CustomerController))
        .BuildAppHost()
        .Parse(args)
@@ -94,9 +94,9 @@ When invoked it will output two lines to the command prompt, the yielded lines a
 ```csharp
 class Program
 {
-    static async Task Main(string[] args)
+    static async Task<int> Main(string[] args)
     {
-        var appHost = Builder
+        var appHost = AppHostBuilder
             .Create(new Configuration
             {
                 CultureInfo = CultureInfo.GetCultureInfo("sv-SE")
@@ -113,9 +113,11 @@ class Program
 Did you mean any of these arguments?
 {string.Join(",", parsedMethod.ArgumentWithOptions.Select(rec => rec.Name).ToArray())}";
                 Console.WriteLine(unRecognizedArgumentsMessage);
+                return 1;
             }else
             {
                 await parsedMethod.InvokeAsync(Console.Out);
+                return 0;
             }
         }
         catch (TypeConversionFailedException ex)
@@ -127,11 +129,13 @@ Did you mean any of these arguments?
                 Console.WriteLine("Inner exception: ");
                 Console.WriteLine(ex.InnerException.Message);
             }
+            return 9;
         }
         catch (MissingArgumentException ex)
         {
             Console.WriteLine($"Missing argument(s): {String.Join(", ", ex.Arguments).ToArray()}");
             Console.WriteLine(appHost.Help());
+            return 10;
         }
     }
 }

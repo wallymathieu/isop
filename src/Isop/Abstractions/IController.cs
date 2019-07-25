@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+
 namespace Isop.Abstractions
 {
     /// <summary>
     /// Controller expression in order to get help for controller or specify action
     /// </summary>
-    public interface IControllerExpression
+    public interface IController
     {
         /// <summary>
         /// Get help for controller
@@ -14,6 +16,14 @@ namespace Isop.Abstractions
         /// </summary>
         /// <param name="name">action name</param>
         /// <returns></returns>
-        IActionControllerExpression Action(string name);
+        IActionOnController Action(string name);
+        /// <summary>
+        /// Actions exposed by controller
+        /// </summary>
+        IReadOnlyCollection<IActionOnController> Actions { get; }
+        /// <summary>
+        /// Name of controller
+        /// </summary>
+        string Name { get; }
     }
 }

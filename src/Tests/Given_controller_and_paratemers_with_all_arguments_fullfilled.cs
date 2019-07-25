@@ -12,7 +12,7 @@ namespace Tests
     {
         private int count;
         private int countArg;
-        private IParsedExpression parsed;
+        private IParsed parsed;
         string[] args= { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4", "--beta" };
 
         [SetUp]
@@ -23,7 +23,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
 
-            parsed = Builder.Create(sc)
+            parsed = AppHostBuilder.Create(sc)
                 .Recognize(typeof(MyController))
                 .Parameter("beta", arg => countArg++)
                 .BuildAppHost()

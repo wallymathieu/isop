@@ -9,16 +9,22 @@ using Isop.CommandLine.Parse.Parameters;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Tests.FakeControllers;
+using Tests.Routing;
 
 namespace Tests
 {
     [TestFixture]
     public class ArgumentParserTests
     {
+        public class SingleIntAction
+        {
+            public void Action(int param) { }
+        }
+        
         [Test]
         public void Recognizes_shortform()
         {
-            var parser = Builder.Create()
+            var parser = AppHostBuilder.Create()
                 .Parameter("&argument")
                 .BuildAppHost()
                 .Parse(new[] { "-a" });
@@ -31,7 +37,7 @@ namespace Tests
         [Test]
         public void Given_several_arguments_Then_the_correct_one_is_recognized()
         {
-            var arguments = Builder.Create()
+            var arguments = AppHostBuilder.Create()
                 .Parameter("&beta")
                 .BuildAppHost()
                 .Parse(new[] { "-a", "-b" }).Recognized;
@@ -44,7 +50,7 @@ namespace Tests
         [Test]
         public void Recognizes_longform()
         {
-            var arguments = Builder.Create()
+            var arguments = AppHostBuilder.Create()
                 .Parameter("beta")
                 .BuildAppHost()
                 .Parse(new[] { "-a", "--beta" }).Recognized;
@@ -56,7 +62,7 @@ namespace Tests
         [Test]
         public void It_can_parse_parameter_value()
         {
-            var arguments = Builder.Create()
+            var arguments = AppHostBuilder.Create()
                 .Parameter("beta")
                 .BuildAppHost()
                 .Parse(new[] { "-a", "--beta", "value" }).Recognized;
@@ -74,7 +80,7 @@ namespace Tests
         [Test]
         public void It_can_parse_ordinal_parameter_value()
         {
-            var arguments = Builder.Create()
+            var arguments = AppHostBuilder.Create()
                 .Parameter("#0first")
                 .BuildAppHost()
                 .Parse(new[] { "first" }).Recognized;
@@ -85,7 +91,7 @@ namespace Tests
         [Test]
         public void It_can_parse_parameter_with_equals()
         {
-            var arguments = Builder.Create()
+            var arguments = AppHostBuilder.Create()
                 .Parameter("beta=")
                 .BuildAppHost()
                 .Parse(new[] { "-a", "--beta=test", "value" }).Recognized;
@@ -97,7 +103,7 @@ namespace Tests
         [Test]
         public void It_can_parse_parameter_alias()
         {
-            var arguments = Builder.Create()
+            var arguments = AppHostBuilder.Create()
                 .Parameter("beta|b=")
                 .BuildAppHost()
                 .Parse(new[] { "-a", "-b=test", "value" }).Recognized;
@@ -109,7 +115,7 @@ namespace Tests
         [Test]
         public void It_can_report_unrecognized_parameters()
         {
-            var unRecognizedArguments = Builder.Create()
+            var unRecognizedArguments = AppHostBuilder.Create()
                .Parameter("beta")
                .BuildAppHost()
                .Parse(new[] { "-a", "value", "--beta" }).Unrecognized;
@@ -122,7 +128,7 @@ namespace Tests
         [Test]
         public void It_can_infer_ordinal_usage_of_named_parameters()
         {
-            var arguments = Builder.Create()
+            var arguments = AppHostBuilder.Create()
                 .Parameter("beta|b=")
                 .Parameter("alpha|a=")
                 .BuildAppHost()
@@ -136,7 +142,7 @@ namespace Tests
         [Test]
         public void It_wont_report_matched_parameters()
         {
-            var arguments = Builder.Create()
+            var arguments = AppHostBuilder.Create()
                 .Parameter("beta")
                 .BuildAppHost()
                 .Parse(new[] { "--beta", "value" }).Unrecognized;
@@ -145,7 +151,7 @@ namespace Tests
         }
         [Test]
         public void It_will_fail_if_argument_not_supplied_and_it_is_required() =>
-            Assert.Throws<MissingArgumentException>(() => Builder.Create()
+            Assert.Throws<MissingArgumentException>(() => AppHostBuilder.Create()
                 .Parameter("beta", required: true)
                 .BuildAppHost()
                 .Parse(new[] { "-a", "value" }).Invoke(Console.Out));
@@ -153,7 +159,7 @@ namespace Tests
         [Test]
         public void It_can_recognize_arguments()
         {
-            var arguments = Builder.Create()
+            var arguments = AppHostBuilder.Create()
                 .Parameter("alpha")
                 .BuildAppHost()
                 .Parse(new[] { "alpha" }).Recognized;
@@ -166,7 +172,7 @@ namespace Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail_because_of_type_conversion()
         {
-            var builder = Builder.Create().Recognize<SingleIntAction>()
+            var builder = AppHostBuilder.Create().Recognize<SingleIntAction>()
                  .BuildAppHost();
             Assert.Throws<TypeConversionFailedException>(() =>
                 builder.Parse(new[] { "SingleIntAction", "Action", "--param", "value" })
@@ -174,27 +180,10 @@ namespace Tests
         }
 
         [Test]
-        public void It_can_parse_class_and_default_method_and_execute()
-        {
-            var count = 0;
-            var sc = new ServiceCollection();
-            sc.AddSingleton(ci => new WithIndexController { OnIndex = (p1, p2, p3, p4) => (count++).ToString() });
-
-            var arguments = Builder.Create(sc)
-                                .Recognize(typeof(WithIndexController))
-                                .BuildAppHost()
-                                .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
-
-            Assert.That(arguments.Unrecognized.Select(u=>u.Value), Is.Empty);
-            arguments.Invoke(new StringWriter());
-            Assert.That(count, Is.EqualTo(1));
-        }
-
-        [Test]
         public void It_can_invoke_recognized()
         {
             var count = 0;
-            Builder.Create()
+            AppHostBuilder.Create()
                            .Parameter("beta", arg => count++)
                            .Parameter("alpha", arg => Assert.Fail())
                            .BuildAppHost()
@@ -202,34 +191,5 @@ namespace Tests
             Assert.That(count, Is.EqualTo(1));
         }
 
-        [Test]
-        public void It_can_handle_different_casing_for_enum()
-        {
-            foreach (var pair in new[] {
-                new { value = "param1", expected = WithEnumController.WithEnum.Param1 },
-                new { value = "paramwithcasing", expected = WithEnumController.WithEnum.ParamWithCasing },
-            })
-            {
-                var parameters = new List<WithEnumController.WithEnum?>();
-                var sc = new ServiceCollection();
-                sc.AddSingleton(ci => new WithEnumController
-                {
-                    OnIndex = p1 =>
-                    {
-                        parameters.Add(p1);
-                        return "";
-                    }
-                });
-
-                var arguments = Builder.Create(sc)
-                                                   .Recognize(typeof(WithEnumController))
-                                                   .BuildAppHost()
-                                                   .Parse(new[] { "WithEnum", /*"Index", */"--value", pair.value });
-
-                Assert.That(arguments.Unrecognized.Select(u=>u.Value), Is.Empty);
-                arguments.Invoke(new StringWriter());
-                Assert.That(parameters, Is.EquivalentTo(new[] { pair.expected }));
-            }
-        }
     }
 }

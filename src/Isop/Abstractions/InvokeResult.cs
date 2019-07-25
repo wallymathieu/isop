@@ -1,17 +1,15 @@
 using System;
 using System.Threading.Tasks;
-using Isop.Abstractions;
-using Isop.CommandLine.Parse;
 
-namespace Isop.Implementations
+namespace Isop.Abstractions
 {
-    internal abstract class Result:IResult
+    public abstract class InvokeResult
     {
-        public class Empty : Result
+        public class Empty : InvokeResult
         {
         }
 
-        public class ControllerAction : Result
+        public class ControllerAction : InvokeResult
         {
             public object Result { get; }
 
@@ -21,7 +19,7 @@ namespace Isop.Implementations
             }
         }
 
-        public class Argument : Result
+        public class Argument : InvokeResult
         {
             public object Result { get; }
 
@@ -31,7 +29,7 @@ namespace Isop.Implementations
             }
         }
 
-        public class AsyncControllerAction : Result
+        public class AsyncControllerAction : InvokeResult
         {
             public Task<object> Task { get; }
 
@@ -42,9 +40,10 @@ namespace Isop.Implementations
         }
         
         /// <summary>
-        /// Map from <see cref="Result"/> to <see cref="T"/>.
+        /// Map from <see cref="InvokeResult"/> to <see cref="T"/>.
         /// </summary>
-        public T Select<T>(Func<ControllerAction, T> controllerAction, 
+        public T Select<T>(
+            Func<ControllerAction, T> controllerAction, 
             Func<AsyncControllerAction, T> asyncControllerAction, 
             Func<Argument, T> argument, 
             Func<Empty,T> empty)

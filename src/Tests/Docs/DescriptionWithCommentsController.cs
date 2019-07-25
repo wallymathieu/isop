@@ -1,4 +1,4 @@
-namespace Tests.FakeControllers
+namespace Tests.Docs
 {
     /// <summary>
     /// Some description

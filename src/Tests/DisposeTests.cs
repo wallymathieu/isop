@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.IO;
 using Isop;
@@ -11,6 +12,27 @@ namespace Tests
     [TestFixture]
     public class DisposeTests
     {
+        public class DisposeController:IDisposable
+        {
+            public DisposeController()
+            {
+            }
+
+            public event Action OnDispose;
+            public static event Action<DisposeController> StaticOnDispose;
+
+            public string Method()
+            {
+                return "test";
+            }
+
+            public void Dispose()
+            {
+                OnDispose?.Invoke();
+                StaticOnDispose?.Invoke(this);
+            }
+        }
+        
         [Test]
         public void It_will_not_dispose_instances_set_to_be_recognized()
         {
@@ -19,7 +41,7 @@ namespace Tests
             c.OnDispose += () => count++;
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(c);
-            var build = Builder.Create(serviceCollection,new Configuration
+            var build = AppHostBuilder.Create(serviceCollection,new Configuration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             }).Recognize(typeof(DisposeController)).BuildAppHost();

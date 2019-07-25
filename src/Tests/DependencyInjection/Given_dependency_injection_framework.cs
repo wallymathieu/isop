@@ -22,7 +22,7 @@ namespace Tests.DependencyInjection
         [Test]
         public void It_can_parse_and_invoke()
         {
-            Builder.Create(ServiceProvider)
+            AppHostBuilder.Create(ServiceProvider)
                 .Recognize<MyController>()
                 .BuildAppHost()
                 .Controller("My")

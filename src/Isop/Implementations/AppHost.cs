@@ -65,9 +65,9 @@ namespace Isop.Implementations
         /// <summary>
         /// Parse command line arguments and return parsed arguments entity
         /// </summary>
-        public IParsedExpression Parse(IEnumerable<string> arg) => Parse(arg.ToList());
+        public IParsed Parse(IEnumerable<string> arg) => Parse(arg.ToList());
 
-        private IParsedExpression Parse(IReadOnlyCollection<string> arg)
+        private IParsed Parse(IReadOnlyCollection<string> arg)
         {
             var argumentParser = new ArgumentParser(
                 Recognizes.Properties.Select(p=>p.ToArgument(Configuration.Value.CultureInfo)).ToArray(),
@@ -96,10 +96,16 @@ namespace Isop.Implementations
         /// <summary>
         /// 
         /// </summary>
-        public IControllerExpression Controller(string controllerName)
+        public IController Controller(string controllerName)
         {
-            return new ControllerExpression(controllerName, this);
+            if (ControllerRecognizer.TryFindController(controllerName, out var controller))
+            {
+                return new ControllerExpression(controllerName, this, controller);
+            }
+            throw new ArgumentException($"Unknown controller {controllerName}");
         }
 
+        public IReadOnlyList<IController> Controllers => 
+            Recognizes.Controllers.Select(c => Controller(c.GetName(Conventions.Value))).ToArray();
     }
 }

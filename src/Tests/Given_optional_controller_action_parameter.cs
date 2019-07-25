@@ -26,10 +26,10 @@ namespace Tests
         {
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyOptionalController() { OnAction = (p1, p2, p3, p4) => "" });
-            var build = Builder.Create(sc).Recognize(typeof(MyOptionalController)).BuildAppHost();
+            var build = AppHostBuilder.Create(sc).Recognize(typeof(MyOptionalController)).BuildAppHost();
             var expected = Helpers.DictionaryDescriptionToKv("[param1, True], [param2, False], [param3, False], [param4, False]", Boolean.Parse);
 
-            var recognizers = build.Controller("MyOptional").Action("Action").GetArguments();
+            var recognizers = build.Controller("MyOptional").Action("Action").Arguments;
             Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Name, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
@@ -41,7 +41,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
                 { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
-            var arguments = Builder.Create(sc).Recognize<MyOptionalController>()
+            var arguments = AppHostBuilder.Create(sc).Recognize<MyOptionalController>()
                 .BuildAppHost()
                 .Parse(new[] { "MyOptional", "Action", "--param1", "value1" });
             arguments.Invoke(new StringWriter());
@@ -55,7 +55,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
                 { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
-            var arguments = Builder.Create(sc).Recognize<MyOptionalController>()
+            var arguments = AppHostBuilder.Create(sc).Recognize<MyOptionalController>()
                 .BuildAppHost()
                 .Parse(new[] { "MyOptional", "Action", "value1" });
             arguments.Invoke(new StringWriter());

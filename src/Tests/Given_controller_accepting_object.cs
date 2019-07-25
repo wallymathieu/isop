@@ -27,14 +27,14 @@ namespace Tests
             public Func<Argument, string> OnAction { get; set; }
             public string Action(Argument a) { return OnAction(a); }
         }
-        [Test, Ignore("Brown")]
+        [Test]
         public void It_can_parse_class_and_method_with_object_and_execute()
         {
             var count = 0;
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyObjectController() { OnAction = (p1) => (count++).ToString() });
 
-            var arguments = Builder.Create(sc)
+            var arguments = AppHostBuilder.Create(sc)
                 .Recognize(typeof(MyObjectController))
                 .BuildAppHost()
                 .Parse(new[] { "MyObject", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });

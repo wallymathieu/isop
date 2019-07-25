@@ -59,7 +59,7 @@ namespace Isop.Domain
                 .Select(prop => 
                     new Argument( 
                         required: parameterInfo.LooksRequired() && IsRequired(prop),
-                        parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo)));
+                        parameter: ArgumentParameter.Parse(prop.Name, cultureInfo)));
 
         private static bool IsRequired(PropertyInfo propertyInfo) => 
             propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();

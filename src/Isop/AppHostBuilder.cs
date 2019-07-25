@@ -11,7 +11,7 @@ namespace Isop
     /// <summary>
     /// Utility methods to create builders
     /// </summary>
-    public static class Builder 
+    public static class AppHostBuilder 
     {
         /// <summary>
         /// Create an instance of builder using IServiceCollection to wire up dependencies
@@ -22,7 +22,7 @@ namespace Isop
             Create(configuration: configuration, serviceCollection: null);
 
         /// <summary>
-        /// Create an instance of builder using IServiceCollection to wire up dependencies
+        /// Create an instance of builder that uses IServiceCollection to configure IServiceProvider
         /// </summary>
         /// <param name="serviceCollection"></param>
         /// <param name="configuration"></param>
@@ -40,12 +40,12 @@ namespace Isop
                 serviceCollection.AddSingleton(Options.Create(configuration));
             }
             var recognizes = new RecognizesBuilder();
-            recognizes.Recognizes.Add(new Controller(type: typeof(HelpController)));
+            recognizes.Recognizes.Add(new Domain.Controller(type: typeof(HelpController)));
             return new MicrosoftExtensionsDependencyInjectionBuilder(serviceCollection, recognizes);
         }
 
         /// <summary>
-        /// Create an instance of builder using IServiceProvider to get dependencies
+        /// Create an instance of builder that uses IServiceCollection to configure IServiceProvider
         /// </summary>
         public static IAppHostBuilder Create()=>
             Create(configuration: null, serviceCollection: null);
@@ -59,7 +59,7 @@ namespace Isop
         public static IAppHostBuilder Create(IServiceProvider serviceProvider)
         {
             var recognizes = new RecognizesBuilder();
-            recognizes.Recognizes.Add(new Controller(type: typeof(HelpController)));
+            recognizes.Recognizes.Add(new Domain.Controller(type: typeof(HelpController)));
             return new ServiceProviderAppHostBuilder(serviceProvider, recognizes);
         }
     }

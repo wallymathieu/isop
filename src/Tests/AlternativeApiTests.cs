@@ -18,7 +18,7 @@ namespace Tests
             var count = 0;
             var sc = new ServiceCollection();
             sc.AddSingleton(ci=>new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
-            var arguments = Builder.Create(sc,new Configuration {
+            var arguments = AppHostBuilder.Create(sc,new Configuration {
                 CultureInfo= CultureInfo.InvariantCulture
             })
             .Recognize<MyController>()
@@ -34,7 +34,7 @@ namespace Tests
         [Test]
         public void It_can_get_help()
         {
-            var help = Builder.Create(new Configuration
+            var help = AppHostBuilder.Create(new Configuration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -45,6 +45,45 @@ namespace Tests
             .Help();
 
             Assert.IsNotEmpty(help);
+        }
+        [Test]
+        public void It_can_list_controllers()
+        {
+            var controllers = AppHostBuilder.Create(new Configuration
+                {
+                    CultureInfo = CultureInfo.InvariantCulture
+                })
+                .Recognize<MyController>()
+                .BuildAppHost()
+                .Controllers.Select(c=>c.Name).ToArray();
+
+            CollectionAssert.AreEqual(new []{"Help","My"}, controllers);
+        }
+        [Test]
+        public void It_can_list_actions()
+        {
+            var actions = AppHostBuilder.Create(new Configuration
+                {
+                    CultureInfo = CultureInfo.InvariantCulture
+                })
+                .Recognize<MyController>()
+                .BuildAppHost()
+                .Controllers.Single(c=>c.Name=="My").Actions.Select(a=>a.Name).ToArray();
+
+            CollectionAssert.AreEqual(new []{"Action"}, actions);
+        }
+        [Test]
+        public void It_can_list_action_parameters()
+        {
+            var actions = AppHostBuilder.Create(new Configuration
+                {
+                    CultureInfo = CultureInfo.InvariantCulture
+                })
+                .Recognize<MyController>()
+                .BuildAppHost()
+                .Controllers.Single(c=>c.Name=="My").Actions.Single(a=>a.Name=="Action").Arguments.Select(a=>a.Name).ToArray();
+
+            CollectionAssert.AreEqual(new []{"param1","param2","param3","param4"}, actions);
         }
     }
 }

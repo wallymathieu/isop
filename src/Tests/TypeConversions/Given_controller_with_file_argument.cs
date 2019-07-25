@@ -6,7 +6,7 @@ using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
-namespace Tests
+namespace Tests.TypeConversions
 {
     [TestFixture]
     public class Given_controller_with_file_argument
@@ -57,7 +57,7 @@ namespace Tests
             sc.AddSingleton(ci => new MyFileController { OnAction = file => filename = file.Name });
             using (var files = new DeleteOnDispose())
             {
-                var arguments = Builder.Create(sc)
+                var arguments = AppHostBuilder.Create(sc)
                     .SetTypeConverter((t, s, c) =>
                     {
                         //creating file before use ...

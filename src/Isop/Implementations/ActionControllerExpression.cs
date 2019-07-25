@@ -10,26 +10,26 @@ namespace Isop.Implementations
     using CommandLine.Parse;
     using Infrastructure;
 
-    internal class ActionControllerExpression:IActionControllerExpression
+    internal class ActionControllerExpression:IActionOnController
     {
         private readonly string _controllerName;
-        private readonly string _actionName;
         private readonly AppHost _appHost;
         private readonly ConvertArgumentsToParameterValue _convertArguments;
 
         internal ActionControllerExpression(string controllerName, string actionName, AppHost appHost)
         {
             _controllerName = controllerName;
-            _actionName = actionName;
+            Name = actionName;
             _appHost = appHost;
             _convertArguments = new ConvertArgumentsToParameterValue(_appHost.Configuration,_appHost.TypeConverter);
         }
 
-        public IReadOnlyCollection<Argument> GetArguments() =>
-            _appHost.ControllerRecognizer.TryFind(_controllerName, _actionName, out var controllerAndMethod)
+        public IReadOnlyCollection<Argument> Arguments =>
+            _appHost.ControllerRecognizer.TryFind(_controllerName, Name, out var controllerAndMethod)
                 ? controllerAndMethod.Item2.GetArguments(_appHost.CultureInfo).ToArray()
-                : throw new ArgumentException($"Controller: {_controllerName}, method: {_actionName}");
-        public IParsedExpression Parameters(Dictionary<string, string> parameters)
+                : throw new ArgumentException($"Controller: {_controllerName}, method: {Name}");
+
+        public IParsed Parameters(Dictionary<string, string> parameters)
         {
             var valuePairs = parameters.ToArray();
             
@@ -57,7 +57,7 @@ namespace Isop.Implementations
                 unrecognized: unrecognizedArguments,
                 recognized: recognizedArguments
             );
-            if (!_appHost.ControllerRecognizer.TryFind(_controllerName, _actionName, out var controllerAndMethod))
+            if (!_appHost.ControllerRecognizer.TryFind(_controllerName, Name, out var controllerAndMethod))
                 return new ParsedExpression(parsedArguments, _appHost);
             var (controller, method) = controllerAndMethod;
             if (!_convertArguments.TryGetParametersForMethod(method, parameters, out var parametersForMethod, out var missingParameters))
@@ -84,6 +84,8 @@ namespace Isop.Implementations
                 _appHost);
         }
         public string Help() => 
-            (_appHost.HelpController.Index(_controllerName, _actionName) ?? String.Empty).Trim();
+            (_appHost.HelpController.Index(_controllerName, Name) ?? String.Empty).Trim();
+
+        public string Name { get; }
     }
 }

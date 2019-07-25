@@ -21,7 +21,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
 
-            var arguments = Builder.Create(sc).Recognize<MyController>()
+            var arguments = AppHostBuilder.Create(sc).Recognize<MyController>()
                                 .BuildAppHost()
                                 .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
@@ -36,7 +36,7 @@ namespace Tests
             var count = 0;
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
-            var arguments = Builder.Create(sc).Recognize<MyController>()
+            var arguments = AppHostBuilder.Create(sc).Recognize<MyController>()
                             .BuildAppHost()
                             .Parse(new[] { "My", "Action", "value1", "value2", "3", "3.4" });
 
@@ -50,11 +50,11 @@ namespace Tests
         {
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => "" });
-            var build = Builder.Create(sc).Recognize<MyController>()
+            var build = AppHostBuilder.Create(sc).Recognize<MyController>()
                             .BuildAppHost();
             var expected = Helpers.DictionaryDescriptionToKv("[param1, True], [param2, True], [param3, True], [param4, True]", Boolean.Parse);
 
-            var recognizers = build.Controller("My").Action("Action").GetArguments();
+            var recognizers = build.Controller("My").Action("Action").Arguments;
             Assert.That(recognizers.Select(r => new KeyValuePair<string, bool>(r.Name, r.Required)).ToArray(),
                 Is.EquivalentTo(expected.ToArray()));
         }
@@ -62,7 +62,7 @@ namespace Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail()
         {
-            var builder = Builder.Create().Recognize<MyController>()
+            var builder = AppHostBuilder.Create().Recognize<MyController>()
                 .BuildAppHost();
 
             Assert.Throws<MissingArgumentException>(() => builder
@@ -73,7 +73,7 @@ namespace Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail_because_no_arguments_given()
         {
-            var builder = Builder.Create().Recognize<MyController>()
+            var builder = AppHostBuilder.Create().Recognize<MyController>()
                 .BuildAppHost();
 
             Assert.Throws<MissingArgumentException>(() => builder

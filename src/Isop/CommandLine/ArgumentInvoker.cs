@@ -31,14 +31,14 @@ namespace Isop.CommandLine
             _helpController = helpController;
         }
 
-        public IEnumerable<Task<IResult>> Invoke(ParsedArguments parsedArguments)
+        public IEnumerable<Task<InvokeResult>> Invoke(ParsedArguments parsedArguments)
         {
-            IEnumerable<Task<IResult>> ChooseArgument(RecognizedArgument arg)
+            IEnumerable<Task<InvokeResult>> ChooseArgument(RecognizedArgument arg)
             {
                 return RecognizesMap.Contains(arg.Argument.Name) 
                     ? RecognizesMap[arg.Argument.Name].Select(async action => 
-                        (IResult)new Result.Argument( await action(arg.Value)))
-                    : Enumerable.Empty<Task<IResult>>();
+                        (InvokeResult)new InvokeResult.Argument( await action(arg.Value)))
+                    : Enumerable.Empty<Task<InvokeResult>>();
             }
             async Task<object> RunTask(Task task)
             {
@@ -53,7 +53,7 @@ namespace Isop.CommandLine
             using (var scope = _serviceProvider.CreateScope())
             {
                 var tasks = parsedArguments.Select(
-                    methodMissingArguments: empty=>new[]{Task.FromResult<IResult>(new Result.Empty())},
+                    methodMissingArguments: empty=>new[]{Task.FromResult<InvokeResult>(new InvokeResult.Empty())},
                     properties: args =>
                     {
                         var enumerable = args.Recognized
@@ -74,8 +74,8 @@ namespace Isop.CommandLine
                                 var result = method.RecognizedAction.Invoke(instance,
                                     method.RecognizedActionParameters.ToArray());
                                 return new []{ Task.FromResult(result is Task task 
-                                    ? (IResult)new Result.AsyncControllerAction(RunTask(task))
-                                    : new Result.ControllerAction(result)) };
+                                    ? (InvokeResult)new InvokeResult.AsyncControllerAction(RunTask(task))
+                                    : new InvokeResult.ControllerAction(result)) };
                             });
                 return tasks;
             }

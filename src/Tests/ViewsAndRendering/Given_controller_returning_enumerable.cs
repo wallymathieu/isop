@@ -1,15 +1,29 @@
+using System;
 using System.IO;
 using System.Linq;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Tests.FakeControllers;
 
-namespace Tests
+namespace Tests.ViewsAndRendering
 {
     [TestFixture]
     public class Given_controller_returning_enumerable
     {
+        class EnumerableController
+        {
+            public Func<object> OnEnumerate;
+            public int Length;
+            public System.Collections.IEnumerable Return()
+            {
+                for (int i = 0; i < Length; i++)
+                {
+                    yield return OnEnumerate();
+                }
+            }
+        }
+        
+        
         [Test]
         public void It_understands_method_returning_enumerable()
         {
@@ -17,7 +31,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new EnumerableController() { Length = 2, OnEnumerate = () => (count++) });
 
-            var arguments = Builder.Create(sc)
+            var arguments = AppHostBuilder.Create(sc)
                 .Recognize(typeof(EnumerableController))
                 .BuildAppHost()
                 .Parse(new[] { "Enumerable", "Return" });

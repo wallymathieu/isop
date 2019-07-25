@@ -9,7 +9,7 @@ namespace Isop.Abstractions
     /// <summary>
     /// Parsed expression with what's recognized and what's not
     /// </summary>
-    public interface IParsedExpression
+    public interface IParsed
     {
         /// <summary>
         /// Recognized arguments
@@ -25,5 +25,9 @@ namespace Isop.Abstractions
         /// Invoke using parameters
         /// </summary>
         Task InvokeAsync(TextWriter output);
+        /// <summary>
+        /// Invoke using parameters
+        /// </summary>
+        Task<IEnumerable<InvokeResult>> InvokeAsync();
     }
 }

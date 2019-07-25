@@ -5,13 +5,13 @@ using System.Linq;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Tests.FakeControllers;
 
-namespace Tests
+namespace Tests.ViewsAndRendering
 {
     [TestFixture]
     public class ReturnValueFormatterTests
     {
+        
         class WithTwoProperties
         {
             public WithTwoProperties(int value)
@@ -30,7 +30,18 @@ namespace Tests
                 set;
             }
         }
-
+        public class ObjectController
+        {
+            public ObjectController()
+            {
+                OnAction = () => string.Empty;
+            }
+            public Func<object> OnAction { get; set; }
+            /// <summary>
+            /// ActionHelp
+            /// </summary>
+            public object Action() { return OnAction(); }
+        }
 
         [Test]
         public void It_can_format_object_as_table()
@@ -39,7 +50,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new ObjectController() { OnAction = () => new WithTwoProperties(count++) });
 
-            var arguments = Builder.Create(sc, new Configuration
+            var arguments = AppHostBuilder.Create(sc, new Configuration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             }).Recognize( typeof(ObjectController) )
@@ -54,13 +65,13 @@ namespace Tests
         }
 
         [Test]
-        public void It_can_format_ienumerable_objects_as_table()
+        public void It_can_format_enumerable_objects_as_table()
         {
             var count = 0;
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new ObjectController { OnAction = () => new[] { new WithTwoProperties(count++), new WithTwoProperties(count++) } });
 
-            var arguments = Builder.Create(sc, new Configuration
+            var arguments = AppHostBuilder.Create(sc, new Configuration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             }).Recognize(typeof(ObjectController))

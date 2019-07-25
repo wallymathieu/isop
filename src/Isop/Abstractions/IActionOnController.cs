@@ -6,21 +6,25 @@ namespace Isop.Abstractions
     /// <summary>
     /// 
     /// </summary>
-    public interface IActionControllerExpression
+    public interface IActionOnController
     {
         /// <summary>
         /// Get arguments for controller action
         /// </summary>
-        IReadOnlyCollection<Argument> GetArguments();
+        IReadOnlyCollection<Argument> Arguments { get; }
 
         /// <summary>
         /// send parameters to controller actions
         /// </summary>
-        IParsedExpression Parameters(Dictionary<string, string> parameters);
+        IParsed Parameters(Dictionary<string, string> parameters);
 
         /// <summary>
         /// Get help for controller action
         /// </summary>
         string Help();
+        /// <summary>
+        /// Action name
+        /// </summary>
+        string Name { get; }
     }
 }

@@ -11,7 +11,7 @@ namespace Isop.Abstractions
         /// <summary>
         /// Parse command line arguments and return parsed arguments entity
         /// </summary>
-        IParsedExpression Parse(IEnumerable<string> arg);
+        IParsed Parse(IEnumerable<string> arg);
 
         /// <summary>
         /// Return help-text
@@ -21,6 +21,10 @@ namespace Isop.Abstractions
         /// <summary>
         /// 
         /// </summary>
-        IControllerExpression Controller(string controllerName);
+        IController Controller(string controllerName);
+        /// <summary>
+        /// Controllers exposed by the API
+        /// </summary>
+        IReadOnlyList<IController> Controllers { get; }
     }
 }
