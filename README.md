@@ -145,4 +145,4 @@ Why all this code? Mostly it's because I want the programmer to be able to have 
 
 ## Alternative
 
-If you want to have something simpler for simple command line applications then I would recommend using [ndesc options](https://github.com/wallymathieu/ndesk-options-mirror) or [commandline](https://github.com/commandlineparser/commandline).
+If you want to have something simpler for simple command line applications then I would recommend using [ndesc options](https://github.com/wallymathieu/ndesk-options-mirror) or [commandline](https://github.com/commandlineparser/commandline) or perhaps [.net command-line-api](https://github.com/dotnet/command-line-api).
