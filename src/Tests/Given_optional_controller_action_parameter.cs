@@ -62,5 +62,22 @@ namespace Tests
             Assert.That(parameters, Is.EquivalentTo(new object[] { "value1", null, null, 1 }));
         }
 
+        [Test,Ignore("Failure mode not implemented")]
+        public void When_using_ordinal_syntax_and_infer_is_disabled()
+        {
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) => 
+                throw new Exception("!")});
+            var parsed = AppHostBuilder.Create(sc, new Configuration()
+                {
+                    DisableAllowInferParameter = true
+                }).Recognize<MyOptionalController>()
+                .BuildAppHost()
+                .Parse(new[] { "MyOptional", "Action", "value1" });
+            Assert.That(parsed.Recognized.Count, Is.EqualTo(0));
+            CollectionAssert.AreEqual(
+                new []{"value1"},
+                parsed.Unrecognized.Select(u=>u.Value).ToArray());
+        }
     }
 }

@@ -133,11 +133,27 @@ namespace Tests
                 .Parameter("alpha|a=")
                 .BuildAppHost()
                 .Parse(new[] { "test", "value" }).Recognized;
-            Assert.That(arguments.Count(), Is.EqualTo(2));
+            Assert.That(arguments.Count, Is.EqualTo(2));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.EqualTo("test"));
             var arg2 = arguments.Last();
             Assert.That(arg2.Value, Is.EqualTo("value"));
+        }
+        [Test]
+        public void When_infer_is_turned_off()
+        {
+            var parsed = AppHostBuilder.Create(new Configuration
+                {
+                    DisableAllowInferParameter = true
+                })
+                .Parameter("beta|b=")
+                .Parameter("alpha|a=")
+                .BuildAppHost()
+                .Parse(new[] { "test", "value" });
+            Assert.That(parsed.Recognized.Count, Is.EqualTo(0));
+            CollectionAssert.AreEqual(
+                new []{"test", "value"},
+                parsed.Unrecognized.Select(u=>u.Value));
         }
         [Test]
         public void It_wont_report_matched_parameters()

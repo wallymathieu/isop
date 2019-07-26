@@ -11,6 +11,7 @@ namespace Isop
         /// The culture info for the console application
         /// </summary>
         public CultureInfo CultureInfo { get; set; }
+
         /// <summary>
         /// If you want to disable infer parameter
         /// </summary>

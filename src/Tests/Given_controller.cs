@@ -44,6 +44,25 @@ namespace Tests
             arguments.Invoke(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
+        
+        [Test]
+        public void Ordinal_syntax_when_infer_is_turned_off()
+        {
+            var count = 0;
+            var sc = new ServiceCollection();
+            sc.AddSingleton(ci => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
+            var args = new[] { "My", "Action", "value1", "value2", "3", "3.4" };
+            var parsed = AppHostBuilder.Create(sc, new Configuration
+                {
+                    DisableAllowInferParameter = true
+                }).Recognize<MyController>()
+                .BuildAppHost()
+                .Parse(args);
+            Assert.That(parsed.Recognized.Count, Is.EqualTo(0));
+            CollectionAssert.AreEqual(
+                args,
+                parsed.Unrecognized.Select(u=>u.Value));
+        }
 
         [Test]
         public void It_can_parse_class_and_method_and_knows_whats_required()
