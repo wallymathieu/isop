@@ -80,7 +80,7 @@ namespace Isop.CommandLine.Parse
                     case TokenType.ParameterValue:
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(current.TokenType.ToString());
+                        throw new Exception($"Unexpected token type {current.TokenType}");
                 }
             }
 
