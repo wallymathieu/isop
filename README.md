@@ -32,7 +32,7 @@ someprogram.exe My Action value
 
 So that the class with the name My or MyController and the method with the name Action gets invoked.
 
-This library is intended to be like chocolate pudding mix. Not something that will replace your dinner, but rather something easy to make for dessert. A way of helping you build for instance the essential administrative apps. It's not a replacement for baking cake (building a full blown administrative interface in html, silverlight, wpf ... ). 
+This library is intended to be like chocolate pudding mix. Not something that will replace your dinner, but rather something easy to make for dessert. A way of helping you build for instance the essential administrative apps. It's not a replacement for baking cake (building a full blown administrative interface in html). 
 
 ## When to use Isop
 
