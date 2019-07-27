@@ -18,7 +18,7 @@ let (|Parameter|_|) name : _-> string option =
   let regex = Regex(sprintf "--%s[:=](.+)" (Regex.Escape name))
   fun value ->  
     let m = regex.Match value
-    if m.Success then Some (m.Groups.Cast<Group>().ElementAt(1).Value)
+    if m.Success then Some ((nth 1 m.Groups).Value)
     else None
 let (|Cmd|_|) : _-> Cmd option = tryParse
 
@@ -36,6 +36,6 @@ let rec parseArgs b args =
 [<InlineData("fetch --dir=folder")>]
 [<InlineData("fetch --dir:folder")>]
 let ``Can parse`` (args:string) =
-  let args = args.Split(" ") |> List.ofArray
+  let args =  args.Split(" ") |> List.ofArray
   Assert.Equal(Ok {Dir="folder"; Command=Some Cmd.fetch}, parseArgs defaultArgs args)
 
