@@ -2,7 +2,6 @@ module Tests
 
 open System
 open Xunit
-open System.Linq
 open FSharpPlus
 open System.Text.RegularExpressions
 [<Diagnostics.CodeAnalysis.SuppressMessage("*", "EnumCasesNames")>]
@@ -20,7 +19,10 @@ let (|Parameter|_|) name : _-> string option =
     let m = regex.Match value
     if m.Success then Some ((nth 1 m.Groups).Value)
     else None
-let (|Cmd|_|) : _-> Cmd option = tryParse
+let (|Cmd|_|) : _-> Cmd option = 
+    fun x -> if Regex.IsMatch(x, "\d.*") then None
+             else 
+             tryParse x
 
 let rec parseArgs b args =
   match args with
@@ -31,11 +33,27 @@ let rec parseArgs b args =
   | invalidArgs ->
     sprintf "error: invalid arguments %A" invalidArgs |> Error
   
+let assertEqual(expected:Result<'a,'e>,actual:Result<'a,'e>)=
+    match actual, expected with
+    | Ok actual, Ok expected when actual = expected -> ()
+    | Error actual, Error expected when actual = expected -> ()
+    | _ ,_ -> Assert.True (false, sprintf "Expected %A should equal %A" expected actual)
+
 [<Theory>]
 [<InlineData("fetch --dir folder")>]
 [<InlineData("fetch --dir=folder")>]
 [<InlineData("fetch --dir:folder")>]
+[<InlineData("--dir:folder fetch")>]
 let ``Can parse`` (args:string) =
   let args = split [" "] args
-  Assert.Equal(Ok {Dir="folder"; Command=Some Cmd.fetch}, parseArgs defaultArgs args)
+  assertEqual(Ok {Dir="folder"; Command=Some Cmd.fetch}, parseArgs defaultArgs args)
+
+[<Theory>]
+[<InlineData("fetchx", "[\"fetchx\"]")>]
+[<InlineData("fetch --dirfolder", "[\"--dirfolder\"]")>]
+[<InlineData("100", "[\"100\"]")>]
+[<InlineData("1", "[\"1\"]")>]
+let ``Cannot parse`` (args:string, err) =
+  let args = split [" "] args
+  assertEqual(Error (sprintf "error: invalid arguments %s" err), parseArgs defaultArgs args)
 
