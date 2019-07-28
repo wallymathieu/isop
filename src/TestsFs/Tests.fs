@@ -20,9 +20,8 @@ let (|Parameter|_|) name : _-> string option =
     if m.Success then Some ((nth 1 m.Groups).Value)
     else None
 let (|Cmd|_|) : _-> Cmd option = 
-    fun x -> if Regex.IsMatch(x, "\d.*") then None
-             else 
-             tryParse x
+    fun x -> match tryParse x with | Some (_ : int64) -> None // should fail if can be parsed as integer
+                                   | _ -> tryParse x // try to parse as enum
 
 let rec parseArgs b args =
   match args with
