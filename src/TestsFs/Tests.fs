@@ -36,6 +36,6 @@ let rec parseArgs b args =
 [<InlineData("fetch --dir=folder")>]
 [<InlineData("fetch --dir:folder")>]
 let ``Can parse`` (args:string) =
-  let args = String.split [" "] args |> List.ofSeq
+  let args = split [" "] args
   Assert.Equal(Ok {Dir="folder"; Command=Some Cmd.fetch}, parseArgs defaultArgs args)
 
