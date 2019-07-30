@@ -4,11 +4,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Isop.CommandLine.Views
+namespace Isop.CommandLine
 {
-    class TableFormatter
+    internal static class ToStrings
     {
-        public IEnumerable<string> Format(object value)
+        public static IEnumerable<string> Default(object value)
+        {
+            if (value == null) yield break;
+            switch (value)
+            {
+                case string s:
+                    yield return s;
+                    break;
+                case IEnumerable enumerable:
+                {
+                    foreach (var item in enumerable)
+                    {
+                        foreach (var formatted in Default(item))
+                        {
+                            yield return formatted;
+                        }
+                    }
+                    break;
+                }
+                default:
+                    yield return value.ToString();
+                    break;
+            }
+        }
+        
+        public static IEnumerable<string> AsTable(object value)
         {
             if (value == null) yield break;
             switch (value)
@@ -23,7 +48,7 @@ namespace Isop.CommandLine.Views
                     {
                         foreach (var item in enumerable)
                         {
-                            foreach (var formatted in Format(item))
+                            foreach (var formatted in AsTable(item))
                             {
                                 yield return formatted;
                             }

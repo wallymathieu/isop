@@ -94,9 +94,9 @@ namespace Isop.Implementations
             {
                 var item = await result;
                 var formatted = await item.Select(
-                    argument: arg => Task.FromResult(_appHost.Formatter(arg.Result)),
-                    asyncControllerAction: async ca => _appHost.Formatter(await ca.Task),
-                    controllerAction: ca => Task.FromResult(_appHost.Formatter(ca.Result)),
+                    argument: arg => Task.FromResult(_appHost.ToStrings(arg.Result)),
+                    asyncControllerAction: async ca => _appHost.ToStrings(await ca.Task),
+                    controllerAction: ca => Task.FromResult(_appHost.ToStrings(ca.Result)),
                     empty: e => Task.FromResult(Enumerable.Empty<string>())
                 );
                 foreach (var str in formatted) await output.WriteLineAsync(str);

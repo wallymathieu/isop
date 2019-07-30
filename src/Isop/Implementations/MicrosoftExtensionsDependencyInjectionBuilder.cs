@@ -8,20 +8,20 @@ using Microsoft.Extensions.Options;
 namespace Isop.Implementations
 {
     using Abstractions;
-    using CommandLine.Views;
+    using CommandLine;
     using Domain;
     internal class MicrosoftExtensionsDependencyInjectionBuilder : IAppHostBuilder
     {
         private readonly RecognizesBuilder _recognizes;
         private readonly IServiceCollection _serviceCollection;
-        private Formatter _formatter;
+        private Abstractions.ToStrings _toStrings;
         private TypeConverter _typeConverter;
        
         public MicrosoftExtensionsDependencyInjectionBuilder(IServiceCollection serviceCollection, RecognizesBuilder recognizes)
         {
             _serviceCollection = serviceCollection;
             _recognizes = recognizes;
-            _formatter = new ToStringFormatter().Format;
+            _toStrings = CommandLine.ToStrings.Default;
             _typeConverter = new DefaultConverter().ConvertFrom;
         }
         public IAppHostBuilder SetTypeConverter(TypeConverter typeConverter)
@@ -29,9 +29,9 @@ namespace Isop.Implementations
             _typeConverter = typeConverter;
             return this;
         }
-        public IAppHostBuilder SetFormatter(Formatter formatter)
+        public IAppHostBuilder SetFormatter(Abstractions.ToStrings toStrings)
         {
-            _formatter = formatter;
+            _toStrings = toStrings;
             return this;
         }
         public IAppHostBuilder Parameter(string argument, ArgumentAction action = null, bool required = false, string description = null)
@@ -68,7 +68,7 @@ namespace Isop.Implementations
                 svcProvider, 
                 new Recognizes(_recognizes.Recognizes.ToArray(), _recognizes.Properties.ToArray()),
                 _typeConverter,
-                _formatter, 
+                _toStrings, 
                 texts,
                 conventions);
         }

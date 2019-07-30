@@ -7,20 +7,20 @@ using Microsoft.Extensions.Options;
 namespace Isop.Implementations
 {
     using Abstractions;
-    using CommandLine.Views;
+    using CommandLine;
     using Domain;
     internal class ServiceProviderAppHostBuilder : IAppHostBuilder
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly RecognizesBuilder _recognizes;
-        private Formatter _formatter;
+        private Abstractions.ToStrings _toStrings;
         private TypeConverter _typeConverter;
 
         public ServiceProviderAppHostBuilder(IServiceProvider serviceProvider, RecognizesBuilder recognizes)
         {
             _serviceProvider = serviceProvider;
             _recognizes = recognizes;
-            _formatter = new ToStringFormatter().Format;
+            _toStrings = CommandLine.ToStrings.Default;
             _typeConverter = new DefaultConverter().ConvertFrom;
         }
         public IAppHostBuilder SetTypeConverter(TypeConverter typeConverter)
@@ -28,9 +28,9 @@ namespace Isop.Implementations
             _typeConverter = typeConverter;
             return this;
         }
-        public IAppHostBuilder SetFormatter(Formatter formatter)
+        public IAppHostBuilder SetFormatter(Abstractions.ToStrings toStrings)
         {
-            _formatter = formatter;
+            _toStrings = toStrings;
             return this;
         }
 
@@ -70,7 +70,7 @@ namespace Isop.Implementations
                 _serviceProvider, 
                 new Recognizes(_recognizes.Recognizes.ToArray(), _recognizes.Properties.ToArray()),
                 _typeConverter,
-                _formatter, 
+                _toStrings, 
                 texts,
                 conventions);
         }

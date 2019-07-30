@@ -2,7 +2,6 @@ using System;
 
 namespace Isop.Abstractions
 {
-    using CommandLine.Views;
     /// <summary>
     /// 
     /// </summary>
@@ -16,7 +15,7 @@ namespace Isop.Abstractions
         /// <summary>
         /// 
         /// </summary>
-        IAppHostBuilder SetFormatter(Formatter formatter);
+        IAppHostBuilder SetFormatter(ToStrings toStrings);
 
         /// <summary>
         /// 

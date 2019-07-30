@@ -34,7 +34,7 @@ namespace Tests
         }
         
         [Test]
-        public void It_can_tokenize_parametervalue_slash_and_equals()
+        public void It_can_tokenize_parameter_value_slash_and_equals()
         {
             var lexed = ArgumentLexer.Lex(new[] { "/parameter=parametervalue" });
             var tokens = lexed.ToArray();
@@ -42,7 +42,7 @@ namespace Tests
         }
 
         [Test]
-        public void It_can_tokenize_parametervalue_minus_minus()
+        public void It_can_tokenize_parameter_value_minus_minus()
         {
             var lexed = ArgumentLexer.Lex(new[] { "--parameter", "parametervalue" });
             var tokens = lexed.ToArray();
@@ -50,7 +50,7 @@ namespace Tests
         }
         
         [Test]
-        public void It_can_tokenize_parametervalue_minus_minus_and_equals()
+        public void It_can_tokenize_parameter_value_minus_minus_and_equals()
         {
             var lexed = ArgumentLexer.Lex(new[] { "--parameter=parametervalue" });
             var tokens = lexed.ToArray();

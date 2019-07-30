@@ -1,7 +1,7 @@
 namespace Isop
 {
     using Abstractions;
-    using CommandLine.Views;
+    using CommandLine;
 
     /// <summary>
     /// Extensions of <see cref="IAppHostBuilder"/>
@@ -22,6 +22,6 @@ namespace Isop
         /// 
         /// </summary>
         /// <returns></returns>
-        public static IAppHostBuilder FormatObjectsAsTable(this IAppHostBuilder build) => build.SetFormatter(new TableFormatter().Format);
+        public static IAppHostBuilder FormatObjectsAsTable(this IAppHostBuilder build) => build.SetFormatter(CommandLine.ToStrings.AsTable);
     }
 }
