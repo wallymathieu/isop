@@ -12,14 +12,13 @@ namespace Isop.Implementations
     using CommandLine;
     using CommandLine.Lex;
     using CommandLine.Parse;
-    using CommandLine.Views;
     using Domain;
     using Help;
     using Localization;
 
     internal class AppHost : IAppHost
     {
-        internal readonly Formatter Formatter;
+        internal readonly Abstractions.ToStrings ToStrings;
         internal readonly Recognizes Recognizes;
         internal readonly IServiceProvider ServiceProvider;
         internal readonly ControllerRecognizer ControllerRecognizer;
@@ -46,11 +45,11 @@ namespace Isop.Implementations
             IServiceProvider serviceProvider,
             Recognizes recognizes,
             TypeConverter typeConverter, 
-            Formatter formatter, 
+            Abstractions.ToStrings toStrings, 
             IOptions<Texts> texts,
             IOptions<Conventions> conventions)
         {
-            Formatter = formatter;
+            ToStrings = toStrings;
             Configuration = options ?? Options.Create(new Configuration());
             Recognizes = recognizes;
             ServiceProvider = serviceProvider;
