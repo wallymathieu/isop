@@ -32,11 +32,6 @@ let rec parseArgs b args =
   | invalidArgs ->
     sprintf "error: invalid arguments %A" invalidArgs |> Error
   
-let assertEqual(expected:Result<'a,'e>,actual:Result<'a,'e>)=
-    match actual, expected with
-    | Ok actual, Ok expected when actual = expected -> ()
-    | Error actual, Error expected when actual = expected -> ()
-    | _ ,_ -> Assert.True (false, sprintf "Expected %A should equal %A" expected actual)
 
 [<Theory>]
 [<InlineData("fetch --dir folder")>]
@@ -45,7 +40,7 @@ let assertEqual(expected:Result<'a,'e>,actual:Result<'a,'e>)=
 [<InlineData("--dir:folder fetch")>]
 let ``Can parse`` (args:string) =
   let args = split [" "] args
-  assertEqual(Ok {Dir="folder"; Command=Some Cmd.fetch}, parseArgs defaultArgs args)
+  Result.assertEqual(Ok {Dir="folder"; Command=Some Cmd.fetch}, parseArgs defaultArgs args)
 
 [<Theory>]
 [<InlineData("fetchx", "[\"fetchx\"]")>]
@@ -54,5 +49,4 @@ let ``Can parse`` (args:string) =
 [<InlineData("1", "[\"1\"]")>]
 let ``Cannot parse`` (args:string, err) =
   let args = split [" "] args
-  assertEqual(Error (sprintf "error: invalid arguments %s" err), parseArgs defaultArgs args)
-
+  Result.assertEqual(Error (sprintf "error: invalid arguments %s" err), parseArgs defaultArgs args)
