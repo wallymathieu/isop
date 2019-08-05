@@ -9,7 +9,8 @@ open FSharpPlus.Data
 type CLIPart<'a> = 'a -> OptionT<Async<'a option>>
 module CLIPart=
   let choose (options : CLIPart<'a> list) = fun x -> choice (List.map ((|>) x) options)
-  let inline fail (_:'a) : OptionT<Async<'a option>> = OptionT <| async.Return None
+  let inline some (a:'a) : OptionT<Async<'a option>> = OptionT <| async.Return (Some a) 
+  let inline none (_:'a) : OptionT<Async<'a option>> = OptionT <| async.Return None
 
 let (|Parameter|_|) name : _-> string option =
   let regex = Regex(sprintf "--%s[:=](.+)" (Regex.Escape name))
@@ -20,8 +21,6 @@ let (|Parameter|_|) name : _-> string option =
 
 module Filters=
   let method (text : string) = OptionT << fun (x : string list) -> async.Return (match x with x'::xs when x'=text -> Some xs | _->  None)
-  
-
 
 type CmdArgs =
   { Dir: string; }
@@ -35,30 +34,37 @@ let rec parseArgs b args =
   | invalidArgs ->
     sprintf "error: invalid arguments %A" invalidArgs |> Error
 
-let app=CLIPart.choose [ 
-  Filters.method "fetch" >=> 
-  (fun args-> monad {
-    match parseArgs defaultArgs args with
-    | Ok v->
+type T(l:ResizeArray<_>)=
+  let app=CLIPart.choose [ 
+    Filters.method "fetch" >=> 
+    (fun args-> monad {
+      let r = parseArgs defaultArgs args
+      match r with
+      | Ok (v:CmdArgs)-> 
+        l.Add v
         // do some async work
-        return []
-    | Error err->
-      Console.Error.WriteLine err
-      // print error
-      return! CLIPart.fail []
-  }) ]
+        return! CLIPart.some []
+      | Error err ->
+        Console.Error.WriteLine (string err)
+        return! CLIPart.none []
+    }) ]
 
-let parse args=async {
-  match! app args |> OptionT.run with
-    | Some _ -> return 0
-    | None -> return 1
-}
+  let parse args=async {
+    match! app args |> OptionT.run with
+      | Some _ -> return 0
+      | None -> return 1
+  }
+  member __.Parse(args)=parse args
 
 [<Theory>]
 [<InlineData("fetch --dir folder")>]
 [<InlineData("fetch --dir=folder")>]
 [<InlineData("fetch --dir:folder")>]
-[<InlineData("--dir:folder fetch")>]
-let ``Can parse`` (args:string) =
-  let args = split [" "] args
-  Result.assertEqual(Ok {Dir="folder"; }, parseArgs defaultArgs args)
+let ``Can parse`` (args:string) = Async.StartAsTask <| async{
+    let args = split [" "] args
+    let l=ResizeArray()
+    let t=T(l)
+    let! i= t.Parse args
+    Assert.Equal(0, i)
+    Assert.Equal({Dir="folder"; }, Assert.Single(l))
+  }
