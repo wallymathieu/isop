@@ -29,5 +29,10 @@ namespace Isop.Abstractions
         /// Invoke using parameters
         /// </summary>
         Task<IEnumerable<InvokeResult>> InvokeAsync();
+        /// <summary>
+        /// Return help text
+        /// </summary>
+        /// <returns></returns>
+        string Help();
     }
 }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using Isop;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Tests.FakeControllers;
 
@@ -16,9 +18,10 @@ namespace Tests.DependencyInjection
         public void SetUp()
         {
             count = 0;
-            RegisterSingleton(()=>new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
+            RegisterSingleton(() => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
+            //RegisterSingleton(() => Options.Create(new Configuration { CultureInfo = CultureInfo.InvariantCulture }));
         }
-        
+
         [Test]
         public void It_can_parse_and_invoke()
         {

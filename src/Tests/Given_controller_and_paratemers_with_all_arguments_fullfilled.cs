@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using Isop;
 using Isop.Abstractions;
@@ -23,7 +24,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
 
-            parsed = AppHostBuilder.Create(sc)
+            parsed = AppHostBuilder.Create(sc, new Configuration { CultureInfo = CultureInfo.InvariantCulture })
                 .Recognize(typeof(MyController))
                 .Parameter("beta", arg => countArg++)
                 .BuildAppHost()
