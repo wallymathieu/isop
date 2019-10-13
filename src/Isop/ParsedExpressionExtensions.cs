@@ -34,8 +34,9 @@ namespace Isop
                 {
                     await error.WriteLineAsync($@"Unrecognized arguments: 
 {string.Join(",", parsed.Unrecognized.Select(arg => arg.Value).ToArray())}");
+                    return 400;
                 }
-                await parsed.InvokeAsync(Console.Out);
+                await parsed.InvokeAsync(@out);
             }
             catch (TypeConversionFailedException ex)
             {
