@@ -12,8 +12,8 @@ namespace Tests.DependencyInjection
     { 
         class AutoFacRegistrationBuilder: RegistrationBuilder
         {
-            IServiceCollection serviceCollection = new ServiceCollection().AddLogging();
-            private ContainerBuilder _containerBuilder = new ContainerBuilder();
+            private ContainerBuilder _containerBuilder = new ContainerBuilder().Tap(c=>
+                c.Populate(new ServiceCollection().AddLogging()));
             public override void RegisterSingleton<T>(Func<T> factory) => _containerBuilder.Register(di => factory()).As<T>().SingleInstance();
             public override IServiceProvider Build()=>
                 new AutofacServiceProvider(_containerBuilder.Build());
