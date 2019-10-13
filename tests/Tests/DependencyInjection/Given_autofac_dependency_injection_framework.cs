@@ -14,9 +14,9 @@ namespace Tests.DependencyInjection
         {
             IServiceCollection serviceCollection = new ServiceCollection().AddLogging();
             private ContainerBuilder _containerBuilder = new ContainerBuilder();
-            public override void RegisterSingleton<T>(Func<T> factory) => _containerBuilder.Register(di => factory()).As<T>();
+            public override void RegisterSingleton<T>(Func<T> factory) => _containerBuilder.Register(di => factory()).As<T>().SingleInstance();
             public override IServiceProvider Build()=>
-                new AutofacServiceProvider(_containerBuilder.Build().BeginLifetimeScope(b => b.Populate(serviceCollection)));
+                new AutofacServiceProvider(_containerBuilder.Build());
         }
         protected override RegistrationBuilder RegistrationBuilder => new AutoFacRegistrationBuilder();
     }
