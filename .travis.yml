@@ -1,5 +1,5 @@
 language: csharp
-dotnet: 2.1.301
+dotnet: 2.2.401
 
 solution: ./src/Isop.sln
 install:
