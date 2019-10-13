@@ -9,9 +9,9 @@ namespace Tests.DependencyInjection
     [TestFixture]
     public class Given_your_own_dependency_injection_framework:Given_dependency_injection_framework
     {
-        private readonly MyOwnContainer _myOwnContainer = new MyOwnContainer();
+        protected override RegistrationBuilder RegistrationBuilder => new MyOwnContainer();
 
-        class MyOwnContainer:IServiceScopeFactory
+        class MyOwnContainer: RegistrationBuilder, IServiceScopeFactory
         {
             private readonly IDictionary<Type, Func<object>> _registrations;
             private IServiceProvider _scp;
@@ -22,10 +22,12 @@ namespace Tests.DependencyInjection
                     {typeof(IServiceScopeFactory), ()=>this}
                 };
 
-            public void RegisterSingleton<T>(Func<T> factory) => _registrations.Add(typeof(T), ()=>factory());
             
             public IServiceScope CreateScope() => new SimpleScope(new ServiceProviderImpl(_registrations));
 
+            public override void RegisterSingleton<T>(Func<T> factory) => _registrations.Add(typeof(T), () => factory());
+
+            public override IServiceProvider Build() => _scp ?? (_scp = new ServiceProviderImpl(_registrations));
 
             class SimpleScope : IServiceScope
             {
@@ -50,10 +52,6 @@ namespace Tests.DependencyInjection
                     ?factory.Invoke()
                     :null;
             }
-            public IServiceProvider ServiceProvider => _scp ?? (_scp = new ServiceProviderImpl(_registrations));
         }
-
-        protected override IServiceProvider ServiceProvider => _myOwnContainer.ServiceProvider;
-        protected override void RegisterSingleton<T>(Func<T> factory) => _myOwnContainer.RegisterSingleton(factory);
     }
 }

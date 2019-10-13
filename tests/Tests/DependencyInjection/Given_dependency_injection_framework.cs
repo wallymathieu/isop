@@ -9,18 +9,27 @@ using Tests.FakeControllers;
 
 namespace Tests.DependencyInjection
 {
+    public abstract class RegistrationBuilder
+    {
+        public abstract void RegisterSingleton<T>(Func<T> factory) where T : class;
+        public abstract IServiceProvider Build();
+    }
     public abstract class Given_dependency_injection_framework
     {
-        protected abstract IServiceProvider ServiceProvider { get; }
-        protected abstract void RegisterSingleton<T>(Func<T> factory) where T : class;
+      
+        protected IServiceProvider ServiceProvider;
         private int count;
         [SetUp]
         public void SetUp()
         {
             count = 0;
-            RegisterSingleton(() => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
-            //RegisterSingleton(() => Options.Create(new Configuration { CultureInfo = CultureInfo.InvariantCulture }));
+            var registrationBuilder = RegistrationBuilder;
+            registrationBuilder.RegisterSingleton(() => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
+            registrationBuilder.RegisterSingleton(() => Options.Create(new Configuration { CultureInfo = CultureInfo.InvariantCulture }));
+            ServiceProvider = registrationBuilder.Build();
         }
+
+        protected abstract RegistrationBuilder RegistrationBuilder { get; }
 
         [Test]
         public void It_can_parse_and_invoke()
