@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,44 +21,7 @@ namespace Example
                 .Recognize(typeof(MyController))
                 .Recognize(typeof(CustomerController))
                 .BuildAppHost();
-            try
-            {
-                var parsed = appHost.Parse(args);
-                if (parsed.Unrecognized.Any()) //Warning:
-                {
-                    await Console.Error.WriteLineAsync($@"Unrecognized arguments: 
-{string.Join(",", parsed.Unrecognized.Select(arg => arg.Value).ToArray())}");
-                }
-
-                await parsed.InvokeAsync(Console.Out);
-            }
-            catch (TypeConversionFailedException ex)
-            {
-
-                await Console.Error.WriteLineAsync(
-                    $"Could not convert argument {ex.Argument} with value {ex.Value} to type {ex.TargetType}");
-                if (null != ex.InnerException)
-                {
-                    await Console.Error.WriteLineAsync("Inner exception: ");
-                    await Console.Error.WriteLineAsync(ex.InnerException.Message);
-                }
-
-                return 400;
-            }
-            catch (MissingArgumentException ex)
-            {
-                await Console.Error.WriteLineAsync($"Missing argument(s): {String.Join(", ", ex.Arguments).ToArray()}");
-
-                await Console.Error.WriteLineAsync(appHost.Help());
-                return 400;
-            }
-            catch (Exception ex)
-            {
-                await Console.Error.WriteLineAsync(ex.Message);
-                return 500;
-            }
-
-            return 0;
+            return await appHost.Parse(args).TryInvokeAsync();
         }
     }
 }

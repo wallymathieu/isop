@@ -2,6 +2,9 @@ namespace Isop
 {
     using Abstractions;
     using CommandLine;
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Extensions of <see cref="IAppHostBuilder"/>

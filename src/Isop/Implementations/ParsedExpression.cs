@@ -107,5 +107,7 @@ namespace Isop.Implementations
             AssertFailOnMissing();
             return await Task.WhenAll( _argumentInvoker.Invoke(_parsedArguments));
         }
+
+        public string Help() => _appHost.Help();
     }
 }
