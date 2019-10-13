@@ -1,13 +1,13 @@
 language: csharp
 dotnet: 2.2.401
 
-solution: ./src/Isop.sln
+solution: ./Isop.sln
 install:
-  - msbuild /t:restore src
+  - msbuild /t:restore . 
 
 script: 
-  - msbuild src
-  - dotnet test -f netcoreapp2.1 src/Tests/Tests.csproj
+  - msbuild . 
+  - dotnet test -f netcoreapp2.1 tests/Tests/Tests.csproj
 branches:
   only: 
     - master
