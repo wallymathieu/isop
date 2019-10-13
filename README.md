@@ -65,7 +65,7 @@ static Task Main(string[] args)=>
        .Recognize(typeof(CustomerController))
        .BuildAppHost()
        .Parse(args)
-       .InvokeAsync(Console.Out);
+       .TryInvokeAsync();
 ```
 
 Where your controller looks something like this:
