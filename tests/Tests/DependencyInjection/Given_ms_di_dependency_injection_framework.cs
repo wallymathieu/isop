@@ -7,9 +7,14 @@ namespace Tests.DependencyInjection
     [TestFixture]
     public class Given_ms_di_dependency_injection_framework:Given_dependency_injection_framework
     {
-        private ServiceCollection _serviceCollection = new ServiceCollection();
-        protected override IServiceProvider ServiceProvider => _serviceCollection.BuildServiceProvider();
-        protected override void RegisterSingleton<T>(Func<T> factory) => 
-            _serviceCollection.AddSingleton(_ => factory());
+        protected override RegistrationBuilder RegistrationBuilder => new MsRegistrationBuilder();
+
+        class MsRegistrationBuilder : RegistrationBuilder
+        {
+            IServiceCollection serviceCollection = new ServiceCollection().AddLogging();
+            public override void RegisterSingleton<T>(Func<T> factory) =>
+                serviceCollection.AddSingleton<T>(_ => factory());
+            public override IServiceProvider Build() =>serviceCollection.BuildServiceProvider();
+        }
     }
 }

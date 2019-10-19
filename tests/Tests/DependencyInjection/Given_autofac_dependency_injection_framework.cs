@@ -10,13 +10,14 @@ namespace Tests.DependencyInjection
     [TestFixture]
     public class Given_autofac_dependency_injection_framework:Given_dependency_injection_framework
     { 
-        IServiceCollection serviceCollection = new ServiceCollection().AddLogging();
-        private ContainerBuilder _containerBuilder = new ContainerBuilder();
-        protected override IServiceProvider ServiceProvider => 
-            new AutofacServiceProvider(_containerBuilder.Build().BeginLifetimeScope(b=>b.Populate(serviceCollection) ));
-        protected override void RegisterSingleton<T>(Func<T> factory)
+        class AutoFacRegistrationBuilder: RegistrationBuilder
         {
-            _containerBuilder.Register(di=>factory()).As<T>();
+            private ContainerBuilder _containerBuilder = new ContainerBuilder().Tap(c=>
+                c.Populate(new ServiceCollection().AddLogging()));
+            public override void RegisterSingleton<T>(Func<T> factory) => _containerBuilder.Register(di => factory()).As<T>().SingleInstance();
+            public override IServiceProvider Build()=>
+                new AutofacServiceProvider(_containerBuilder.Build());
         }
+        protected override RegistrationBuilder RegistrationBuilder => new AutoFacRegistrationBuilder();
     }
 }
