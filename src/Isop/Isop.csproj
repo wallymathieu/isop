@@ -8,7 +8,11 @@
     <CodeAnalysisRuleSet>Isop.ruleset</CodeAnalysisRuleSet>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>7.1</LangVersion>
+    <DefineConstants>ISOP_CORE;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Isop.Xml.Documentation\XmlDocumentationReader.cs" Link="Help\XmlDocumentationReader.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.3.0" />

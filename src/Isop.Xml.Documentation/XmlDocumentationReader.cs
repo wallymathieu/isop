@@ -7,9 +7,19 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
 
-namespace Isop.Help
+namespace
+#if ISOP_CORE
+    Isop.Help
+#else
+    Isop.Xml.Documentation
+#endif
 {
-    internal class HelpXmlDocumentation
+#if ISOP_CORE
+    internal
+#else
+    public
+#endif
+    class XmlDocumentationReader
     {
         private static IDictionary<string, string> GetSummariesFromText(string text)
         {

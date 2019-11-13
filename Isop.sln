@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\Tests\Tests.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2AEB9AD6-B0BF-4C28-8DB4-CF91250C77FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isop.Xml.Documentation", "src\Isop.Xml.Documentation\Isop.Xml.Documentation.csproj", "{81AE1618-13A5-498C-B0D2-10C1D09CC4EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 		{28442E67-7399-4A0A-A6B5-04C4DED746B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28442E67-7399-4A0A-A6B5-04C4DED746B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28442E67-7399-4A0A-A6B5-04C4DED746B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81AE1618-13A5-498C-B0D2-10C1D09CC4EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81AE1618-13A5-498C-B0D2-10C1D09CC4EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81AE1618-13A5-498C-B0D2-10C1D09CC4EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81AE1618-13A5-498C-B0D2-10C1D09CC4EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,5 +62,6 @@ Global
 		{3B16BAF9-69F1-4A7B-A6C0-62DE88FD38CB} = {CB4D0399-C53D-4B46-9B7E-91F4354B01B2}
 		{02596ACA-3C85-4353-8744-5F0A172BA757} = {CB4D0399-C53D-4B46-9B7E-91F4354B01B2}
 		{28442E67-7399-4A0A-A6B5-04C4DED746B9} = {2AEB9AD6-B0BF-4C28-8DB4-CF91250C77FE}
+		{81AE1618-13A5-498C-B0D2-10C1D09CC4EA} = {CB4D0399-C53D-4B46-9B7E-91F4354B01B2}
 	EndGlobalSection
 EndGlobal

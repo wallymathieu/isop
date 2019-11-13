@@ -24,7 +24,7 @@ namespace Isop.Help
             _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
             _helpForArgumentWithOptions = new HelpForArgumentWithOptions(texts, recognizes, config);
             _helpForClassAndMethod = new HelpForControllers(recognizes, 
-                new HelpXmlDocumentation(), texts, config, serviceProvider, conventions);
+                new XmlDocumentationReader(), texts, config, serviceProvider, conventions);
         }
 
         public string Index()

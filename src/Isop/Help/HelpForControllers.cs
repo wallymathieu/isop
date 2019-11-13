@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,14 +13,14 @@ namespace Isop.Help
     internal class HelpForControllers
     {
         private readonly IEnumerable<Controller> _classAndMethodRecognizers;
-        private readonly HelpXmlDocumentation _helpXmlDocumentation;
+        private readonly XmlDocumentationReader _helpXmlDocumentation;
         private readonly Configuration _configuration;
         private readonly Conventions _conventions;
         private readonly IServiceProvider _serviceProvider;
         private readonly Localization.Texts _texts;
 
-        public HelpForControllers(Recognizes recognizes, 
-            HelpXmlDocumentation helpXmlDocumentation,
+        public HelpForControllers(Recognizes recognizes,
+            XmlDocumentationReader helpXmlDocumentation,
             IOptions<Localization.Texts> texts,
             IOptions<Configuration> configuration,
             IServiceProvider serviceProvider,
