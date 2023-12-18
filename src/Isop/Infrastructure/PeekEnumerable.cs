@@ -15,7 +15,7 @@ namespace Isop.Infrastructure
         private readonly IReadOnlyList<T> _buffer;
         public T Current()
         {
-            if (_currentIndex < _buffer.Count())
+            if (_currentIndex < _buffer.Count)
             {
                 return _buffer[_currentIndex];
             }
