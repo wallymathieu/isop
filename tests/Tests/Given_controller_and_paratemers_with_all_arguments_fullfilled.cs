@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 using Isop;
 using Isop.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,21 +38,21 @@ namespace Tests
             Assert.That(parsed.Unrecognized.Count, Is.EqualTo(0));
         }
         [Test]
-        public void It_will_execute_action_once()
+        public async Task It_will_execute_action_once()
         {
-            parsed.Invoke(new StringWriter());
+            await parsed.InvokeAsync(new StringWriter());
             Assert.That(count, Is.AtLeast(1));
         }
         [Test]
-        public void It_will_only_execute_parameter_at_least_once()
+        public async Task It_will_only_execute_parameter_at_least_once()
         {
-            parsed.Invoke(new StringWriter());
+            await parsed.InvokeAsync(new StringWriter());
             Assert.That(countArg, Is.AtLeast(1));
         }
         [Test]
-        public void It_will_only_execute_parameter_exactly_once()
+        public async Task It_will_only_execute_parameter_exactly_once()
         {
-            parsed.Invoke(new StringWriter());
+            await parsed.InvokeAsync(new StringWriter());
             Assert.That(countArg, Is.EqualTo(1));
         }
     }

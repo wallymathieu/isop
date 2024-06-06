@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -44,7 +45,7 @@ namespace Tests.ViewsAndRendering
         }
 
         [Test]
-        public void It_can_format_object_as_table()
+        public async Task It_can_format_object_as_table()
         {
             var count = 0;
             var sc = new ServiceCollection();
@@ -60,12 +61,12 @@ namespace Tests.ViewsAndRendering
 
             Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
             var writer = new StringWriter();
-            arguments.Invoke(writer);
+            await arguments.InvokeAsync(writer);
             Assert.That(Split(writer.ToString()), Is.EquivalentTo(Split("First\tSecond\n0\tV0\n")));
         }
 
         [Test]
-        public void It_can_format_enumerable_objects_as_table()
+        public async Task It_can_format_enumerable_objects_as_table()
         {
             var count = 0;
             var sc = new ServiceCollection();
@@ -81,7 +82,7 @@ namespace Tests.ViewsAndRendering
 
             Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
             var writer = new StringWriter();
-            arguments.Invoke(writer);
+            await arguments.InvokeAsync(writer);
             Assert.That(Split(writer.ToString()), Is.EquivalentTo(Split("First\tSecond\n0\tV0\n1\tV1\n")));
         }
         private string[] Split(string value)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -28,7 +29,7 @@ namespace Tests.TypeConversions
         }
         
         [Test]
-        public void It_can_handle_different_casing_for_enum()
+        public async Task It_can_handle_different_casing_for_enum()
         {
             foreach (var pair in new[] {
                 new { value = "param1", expected = WithEnumController.WithEnum.Param1 },
@@ -52,7 +53,7 @@ namespace Tests.TypeConversions
                     .Parse(new[] { "WithEnum", /*"Index", */"--value", pair.value });
 
                 Assert.That(arguments.Unrecognized.Select(u=>u.Value), Is.Empty);
-                arguments.Invoke(new StringWriter());
+                await arguments.InvokeAsync(new StringWriter());
                 Assert.That(parameters, Is.EquivalentTo(new[] { pair.expected }));
             }
         }

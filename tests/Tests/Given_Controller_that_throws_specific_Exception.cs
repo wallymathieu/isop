@@ -1,12 +1,9 @@
 ﻿using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Isop;
 using Isop.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Tests.FakeControllers;
 
 namespace Tests
 {
@@ -33,9 +30,9 @@ namespace Tests
             sc.AddSingleton(ci => new ObjectController());
 
             _parsed = AppHostBuilder.Create(sc, new Configuration
-                {
-                    CultureInfo = CultureInfo.InvariantCulture
-                }).Recognize<ObjectController>()
+            {
+                CultureInfo = CultureInfo.InvariantCulture
+            }).Recognize<ObjectController>()
                 .BuildAppHost()
                 .Parse(new[] { "Object", "Action" });
         }
@@ -45,10 +42,10 @@ namespace Tests
 
         [Test]
         public void It_throws_correct_exception_sync() =>
-            Assert.Throws<SpecificException>(() =>_parsed.Invoke(new StringWriter()));
+            Assert.ThrowsAsync<SpecificException>(async () => await _parsed.InvokeAsync(new StringWriter()));
 
         [Test]
         public void It_throws_correct_exception_async() =>
-            Assert.ThrowsAsync<SpecificException>(async () =>await _parsed.InvokeAsync(new StringWriter()));
+            Assert.ThrowsAsync<SpecificException>(async () => await _parsed.InvokeAsync(new StringWriter()));
     }
 }

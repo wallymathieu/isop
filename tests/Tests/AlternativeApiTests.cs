@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -13,7 +14,7 @@ namespace Tests
     public class AlternativeApiTests
     {
         [Test]
-        public void It_can_parse_and_invoke()
+        public async Task It_can_parse_and_invoke()
         {
             var count = 0;
             var sc = new ServiceCollection();
@@ -28,7 +29,7 @@ namespace Tests
             .Parameters(new Dictionary<string, string> { { "param1", "value1" }, { "param2", "value2" }, { "param3", "3" }, { "param4", "3.4" } });
 
             Assert.That(arguments.Unrecognized.Select(u=>u.Value), Is.Empty);
-            arguments.Invoke(new StringWriter());
+            await arguments.InvokeAsync(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
         [Test]

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 using Isop;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
@@ -32,15 +33,15 @@ namespace Tests.DependencyInjection
         protected abstract RegistrationBuilder RegistrationBuilder { get; }
 
         [Test]
-        public void It_can_parse_and_invoke()
+        public async Task It_can_parse_and_invoke()
         {
-            AppHostBuilder.Create(ServiceProvider)
+            await AppHostBuilder.Create(ServiceProvider)
                 .Recognize<MyController>()
                 .BuildAppHost()
                 .Controller("My")
                 .Action("Action")
                 .Parameters(new Dictionary<string, string> { { "param1", "value1" }, { "param2", "value2" }, { "param3", "3" }, { "param4", "3.4" } })
-                .Invoke(new StringWriter());
+                .InvokeAsync(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
     }

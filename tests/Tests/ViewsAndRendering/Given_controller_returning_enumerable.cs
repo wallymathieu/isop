@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -25,7 +26,7 @@ namespace Tests.ViewsAndRendering
         
         
         [Test]
-        public void It_understands_method_returning_enumerable()
+        public async Task It_understands_method_returning_enumerable()
         {
             var count = 0;
             var sc = new ServiceCollection();
@@ -37,7 +38,7 @@ namespace Tests.ViewsAndRendering
                 .Parse(new[] { "Enumerable", "Return" });
 
             Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
-            arguments.Invoke(new StringWriter());
+            await arguments.InvokeAsync(new StringWriter());
             Assert.That(count, Is.EqualTo(2));
         }
     }

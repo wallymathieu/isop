@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Isop;
 using Isop.Localization;
 using Microsoft.Extensions.DependencyInjection;
@@ -184,16 +185,16 @@ My Action PARAM1, PARAM2, PARAM3, PARAM4")));
         }
 
         [Test]
-        public void It_can_report_usage_when_no_parameters_given()
+        public async Task It_can_report_usage_when_no_parameters_given()
         {
             var cout = new StringWriter();
-            AppHostBuilder.Create(new Configuration
+            await AppHostBuilder.Create(new Configuration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
             .Recognize(typeof(MyController))
             .BuildAppHost()
-            .Parse(new string[] { }).Invoke(cout);
+            .Parse(new string[] { }).InvokeAsync(cout);
             Assert.That(LineSplit(cout.ToString()), Is.EquivalentTo(LineSplit(@"The commands are:
   My
 

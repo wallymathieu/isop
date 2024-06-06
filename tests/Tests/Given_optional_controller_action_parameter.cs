@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -35,7 +36,7 @@ namespace Tests
         }
 
         [Test]
-        public void It_can_parse_class_and_method_and_executes_default_with_the_default_values()
+        public async Task It_can_parse_class_and_method_and_executes_default_with_the_default_values()
         {
             var parameters = new object[0];
             var sc = new ServiceCollection();
@@ -44,12 +45,12 @@ namespace Tests
             var arguments = AppHostBuilder.Create(sc).Recognize<MyOptionalController>()
                 .BuildAppHost()
                 .Parse(new[] { "MyOptional", "Action", "--param1", "value1" });
-            arguments.Invoke(new StringWriter());
+            await arguments.InvokeAsync(new StringWriter());
             Assert.That(parameters, Is.EquivalentTo(new object[] { "value1", null, null, 1 }));
         }
 
         [Test]
-        public void It_can_parse_class_and_method_and_executes_default_with_the_default_values_when_using_ordinal_syntax()
+        public async Task It_can_parse_class_and_method_and_executes_default_with_the_default_values_when_using_ordinal_syntax()
         {
             var parameters = new object[0];
             var sc = new ServiceCollection();
@@ -58,7 +59,7 @@ namespace Tests
             var arguments = AppHostBuilder.Create(sc).Recognize<MyOptionalController>()
                 .BuildAppHost()
                 .Parse(new[] { "MyOptional", "Action", "value1" });
-            arguments.Invoke(new StringWriter());
+            await arguments.InvokeAsync(new StringWriter());
             Assert.That(parameters, Is.EquivalentTo(new object[] { "value1", null, null, 1 }));
         }
 

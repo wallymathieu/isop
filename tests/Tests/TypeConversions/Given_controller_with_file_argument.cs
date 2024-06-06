@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -50,7 +51,7 @@ namespace Tests.TypeConversions
         }
         
         [Test]
-        public void It_can_handle_file_argument()
+        public async Task It_can_handle_file_argument()
         {
             var filename = string.Empty;
             var sc = new ServiceCollection();
@@ -70,7 +71,7 @@ namespace Tests.TypeConversions
                     .Parse(new[] {"MyFile", "Action", "--file", "myfile.txt"});
 
                 Assert.That(arguments.Unrecognized.Select(u => u.Value).ToArray(), Is.Empty);
-                arguments.Invoke(new StringWriter());
+                await arguments.InvokeAsync(new StringWriter());
                 Assert.True(filename.Contains("myfile.txt"));
             }
         }

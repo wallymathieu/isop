@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -34,7 +35,7 @@ namespace Tests
         }
         
         [Test]
-        public void It_will_not_dispose_instances_set_to_be_recognized()
+        public async Task It_will_not_dispose_instances_set_to_be_recognized()
         {
             var count = 0;
             var c = new DisposeController();
@@ -45,9 +46,9 @@ namespace Tests
             {
                 CultureInfo = CultureInfo.InvariantCulture
             }).Recognize(typeof(DisposeController)).BuildAppHost();
-            build
+            await build
                 .Parse(new[] { "Dispose", "method" })
-                .Invoke(new StringWriter());
+                .InvokeAsync(new StringWriter());
             Assert.That(count, Is.EqualTo(0));
         }
     }

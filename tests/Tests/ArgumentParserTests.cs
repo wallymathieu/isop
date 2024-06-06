@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Isop;
 using Isop.CommandLine.Parse;
 using Isop.CommandLine.Parse.Parameters;
@@ -167,10 +168,10 @@ namespace Tests
         }
         [Test]
         public void It_will_fail_if_argument_not_supplied_and_it_is_required() =>
-            Assert.Throws<MissingArgumentException>(() => AppHostBuilder.Create()
+            Assert.ThrowsAsync<MissingArgumentException>(async () => await AppHostBuilder.Create()
                 .Parameter("beta", required: true)
                 .BuildAppHost()
-                .Parse(new[] { "-a", "value" }).Invoke(Console.Out));
+                .Parse(new[] { "-a", "value" }).InvokeAsync(Console.Out));
 
         [Test]
         public void It_can_recognize_arguments()
@@ -196,14 +197,14 @@ namespace Tests
         }
 
         [Test]
-        public void It_can_invoke_recognized()
+        public async Task It_can_invoke_recognized()
         {
             var count = 0;
-            AppHostBuilder.Create()
+            await AppHostBuilder.Create()
                            .Parameter("beta", arg => count++)
                            .Parameter("alpha", arg => Assert.Fail())
                            .BuildAppHost()
-                           .Parse(new[] { "-a", "value", "--beta" }).Invoke(new StringWriter());
+                           .Parse(new[] { "-a", "value", "--beta" }).InvokeAsync(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
 

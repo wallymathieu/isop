@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Isop;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -16,7 +17,7 @@ namespace Tests
     {
         
         [Test]
-        public void It_can_parse_class_and_method_and_execute()
+        public async Task It_can_parse_class_and_method_and_execute()
         {
             var count = 0;
             var sc = new ServiceCollection();
@@ -27,12 +28,12 @@ namespace Tests
                                 .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
 
             Assert.That(arguments.Unrecognized.Count, Is.EqualTo(0));
-            arguments.Invoke(new StringWriter());
+            await arguments.InvokeAsync(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
 
         [Test]
-        public void It_can_parse_class_and_method_and_execute_with_ordinal_syntax()
+        public async Task It_can_parse_class_and_method_and_execute_with_ordinal_syntax()
         {
             var count = 0;
             var sc = new ServiceCollection();
@@ -42,7 +43,7 @@ namespace Tests
                             .Parse(new[] { "My", "Action", "value1", "value2", "3", "3.4" });
 
             Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
-            arguments.Invoke(new StringWriter());
+            await arguments.InvokeAsync(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
         
@@ -85,9 +86,9 @@ namespace Tests
             var builder = AppHostBuilder.Create(new Configuration { CultureInfo = CultureInfo.InvariantCulture }).Recognize<MyController>()
                 .BuildAppHost();
 
-            Assert.Throws<MissingArgumentException>(() => builder
+            Assert.ThrowsAsync<MissingArgumentException>(async () => await builder
                 .Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" })
-                .Invoke(Console.Out));
+                .InvokeAsync(Console.Out));
         }
 
         [Test]
@@ -96,9 +97,9 @@ namespace Tests
             var builder = AppHostBuilder.Create().Recognize<MyController>()
                 .BuildAppHost();
 
-            Assert.Throws<MissingArgumentException>(() => builder
+            Assert.ThrowsAsync<MissingArgumentException>(async () => await builder
                 .Parse(new[] { "My", "Action" })
-                .Invoke(Console.Out));
+                .InvokeAsync(Console.Out));
         }
     }
 }

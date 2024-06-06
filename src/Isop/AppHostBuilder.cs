@@ -27,12 +27,9 @@ namespace Isop
         /// <param name="serviceCollection"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IAppHostBuilder Create(IServiceCollection serviceCollection, Configuration configuration=null)
+        public static IAppHostBuilder Create(IServiceCollection? serviceCollection, Configuration? configuration=null)
         {
-            if (serviceCollection == null)
-            {
-                serviceCollection = new ServiceCollection();
-            }
+            serviceCollection ??= new ServiceCollection();
             serviceCollection.AddOptions();
             //
             if (configuration != null)
