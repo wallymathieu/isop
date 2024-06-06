@@ -10,7 +10,7 @@ namespace Isop.CommandLine
     using Domain;
     using Infrastructure;
     internal class ConvertArgumentsToParameterValue(
-        IOptions<Configuration> configuration, 
+        IOptions<Configuration>? configuration, 
         TypeConverter typeConverter)
     {
         private readonly TypeConverter _typeConverter = typeConverter ?? throw new ArgumentNullException(nameof(typeConverter));
