@@ -19,10 +19,10 @@ namespace Isop.CommandLine
         private readonly IServiceProvider _serviceProvider;
         private readonly Recognizes _recognizes;
         private readonly HelpController _helpController;
-        private ILookup<string, ArgumentAction> _recognizesMap;
+        private ILookup<string, ArgumentAction>? _recognizesMap;
         
-        private ILookup<string,ArgumentAction> RecognizesMap => _recognizesMap 
-            ??(_recognizesMap= _recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action));
+        private ILookup<string,ArgumentAction> RecognizesMap =>
+            _recognizesMap ??= _recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action);
 
         public ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recognizes, HelpController helpController)
         {
@@ -40,7 +40,7 @@ namespace Isop.CommandLine
                         (InvokeResult)new InvokeResult.Argument( await action(arg.Value)))
                     : Enumerable.Empty<Task<InvokeResult>>();
             }
-            async Task<object> RunTask(Task task)
+            async Task<object?> RunTask(Task task)
             {
                 await task;
                 var type = task.GetType();
@@ -73,9 +73,18 @@ namespace Isop.CommandLine
                                     throw new Exception($"Unable to resolve {method.RecognizedClass.Name}");
                                 var result = method.RecognizedAction.Invoke(instance,
                                     method.RecognizedActionParameters.ToArray());
-                                return new []{ Task.FromResult(result is Task task 
-                                    ? (InvokeResult)new InvokeResult.AsyncControllerAction(RunTask(task))
-                                    : new InvokeResult.ControllerAction(result)) };
+                                InvokeResult? res = result switch
+                                {
+                                    Task task=> new InvokeResult.AsyncControllerAction(RunTask(task)),
+                                    #if NET8_0_OR_GREATER
+                                    System.Collections.Generic.IAsyncEnumerable<object> enumerable=>
+                                         new InvokeResult.AsyncEnumerableControllerAction(enumerable),
+                                    #endif
+                                    _ => new InvokeResult.ControllerAction(result),
+                                };
+
+                                return new []{ 
+                                    Task.FromResult( res)};
                             });
                 return tasks;
             }

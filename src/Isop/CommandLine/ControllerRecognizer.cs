@@ -42,7 +42,7 @@ namespace Isop.CommandLine
                     StringComparer.OrdinalIgnoreCase);
         }
 
-        private CultureInfo Culture => _configuration?.Value?.CultureInfo;
+        private CultureInfo? Culture => _configuration?.Value?.CultureInfo;
 
         public bool TryRecognize(IEnumerable<string> arg, out (Controller,Method) controllerAndMethod)
         {

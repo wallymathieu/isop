@@ -96,6 +96,9 @@ namespace Isop.Implementations
                 var formatted = await item.Select(
                     argument: arg => Task.FromResult(_appHost.ToStrings(arg.Result)),
                     asyncControllerAction: async ca => _appHost.ToStrings(await ca.Task),
+                    #if NET8_0_OR_GREATER
+                    asyncEnumerableControllerAction: async ca => _appHost.ToStrings(ca.Enumerable.ToBlockingEnumerable()),
+                    #endif
                     controllerAction: ca => Task.FromResult(_appHost.ToStrings(ca.Result)),
                     empty: e => Task.FromResult(Enumerable.Empty<string>())
                 );

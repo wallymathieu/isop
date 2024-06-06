@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 namespace FullExample
 {
     public class MyController
@@ -19,6 +20,15 @@ namespace FullExample
             for (int i = 0; i < 10; i++)
             {
                 Thread.Sleep(1000);
+                yield return "i:" + i;
+            }
+        }
+        public async IAsyncEnumerable<string> ActionYields10Responses2(string value)
+        {
+            yield return "invoking action on mycontroller with value : " + value;
+            for (int i = 0; i < 10; i++)
+            {
+                await Task.Delay(1000);
                 yield return "i:" + i;
             }
         }
