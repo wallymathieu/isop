@@ -12,13 +12,13 @@ namespace Isop.CommandLine.Parse.Parameters
         /// <param name="value"></param>
         /// <param name="optionParameter"></param>
         /// <returns></returns>
-        public static bool TryParse(string value, out ArgumentParameter optionParameter)
+        public static bool TryParse(string? value, out ArgumentParameter? optionParameter)
         {
-            if (value.Contains("|"))
+            if (value != null && value.Contains("|"))
             {
                 var prototype = value;
                 var names = prototype.TrimEnd(delimiters.ToArray()).Split('|');
-                string delimiter = null;
+                string? delimiter = null;
                 var last = prototype.Last();
                 if (delimiters.Contains(last))
                     delimiter = last.ToString();

@@ -31,7 +31,7 @@ namespace Isop.CommandLine.Parse
                     case TokenType.Argument:
                         {
                             var argument = _globalArguments
-                               .SingleOrDefault(arg => Accept(arg, current.Index, current.Value));
+                               .SingleOrDefault(arg => arg.Accept(current.Index, current.Value));
 
                             if (null == argument && !encounteredParameter && _allowInferParameter)
                             {
@@ -54,7 +54,7 @@ namespace Isop.CommandLine.Parse
                         {
                             encounteredParameter = true;
                             var argumentWithOptions = _globalArguments
-                                .SingleOrDefault(argopt => Accept(argopt, current.Index, current.Value));
+                                .SingleOrDefault(argopt => argopt.Accept(current.Index, current.Value));
                             if (null == argumentWithOptions)
                                 continue;
                             string value;

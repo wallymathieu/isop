@@ -12,7 +12,7 @@ namespace Isop
     public static class AppHostBuilderExtensions
     {
         /// <summary>
-        /// Recognize <see cref="T"/> as controller
+        /// Recognize <typeparamref name="T"/> as controller
         /// </summary>
         /// <param name="build"></param>
         /// <typeparam name="T"></typeparam>

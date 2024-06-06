@@ -41,7 +41,7 @@ namespace Isop.Help
             return sb.ToString().Trim(' ', '\t', '\r', '\n') + Environment.NewLine;
         }
 
-        public string Index(string controller, string action)
+        public string Index(string controller, string? action)
         {
             if (string.IsNullOrEmpty(controller))
                 return Index();

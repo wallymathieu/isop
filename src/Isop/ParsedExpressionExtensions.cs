@@ -13,6 +13,7 @@ namespace Isop
         /// <summary>
         /// 
         /// </summary>
+        [Obsolete("Prefer InvokeAsync")]
         public static void Invoke(this IParsed parsed, TextWriter output)
         {
             parsed.InvokeAsync(output).GetAwaiter().GetResult();
@@ -24,7 +25,7 @@ namespace Isop
         /// <param name="out"></param>
         /// <param name="error"></param>
         /// <returns></returns>
-        public static async Task<int> TryInvokeAsync(this IParsed parsed, TextWriter @out = null, TextWriter @error = null)
+        public static async Task<int> TryInvokeAsync(this IParsed parsed, TextWriter? @out = null, TextWriter? @error = null)
         {
             if (@out == null) @out = Console.Out;
             if (error == null) error = Console.Error;

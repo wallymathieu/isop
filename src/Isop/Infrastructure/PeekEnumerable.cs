@@ -28,7 +28,7 @@ namespace Isop.Infrastructure
             return Current();
         }
 
-        public T Peek()
+        public T? Peek()
         {
              var idx = _currentIndex+1; 
              return idx<_buffer.Count ? _buffer[idx] : default;

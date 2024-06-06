@@ -12,7 +12,7 @@ namespace Isop.CommandLine.Parse
     /// </summary>
     public class ArgumentParameter
     {
-        public ArgumentParameter(string prototype, IEnumerable<string> names, string delimiter = null, int? ordinal = null)
+        public ArgumentParameter(string prototype, IEnumerable<string> names, string? delimiter = null, int? ordinal = null)
         {
             Prototype = prototype;
             Aliases = names.ToArray();
@@ -38,7 +38,7 @@ namespace Isop.CommandLine.Parse
         }
 
         public ICollection<string> Aliases { get; }
-        public string Delimiter { get; }
+        public string? Delimiter { get; }
         public string Help()
         {
             return

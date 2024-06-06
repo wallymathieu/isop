@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -25,18 +25,18 @@ namespace Isop.Implementations
         internal readonly IOptions<Conventions> Conventions;
         internal readonly IOptions<Configuration> Configuration;
         internal readonly TypeConverter TypeConverter;
-        private HelpController _helpController;
+        private HelpController? _helpController;
         private readonly IOptions<Texts> _texts;
         
 
         internal HelpController HelpController =>
-            _helpController??(_helpController = ServiceProvider.GetService<HelpController>() ?? 
-                                                new HelpController(
+            _helpController ??= ServiceProvider.GetService<HelpController>()
+                            ?? new HelpController(
                                                     _texts,
                                                     Recognizes,
                                                     Configuration,
                                                     ServiceProvider,
-                                                    Conventions));
+                                    Conventions);
 
         /// <summary>
         /// 
@@ -82,13 +82,13 @@ namespace Isop.Implementations
         }
         
         internal bool AllowInferParameter => !(Configuration.Value?.DisableAllowInferParameter ?? false);
-        internal CultureInfo CultureInfo => Configuration.Value?.CultureInfo;
+        internal CultureInfo? CultureInfo => Configuration.Value?.CultureInfo;
         /// <summary>
         /// Return help-text
         /// </summary>
-        public String Help()
+        public string Help()
         {
-            var output = new StringWriter(CultureInfo);
+            using var output = new StringWriter(CultureInfo);
             Parse(new[] { Conventions.Value.Help }).Invoke(output);
             return output.ToString();
         }

@@ -68,7 +68,7 @@ namespace Isop.Implementations
             var recognized = method.GetArguments(_appHost.CultureInfo)
                 .SelectMany(arg=> paramMap.TryGetValue(arg.Name, out var value) 
                     ? new[] {(arg, value)} 
-                    : new (Argument,(KeyValuePair<string,string>,int))[0])
+                    : Array.Empty<(Argument, (KeyValuePair<string, string>, int))>())
                 .Select(chosen=>
                 {
                     var (arg, value) = chosen;

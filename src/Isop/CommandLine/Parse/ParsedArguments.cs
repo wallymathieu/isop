@@ -90,15 +90,14 @@ namespace Isop.CommandLine.Parse
         /// </summary>
         public T Select<T>(Func<Method, T> method, Func<Merged, T> merged, Func<Properties, T> properties, Func<MethodMissingArguments,T> methodMissingArguments)
         {
-            switch (this)
+            return this switch
             {
-                case Method pm: return method(pm);
-                case Merged m: return merged(m);
-                case Properties d: return properties(d);
-                case MethodMissingArguments e: return methodMissingArguments(e);
-                default:
-                    throw new Exception("Unimplemented switch case");
-            }
+                Method pm => method(pm),
+                Merged m => merged(m),
+                Properties d => properties(d),
+                MethodMissingArguments e => methodMissingArguments(e),
+                _ => throw new Exception("Unimplemented switch case"),
+            };
         }
 
     }

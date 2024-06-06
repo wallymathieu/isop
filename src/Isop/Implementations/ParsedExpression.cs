@@ -26,7 +26,7 @@ namespace Isop.Implementations
                         properties: properties => properties.Recognized,
                         merged: merged => Recognized(merged.First).Union(Recognized(merged.Second)).ToArray(),
                         method: method => method.Recognized.ToArray(),
-                        methodMissingArguments: methodMissingArgs=>new RecognizedArgument[0]
+                        methodMissingArguments: methodMissingArgs=> System.Array.Empty<RecognizedArgument>()
                     );
                 }
                 
@@ -42,8 +42,8 @@ namespace Isop.Implementations
                     return parsedArguments.Select(
                         properties: properties => properties.Unrecognized,
                         merged: merged => GetPotentiallyUnrecognized(merged.First).Union(GetPotentiallyUnrecognized(merged.Second)).ToArray(),
-                        method: method => new UnrecognizedArgument[0],
-                        methodMissingArguments: missingArgs=>new UnrecognizedArgument[0]
+                        method: method => System.Array.Empty<UnrecognizedArgument>(),
+                        methodMissingArguments: missingArgs=> System.Array.Empty<UnrecognizedArgument>()
                     );
                 }
 
@@ -69,9 +69,9 @@ namespace Isop.Implementations
             IReadOnlyCollection<string> GetMissing(ParsedArguments parsedArguments)
             {
                 return parsedArguments.Select(
-                    properties: properties => new string[0],
+                    properties: properties => System.Array.Empty<string>(),
                     merged: merged => GetMissing(merged.First).Union(GetMissing(merged.Second)).ToArray(),
-                    method: method => new string[0],
+                    method: method => System.Array.Empty<string>(),
                     methodMissingArguments: missingArgs=>missingArgs.MissingParameters
                 );
             }

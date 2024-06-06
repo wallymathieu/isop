@@ -6,10 +6,11 @@ namespace Isop.CommandLine.Parse.Parameters
     public class OrdinalParameter 
     {
         private static readonly Regex Pattern = new Regex(@"#(?<ord>\d*)(?<rest>.*)");
-        public static bool TryParse(string value, IFormatProvider formatProvider, out ArgumentParameter ordinalParameter)
+        public static bool TryParse(string? value, IFormatProvider formatProvider, out ArgumentParameter? ordinalParameter)
         {
-            var match = Pattern.Match(value);
-            if (match.Success)
+            Match match;
+            if (value!=null 
+                && (match = Pattern.Match(value)).Success)
             {
                 var prototype = value;
                 var rest = match.Groups["rest"].Value;
