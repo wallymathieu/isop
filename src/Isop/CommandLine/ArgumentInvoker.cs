@@ -73,8 +73,8 @@ namespace Isop.CommandLine
                                     _ => new InvokeResult.ControllerAction(result),
                                 };
 
-                                return new []{ 
-                                    Task.FromResult( res)};
+                                return [ 
+                                    Task.FromResult( res)];
                             });
                 return tasks;
             }
