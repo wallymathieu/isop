@@ -11,19 +11,17 @@ namespace Isop.Domain
 {
     using CommandLine;
     using CommandLine.Parse;
-    public class Method
+    public class Method(MethodInfo methodInfo)
     {
-        private readonly MethodInfo _methodInfo;
-        public Method(MethodInfo methodInfo) => _methodInfo = methodInfo;
-        public string Name => _methodInfo.Name;
-        public MethodInfo MethodInfo => _methodInfo;
-        public Parameter[] GetParameters() => _methodInfo.GetParameters().Select(p => new Parameter(p)).ToArray();
+        public string Name => methodInfo.Name;
+        public MethodInfo MethodInfo => methodInfo;
+        public Parameter[] GetParameters() => methodInfo.GetParameters().Select(p => new Parameter(p)).ToArray();
         public object Invoke(object instance, object[] values)
         {
             if (instance==null) throw new ArgumentNullException(nameof(instance));
             try
             {
-                return _methodInfo.Invoke(instance, values);
+                return methodInfo.Invoke(instance, values);
             }catch(TargetInvocationException ex){
                 if (ex.InnerException != null)
                 {
@@ -32,7 +30,7 @@ namespace Isop.Domain
                 throw;
             }
         }
-        public IEnumerable<Argument> GetArguments(IFormatProvider cultureInfo)
+        public IEnumerable<Argument> GetArguments(IFormatProvider? cultureInfo)
         {
             var parameterInfos = GetParameters();
             var recognizers = new List<Argument>();
@@ -50,7 +48,7 @@ namespace Isop.Domain
             return recognizers;
         }
 
-        private static Argument CreateArgument(Parameter parameterInfo, IFormatProvider cultureInfo) =>
+        private static Argument CreateArgument(Parameter parameterInfo, IFormatProvider? cultureInfo) =>
             new Argument(required: parameterInfo.LooksRequired(),
                 parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo));
 

@@ -19,6 +19,7 @@ namespace Tests.ViewsAndRendering
             {
                 for (int i = 0; i < Length; i++)
                 {
+                    await Task.CompletedTask;
                     yield return OnEnumerate();
                 }
             }

@@ -7,29 +7,20 @@ namespace Isop.Implementations
 {
     using Abstractions;
     ///
-    internal class ControllerExpression:IController
+    internal class ControllerExpression(string controllerName, AppHost appHost, Controller controller) : IController
     {
-        private readonly AppHost _appHost;
-        private readonly Controller _controller;
-
-        internal ControllerExpression(string controllerName, AppHost appHost, Controller controller)
-        {
-            Name = controllerName;
-            _appHost = appHost;
-            _controller = controller;
-        }
         public IActionOnController Action(string name) =>
-            new ActionControllerExpression(Name, name, _appHost);
+            new ActionControllerExpression(Name, name, appHost);
 
         public IReadOnlyCollection<IActionOnController> Actions =>
-            _controller.GetControllerActionMethods(_appHost.Conventions.Value).Select(action =>
-                new ActionControllerExpression(Name, action.Name, _appHost)).ToArray();
+            controller.GetControllerActionMethods(appHost.Conventions.Value).Select(action =>
+                new ActionControllerExpression(Name, action.Name, appHost)).ToArray();
 
-        public string Name { get; }
+        public string Name { get; } = controllerName;
 
         public string Help()
         {
-            var helpController = _appHost.HelpController;
+            var helpController = appHost.HelpController;
             return (helpController.Index(Name, null) ?? String.Empty).Trim();
         }
     }

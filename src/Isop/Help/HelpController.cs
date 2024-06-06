@@ -9,23 +9,16 @@ namespace Isop.Help
     using CommandLine.Help;
     using Domain;
 
-    public class HelpController
+    public class HelpController(IOptions<Texts> texts,
+        Recognizes recognizes,
+        IOptions<Configuration> config,
+        IServiceProvider serviceProvider,
+        IOptions<Conventions> conventions)
     {
-        private readonly Conventions _conventions;
-        private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions;
-        private readonly HelpForControllers _helpForClassAndMethod;
-
-        public HelpController(IOptions<Texts> texts, 
-            Recognizes recognizes,
-            IOptions<Configuration> config, 
-            IServiceProvider serviceProvider,
-            IOptions<Conventions> conventions)
-        {
-            _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
-            _helpForArgumentWithOptions = new HelpForArgumentWithOptions(texts, recognizes, config);
-            _helpForClassAndMethod = new HelpForControllers(recognizes, 
+        private readonly Conventions _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
+        private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions = new HelpForArgumentWithOptions(texts, recognizes, config);
+        private readonly HelpForControllers _helpForClassAndMethod = new HelpForControllers(recognizes,
                 new HelpXmlDocumentation(), texts, config, serviceProvider, conventions);
-        }
 
         public string Index()
         {

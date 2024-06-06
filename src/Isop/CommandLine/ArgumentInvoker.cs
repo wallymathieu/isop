@@ -14,22 +14,12 @@ namespace Isop.CommandLine
     using Isop.Help;
     using Infrastructure;
     
-    public class ArgumentInvoker
+    public class ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recognizes, HelpController helpController)
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly Recognizes _recognizes;
-        private readonly HelpController _helpController;
         private ILookup<string, ArgumentAction>? _recognizesMap;
         
         private ILookup<string,ArgumentAction> RecognizesMap =>
-            _recognizesMap ??= _recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action);
-
-        public ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recognizes, HelpController helpController)
-        {
-            _serviceProvider = serviceProvider;
-            _recognizes = recognizes;
-            _helpController = helpController;
-        }
+            _recognizesMap ??= recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action);
 
         public IEnumerable<Task<InvokeResult>> Invoke(ParsedArguments parsedArguments)
         {
@@ -50,7 +40,7 @@ namespace Isop.CommandLine
                 }
                 return type.GetProperty("Result")?.GetValue(task) ;
             }
-            using (var scope = _serviceProvider.CreateScope())
+            using (var scope = serviceProvider.CreateScope())
             {
                 var tasks = parsedArguments.Select(
                     methodMissingArguments: empty=>new[]{Task.FromResult<InvokeResult>(new InvokeResult.Empty())},
@@ -66,7 +56,7 @@ namespace Isop.CommandLine
                                 var instance = scope.ServiceProvider.GetService(method.RecognizedClass);
                                 if (instance==null && method.RecognizedClass == typeof(HelpController))
                                 {
-                                    instance = _helpController;
+                                    instance = helpController;
                                 }
                         
                                 if (ReferenceEquals(null, instance))
@@ -78,7 +68,7 @@ namespace Isop.CommandLine
                                     Task task=> new InvokeResult.AsyncControllerAction(RunTask(task)),
                                     #if NET8_0_OR_GREATER
                                     System.Collections.Generic.IAsyncEnumerable<object> enumerable=>
-                                         new InvokeResult.AsyncEnumerableControllerAction(enumerable),
+                                         new InvokeResult.ControllerAction(enumerable.ToBlockingEnumerable()),
                                     #endif
                                     _ => new InvokeResult.ControllerAction(result),
                                 };

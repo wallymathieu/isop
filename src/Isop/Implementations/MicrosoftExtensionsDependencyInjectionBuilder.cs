@@ -10,20 +10,13 @@ namespace Isop.Implementations
     using Abstractions;
     using CommandLine;
     using Domain;
-    internal class MicrosoftExtensionsDependencyInjectionBuilder : IAppHostBuilder
+    internal class MicrosoftExtensionsDependencyInjectionBuilder(
+        IServiceCollection serviceCollection, 
+        RecognizesBuilder recognizes) : IAppHostBuilder
     {
-        private readonly RecognizesBuilder _recognizes;
-        private readonly IServiceCollection _serviceCollection;
-        private Abstractions.ToStrings _toStrings;
-        private TypeConverter _typeConverter;
-       
-        public MicrosoftExtensionsDependencyInjectionBuilder(IServiceCollection serviceCollection, RecognizesBuilder recognizes)
-        {
-            _serviceCollection = serviceCollection;
-            _recognizes = recognizes;
-            _toStrings = CommandLine.ToStrings.Default;
-            _typeConverter = new DefaultConverter().ConvertFrom;
-        }
+        private Abstractions.ToStrings _toStrings = CommandLine.ToStrings.Default;
+        private TypeConverter _typeConverter = new DefaultConverter().ConvertFrom;
+
         public IAppHostBuilder SetTypeConverter(TypeConverter typeConverter)
         {
             _typeConverter = typeConverter;
@@ -34,39 +27,39 @@ namespace Isop.Implementations
             _toStrings = toStrings;
             return this;
         }
-        public IAppHostBuilder Parameter(string argument, ArgumentAction action = null, bool required = false, string description = null)
+        public IAppHostBuilder Parameter(string argument, ArgumentAction? action = null, bool required = false, string? description = null)
         {
-            _recognizes.Properties.Add(new Property(argument, action, required, description));
+            recognizes.Properties.Add(new Property(argument, action, required, description));
             return this;
         }
-        public IAppHostBuilder Parameter(string argument, Action<string> action, bool required = false, string description = null)
+        public IAppHostBuilder Parameter(string argument, Action<string> action, bool required = false, string? description = null)
         {
             var argumentAction = action!=null 
                 ? new ArgumentAction(value=>
                 {
                     action(value);
-                    return Task.FromResult<object>(null);
+                    return Task.FromResult<object?>(null);
                 })
                 : null;
-            _recognizes.Properties.Add(new Property(argument, argumentAction, required, description));
+            recognizes.Properties.Add(new Property(argument, argumentAction, required, description));
             return this;
         }
 
         public IAppHostBuilder Recognize(Type arg)
         {
-            _serviceCollection.TryAddSingleton(arg);
-            _recognizes.Recognizes.Add(new Domain.Controller(arg));
+            serviceCollection.TryAddSingleton(arg);
+            recognizes.Recognizes.Add(new Domain.Controller(arg));
             return this;
         }
         public IAppHost BuildAppHost()
         {
-            var svcProvider= _serviceCollection.BuildServiceProvider();
+            var svcProvider= serviceCollection.BuildServiceProvider();
             var options = svcProvider.GetService<IOptions<Configuration>>();
             var conventions = svcProvider.GetService<IOptions<Conventions>>();
             var texts = svcProvider.GetService<IOptions<Localization.Texts>>();
             return new AppHost(options, 
                 svcProvider, 
-                new Recognizes(_recognizes.Recognizes.ToArray(), _recognizes.Properties.ToArray()),
+                new Recognizes(recognizes.Recognizes.ToArray(), recognizes.Properties.ToArray()),
                 _typeConverter,
                 _toStrings, 
                 texts,

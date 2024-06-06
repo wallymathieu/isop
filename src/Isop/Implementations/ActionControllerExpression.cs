@@ -16,7 +16,7 @@ namespace Isop.Implementations
         private readonly AppHost _appHost;
         private readonly ConvertArgumentsToParameterValue _convertArguments;
 
-        internal ActionControllerExpression(string controllerName, string actionName, AppHost appHost)
+        public ActionControllerExpression(string controllerName, string actionName, AppHost appHost)
         {
             _controllerName = controllerName;
             Name = actionName;

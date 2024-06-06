@@ -1,18 +1,24 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Isop.CommandLine.Parse.Parameters
 {
     public class OptionParameter 
     {
-        private static List<char> delimiters = new List<char> { '=', ':' };
+        private static readonly List<char> delimiters = ['=', ':'];
         /// <summary>
         /// Note: this may accept invalid patterns.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="optionParameter"></param>
         /// <returns></returns>
-        public static bool TryParse(string? value, out ArgumentParameter? optionParameter)
+        public static bool TryParse(
+            string? value,
+            #if NET8_0_OR_GREATER
+            [NotNullWhen(true)]
+            #endif
+            out ArgumentParameter? optionParameter)
         {
             if (value != null && value.Contains("|"))
             {

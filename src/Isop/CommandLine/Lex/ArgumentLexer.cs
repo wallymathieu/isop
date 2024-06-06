@@ -7,7 +7,7 @@ namespace Isop.CommandLine.Lex
 {
     public class ArgumentLexer
     {
-        private static readonly Regex ParamPattern = new Regex("(?<paramPrefix>--|/|-)(?<param>[^:=]*)([:=]?)(?<paramValue>.*)");
+        private static readonly Regex ParamPattern = new("(?<paramPrefix>--|/|-)(?<param>[^:=]*)([:=]?)(?<paramValue>.*)");
 
         /// <summary>
         /// The case --parameter parametervalue

@@ -10,30 +10,17 @@ namespace Isop.Help
     using CommandLine;
     using Infrastructure;
     using Domain;
-    internal class HelpForControllers
+    internal class HelpForControllers(Recognizes recognizes,
+        HelpXmlDocumentation helpXmlDocumentation,
+        IOptions<Localization.Texts> texts,
+        IOptions<Configuration> configuration,
+        IServiceProvider serviceProvider,
+        IOptions<Conventions> conventions)
     {
-        private readonly IEnumerable<Controller> _classAndMethodRecognizers;
-        private readonly HelpXmlDocumentation _helpXmlDocumentation;
-        private readonly Configuration _configuration;
-        private readonly Conventions _conventions;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly Localization.Texts _texts;
-
-        public HelpForControllers(Recognizes recognizes, 
-            HelpXmlDocumentation helpXmlDocumentation,
-            IOptions<Localization.Texts> texts,
-            IOptions<Configuration> configuration,
-            IServiceProvider serviceProvider,
-            IOptions<Conventions> conventions)
-        {
-            _classAndMethodRecognizers = recognizes.Controllers;
-            _helpXmlDocumentation = helpXmlDocumentation;
-            _configuration = configuration?.Value;
-            _serviceProvider = serviceProvider;
-            _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
-            _texts = texts.Value ?? new Localization.Texts();
-        }
-
+        private readonly IEnumerable<Controller> _classAndMethodRecognizers = recognizes.Controllers;
+        private readonly Configuration? _configuration = configuration?.Value;
+        private readonly Conventions _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
+        private readonly Localization.Texts _texts = texts.Value ?? new Localization.Texts();
         private readonly Type[] _onlyStringType = { typeof(string) };
 
         private string Description(Controller t, Method method, bool includeArguments)
@@ -46,16 +33,16 @@ namespace Isop.Help
             if (null == description)
             {
                 helpText.Add(null == method
-                    ? _helpXmlDocumentation.GetDescriptionForType(t.Type)
-                    : _helpXmlDocumentation.GetDescriptionForMethod(method.MethodInfo));
+                    ? helpXmlDocumentation.GetDescriptionForType(t.Type)
+                    : helpXmlDocumentation.GetDescriptionForMethod(method.MethodInfo));
             }
             else
             {
-                using (var scope = _serviceProvider.CreateScope())
+                using (var scope = serviceProvider.CreateScope())
                 {
                     var obj = scope.ServiceProvider.GetService(t.Type);
                     if (ReferenceEquals(null, obj)) throw new Exception($"Unable to resolve {t.Type}");
-                    helpText.Add((string)description.Invoke(obj, new object[]{method?.Name}));
+                    helpText.Add((string)description.Invoke(obj, [method?.Name]));
                 }
             }
 

@@ -9,20 +9,11 @@ namespace Isop.Implementations
     using Abstractions;
     using CommandLine;
     using Domain;
-    internal class ServiceProviderAppHostBuilder : IAppHostBuilder
+    internal class ServiceProviderAppHostBuilder(IServiceProvider serviceProvider, RecognizesBuilder recognizes) : IAppHostBuilder
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly RecognizesBuilder _recognizes;
-        private Abstractions.ToStrings _toStrings;
-        private TypeConverter _typeConverter;
+        private Abstractions.ToStrings _toStrings = CommandLine.ToStrings.Default;
+        private TypeConverter _typeConverter = new DefaultConverter().ConvertFrom;
 
-        public ServiceProviderAppHostBuilder(IServiceProvider serviceProvider, RecognizesBuilder recognizes)
-        {
-            _serviceProvider = serviceProvider;
-            _recognizes = recognizes;
-            _toStrings = CommandLine.ToStrings.Default;
-            _typeConverter = new DefaultConverter().ConvertFrom;
-        }
         public IAppHostBuilder SetTypeConverter(TypeConverter typeConverter)
         {
             _typeConverter = typeConverter;
@@ -36,7 +27,7 @@ namespace Isop.Implementations
 
         public IAppHostBuilder Parameter(string argument, ArgumentAction action = null, bool required = false, string description = null)
         {
-            _recognizes.Properties.Add(new Property(argument, action, required, description));
+            recognizes.Properties.Add(new Property(argument, action, required, description));
             return this;
         }
         public IAppHostBuilder Parameter(string argument, Action<string> action, bool required = false, string description = null)
@@ -48,13 +39,13 @@ namespace Isop.Implementations
                     return Task.FromResult<object>(null);
                 })
                 : null;
-            _recognizes.Properties.Add(new Property(argument, argumentAction, required, description));
+            recognizes.Properties.Add(new Property(argument, argumentAction, required, description));
             return this;
         }
 
         public IAppHostBuilder Recognize(Type arg)
         {
-            _recognizes.Recognizes.Add(new Domain.Controller(arg));
+            recognizes.Recognizes.Add(new Domain.Controller(arg));
             return this;
         }
         /// <summary>
@@ -62,13 +53,13 @@ namespace Isop.Implementations
         /// </summary>
         public IAppHost BuildAppHost()
         {
-            var options = _serviceProvider.GetService<IOptions<Configuration>>();
-            var conventions = _serviceProvider.GetService<IOptions<Conventions>>();
-            var texts = _serviceProvider.GetService<IOptions<Localization.Texts>>();
+            var options = serviceProvider.GetService<IOptions<Configuration>>();
+            var conventions = serviceProvider.GetService<IOptions<Conventions>>();
+            var texts = serviceProvider.GetService<IOptions<Localization.Texts>>();
 
             return new AppHost(options, 
-                _serviceProvider, 
-                new Recognizes(_recognizes.Recognizes.ToArray(), _recognizes.Properties.ToArray()),
+                serviceProvider, 
+                new Recognizes(recognizes.Recognizes.ToArray(), recognizes.Properties.ToArray()),
                 _typeConverter,
                 _toStrings, 
                 texts,

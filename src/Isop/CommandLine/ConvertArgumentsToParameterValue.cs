@@ -9,15 +9,12 @@ namespace Isop.CommandLine
     using Abstractions;
     using Domain;
     using Infrastructure;
-    internal class ConvertArgumentsToParameterValue
+    internal class ConvertArgumentsToParameterValue(
+        IOptions<Configuration> configuration, 
+        TypeConverter typeConverter)
     {
-        private readonly TypeConverter _typeConverter;
-        private readonly CultureInfo _culture;
-        public ConvertArgumentsToParameterValue(IOptions<Configuration> configuration, TypeConverter typeConverter)
-        {
-            _culture = configuration?.Value.CultureInfo;
-            _typeConverter = typeConverter?? throw new ArgumentNullException(nameof(typeConverter));
-        }
+        private readonly TypeConverter _typeConverter = typeConverter ?? throw new ArgumentNullException(nameof(typeConverter));
+        private readonly CultureInfo? _culture = configuration?.Value.CultureInfo;
 
         public bool TryGetParametersForMethod(Method method,
             IReadOnlyCollection<KeyValuePair<string,string>> parsedArguments, out IReadOnlyCollection<object> parameters, out IReadOnlyCollection<string> missingParameters)

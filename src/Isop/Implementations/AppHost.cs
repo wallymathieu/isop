@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 
 namespace Isop.Implementations
 {
+    using System.Threading.Tasks;
     using Abstractions;
     using CommandLine;
     using CommandLine.Lex;
@@ -86,10 +87,19 @@ namespace Isop.Implementations
         /// <summary>
         /// Return help-text
         /// </summary>
-        public string Help()
+        [Obsolete("Prefer HelpAsync")]public string Help()
         {
             using var output = new StringWriter(CultureInfo);
             Parse(new[] { Conventions.Value.Help }).Invoke(output);
+            return output.ToString();
+        }
+         /// <summary>
+        /// Return help-text
+        /// </summary>
+        public async Task<string> HelpAsync()
+        {
+            using var output = new StringWriter(CultureInfo);
+            await Parse(new[] { Conventions.Value.Help }).InvokeAsync(output);
             return output.ToString();
         }
         /// <summary>
