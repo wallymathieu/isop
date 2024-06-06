@@ -14,22 +14,12 @@ namespace Isop.CommandLine
     using Isop.Help;
     using Infrastructure;
     
-    public class ArgumentInvoker
+    public class ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recognizes, HelpController helpController)
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly Recognizes _recognizes;
-        private readonly HelpController _helpController;
-        private ILookup<string, ArgumentAction> _recognizesMap;
+        private ILookup<string, ArgumentAction>? _recognizesMap;
         
-        private ILookup<string,ArgumentAction> RecognizesMap => _recognizesMap 
-            ??(_recognizesMap= _recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action));
-
-        public ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recognizes, HelpController helpController)
-        {
-            _serviceProvider = serviceProvider;
-            _recognizes = recognizes;
-            _helpController = helpController;
-        }
+        private ILookup<string,ArgumentAction> RecognizesMap =>
+            _recognizesMap ??= recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action);
 
         public IEnumerable<Task<InvokeResult>> Invoke(ParsedArguments parsedArguments)
         {
@@ -40,7 +30,7 @@ namespace Isop.CommandLine
                         (InvokeResult)new InvokeResult.Argument( await action(arg.Value)))
                     : Enumerable.Empty<Task<InvokeResult>>();
             }
-            async Task<object> RunTask(Task task)
+            async Task<object?> RunTask(Task task)
             {
                 await task;
                 var type = task.GetType();
@@ -50,7 +40,7 @@ namespace Isop.CommandLine
                 }
                 return type.GetProperty("Result")?.GetValue(task) ;
             }
-            using (var scope = _serviceProvider.CreateScope())
+            using (var scope = serviceProvider.CreateScope())
             {
                 var tasks = parsedArguments.Select(
                     methodMissingArguments: empty=>new[]{Task.FromResult<InvokeResult>(new InvokeResult.Empty())},
@@ -66,16 +56,21 @@ namespace Isop.CommandLine
                                 var instance = scope.ServiceProvider.GetService(method.RecognizedClass);
                                 if (instance==null && method.RecognizedClass == typeof(HelpController))
                                 {
-                                    instance = _helpController;
+                                    instance = helpController;
                                 }
                         
                                 if (ReferenceEquals(null, instance))
                                     throw new Exception($"Unable to resolve {method.RecognizedClass.Name}");
                                 var result = method.RecognizedAction.Invoke(instance,
                                     method.RecognizedActionParameters.ToArray());
-                                return new []{ Task.FromResult(result is Task task 
-                                    ? (InvokeResult)new InvokeResult.AsyncControllerAction(RunTask(task))
-                                    : new InvokeResult.ControllerAction(result)) };
+                                InvokeResult? res = result switch
+                                {
+                                    Task task=> new InvokeResult.AsyncControllerAction(RunTask(task)),
+                                    _ => new InvokeResult.ControllerAction(result),
+                                };
+
+                                return new []{ 
+                                    Task.FromResult( res)};
                             });
                 return tasks;
             }

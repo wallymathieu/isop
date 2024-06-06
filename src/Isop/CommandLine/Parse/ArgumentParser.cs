@@ -7,22 +7,16 @@ namespace Isop.CommandLine.Parse
     using Infrastructure;
     using Lex;
 
-    public class ArgumentParser
+    public class ArgumentParser(
+        IReadOnlyCollection<Argument> globalArguments, 
+        bool allowInferParameter)
     {
-        private readonly IReadOnlyCollection<Argument> _globalArguments;
-        private readonly bool _allowInferParameter;
-
-        public ArgumentParser(IReadOnlyCollection<Argument> globalArguments, bool allowInferParameter)
-        {
-            _globalArguments = globalArguments;
-            _allowInferParameter = allowInferParameter;
-        }
 
         public ParsedArguments.Properties Parse(IReadOnlyList<Token> lexed, IReadOnlyCollection<string> arguments)
         {
             var peekTokens = new PeekEnumerable<Token>(lexed);
             var encounteredParameter = false;
-            IList<RecognizedArgument> recognized = new List<RecognizedArgument>();
+            IList<RecognizedArgument> recognized = [];
             while (peekTokens.HasMore())
             {
                 var current = peekTokens.Next();
@@ -30,10 +24,10 @@ namespace Isop.CommandLine.Parse
                 {
                     case TokenType.Argument:
                         {
-                            var argument = _globalArguments
+                            var argument = globalArguments
                                .SingleOrDefault(arg => arg.Accept(current.Index, current.Value));
 
-                            if (null == argument && !encounteredParameter && _allowInferParameter)
+                            if (null == argument && !encounteredParameter && allowInferParameter)
                             {
                                 InferParameter(recognized, current);
                                 continue;
@@ -53,7 +47,7 @@ namespace Isop.CommandLine.Parse
                     case TokenType.Parameter:
                         {
                             encounteredParameter = true;
-                            var argumentWithOptions = _globalArguments
+                            var argumentWithOptions = globalArguments
                                 .SingleOrDefault(argopt => argopt.Accept(current.Index, current.Value));
                             if (null == argumentWithOptions)
                                 continue;
@@ -113,13 +107,13 @@ namespace Isop.CommandLine.Parse
 
         private void InferParameter(IList<RecognizedArgument> recognized, Token current)
         {
-            var argumentWithOptions = _globalArguments
+            var argumentWithOptions = globalArguments
                 .Where((argopt, i) => i == current.Index).SingleOrDefault();
             if (null != argumentWithOptions)
             {
                 recognized.Add(new RecognizedArgument(
                                    argumentWithOptions,
-                                   new []{current.Index},
+                                   [current.Index],
                                    argumentWithOptions.Name,
                                    current.Value,
                                    inferredOrdinal:true));

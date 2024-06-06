@@ -7,7 +7,7 @@ namespace Isop.CommandLine
     using Domain;
     internal static class MethodQueries
     {
-        public static Method FindMethod(ILookup<string, Method> methods, String methodName, int parameterCount=0)
+        public static Method? FindMethod(ILookup<string, Method> methods, string methodName, int parameterCount=0)
         {
             if (!methods.Contains(methodName)) return null;
             var potential = methods[methodName].ToArray();

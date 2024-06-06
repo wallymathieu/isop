@@ -10,35 +10,28 @@ namespace Isop.CommandLine.Parse
     /// <summary>
     /// Represents the parameter. For instance "file" of the commandline argument --file. 
     /// </summary>
-    public class ArgumentParameter
+    public class ArgumentParameter(
+        string prototype,
+        IEnumerable<string> names,
+        string? delimiter = null,
+        int? ordinal = null)
     {
-        public ArgumentParameter(string prototype, IEnumerable<string> names, string? delimiter = null, int? ordinal = null)
-        {
-            Prototype = prototype;
-            Aliases = names.ToArray();
-            Delimiter = delimiter;
-            Ordinal = ordinal;
-        }
+        public string Prototype { get; } = prototype;
+        public int? Ordinal { get; } = ordinal;
 
-        public string Prototype { get; }
-        public int? Ordinal { get; }
-
-        public static ArgumentParameter Parse(string value, IFormatProvider formatProvider)
+        public static ArgumentParameter Parse(string? value, IFormatProvider? formatProvider)
         {
-            ArgumentParameter ordinalParameter;
-            if (OrdinalParameter.TryParse(value, formatProvider, out ordinalParameter))
-                return ordinalParameter;
-            ArgumentParameter optionParameter;
-            if (OptionParameter.TryParse(value, out optionParameter))
-                return optionParameter;
-            ArgumentParameter visualStudioParameter;
-            if (VisualStudioParameter.TryParse(value, out visualStudioParameter))
-                return visualStudioParameter;
+            if (OrdinalParameter.TryParse(value, formatProvider, out var ordinalParameter))
+                return ordinalParameter!;
+            if (OptionParameter.TryParse(value, out var optionParameter))
+                return optionParameter!;
+            if (VisualStudioParameter.TryParse(value, out var visualStudioParameter))
+                return visualStudioParameter!;
             throw new ArgumentOutOfRangeException(value);
         }
 
-        public ICollection<string> Aliases { get; }
-        public string? Delimiter { get; }
+        public ICollection<string> Aliases { get; } = names.ToArray();
+        public string? Delimiter { get; } = delimiter;
         public string Help()
         {
             return

@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Isop.CommandLine.Parse.Parameters
 {
@@ -11,12 +12,17 @@ namespace Isop.CommandLine.Parse.Parameters
         /// <summary>
         /// same pattern as in visual studio external tools: &amp;tool
         /// </summary>
-        public static readonly Regex VisualStudioArgPattern = new Regex(@"(?<main>[^=:&]*(?<alias>\&.)?[^=:&]*)(?<equals>[=:])?");
+        public static readonly Regex VisualStudioArgPattern = new(@"(?<main>[^=:&]*(?<alias>\&.)?[^=:&]*)(?<equals>[=:])?");
 
-        public static bool TryParse(string value, out ArgumentParameter visualStudioParameter)
+        public static bool TryParse(string? value,
+            #if NET8_0_OR_GREATER
+            [NotNullWhen(true)]
+            #endif
+            out ArgumentParameter? visualStudioParameter)
         {
-            var match = VisualStudioArgPattern.Match(value);
-            if (match.Success)
+            Match match;
+            if (value!=null
+                && (match = VisualStudioArgPattern.Match(value)).Success)
             {
                 var main = match.Groups["main"].Value.Replace("&", "");
 
@@ -25,7 +31,7 @@ namespace Isop.CommandLine.Parse.Parameters
                 {
                     aliases.Add(match.Groups["alias"].Value.Substring(1));
                 }
-                string delimiter;
+                string? delimiter;
                 if (match.Groups["equals"].Success)
                 {
                     delimiter = match.Groups["equals"].Value;

@@ -11,13 +11,9 @@ namespace Isop.Domain
     using Infrastructure;
     using Help;
 
-    public class Controller
+    public class Controller(Type type)
     {
-        public Controller(Type type)
-        {
-            Type = type;
-        }
-        public Type Type { get; }
+        public Type Type { get; } = type;
         public string GetName(Conventions conventions) => 
             Regex.Replace(Type.Name, conventions.ControllerName + "$", "", RegexOptions.IgnoreCase);
 
