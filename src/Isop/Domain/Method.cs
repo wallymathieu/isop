@@ -16,13 +16,15 @@ namespace Isop.Domain
         public string Name => methodInfo.Name;
         public MethodInfo MethodInfo => methodInfo;
         public Parameter[] GetParameters() => methodInfo.GetParameters().Select(p => new Parameter(p)).ToArray();
-        public object Invoke(object instance, object[] values)
+        public object? Invoke(object instance, object[] values)
         {
-            if (instance==null) throw new ArgumentNullException(nameof(instance));
+            if (instance == null) throw new ArgumentNullException(nameof(instance));
             try
             {
                 return methodInfo.Invoke(instance, values);
-            }catch(TargetInvocationException ex){
+            }
+            catch (TargetInvocationException ex)
+            {
                 if (ex.InnerException != null)
                 {
                     ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
@@ -52,14 +54,14 @@ namespace Isop.Domain
             new Argument(required: parameterInfo.LooksRequired(),
                 parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo));
 
-        private static IEnumerable<Argument> CreateArgumentsForInstanceProperties(Parameter parameterInfo, IFormatProvider cultureInfo) =>
+        private static IEnumerable<Argument> CreateArgumentsForInstanceProperties(Parameter parameterInfo, IFormatProvider? cultureInfo) =>
             parameterInfo.GetPublicInstanceProperties()
-                .Select(prop => 
-                    new Argument( 
+                .Select(prop =>
+                    new Argument(
                         required: parameterInfo.LooksRequired() && IsRequired(prop),
                         parameter: ArgumentParameter.Parse(prop.Name, cultureInfo)));
 
-        private static bool IsRequired(PropertyInfo propertyInfo) => 
+        private static bool IsRequired(PropertyInfo propertyInfo) =>
             propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();
     }
 }

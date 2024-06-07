@@ -14,7 +14,7 @@ namespace Tests.DependencyInjection
         class MyOwnContainer: RegistrationBuilder, IServiceScopeFactory
         {
             private readonly IDictionary<Type, Func<object>> _registrations;
-            private IServiceProvider _scp;
+            private IServiceProvider? _scp;
 
             public MyOwnContainer() =>
                 _registrations = new Dictionary<Type,Func<object>>
@@ -48,7 +48,7 @@ namespace Tests.DependencyInjection
 
                 public ServiceProviderImpl(IDictionary<Type, Func<object>> registrations) => _registrations = registrations;
 
-                public object GetService(Type serviceType) => _registrations.TryGetValue(serviceType, out var factory)
+                public object? GetService(Type serviceType) => _registrations.TryGetValue(serviceType, out var factory)
                     ?factory.Invoke()
                     :null;
             }

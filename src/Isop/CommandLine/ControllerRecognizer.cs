@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Isop.CommandLine
 {
@@ -94,20 +95,24 @@ namespace Isop.CommandLine
 
             if (! _convertArgument.TryGetParametersForMethod(method, 
                 parsedArguments.Recognized
-                    .Select(a => new KeyValuePair<string,string>(a.RawArgument, a.Value))
+                    .Select(a => new KeyValuePair<string,string?>(a.RawArgument, a.Value))
                     .ToArray(), out var recognizedActionParameters, out var missingParameters))
                 return new ParsedArguments.MethodMissingArguments(
-                    missingParameters: missingParameters,
+                    missingParameters: missingParameters!,
                     recognizedClass: controller.Type,
                     recognizedAction: method);
             return new ParsedArguments.Method(
-                recognizedActionParameters: recognizedActionParameters, 
+                recognizedActionParameters: recognizedActionParameters!, 
                 recognized: parsedArguments.Recognized,
                 recognizedClass: controller.Type,
                 recognizedAction: method);
         }
 
-        public bool TryFindController(string name, out Controller controller)
+        public bool TryFindController(string name, 
+            #if NET8_0_OR_GREATER
+            [NotNullWhen(true)]
+            #endif
+            out Controller? controller)
         {
             if (_controllerActionMap.TryGetValue(name,
                 out var controllerAndMap))

@@ -30,12 +30,12 @@ namespace Isop.Domain
                 .Where(m => !m.Name.StartsWithIgnoreCase("get_")
                             && !m.Name.StartsWithIgnoreCase("set_"));
 
-        public Method GetMethod(Conventions conventions, string name) => 
+        public Method? GetMethod(Conventions conventions, string name) => 
             GetControllerActionMethods(conventions).SingleOrDefault(m => m.Name.EqualsIgnoreCase(name));
 
         public bool IsHelp() => Type == typeof(HelpController);
 
-        public override bool Equals(object obj) => obj is Controller controller && Equals(controller);
+        public override bool Equals(object? obj) => obj is Controller controller && Equals(controller);
         public bool Equals(Controller obj) => Type == obj?.Type;
 
         public override int GetHashCode() => Type.GetHashCode();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Options;
-
+using System.Diagnostics.CodeAnalysis;
 namespace Isop.CommandLine
 {
     using Abstractions;
@@ -17,10 +17,18 @@ namespace Isop.CommandLine
         private readonly CultureInfo? _culture = configuration?.Value.CultureInfo;
 
         public bool TryGetParametersForMethod(Method method,
-            IReadOnlyCollection<KeyValuePair<string,string>> parsedArguments, out IReadOnlyCollection<object> parameters, out IReadOnlyCollection<string> missingParameters)
+            IReadOnlyCollection<KeyValuePair<string,string?>> parsedArguments,
+            #if NET8_0_OR_GREATER
+            [NotNullWhen(true)]
+            #endif
+            out IReadOnlyCollection<object?>? parameters,
+            #if NET8_0_OR_GREATER
+            [NotNullWhen(false)]
+            #endif
+            out IReadOnlyCollection<string>? missingParameters)
         {
             var parameterInfos = method.GetParameters();
-            var parameterValues = new List<object>();
+            var parameterValues = new List<object?>();
             var missing = new List<string>();
             foreach (var paramInfo in parameterInfos)
             {
@@ -44,14 +52,16 @@ namespace Isop.CommandLine
                 }
             }
 
-            parameters = missing.Any() ? null: parameterValues;
-            missingParameters = missing.Any() ? missing : null;
-            return !missing.Any();
+            bool anythingMissing = missing.Count != 0;
+            parameters = anythingMissing ? null: parameterValues;
+            missingParameters = anythingMissing ? missing : null;
+            return !anythingMissing;
         }
 
-        private object CreateObjectFromArguments(IReadOnlyCollection<KeyValuePair<string,string>> parsedArguments, Parameter paramInfo)
+        private object CreateObjectFromArguments(IReadOnlyCollection<KeyValuePair<string,string?>> parsedArguments, Parameter paramInfo)
         {
             var obj = Activator.CreateInstance(paramInfo.ParameterType);
+            if (obj is null) throw new Exception($"Failed to initialize {paramInfo.ParameterType.Name}");
             foreach (var prop in paramInfo.GetPublicInstanceProperties())
             {
                 var recognizedArgument = parsedArguments.FirstOrDefault(a => a.Key.EqualsIgnoreCase(prop.Name));
@@ -63,7 +73,7 @@ namespace Isop.CommandLine
             return obj;
         }
 
-        private object ConvertFrom(KeyValuePair<string,string> arg1, Type type)
+        private object? ConvertFrom(KeyValuePair<string,string?> arg1, Type type)
         {
             try
             {

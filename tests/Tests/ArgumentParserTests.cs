@@ -75,8 +75,7 @@ namespace Tests
         [Test]
         public void It_can_parse_ordinal_parameters()
         {
-            ArgumentParameter o;
-            Assert.That(OrdinalParameter.TryParse("#1first", CultureInfo.InvariantCulture, out o));
+            Assert.That(OrdinalParameter.TryParse("#1first", CultureInfo.InvariantCulture, out var _));
         }
         [Test]
         public void It_can_parse_ordinal_parameter_value()

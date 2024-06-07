@@ -109,7 +109,7 @@ namespace Isop.Implementations
         {
             if (ControllerRecognizer.TryFindController(controllerName, out var controller))
             {
-                return new ControllerExpression(controllerName, this, controller);
+                return new ControllerExpression(controllerName, this, controller!);
             }
             throw new ArgumentException($"Unknown controller {controllerName}");
         }

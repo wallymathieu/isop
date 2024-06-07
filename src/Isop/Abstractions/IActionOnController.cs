@@ -16,7 +16,7 @@ namespace Isop.Abstractions
         /// <summary>
         /// send parameters to controller actions
         /// </summary>
-        IParsed Parameters(Dictionary<string, string> parameters);
+        IParsed Parameters(Dictionary<string, string?> parameters);
 
         /// <summary>
         /// Get help for controller action

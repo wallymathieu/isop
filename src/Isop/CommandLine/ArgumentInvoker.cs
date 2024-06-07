@@ -15,13 +15,14 @@ namespace Isop.CommandLine
     using Infrastructure;
     using System.Threading;
     using System.Reflection;
+    using System.Diagnostics.CodeAnalysis;
 
     public class ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recognizes, HelpController helpController)
     {
         private ILookup<string, ArgumentAction>? _recognizesMap;
         
         private ILookup<string,ArgumentAction> RecognizesMap =>
-            _recognizesMap ??= recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action);
+            _recognizesMap ??= recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action!);
 
 #if NET8_0_OR_GREATER
         private static bool IsIAsyncEnumerable(Type type) =>(
@@ -36,7 +37,7 @@ namespace Isop.CommandLine
                 yield return val;
             }
         }
-        private static bool AsyncEnumerable(object result, out IAsyncEnumerable<object?>? enumerable)
+        private static bool AsyncEnumerable(object? result, [NotNullWhen(true)] out IAsyncEnumerable<object?>? enumerable)
         {
             enumerable = null;
             if (result is null) return false;

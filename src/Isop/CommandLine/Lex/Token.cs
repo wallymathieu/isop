@@ -11,7 +11,7 @@ namespace Isop.CommandLine.Lex
         /// </summary>
         public int Index = index;
 
-        public override readonly bool Equals(object obj)
+        public override readonly bool Equals(object? obj)
         {
             if (obj is null) return false;
             return obj is Token token && Equals(token);

@@ -9,19 +9,19 @@ namespace Isop.Abstractions
         {
         }
 
-        public class ControllerAction(object result) : InvokeResult
+        public class ControllerAction(object? result) : InvokeResult
         {
-            public object Result { get; } = result;
+            public object? Result { get; } = result;
         }
 
-        public class Argument(object result) : InvokeResult
+        public class Argument(object? result) : InvokeResult
         {
-            public object Result { get; } = result;
+            public object? Result { get; } = result;
         }
 
-        public class AsyncControllerAction(Task<object> task) : InvokeResult
+        public class AsyncControllerAction(Task<object?> task) : InvokeResult
         {
-            public Task<object> Task { get; } = task;
+            public Task<object?> Task { get; } = task;
         }
 
         /// <summary>

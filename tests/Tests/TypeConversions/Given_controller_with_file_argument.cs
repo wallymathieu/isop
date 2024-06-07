@@ -12,9 +12,8 @@ namespace Tests.TypeConversions
     [TestFixture]
     public class Given_controller_with_file_argument
     {
-        class MyFileController
+        class MyFileController(Func<FileStream, string> OnAction)
         {
-            public Func<FileStream, string> OnAction { get; set; }
             public string Action(FileStream file) { return OnAction(file); }
         }
 
@@ -55,20 +54,20 @@ namespace Tests.TypeConversions
         {
             var filename = string.Empty;
             var sc = new ServiceCollection();
-            sc.AddSingleton(ci => new MyFileController { OnAction = file => filename = file.Name });
+            sc.AddSingleton(ci => new MyFileController (OnAction: file => filename = file.Name ));
             using (var files = new DeleteOnDispose())
             {
                 var arguments = AppHostBuilder.Create(sc)
                     .SetTypeConverter((t, s, c) =>
                     {
                         //creating file before use ...
-                        var fileStream = new FileStream(s, FileMode.Create);
+                        var fileStream = new FileStream(s!, FileMode.Create);
                         files.files.Add(fileStream);
                         return fileStream;
                     })
                     .Recognize(typeof(MyFileController))
                     .BuildAppHost()
-                    .Parse(new[] {"MyFile", "Action", "--file", "myfile.txt"});
+                    .Parse(["MyFile", "Action", "--file", "myfile.txt"]);
 
                 Assert.That(arguments.Unrecognized.Select(u => u.Value).ToArray(), Is.Empty);
                 await arguments.InvokeAsync(new StringWriter());

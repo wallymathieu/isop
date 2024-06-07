@@ -16,8 +16,8 @@ namespace Tests
         {
             public class Argument
             {
-                public string param1 { get; set; }
-                public string param2 { get; set; }
+                public string? param1 { get; set; }
+                public string? param2 { get; set; }
                 public int param3 { get; set; }
                 public decimal param4 { get; set; }
             }
@@ -39,7 +39,7 @@ namespace Tests
             var arguments = AppHostBuilder.Create(sc, new Configuration { CultureInfo = CultureInfo.InvariantCulture })
                 .Recognize(typeof(MyObjectController))
                 .BuildAppHost()
-                .Parse(new[] { "MyObject", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+                .Parse(["MyObject", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4"]);
 
             Assert.That(arguments.Unrecognized.Count, Is.EqualTo(0));
             await arguments.InvokeAsync(new StringWriter());

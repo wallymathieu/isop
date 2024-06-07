@@ -7,8 +7,9 @@ namespace Isop.Implementations
 {
     internal class DefaultConverter
     {
-        public object ConvertFrom(Type type, string s, CultureInfo cultureInfo)
+        public object? ConvertFrom(Type type, string? s, CultureInfo? cultureInfo)
         {
+            if (s is null) return null;
             if (type == typeof(FileStream))
             {
                 return new FileStream(s, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);

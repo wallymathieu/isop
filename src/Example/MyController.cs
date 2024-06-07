@@ -32,7 +32,7 @@ namespace Example
         }
         public class Argument
         {
-            public string MyProperty { get; set; }
+            public string? MyProperty { get; set; }
 
         }
         public string ActionWithObjectArgument(Argument arg)

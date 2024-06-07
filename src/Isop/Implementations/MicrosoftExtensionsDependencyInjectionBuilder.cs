@@ -32,7 +32,7 @@ namespace Isop.Implementations
             recognizes.Properties.Add(new Property(argument, action, required, description));
             return this;
         }
-        public IAppHostBuilder Parameter(string argument, Action<string> action, bool required = false, string? description = null)
+        public IAppHostBuilder Parameter(string argument, Action<string?> action, bool required = false, string? description = null)
         {
             var argumentAction = action!=null 
                 ? new ArgumentAction(value=>

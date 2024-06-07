@@ -8,7 +8,7 @@ namespace Isop.CommandLine
 {
     internal static class ToStrings
     {
-        public static IEnumerable<string> Default(object value)
+        public static IEnumerable<string> Default(object? value)
         {
             if (value == null) yield break;
             switch (value)
@@ -28,12 +28,12 @@ namespace Isop.CommandLine
                     break;
                 }
                 default:
-                    yield return value.ToString();
+                    yield return value.ToString()!;
                     break;
             }
         }
         
-        public static IEnumerable<string> AsTable(object value)
+        public static IEnumerable<string> AsTable(object? value)
         {
             if (value == null) yield break;
             switch (value)

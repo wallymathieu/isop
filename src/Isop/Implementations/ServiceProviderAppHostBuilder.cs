@@ -25,18 +25,18 @@ namespace Isop.Implementations
             return this;
         }
 
-        public IAppHostBuilder Parameter(string argument, ArgumentAction action = null, bool required = false, string description = null)
+        public IAppHostBuilder Parameter(string argument, ArgumentAction? action = null, bool required = false, string? description = null)
         {
             recognizes.Properties.Add(new Property(argument, action, required, description));
             return this;
         }
-        public IAppHostBuilder Parameter(string argument, Action<string> action, bool required = false, string description = null)
+        public IAppHostBuilder Parameter(string argument, Action<string?> action, bool required = false, string? description = null)
         {
             var argumentAction = action!=null 
                 ? new ArgumentAction(value=>
                 {
                     action(value);
-                    return Task.FromResult<object>(null);
+                    return Task.FromResult<object?>(null);
                 })
                 : null;
             recognizes.Properties.Add(new Property(argument, argumentAction, required, description));

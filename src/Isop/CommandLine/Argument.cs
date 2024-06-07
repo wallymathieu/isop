@@ -1,15 +1,15 @@
 ﻿namespace Isop.CommandLine
 {
     using Parse;
-    public sealed class Argument(ArgumentParameter parameter, bool required = false, string description = null)
+    public sealed class Argument(ArgumentParameter parameter, bool required = false, string? description = null)
     {
         public ArgumentParameter Parameter { get; } = parameter;
 
-        public string Description { get; } = description;
+        public string? Description { get; } = description;
         public string Name => Parameter.LongAlias();
         public bool Required { get; } = required;
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;

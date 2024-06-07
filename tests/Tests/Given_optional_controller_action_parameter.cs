@@ -19,8 +19,8 @@ namespace Tests
             {
                 OnAction = (p1, p2, p3, p4) => string.Empty;
             }
-            public Func<string, string, int?, decimal, string> OnAction { get; set; }
-            public string Action(string param1, string param2 = null, int? param3 = null, decimal param4 = 1) { return OnAction(param1, param2, param3, param4); }
+            public Func<string, string?, int?, decimal, string> OnAction { get; set; }
+            public string Action(string param1, string? param2 = null, int? param3 = null, decimal param4 = 1) { return OnAction(param1, param2, param3, param4); }
         }       
         [Test]
         public void It_can_parse_class_and_method_and_knows_whats_not_required()
@@ -38,29 +38,29 @@ namespace Tests
         [Test]
         public async Task It_can_parse_class_and_method_and_executes_default_with_the_default_values()
         {
-            var parameters = new object[0];
+            var parameters = Array.Empty<object?>();
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
-                { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
+                { parameters = [p1, p2, p3, p4]; return ""; } });
             var arguments = AppHostBuilder.Create(sc).Recognize<MyOptionalController>()
                 .BuildAppHost()
                 .Parse(new[] { "MyOptional", "Action", "--param1", "value1" });
             await arguments.InvokeAsync(new StringWriter());
-            Assert.That(parameters, Is.EquivalentTo(new object[] { "value1", null, null, 1 }));
+            Assert.That(parameters, Is.EquivalentTo(new object?[] { "value1", null, null, 1 }));
         }
 
         [Test]
         public async Task It_can_parse_class_and_method_and_executes_default_with_the_default_values_when_using_ordinal_syntax()
         {
-            var parameters = new object[0];
+            var parameters = Array.Empty<object?>();
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) =>
-                { parameters = new object[] { p1, p2, p3, p4 }; return ""; } });
+                { parameters = [p1, p2, p3, p4]; return ""; } });
             var arguments = AppHostBuilder.Create(sc).Recognize<MyOptionalController>()
                 .BuildAppHost()
                 .Parse(new[] { "MyOptional", "Action", "value1" });
             await arguments.InvokeAsync(new StringWriter());
-            Assert.That(parameters, Is.EquivalentTo(new object[] { "value1", null, null, 1 }));
+            Assert.That(parameters, Is.EquivalentTo(new object?[] { "value1", null, null, 1 }));
         }
 
         [Test,Ignore("Failure mode not implemented")]

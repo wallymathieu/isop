@@ -16,17 +16,20 @@ namespace Isop.Help
             var xml = new XmlDocument();
             xml.LoadXml(text);
             var members = xml.GetElementsByTagName("members");
-            var member = members.Item(0).ChildNodes;
+            var member = members.Item(0)?.ChildNodes;
             Dictionary<string, string> doc = new Dictionary<string, string>();
-            foreach (XmlNode m in member)
-            {
-                var attr = m.Attributes;
-                var name = attr.GetNamedItem("name");
-                var nodes = m.ChildNodes.Cast<XmlNode>();
-                var summary = nodes.FirstOrDefault(x => x.Name.Equals("summary"));
-                if (null != summary)
-                    doc.Add(name.InnerText, summary.InnerText.Trim());
-            }
+            if (member is not null)
+                foreach (XmlNode m in member)
+                {
+                    var attr = m.Attributes;
+                    if (attr is null) continue;
+                    var name = attr.GetNamedItem("name");
+                    if (name is null) continue;
+                    var nodes = m.ChildNodes.Cast<XmlNode>();
+                    var summary = nodes.FirstOrDefault(x => x.Name.Equals("summary"));
+                    if (null != summary)
+                        doc.Add(name.InnerText, summary.InnerText.Trim());
+                }
             return doc;
         }
         private readonly Dictionary<Assembly, IDictionary<string, string>> _summaries = new Dictionary<Assembly, IDictionary<string, string>>();
@@ -44,24 +47,24 @@ namespace Isop.Help
             }
         }
 
-        private static string TryGetAssemblyLocation(Assembly a)
+        private static string? TryGetAssemblyLocation(Assembly a)
         {
             var loc = a.Location;
-            string path = new Uri(a.CodeBase).AbsolutePath;
-            var paths = new[] {HelpAt(loc, loc), HelpAt(path, path), HelpAt(path, loc), HelpAt(loc, path)};
+            string path = new Uri(a.Location).AbsolutePath;
+            var paths = new[] { HelpAt(loc, loc), HelpAt(path, path), HelpAt(path, loc), HelpAt(loc, path) };
             var file = paths.FirstOrDefault(File.Exists);
             return file;
         }
 
         private static string HelpAt(string path, string filename)
         {
-            return Path.Combine(Path.GetDirectoryName(path),
+            return Path.Combine(Path.GetDirectoryName(path)!,
                                 Path.GetFileNameWithoutExtension(filename) + ".xml");
         }
 
         public static string GetKey(MethodInfo method)
         {
-            return GetKey(method.DeclaringType, method);
+            return GetKey(method.DeclaringType!, method);
         }
         private static readonly Regex GetOrSet = new Regex("^(get|set)_", RegexOptions.IgnoreCase);
 
@@ -84,13 +87,14 @@ namespace Isop.Help
         }
         private static string GetFullName(Type t)
         {
+            if (t.FullName is null) throw new Exception($"Missing fullname for type! {t.Name}");
             return t.FullName.Replace("+", ".");
         }
         public string GetDescriptionForMethod(MethodInfo method)
         {
             var t = method.DeclaringType;
-            var summaries = GetAssemblyCachedSummaries(t.GetTypeInfo().Assembly);
-            var key = GetKey(t, method);
+            var summaries = GetAssemblyCachedSummaries(t!.GetTypeInfo().Assembly);
+            var key = GetKey(t!, method);
             if (summaries.ContainsKey(key))
                 return summaries[key];
             return string.Empty;

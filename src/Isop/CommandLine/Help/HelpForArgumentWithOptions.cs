@@ -26,14 +26,14 @@ namespace Isop.CommandLine.Help
                 return _texts.TheArgumentsAre + Environment.NewLine +
                       string.Join(Environment.NewLine,
                                   recognizes.Properties.Select(ar => "  "+ Help(ar)).ToArray());
-            return Help(recognizes.Properties.First(ar => ar.ToArgument(config?.Value?.CultureInfo).Accept(val)));
+            return Help(recognizes.Properties.First(ar => ar.ToArgument(config?.Value?.CultureInfo).Accept(val!)));
         }
 
         public bool CanHelp(string? val = null)
         {
             return string.IsNullOrEmpty(val)
                 ? recognizes.Properties.Any()
-                : recognizes.Properties.Any(ar => ar.ToArgument(config?.Value?.CultureInfo).Accept(val));
+                : recognizes.Properties.Any(ar => ar.ToArgument(config?.Value?.CultureInfo).Accept(val!));
         }
     }
 }

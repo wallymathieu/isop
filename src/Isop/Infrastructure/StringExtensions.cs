@@ -9,8 +9,11 @@ namespace Isop.Infrastructure
         /// ignore case
         /// </summary>
         /// <returns></returns>
-        public static bool EqualsIgnoreCase(this string self, string other)
+        public static bool EqualsIgnoreCase(this string self, string? other)
         {
+            if (self is null && other is null) return true;
+            if (other is null) return false;
+            if (self is null) return false;
             return self.Equals(other, StringComparison.OrdinalIgnoreCase);
         }
         /// <summary>
@@ -20,14 +23,6 @@ namespace Isop.Infrastructure
         public static bool StartsWithIgnoreCase(this string self, string other)
         {
             return self.StartsWith(other, StringComparison.OrdinalIgnoreCase);
-        }
-        /// <summary>
-        /// ignore case
-        /// </summary>
-        /// <returns></returns>
-        public static bool EndsWithIgnoreCase(this string self, string other)
-        {
-            return self.EndsWith(other, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

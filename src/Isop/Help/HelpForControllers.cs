@@ -23,7 +23,7 @@ namespace Isop.Help
         private readonly Localization.Texts _texts = texts.Value ?? new Localization.Texts();
         private readonly Type[] _onlyStringType = { typeof(string) };
 
-        private string Description(Controller t, Method method, bool includeArguments)
+        private string Description(Controller t, Method? method, bool includeArguments)
         {
             var description = t.Type.GetTypeInfo().GetMethods()
                 .SingleOrDefault(m => m.ReturnType == typeof(string)
@@ -38,12 +38,10 @@ namespace Isop.Help
             }
             else
             {
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    var obj = scope.ServiceProvider.GetService(t.Type);
-                    if (ReferenceEquals(null, obj)) throw new Exception($"Unable to resolve {t.Type}");
-                    helpText.Add((string)description.Invoke(obj, [method?.Name]));
-                }
+                using var scope = serviceProvider.CreateScope();
+                var obj = scope.ServiceProvider.GetService(t.Type) ?? throw new Exception($"Unable to resolve {t.Type}");
+                var text = (string?)description.Invoke(obj, [method?.Name]);
+                if (text is not null) helpText.Add(text);
             }
 
             if (method != null && includeArguments)
@@ -54,7 +52,7 @@ namespace Isop.Help
 
             if (!helpText.Any())
                 return string.Empty;
-            return "  " + String.Join(" ", helpText).Trim();
+            return "  " + string.Join(" ", helpText).Trim();
         }
 
         private string HelpFor(Controller type, bool simpleDescription)
@@ -111,7 +109,7 @@ namespace Isop.Help
             return argument.Help();
         }
 
-        public string Help(string val = null, string action = null)
+        public string Help(string? val = null, string? action = null)
         {
             if (string.IsNullOrEmpty(val))
             {
@@ -137,10 +135,10 @@ namespace Isop.Help
                        Environment.NewLine,
                        _texts.HelpSubCommandForMoreInformation);
             }
-            return HelpForAction(controllerRecognizer, action);
+            return HelpForAction(controllerRecognizer, action!);
         }
 
-        public bool CanHelp(string val = null)
+        public bool CanHelp(string? val = null)
         {
             return string.IsNullOrEmpty(val)
                 ? _classAndMethodRecognizers.Any(cmr => !cmr.IsHelp())

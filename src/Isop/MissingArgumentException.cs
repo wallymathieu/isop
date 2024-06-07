@@ -15,15 +15,14 @@ namespace Isop
         /// <summary>
         /// The arguments that are missing
         /// </summary>
-        public IReadOnlyCollection<string> Arguments { get => (IReadOnlyCollection<string>)Data["Arguments"];
+        public IReadOnlyCollection<string> Arguments
+        {
+            get => (IReadOnlyCollection<string>)Data["Arguments"]!;
             set => Data["Arguments"] = value;
         }
         ///
-        public MissingArgumentException() { }
-        ///
-        public MissingArgumentException(string message) : base(message) { }
-        ///
-        public MissingArgumentException(string message, Exception inner) : base(message, inner) { }
+        public MissingArgumentException(string message, IReadOnlyCollection<string> arguments) : base(message) { Arguments = arguments; }
+
         ///
 #if !NETSTANDARD1_6
         protected MissingArgumentException(SerializationInfo info, StreamingContext context) : base(info, context) { }

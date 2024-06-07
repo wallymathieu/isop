@@ -12,6 +12,8 @@
     <PackageProjectUrl>https://github.com/wallymathieu/isop</PackageProjectUrl>
     <PackageTags>CLI;command line;commandline;argument;option;parser;parsing;library;syntax;shell</PackageTags>
     <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
   </PropertyGroup>
 
   <!-- mono -->

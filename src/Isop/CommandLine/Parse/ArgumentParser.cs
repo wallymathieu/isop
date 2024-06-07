@@ -85,7 +85,7 @@ namespace Isop.CommandLine.Parse
                         !recognized.Any(otherArgument =>
                             argument.InferredOrdinal &&
                             !ReferenceEquals(argument, otherArgument) 
-                            && otherArgument.RawArgument.Equals(argument.RawArgument)))
+                            && (otherArgument.RawArgument?.Equals(argument.RawArgument)??false)))
                 .ToList();
             var recognizedIndexes = minusDuplicates.SelectMany(token=>token.Index).ToList();
 
@@ -112,10 +112,10 @@ namespace Isop.CommandLine.Parse
             if (null != argumentWithOptions)
             {
                 recognized.Add(new RecognizedArgument(
-                                   argumentWithOptions,
-                                   [current.Index],
-                                   argumentWithOptions.Name,
-                                   current.Value,
+                                   argument: argumentWithOptions,
+                                   index: [current.Index],
+                                   rawArgument: argumentWithOptions.Name,
+                                   value: current.Value,
                                    inferredOrdinal:true));
             }
         }

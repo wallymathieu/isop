@@ -19,8 +19,8 @@ namespace Tests
             {
             }
 
-            public event Action OnDispose;
-            public static event Action<DisposeController> StaticOnDispose;
+            public event Action? OnDispose;
+            public static event Action<DisposeController>? StaticOnDispose;
 
             public string Method()
             {

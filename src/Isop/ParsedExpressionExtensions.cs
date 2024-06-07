@@ -53,7 +53,7 @@ namespace Isop
             }
             catch (MissingArgumentException ex)
             {
-                await error.WriteLineAsync($"Missing argument(s): {string.Join(", ", ex.Arguments).ToArray()}");
+                await error.WriteLineAsync($"Missing argument(s): {string.Join(", ", ex.Arguments??Array.Empty<string>()).ToArray()}");
 
                 await error.WriteLineAsync(parsed.Help());
                 return 400;

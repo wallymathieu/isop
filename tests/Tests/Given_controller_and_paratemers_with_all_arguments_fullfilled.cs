@@ -14,7 +14,7 @@ namespace Tests
     {
         private int count;
         private int countArg;
-        private IParsed parsed;
+        private IParsed? parsed;
         string[] args= { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4", "--beta" };
 
         [SetUp]
@@ -35,24 +35,24 @@ namespace Tests
         [Test]
         public void There_are_no_unrecognized_arguments()
         {
-            Assert.That(parsed.Unrecognized.Count, Is.EqualTo(0));
+            Assert.That(parsed!.Unrecognized.Count, Is.EqualTo(0));
         }
         [Test]
         public async Task It_will_execute_action_once()
         {
-            await parsed.InvokeAsync(new StringWriter());
+            await parsed!.InvokeAsync(new StringWriter());
             Assert.That(count, Is.AtLeast(1));
         }
         [Test]
         public async Task It_will_only_execute_parameter_at_least_once()
         {
-            await parsed.InvokeAsync(new StringWriter());
+            await parsed!.InvokeAsync(new StringWriter());
             Assert.That(countArg, Is.AtLeast(1));
         }
         [Test]
         public async Task It_will_only_execute_parameter_exactly_once()
         {
-            await parsed.InvokeAsync(new StringWriter());
+            await parsed!.InvokeAsync(new StringWriter());
             Assert.That(countArg, Is.EqualTo(1));
         }
     }

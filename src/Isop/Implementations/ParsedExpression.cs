@@ -82,10 +82,7 @@ namespace Isop.Implementations
         {
             var missing = MissingRequiredArguments().ToArray();
             if (missing.Any())
-                throw new MissingArgumentException("Missing arguments")
-                {
-                    Arguments = missing
-                };
+                throw new MissingArgumentException("Missing arguments", missing);
         }
         public async Task InvokeAsync(TextWriter output)
         {

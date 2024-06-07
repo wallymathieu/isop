@@ -25,7 +25,7 @@ namespace Isop.Abstractions
         /// <param name="required"></param>
         /// <param name="description"></param>
         /// <returns></returns>
-        IAppHostBuilder Parameter(string argument, ArgumentAction action = null, bool required = false, string description = null);
+        IAppHostBuilder Parameter(string argument, ArgumentAction? action = null, bool required = false, string? description = null);
 
         /// <summary>
         /// 
@@ -35,7 +35,7 @@ namespace Isop.Abstractions
         /// <param name="required"></param>
         /// <param name="description"></param>
         /// <returns></returns>
-        IAppHostBuilder Parameter(string argument, Action<string> action, bool required = false, string description = null);
+        IAppHostBuilder Parameter(string argument, Action<string?> action, bool required = false, string? description = null);
 
         /// <summary>
         /// 
