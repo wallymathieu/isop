@@ -10,14 +10,14 @@ namespace Isop.CommandLine.Parse
     /// <summary>
     /// Represents the parameter. For instance "file" of the commandline argument --file. 
     /// </summary>
-    public class ArgumentParameter(
-        string prototype,
-        IEnumerable<string> names,
-        string? delimiter = null,
-        int? ordinal = null)
+    public record ArgumentParameter(
+        string Prototype,
+        IEnumerable<string> Names,
+        string? Delimiter = null,
+        int? Ordinal = null)
     {
-        public string Prototype { get; } = prototype;
-        public int? Ordinal { get; } = ordinal;
+        public string Prototype { get; } = Prototype;
+        public int? Ordinal { get; } = Ordinal;
 
         public static ArgumentParameter Parse(string? value, IFormatProvider? formatProvider)
         {
@@ -30,8 +30,8 @@ namespace Isop.CommandLine.Parse
             throw new ArgumentOutOfRangeException(value);
         }
 
-        public ICollection<string> Aliases { get; } = names.ToArray();
-        public string? Delimiter { get; } = delimiter;
+        public ICollection<string> Aliases { get; } = Names.ToArray();
+        public string? Delimiter { get; } = Delimiter;
         public string Help()
         {
             return
@@ -56,7 +56,7 @@ namespace Isop.CommandLine.Parse
 
         }
 
-        public string LongAlias()
+        public string? LongAlias()
         {
             var maxLength = Aliases.Max(a => a.Length);
             return Aliases.SingleOrDefault(a => a.Length == maxLength);

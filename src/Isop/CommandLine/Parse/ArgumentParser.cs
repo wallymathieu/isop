@@ -66,7 +66,7 @@ namespace Isop.CommandLine.Parse
 
                             recognized.Add(new RecognizedArgument(
                                         argumentWithOptions,
-                                        indexes.ToArray(),
+                                        [.. indexes],
                                         current.Value,
                                         value));
                         }

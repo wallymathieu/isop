@@ -39,9 +39,9 @@ namespace Isop.CommandLine.Parse.Parameters
                 else delimiter = null;
 
                 visualStudioParameter = new ArgumentParameter(
-                        prototype: value,
-                        names: aliases.ToArray(),
-                        delimiter: delimiter);
+                        Prototype: value,
+                        Names: aliases.ToArray(),
+                        Delimiter: delimiter);
 
                 return true;
             }
