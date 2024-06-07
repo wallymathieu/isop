@@ -1,24 +1,19 @@
 namespace Isop.CommandLine.Parse
 {
-    public class RecognizedArgument(Argument argument, 
-        int[] index, 
-        string rawArgument, 
-        string? value = null,
-        bool inferredOrdinal = false)
+    public record RecognizedArgument(Argument Argument, 
+        int[] Index, 
+        string RawArgument, 
+        string? Value = null,
+        bool InferredOrdinal = false)
     {
-        public int[] Index { get; } = index;
-
         /// <summary>
         /// the matched value if any, for instance the "value" of the expression "--argument value"
         /// </summary>
-        public string? Value { get; } = value;
-        public Argument Argument { get; } = argument;
+        public string? Value { get; } = Value;
         /// <summary>
         /// the "argument" of the expression "--argument"
         /// </summary>
-        public string RawArgument { get; } = rawArgument;
-
-        public bool InferredOrdinal { get; } = inferredOrdinal;
-    }
+        public string RawArgument { get; } = RawArgument;
+   }
 }
 

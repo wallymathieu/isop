@@ -95,8 +95,8 @@ namespace Isop.CommandLine.Parse
                 .Select(v => new UnrecognizedArgument(v.Index, v.Value));
 
             return new ParsedArguments.Properties(
-                unrecognized: unRecognizedArguments.ToArray(),
-                recognized : minusDuplicates.ToArray()
+                Unrecognized: unRecognizedArguments.ToArray(),
+                Recognized : minusDuplicates.ToArray()
             );
         }
 
@@ -116,7 +116,7 @@ namespace Isop.CommandLine.Parse
                                    [current.Index],
                                    argumentWithOptions.Name,
                                    current.Value,
-                                   inferredOrdinal:true));
+                                   InferredOrdinal:true));
             }
         }
     }

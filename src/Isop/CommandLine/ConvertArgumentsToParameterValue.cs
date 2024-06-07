@@ -17,7 +17,7 @@ namespace Isop.CommandLine
         private readonly CultureInfo? _culture = configuration?.Value.CultureInfo;
 
         public bool TryGetParametersForMethod(Method method,
-            IReadOnlyCollection<KeyValuePair<string,string>> parsedArguments, out IReadOnlyCollection<object> parameters, out IReadOnlyCollection<string> missingParameters)
+            IReadOnlyCollection<KeyValuePair<string,string?>> parsedArguments, out IReadOnlyCollection<object>? parameters, out IReadOnlyCollection<string>? missingParameters)
         {
             var parameterInfos = method.GetParameters();
             var parameterValues = new List<object>();
@@ -49,9 +49,10 @@ namespace Isop.CommandLine
             return !missing.Any();
         }
 
-        private object CreateObjectFromArguments(IReadOnlyCollection<KeyValuePair<string,string>> parsedArguments, Parameter paramInfo)
+        private object CreateObjectFromArguments(IReadOnlyCollection<KeyValuePair<string,string?>> parsedArguments, Parameter paramInfo)
         {
             var obj = Activator.CreateInstance(paramInfo.ParameterType);
+            if (obj is null) throw new Exception($"Unable to initialize parameter type {paramInfo.ParameterType}");
             foreach (var prop in paramInfo.GetPublicInstanceProperties())
             {
                 var recognizedArgument = parsedArguments.FirstOrDefault(a => a.Key.EqualsIgnoreCase(prop.Name));
@@ -63,7 +64,7 @@ namespace Isop.CommandLine
             return obj;
         }
 
-        private object ConvertFrom(KeyValuePair<string,string> arg1, Type type)
+        private object ConvertFrom(KeyValuePair<string,string?> arg1, Type type)
         {
             try
             {

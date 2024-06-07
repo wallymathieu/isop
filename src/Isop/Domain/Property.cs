@@ -1,11 +1,11 @@
 namespace Isop.Domain
 {
     using Abstractions;
-    public class Property(string name, ArgumentAction? action, bool required, string? description)
+    public record Property(string Name, ArgumentAction? Action, bool Required, string? Description)
     {
-        public string? Description { get; } = description;
-        public string Name { get; } = name;
-        public ArgumentAction? Action { get; } = action;
-        public bool Required { get; } = required;
+        public string? Description { get; } = Description;
+        public string Name { get; } = Name;
+        public ArgumentAction? Action { get; } = Action;
+        public bool Required { get; } = Required;
     }
 }

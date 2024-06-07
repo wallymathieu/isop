@@ -27,8 +27,8 @@ namespace Isop
         /// <returns></returns>
         public static async Task<int> TryInvokeAsync(this IParsed parsed, TextWriter? @out = null, TextWriter? @error = null)
         {
-            if (@out == null) @out = Console.Out;
-            if (error == null) error = Console.Error;
+            @out ??= Console.Out;
+            error ??= Console.Error;
             try
             {
                 if (parsed.Unrecognized.Any()) //Warning:

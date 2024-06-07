@@ -2,16 +2,16 @@ using System.Globalization;
 
 namespace Isop.CommandLine.Lex
 {
-    public struct Token(string value, TokenType tokenType, int index)
+    public readonly struct Token(string value, TokenType tokenType, int index)
     {
-        public string Value = value;
-        public TokenType TokenType = tokenType;
+        public readonly string Value = value;
+        public readonly TokenType TokenType = tokenType;
         /// <summary>
         /// the index in the argument array
         /// </summary>
-        public int Index = index;
+        public readonly int Index = index;
 
-        public override readonly bool Equals(object obj)
+        public override readonly bool Equals(object? obj)
         {
             if (obj is null) return false;
             return obj is Token token && Equals(token);

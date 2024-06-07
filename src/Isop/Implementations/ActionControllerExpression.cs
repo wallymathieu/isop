@@ -54,8 +54,8 @@ namespace Isop.Implementations
             }
             
             var parsedArguments = new ParsedArguments.Properties(
-                unrecognized: unrecognizedArguments,
-                recognized: recognizedArguments
+                Unrecognized: unrecognizedArguments,
+                Recognized: recognizedArguments
             );
             if (!_appHost.ControllerRecognizer.TryFind(_controllerName, Name, out var controllerAndMethod))
                 return new ParsedExpression(parsedArguments, _appHost);
@@ -76,11 +76,11 @@ namespace Isop.Implementations
                 }).ToArray();
             return new ParsedExpression(
                 parsedArguments.Merge(new ParsedArguments.Method(
-                    recognizedActionParameters: parametersForMethod,
-                    recognized: 
+                    RecognizedActionParameters: parametersForMethod,
+                    Recognized: 
                         recognized,
-                    recognizedClass: controller.Type, 
-                    recognizedAction:method)), 
+                    RecognizedClass: controller.Type, 
+                    RecognizedAction:method)), 
                 _appHost);
         }
         public string Help() => 

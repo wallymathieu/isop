@@ -49,15 +49,15 @@ namespace Isop.Domain
         }
 
         private static Argument CreateArgument(Parameter parameterInfo, IFormatProvider? cultureInfo) =>
-            new Argument(required: parameterInfo.LooksRequired(),
-                parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo));
+            new Argument(Required: parameterInfo.LooksRequired(),
+                Parameter: ArgumentParameter.Parse(parameterInfo.Name, cultureInfo));
 
         private static IEnumerable<Argument> CreateArgumentsForInstanceProperties(Parameter parameterInfo, IFormatProvider cultureInfo) =>
             parameterInfo.GetPublicInstanceProperties()
                 .Select(prop => 
                     new Argument( 
-                        required: parameterInfo.LooksRequired() && IsRequired(prop),
-                        parameter: ArgumentParameter.Parse(prop.Name, cultureInfo)));
+                        Required: parameterInfo.LooksRequired() && IsRequired(prop),
+                        Parameter: ArgumentParameter.Parse(prop.Name, cultureInfo)));
 
         private static bool IsRequired(PropertyInfo propertyInfo) => 
             propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();

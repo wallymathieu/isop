@@ -85,8 +85,8 @@ namespace Isop.CommandLine
             var argumentRecognizers = method.GetArguments(Culture)
                 .ToList();
             argumentRecognizers.InsertRange(0, new[] { 
-                new Argument(parameter: ArgumentParameter.Parse("#0" + controller.GetName(_conventions), Culture), required: true),
-                new Argument(parameter: ArgumentParameter.Parse("#1" + method.Name, Culture), required: false)
+                new Argument(Parameter: ArgumentParameter.Parse("#0" + controller.GetName(_conventions), Culture), Required: true),
+                new Argument(Parameter: ArgumentParameter.Parse("#1" + method.Name, Culture), Required: false)
             });
             var controllerLexed = RewriteLexedTokensToSupportHelpAndIndex.Rewrite(_conventions,ArgumentLexer.Lex(arg).ToList());
             var parser = new ArgumentParser(argumentRecognizers, _allowInferParameter);
@@ -94,20 +94,20 @@ namespace Isop.CommandLine
 
             if (! _convertArgument.TryGetParametersForMethod(method, 
                 parsedArguments.Recognized
-                    .Select(a => new KeyValuePair<string,string>(a.RawArgument, a.Value))
+                    .Select(a => new KeyValuePair<string,string?>(a.RawArgument, a.Value))
                     .ToArray(), out var recognizedActionParameters, out var missingParameters))
                 return new ParsedArguments.MethodMissingArguments(
                     missingParameters: missingParameters,
                     recognizedClass: controller.Type,
                     recognizedAction: method);
             return new ParsedArguments.Method(
-                recognizedActionParameters: recognizedActionParameters, 
-                recognized: parsedArguments.Recognized,
-                recognizedClass: controller.Type,
-                recognizedAction: method);
+                RecognizedActionParameters: recognizedActionParameters, 
+                Recognized: parsedArguments.Recognized,
+                RecognizedClass: controller.Type,
+                RecognizedAction: method);
         }
 
-        public bool TryFindController(string name, out Controller controller)
+        public bool TryFindController(string name, out Controller? controller)
         {
             if (_controllerActionMap.TryGetValue(name,
                 out var controllerAndMap))
