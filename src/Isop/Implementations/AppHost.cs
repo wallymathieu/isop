@@ -42,13 +42,13 @@ namespace Isop.Implementations
         /// <summary>
         /// 
         /// </summary>
-        public AppHost(IOptions<AppHostConfiguration> options,
+        public AppHost(IOptions<AppHostConfiguration>? options,
             IServiceProvider serviceProvider,
             Recognizes recognizes,
             TypeConverter typeConverter, 
             Abstractions.ToStrings toStrings, 
-            IOptions<Texts> texts,
-            IOptions<Conventions> conventions)
+            IOptions<Texts>? texts,
+            IOptions<Conventions>? conventions)
         {
             ToStrings = toStrings;
             Configuration = options ?? Options.Create(new AppHostConfiguration());

@@ -71,7 +71,7 @@ namespace Tests.TypeConversions
 
                 Assert.That(arguments.Unrecognized.Select(u => u.Value).ToArray(), Is.Empty);
                 await arguments.InvokeAsync(new StringWriter());
-                Assert.True(filename.Contains("myfile.txt"));
+                Assert.That(filename.Contains("myfile.txt"), Is.True);
             }
         }
 

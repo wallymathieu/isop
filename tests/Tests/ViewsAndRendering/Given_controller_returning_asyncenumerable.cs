@@ -45,7 +45,7 @@ namespace Tests.ViewsAndRendering
             var sw = new StringWriter();
             await arguments.InvokeAsync(sw);
             Assert.That(count, Is.EqualTo(2));
-            Assert.AreEqual(new []{"0","1"},sw.ToString().Split(new []{'\r','\n'}, StringSplitOptions.RemoveEmptyEntries));
+            Assert.That(sw.ToString().Split(new []{'\r','\n'}, StringSplitOptions.RemoveEmptyEntries),Is.EqualTo(new []{"0","1"}));
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace Tests.ViewsAndRendering
             var sw = new StringWriter();
             await arguments.InvokeAsync(sw);
             Assert.That(count, Is.EqualTo(2));
-            Assert.AreEqual(new []{"0","1"},sw.ToString().Split(new []{'\r','\n'}, StringSplitOptions.RemoveEmptyEntries));
+            Assert.That(sw.ToString().Split(new []{'\r','\n'}, StringSplitOptions.RemoveEmptyEntries),Is.EqualTo(new []{"0","1"}));
         }
     }
 }
