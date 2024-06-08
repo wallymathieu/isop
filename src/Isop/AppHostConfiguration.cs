@@ -3,7 +3,7 @@
 namespace Isop
 {
     /// <summary>
-    /// Main configuration
+    /// Main configuration of a command line application.
     /// </summary>
     public class AppHostConfiguration
     {
