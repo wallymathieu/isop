@@ -25,7 +25,7 @@ namespace Tests
 
             var arguments = AppHostBuilder.Create(sc,new Configuration { CultureInfo=CultureInfo.InvariantCulture }).Recognize<MyController>()
                                 .BuildAppHost()
-                                .Parse(new[] { "My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });
+                                .Parse(["My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4"]);
 
             Assert.That(arguments.Unrecognized.Count, Is.EqualTo(0));
             await arguments.InvokeAsync(new StringWriter());
@@ -53,7 +53,7 @@ namespace Tests
             var count = 0;
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
-            var args = new[] { "My", "Action", "value1", "value2", "3", "3.4" };
+            string[] args = ["My", "Action", "value1", "value2", "3", "3.4"];
             var parsed = AppHostBuilder.Create(sc, new Configuration
                 {
                     DisableAllowInferParameter = true
@@ -87,7 +87,7 @@ namespace Tests
                 .BuildAppHost();
 
             Assert.ThrowsAsync<MissingArgumentException>(async () => await builder
-                .Parse(new[] { "My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4" })
+                .Parse(["My", "Action", "--param2", "value2", "--paramX", "3", "--param1", "value1", "--param4", "3.4"])
                 .InvokeAsync(Console.Out));
         }
 
@@ -98,7 +98,7 @@ namespace Tests
                 .BuildAppHost();
 
             Assert.ThrowsAsync<MissingArgumentException>(async () => await builder
-                .Parse(new[] { "My", "Action" })
+                .Parse(["My", "Action"])
                 .InvokeAsync(Console.Out));
         }
     }

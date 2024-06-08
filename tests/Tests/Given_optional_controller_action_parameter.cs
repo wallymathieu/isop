@@ -44,7 +44,7 @@ namespace Tests
                 { parameters = [p1, p2, p3, p4]; return ""; } });
             var arguments = AppHostBuilder.Create(sc).Recognize<MyOptionalController>()
                 .BuildAppHost()
-                .Parse(new[] { "MyOptional", "Action", "--param1", "value1" });
+                .Parse(["MyOptional", "Action", "--param1", "value1"]);
             await arguments.InvokeAsync(new StringWriter());
             Assert.That(parameters, Is.EquivalentTo(new object?[] { "value1", null, null, 1 }));
         }
@@ -58,7 +58,7 @@ namespace Tests
                 { parameters = [p1, p2, p3, p4]; return ""; } });
             var arguments = AppHostBuilder.Create(sc).Recognize<MyOptionalController>()
                 .BuildAppHost()
-                .Parse(new[] { "MyOptional", "Action", "value1" });
+                .Parse(["MyOptional", "Action", "value1"]);
             await arguments.InvokeAsync(new StringWriter());
             Assert.That(parameters, Is.EquivalentTo(new object?[] { "value1", null, null, 1 }));
         }
@@ -74,7 +74,7 @@ namespace Tests
                     DisableAllowInferParameter = true
                 }).Recognize<MyOptionalController>()
                 .BuildAppHost()
-                .Parse(new[] { "MyOptional", "Action", "value1" });
+                .Parse(["MyOptional", "Action", "value1"]);
             Assert.That(parsed.Recognized.Count, Is.EqualTo(0));
             CollectionAssert.AreEqual(
                 new []{"value1"},

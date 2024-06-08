@@ -42,7 +42,7 @@ namespace Isop.Implementations
                 if (prop != null)
                 {
                     recognizedArguments.Add(new RecognizedArgument(
-                        prop.ToArgument(),
+                        prop,
                         [index],
                         current.Key,
                         current.Value));

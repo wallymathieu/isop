@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Isop;
-using Isop.CommandLine.Parse;
 using Isop.CommandLine.Parse.Parameters;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Tests.FakeControllers;
-using Tests.Routing;
 
 namespace Tests
 {
@@ -21,14 +16,14 @@ namespace Tests
         {
             public void Action(int param) { }
         }
-        
+
         [Test]
         public void Recognizes_shortform()
         {
             var parser = AppHostBuilder.Create()
                 .Parameter("&argument")
                 .BuildAppHost()
-                .Parse(new[] { "-a" });
+                .Parse(["-a"]);
             var arguments = parser.Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -41,7 +36,7 @@ namespace Tests
             var arguments = AppHostBuilder.Create()
                 .Parameter("&beta")
                 .BuildAppHost()
-                .Parse(new[] { "-a", "-b" }).Recognized;
+                .Parse(["-a", "-b"]).Recognized;
 
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
@@ -54,7 +49,7 @@ namespace Tests
             var arguments = AppHostBuilder.Create()
                 .Parameter("beta")
                 .BuildAppHost()
-                .Parse(new[] { "-a", "--beta" }).Recognized;
+                .Parse(["-a", "--beta"]).Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.RawArgument, Is.EqualTo("beta"));
@@ -66,7 +61,7 @@ namespace Tests
             var arguments = AppHostBuilder.Create()
                 .Parameter("beta")
                 .BuildAppHost()
-                .Parse(new[] { "-a", "--beta", "value" }).Recognized;
+                .Parse(["-a", "--beta", "value"]).Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.RawArgument, Is.EqualTo("beta"));
@@ -83,7 +78,7 @@ namespace Tests
             var arguments = AppHostBuilder.Create()
                 .Parameter("#0first")
                 .BuildAppHost()
-                .Parse(new[] { "first" }).Recognized;
+                .Parse(["first"]).Recognized;
             Assert.That(arguments.Count, Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.RawArgument, Is.EqualTo("first"));
@@ -94,7 +89,7 @@ namespace Tests
             var arguments = AppHostBuilder.Create()
                 .Parameter("beta=")
                 .BuildAppHost()
-                .Parse(new[] { "-a", "--beta=test", "value" }).Recognized;
+                .Parse(["-a", "--beta=test", "value"]).Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.EqualTo("test"));
@@ -106,7 +101,7 @@ namespace Tests
             var arguments = AppHostBuilder.Create()
                 .Parameter("beta|b=")
                 .BuildAppHost()
-                .Parse(new[] { "-a", "-b=test", "value" }).Recognized;
+                .Parse(["-a", "-b=test", "value"]).Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.EqualTo("test"));
@@ -118,9 +113,9 @@ namespace Tests
             var unRecognizedArguments = AppHostBuilder.Create()
                .Parameter("beta")
                .BuildAppHost()
-               .Parse(new[] { "-a", "value", "--beta" }).Unrecognized;
+               .Parse(["-a", "value", "--beta"]).Unrecognized;
 
-            Assert.That(unRecognizedArguments.Select(unrecognized=>Tuple.Create(unrecognized.Index,unrecognized.Value)), Is.EquivalentTo(new[] {
+            Assert.That(unRecognizedArguments.Select(unrecognized => Tuple.Create(unrecognized.Index, unrecognized.Value)), Is.EquivalentTo(new[] {
                 Tuple.Create(0,"-a"),
                 Tuple.Create(1,"value" )
             }));
@@ -132,7 +127,7 @@ namespace Tests
                 .Parameter("beta|b=")
                 .Parameter("alpha|a=")
                 .BuildAppHost()
-                .Parse(new[] { "test", "value" }).Recognized;
+                .Parse(["test", "value"]).Recognized;
             Assert.That(arguments.Count, Is.EqualTo(2));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.EqualTo("test"));
@@ -143,17 +138,17 @@ namespace Tests
         public void When_infer_is_turned_off()
         {
             var parsed = AppHostBuilder.Create(new Configuration
-                {
-                    DisableAllowInferParameter = true
-                })
+            {
+                DisableAllowInferParameter = true
+            })
                 .Parameter("beta|b=")
                 .Parameter("alpha|a=")
                 .BuildAppHost()
-                .Parse(new[] { "test", "value" });
+                .Parse(["test", "value"]);
             Assert.That(parsed.Recognized.Count, Is.EqualTo(0));
             CollectionAssert.AreEqual(
-                new []{"test", "value"},
-                parsed.Unrecognized.Select(u=>u.Value));
+                new[] { "test", "value" },
+                parsed.Unrecognized.Select(u => u.Value));
         }
         [Test]
         public void It_wont_report_matched_parameters()
@@ -161,7 +156,7 @@ namespace Tests
             var arguments = AppHostBuilder.Create()
                 .Parameter("beta")
                 .BuildAppHost()
-                .Parse(new[] { "--beta", "value" }).Unrecognized;
+                .Parse(["--beta", "value"]).Unrecognized;
 
             Assert.That(arguments.Count(), Is.EqualTo(0));
         }
@@ -170,7 +165,7 @@ namespace Tests
             Assert.ThrowsAsync<MissingArgumentException>(async () => await AppHostBuilder.Create()
                 .Parameter("beta", required: true)
                 .BuildAppHost()
-                .Parse(new[] { "-a", "value" }).InvokeAsync(Console.Out));
+                .Parse(["-a", "value"]).InvokeAsync(Console.Out));
 
         [Test]
         public void It_can_recognize_arguments()
@@ -178,7 +173,7 @@ namespace Tests
             var arguments = AppHostBuilder.Create()
                 .Parameter("alpha")
                 .BuildAppHost()
-                .Parse(new[] { "alpha" }).Recognized;
+                .Parse(["alpha"]).Recognized;
             Assert.That(arguments.Count(), Is.EqualTo(1));
             var arg1 = arguments.First();
             Assert.That(arg1.Value, Is.Null);
@@ -191,7 +186,7 @@ namespace Tests
             var builder = AppHostBuilder.Create().Recognize<SingleIntAction>()
                  .BuildAppHost();
             Assert.Throws<TypeConversionFailedException>(() =>
-                builder.Parse(new[] { "SingleIntAction", "Action", "--param", "value" })
+                builder.Parse(["SingleIntAction", "Action", "--param", "value"])
             );
         }
 
@@ -203,7 +198,7 @@ namespace Tests
                            .Parameter("beta", arg => count++)
                            .Parameter("alpha", arg => Assert.Fail())
                            .BuildAppHost()
-                           .Parse(new[] { "-a", "value", "--beta" }).InvokeAsync(new StringWriter());
+                           .Parse(["-a", "value", "--beta"]).InvokeAsync(new StringWriter());
             Assert.That(count, Is.EqualTo(1));
         }
 

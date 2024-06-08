@@ -47,7 +47,7 @@ namespace Tests
                 CultureInfo = CultureInfo.InvariantCulture
             }).Recognize(typeof(DisposeController)).BuildAppHost();
             await build
-                .Parse(new[] { "Dispose", "method" })
+                .Parse(["Dispose", "method"])
                 .InvokeAsync(new StringWriter());
             Assert.That(count, Is.EqualTo(0));
         }

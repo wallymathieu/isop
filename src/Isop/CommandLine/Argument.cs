@@ -1,7 +1,14 @@
-﻿namespace Isop.CommandLine
+﻿using Isop.CommandLine.Parse;
+
+namespace Isop.CommandLine
 {
-    using Parse;
-    public sealed class Argument(ArgumentParameter parameter, bool required = false, string? description = null)
+    /// <summary>
+    /// An argument is sent through the command line. Arguments are then passed on to controllers.
+    /// </summary>
+    public class Argument(
+        ArgumentParameter parameter,
+        bool required = false,
+        string? description = null)
     {
         public ArgumentParameter Parameter { get; } = parameter;
 
@@ -27,7 +34,7 @@
         {
             unchecked
             {
-                int result = (Description != null ? Description.GetHashCode() : 0);
+                int result = Description != null ? Description.GetHashCode() : 0;
                 result = (result*397) ^ (Name != null ? Name.GetHashCode() : 0);
                 result = (result*397) ^ Required.GetHashCode();
                 return result;
