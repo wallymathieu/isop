@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using Isop.Tests.FakeControllers;
+
+namespace Isop.Tests.FakeConfigurations
+{
+    class FullConfiguration:IDisposable
+    {
+        public bool DisposeCalled = false;
+        
+        public IEnumerable<Type> Recognizes()
+        {
+            return new[] { typeof(MyController) };
+        }
+        /// <summary>
+        /// GLOBAL!!
+        /// </summary>
+        /// <value>
+        /// The global.
+        /// </value>
+        //
+        public string Global {
+            get;
+            set;
+        }
+        [Required]
+        public string GlobalRequired
+        {
+            get;
+            set;
+        }
+        public CultureInfo Culture
+        {
+            get{ return new CultureInfo("es-ES"); }
+        }
+        public bool RecognizeHelp{get{return true;}}
+        public void Dispose()
+        {
+            DisposeCalled = true;
+        }
+        public Func<Type, string, CultureInfo, object> GetTypeconverter()
+        {
+            return TypeConverter;
+        }
+        public static object TypeConverter(Type t, string s, CultureInfo c) { return "FullConfigurationTypeConverter"; }
+    }
+}
