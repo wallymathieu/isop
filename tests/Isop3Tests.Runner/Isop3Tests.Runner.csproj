@@ -6,7 +6,10 @@
 
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Isop3Tests\Isop3Tests.csproj" />
+    <ProjectReference Include="..\Isop3Tests\Isop3Tests.csproj"/>
+    <!--
+    <ProjectReference Include="..\..\src\Isop\Isop.csproj" />
+    -->
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.9.0" />

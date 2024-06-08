@@ -278,7 +278,7 @@ See 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test] public void Can_read_xml_doc()
         {
             var doc = HelpXmlDocumentation.GetSummariesFromText (
-                File.ReadAllText(Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location),"Tests.xml")));
+                File.ReadAllText(Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location),"Isop3Tests.xml")));
             Assert.That(doc["P:Isop.Tests.FakeConfigurations.FullConfiguration.Global"],Is.EqualTo("GLOBAL!!"));
         }
         
