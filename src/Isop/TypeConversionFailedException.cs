@@ -1,16 +1,10 @@
 using System;
-#if ! NETSTANDARD1_6
-using System.Runtime.Serialization;
-#endif
 
 namespace Isop
 {
     /// <summary>
     /// Could not convert to type
     /// </summary>
-#if !NETSTANDARD1_6
-    [Serializable]
-#endif
     public class TypeConversionFailedException : Exception
     {
         /// <summary>
@@ -49,10 +43,6 @@ namespace Isop
         public TypeConversionFailedException(string message, Exception inner) : base(message, inner)
         {
         }
-        ///
-#if !NETSTANDARD1_6
-        protected TypeConversionFailedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-#endif
     }
 }
 

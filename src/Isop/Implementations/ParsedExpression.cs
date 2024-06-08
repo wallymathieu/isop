@@ -6,6 +6,7 @@ using Isop.Infrastructure;
 
 namespace Isop.Implementations
 {
+    using System;
     using Abstractions;
     using CommandLine;
     using CommandLine.Parse;
@@ -105,6 +106,8 @@ namespace Isop.Implementations
             return await Task.WhenAll( _argumentInvoker.Invoke(_parsedArguments));
         }
 
+        [Obsolete("Prefer HelpAsync")]
         public string Help() => _appHost.Help();
+        public Task<string> HelpAsync() => _appHost.HelpAsync();
     }
 }

@@ -70,7 +70,7 @@ namespace Isop.Implementations
         private IParsed Parse(IReadOnlyCollection<string> arg)
         {
             var argumentParser = new ArgumentParser(
-                Recognizes.Properties.Select(p=>p.ToArgument(Configuration.Value.CultureInfo)).ToArray(),
+                Recognizes.Properties.Select(p=>p.ToArgument()).ToArray(),
                 AllowInferParameter);
             var lexed = ArgumentLexer.Lex(arg).ToList();
             var parsedGlobalArgs = argumentParser.Parse(lexed, arg);

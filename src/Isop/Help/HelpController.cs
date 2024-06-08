@@ -16,8 +16,8 @@ namespace Isop.Help
         IOptions<Conventions> conventions)
     {
         private readonly Conventions _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
-        private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions = new HelpForArgumentWithOptions(texts, recognizes, config);
-        private readonly HelpForControllers _helpForClassAndMethod = new HelpForControllers(recognizes,
+        private readonly HelpForArgumentWithOptions _helpForArgumentWithOptions = new(texts, recognizes);
+        private readonly HelpForControllers _helpForClassAndMethod = new(recognizes,
                 new HelpXmlDocumentation(), texts, config, serviceProvider, conventions);
 
         public string Index()

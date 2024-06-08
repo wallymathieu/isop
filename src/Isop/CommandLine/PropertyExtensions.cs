@@ -6,14 +6,12 @@ namespace Isop.CommandLine
     using Domain;
     internal static class PropertyExtensions
     {
-        [Obsolete("Temporary")]
-        public static Argument ToArgument(this Property p, IFormatProvider? formatProvider)
+        public static Argument ToArgument(this Property p)
         {
-            var argumentParam= ArgumentParameter.Parse(p.Name, formatProvider);
             return new Argument(
                 required: p.Required,
                 description: p.Description,
-                parameter: argumentParam
+                parameter: ArgumentParameter.Empty(p.Name)
             );
         }
     }

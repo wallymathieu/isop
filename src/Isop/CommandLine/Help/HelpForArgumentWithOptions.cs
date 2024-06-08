@@ -7,15 +7,14 @@ namespace Isop.CommandLine.Help
     using Domain;
 
     internal class HelpForArgumentWithOptions(IOptions<Localization.Texts> texts,
-        Recognizes recognizes,
-        IOptions<Configuration> config)
+        Recognizes recognizes)
     {
         private readonly Localization.Texts _texts = texts.Value ?? new Localization.Texts();
 
         private string Help(Property entity)
         {
             //var arg = entity.AsArgument();
-            return string.Concat(entity.ToArgument(config?.Value?.CultureInfo).Help(), string.IsNullOrEmpty(entity.Description)
+            return string.Concat(entity.ToArgument().Help(), string.IsNullOrEmpty(entity.Description)
                 ? ""
                 : "\t"+ entity.Description);
         }
@@ -26,14 +25,14 @@ namespace Isop.CommandLine.Help
                 return _texts.TheArgumentsAre + Environment.NewLine +
                       string.Join(Environment.NewLine,
                                   recognizes.Properties.Select(ar => "  "+ Help(ar)).ToArray());
-            return Help(recognizes.Properties.First(ar => ar.ToArgument(config?.Value?.CultureInfo).Accept(val!)));
+            return Help(recognizes.Properties.First(ar => ar.ToArgument().Accept(val!)));
         }
 
         public bool CanHelp(string? val = null)
         {
             return string.IsNullOrEmpty(val)
                 ? recognizes.Properties.Any()
-                : recognizes.Properties.Any(ar => ar.ToArgument(config?.Value?.CultureInfo).Accept(val!));
+                : recognizes.Properties.Any(ar => ar.ToArgument().Accept(val!));
         }
     }
 }

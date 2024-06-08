@@ -66,6 +66,11 @@ namespace Isop.CommandLine.Parse
         {
             return HasAlias(value);
         }
+
+        internal static ArgumentParameter Empty(string name)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

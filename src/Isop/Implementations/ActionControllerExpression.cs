@@ -42,8 +42,8 @@ namespace Isop.Implementations
                 if (prop != null)
                 {
                     recognizedArguments.Add(new RecognizedArgument(
-                        prop.ToArgument(_appHost.CultureInfo),
-                        new[] { index },
+                        prop.ToArgument(),
+                        [index],
                         current.Key,
                         current.Value));
                 }
