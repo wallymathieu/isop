@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net8;net472</TargetFrameworks>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-
+    <RootNamespace>Isop.Tests.Runner</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Isop3Tests\Isop3Tests.csproj"/>

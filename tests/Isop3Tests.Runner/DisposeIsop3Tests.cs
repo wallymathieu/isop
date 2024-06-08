@@ -2,7 +2,7 @@ using NUnit.Framework;
 namespace Isop.Tests.Runner
 {
     [TestFixture]
-    public class DisposeIsop3Tests: Isop.Tests.DisposeTests
+    public class DisposeIsop3Tests: DisposeTests
     {
     }
 }
