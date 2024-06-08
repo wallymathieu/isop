@@ -19,7 +19,8 @@
   <!-- mono -->
   <PropertyGroup Condition="'$(OS)' == 'Unix'">
     <MonoRoot Condition="'$(MonoRoot)' == '' and $([MSBuild]::IsOsPlatform('Linux'))">/usr</MonoRoot>
-    <MonoRoot Condition="'$(MonoRoot)' == '' and $([MSBuild]::IsOsPlatform('OSX'))">/Library/Frameworks/Mono.framework/Versions/Current</MonoRoot>
+    <MonoRoot Condition="'$(MonoRoot)' == '' and $([MSBuild]::IsOsPlatform('OSX'))">
+      /Library/Frameworks/Mono.framework/Versions/Current</MonoRoot>
     <MonoLibFolder>$(MonoRoot)/lib/mono</MonoLibFolder>
     <MonoPackaging Condition="$(TargetFramework.StartsWith('net4'))">true</MonoPackaging>
     <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net45'">$(MonoLibFolder)/4.5-api</FrameworkPathOverride>
@@ -32,5 +33,17 @@
     <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net471'">$(MonoLibFolder)/4.7.1-api</FrameworkPathOverride>
     <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net472'">$(MonoLibFolder)/4.7.2-api</FrameworkPathOverride>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SecurityCodeScan.VS2019" Version="5.6.7">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <!--
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.155">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>-->
+  </ItemGroup>
 
 </Project>

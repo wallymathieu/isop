@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Isop.CommandLine.Lex
 {
-    public class ArgumentLexer
+    public static class ArgumentLexer
     {
         private static readonly Regex ParamPattern = new("(?<paramPrefix>--|/|-)(?<param>[^:=]*)([:=]?)(?<paramValue>.*)");
 

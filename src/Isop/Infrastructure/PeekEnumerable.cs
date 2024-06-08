@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
-using System.Linq;
 
 namespace Isop.Infrastructure
 {
-    internal class PeekEnumerable<T>:IEnumerable<T>
+    internal sealed class PeekEnumerable<T>:IEnumerable<T>
     {
         public PeekEnumerable(IReadOnlyList<T> buffer)
         {

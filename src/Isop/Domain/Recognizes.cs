@@ -10,7 +10,7 @@ namespace Isop.Domain
     /// </remarks>
     /// <param name="controllers"></param>
     /// <param name="properties"></param>
-    public class Recognizes(IReadOnlyList<Controller> controllers, IReadOnlyList<Property> properties)
+    public class Recognizes(IReadOnlyList<Controller> controllers, IReadOnlyList<ArgumentWithAction> properties)
     {
         /// <summary>
         /// Controllers
@@ -19,7 +19,7 @@ namespace Isop.Domain
         /// <summary>
         /// Global arguments
         /// </summary>
-        public IReadOnlyList<Property> Properties { get; } = properties;
+        public IReadOnlyList<ArgumentWithAction> Properties { get; } = properties;
     }
 }
 

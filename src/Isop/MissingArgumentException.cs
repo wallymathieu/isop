@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Isop
 {
@@ -15,6 +16,18 @@ namespace Isop
         }
 
         public MissingArgumentException(string message, IReadOnlyCollection<string> arguments) : base(message) { Arguments = arguments; }
+
+        public MissingArgumentException()
+        {
+        }
+
+        public MissingArgumentException(string message) : base(message)
+        {
+        }
+
+        public MissingArgumentException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }
 

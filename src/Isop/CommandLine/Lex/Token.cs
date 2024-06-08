@@ -1,15 +1,16 @@
+using System;
 using System.Globalization;
 
 namespace Isop.CommandLine.Lex
 {
-    public struct Token(string value, TokenType tokenType, int index)
+    public readonly struct Token(string value, TokenType tokenType, int index) : IEquatable<Token>
     {
-        public string Value = value;
-        public TokenType TokenType = tokenType;
+        public string Value { get; } = value;
+        public TokenType TokenType { get; } = tokenType;
         /// <summary>
         /// the index in the argument array
         /// </summary>
-        public int Index = index;
+        public int Index { get; } = index;
 
         public override readonly bool Equals(object? obj)
         {
@@ -29,12 +30,12 @@ namespace Isop.CommandLine.Lex
         {
             unchecked
             {
-                return ((Value != null ? Value.GetHashCode() : 0) * 397) ^ TokenType.GetHashCode();
+                return ((Value == null ? 0 : Value.GetHashCode()) * 397) ^ TokenType.GetHashCode();
             }
         }
         public override readonly string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture,"{0}:{1}", TokenType, Value);
+            return string.Format(CultureInfo.InvariantCulture, "{0}:{1}", TokenType, Value);
         }
     }
 

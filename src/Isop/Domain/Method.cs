@@ -62,7 +62,7 @@ namespace Isop.Domain
                         parameter: ArgumentParameter.Parse(prop.Name, cultureInfo)));
 
         private static bool IsRequired(PropertyInfo propertyInfo) =>
-            propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Any();
+            propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).Length != 0;
     }
 }
 

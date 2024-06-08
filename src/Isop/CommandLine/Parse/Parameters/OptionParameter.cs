@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Isop.CommandLine.Parse.Parameters
 {
-    public class OptionParameter 
+    public static class OptionParameter 
     {
         private static readonly List<char> delimiters = ['=', ':'];
         /// <summary>
@@ -20,7 +20,7 @@ namespace Isop.CommandLine.Parse.Parameters
             #endif
             out ArgumentParameter? optionParameter)
         {
-            if (value != null && value.Contains("|"))
+            if (value != null && value.Contains('|'))
             {
                 var prototype = value;
                 var names = prototype.TrimEnd(delimiters.ToArray()).Split('|');

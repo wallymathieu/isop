@@ -5,9 +5,9 @@ using System.IO;
 
 namespace Isop.Implementations
 {
-    internal class DefaultConverter
+    internal static class DefaultConverter
     {
-        public object? ConvertFrom(Type type, string? s, CultureInfo? cultureInfo)
+        public static object? ConvertFrom(Type type, string? s, CultureInfo? cultureInfo)
         {
             if (s is null) return null;
             if (type == typeof(FileStream))

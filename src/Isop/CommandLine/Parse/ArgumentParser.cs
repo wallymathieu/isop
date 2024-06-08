@@ -74,7 +74,7 @@ namespace Isop.CommandLine.Parse
                     case TokenType.ParameterValue:
                         break;
                     default:
-                        throw new Exception($"Unexpected token type {current.TokenType}");
+                        throw new ArgumentException($"Unexpected token type {current.TokenType}");
                 }
             }
 
@@ -98,11 +98,6 @@ namespace Isop.CommandLine.Parse
                 unrecognized: unRecognizedArguments.ToArray(),
                 recognized : minusDuplicates.ToArray()
             );
-        }
-
-        private bool Accept(Argument argument, int index, string value)
-        {
-            return argument.Accept(index, value);
         }
 
         private void InferParameter(IList<RecognizedArgument> recognized, Token current)

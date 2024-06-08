@@ -7,7 +7,7 @@ namespace Isop.CommandLine.Parse.Parameters
     /// <summary>
     /// Visual studio style parameter
     /// </summary>
-    public class VisualStudioParameter
+    public static class VisualStudioParameter
     {
         /// <summary>
         /// same pattern as in visual studio external tools: &amp;tool

@@ -10,7 +10,7 @@ namespace Isop.Help
     using CommandLine;
     using Infrastructure;
     using Domain;
-    internal class HelpForControllers(Recognizes recognizes,
+    internal sealed class HelpForControllers(Recognizes recognizes,
         HelpXmlDocumentation helpXmlDocumentation,
         IOptions<Localization.Texts> texts,
         IOptions<AppHostConfiguration> configuration,
@@ -50,7 +50,7 @@ namespace Isop.Help
                 helpText.AddRange(arguments);
             }
 
-            if (!helpText.Any())
+            if (helpText.Count == 0)
                 return string.Empty;
             return "  " + string.Join(" ", helpText).Trim();
         }
@@ -85,7 +85,7 @@ namespace Isop.Help
             var arguments = method
                 .GetArguments(_configuration?.CultureInfo)
                 .ToArray();
-            if (arguments.Any())
+            if (arguments.Length != 0)
             {
                 var lines = new[]
                 {

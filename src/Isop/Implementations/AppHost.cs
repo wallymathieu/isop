@@ -5,19 +5,18 @@ using System.IO;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
+using Isop.Abstractions;
+using Isop.CommandLine;
+using Isop.CommandLine.Lex;
+using Isop.CommandLine.Parse;
+using Isop.Domain;
+using Isop.Help;
+using Isop.Localization;
 
 namespace Isop.Implementations
 {
-    using System.Threading.Tasks;
-    using Abstractions;
-    using CommandLine;
-    using CommandLine.Lex;
-    using CommandLine.Parse;
-    using Domain;
-    using Help;
-    using Localization;
-
-    internal class AppHost : IAppHost
+    internal sealed class AppHost : IAppHost
     {
         internal readonly Abstractions.ToStrings ToStrings;
         internal readonly Recognizes Recognizes;
@@ -67,7 +66,7 @@ namespace Isop.Implementations
         /// </summary>
         public IParsed Parse(IEnumerable<string> arg) => Parse(arg.ToList());
 
-        private IParsed Parse(IReadOnlyCollection<string> arg)
+        private ParsedExpression Parse(IReadOnlyCollection<string> arg)
         {
             var argumentParser = new ArgumentParser(
                 Recognizes.Properties,

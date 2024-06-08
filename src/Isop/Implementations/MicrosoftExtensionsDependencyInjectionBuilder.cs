@@ -4,20 +4,18 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Isop.Abstractions;
+using Isop.Domain;
+using Isop.CommandLine.Parse;
 
 namespace Isop.Implementations
 {
-    using Abstractions;
-    using CommandLine;
-    using Domain;
-    using Isop.CommandLine.Parse;
-
-    internal class MicrosoftExtensionsDependencyInjectionBuilder(
+    internal sealed class MicrosoftExtensionsDependencyInjectionBuilder(
         IServiceCollection serviceCollection,
         RecognizesBuilder recognizes) : IAppHostBuilder
     {
         private Abstractions.ToStrings _toStrings = CommandLine.ToStrings.Default;
-        private TypeConverter _typeConverter = new DefaultConverter().ConvertFrom;
+        private TypeConverter _typeConverter = DefaultConverter.ConvertFrom;
 
         public IAppHostBuilder SetTypeConverter(TypeConverter typeConverter)
         {
@@ -39,7 +37,7 @@ namespace Isop.Implementations
         }
         public IAppHostBuilder Parameter(ArgumentParameter argument, ArgumentAction? action = null, bool required = false, string? description = null)
         {
-            recognizes.Properties.Add(new Property(argument, action, required, description));
+            recognizes.Properties.Add(new ArgumentWithAction(argument, action, required, description));
             return this;
         }
         public IAppHostBuilder Parameter(string argument, Action<string?> action, bool required = false, string? description = null)
@@ -59,7 +57,7 @@ namespace Isop.Implementations
                     return Task.FromResult<object?>(null);
                 })
                 : null;
-            recognizes.Properties.Add(new Property(argument, argumentAction, required, description));
+            recognizes.Properties.Add(new ArgumentWithAction(argument, argumentAction, required, description));
             return this;
         }
 

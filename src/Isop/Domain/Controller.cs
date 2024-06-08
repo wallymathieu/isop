@@ -14,8 +14,11 @@ namespace Isop.Domain
     public class Controller(Type type)
     {
         public Type Type { get; } = type;
-        public string GetName(Conventions conventions) => 
-            Regex.Replace(Type.Name, conventions.ControllerName + "$", "", RegexOptions.IgnoreCase);
+        public string GetName(Conventions conventions)
+        {
+            if (conventions is null) throw new ArgumentNullException(nameof(conventions));
+            return Regex.Replace(Type.Name, conventions.ControllerName + "$", "", RegexOptions.IgnoreCase);
+        }
 
         public IEnumerable<Method> GetControllerActionMethods(Conventions conventions) => 
             GetControllerActionMethods(conventions, Type).Select(m => new Method(m));
@@ -26,7 +29,7 @@ namespace Isop.Domain
 
         private static IEnumerable<MethodInfo> GetOwnPublicMethods(Type type) =>
             type.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(m => m.DeclaringType != typeof(Object))
+                .Where(m => m.DeclaringType != typeof(object))
                 .Where(m => !m.Name.StartsWithIgnoreCase("get_")
                             && !m.Name.StartsWithIgnoreCase("set_"));
 

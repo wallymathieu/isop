@@ -10,7 +10,7 @@ namespace Isop.Implementations
     using CommandLine.Parse;
     using Infrastructure;
 
-    internal class ActionControllerExpression : IActionOnController
+    internal sealed class ActionControllerExpression : IActionOnController
     {
         private readonly string _controllerName;
         private readonly AppHost _appHost;

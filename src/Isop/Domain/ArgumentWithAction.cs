@@ -4,8 +4,8 @@ using Isop.CommandLine;
 
 namespace Isop.Domain
 {
-    /// <summary>A property is an argument with an optional action. Used for global arguments.</summary>
-    public class Property(
+    /// <summary>An argument with an optional action. Used for global arguments.</summary>
+    public class ArgumentWithAction(
         ArgumentParameter parameter,
         ArgumentAction? action,
         bool required,

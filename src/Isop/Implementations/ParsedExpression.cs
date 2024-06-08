@@ -3,16 +3,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Isop.Infrastructure;
+using System;
+using Isop.Abstractions;
+using Isop.CommandLine;
+using Isop.CommandLine.Parse;
 
 namespace Isop.Implementations
 {
-    using System;
-    using Abstractions;
-    using CommandLine;
-    using CommandLine.Parse;
-    using Domain;
-
-    internal class ParsedExpression:IParsed
+    internal sealed class ParsedExpression:IParsed
     {
         private readonly ParsedArguments _parsedArguments;
         private readonly AppHost _appHost;
@@ -82,12 +80,13 @@ namespace Isop.Implementations
         private void AssertFailOnMissing()
         {
             var missing = MissingRequiredArguments().ToArray();
-            if (missing.Any())
+            if (missing.Length != 0)
                 throw new MissingArgumentException("Missing arguments", missing);
         }
-        public async Task InvokeAsync(TextWriter output)
+        public async Task InvokeAsync(TextWriter? output)
         {
             AssertFailOnMissing();
+            output ??= Console.Out;
             foreach (var result in _argumentInvoker.Invoke(_parsedArguments))
             {
                 var item = await result;

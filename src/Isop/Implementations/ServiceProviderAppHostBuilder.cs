@@ -9,10 +9,12 @@ using Isop.CommandLine.Parse;
 
 namespace Isop.Implementations
 {
-    internal class ServiceProviderAppHostBuilder(IServiceProvider serviceProvider, RecognizesBuilder recognizes) : IAppHostBuilder
+    internal sealed class ServiceProviderAppHostBuilder(
+        IServiceProvider serviceProvider, 
+        RecognizesBuilder recognizes) : IAppHostBuilder
     {
         private ToStrings _toStrings = CommandLine.ToStrings.Default;
-        private TypeConverter _typeConverter = new DefaultConverter().ConvertFrom;
+        private TypeConverter _typeConverter = DefaultConverter.ConvertFrom;
 
         public IAppHostBuilder SetTypeConverter(TypeConverter typeConverter)
         {
@@ -35,7 +37,7 @@ namespace Isop.Implementations
 
         public IAppHostBuilder Parameter(ArgumentParameter argument, ArgumentAction? action = null, bool required = false, string? description = null)
         {
-            recognizes.Properties.Add(new Property(
+            recognizes.Properties.Add(new ArgumentWithAction(
                 parameter: argument,
                 action: action,
                 required: required,
@@ -60,7 +62,7 @@ namespace Isop.Implementations
                     return Task.FromResult<object?>(null);
                 })
                 : null;
-            recognizes.Properties.Add(new Property(argument, argumentAction, required, description));
+            recognizes.Properties.Add(new ArgumentWithAction(argument, argumentAction, required, description));
             return this;
         }
 

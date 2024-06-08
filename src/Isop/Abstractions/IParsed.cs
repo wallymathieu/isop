@@ -24,7 +24,7 @@ namespace Isop.Abstractions
         /// <summary>
         /// Invoke using parameters
         /// </summary>
-        Task InvokeAsync(TextWriter output);
+        Task InvokeAsync(TextWriter? output);
         /// <summary>
         /// Invoke using parameters
         /// </summary>

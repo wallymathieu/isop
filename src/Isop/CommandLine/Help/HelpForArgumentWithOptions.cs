@@ -6,12 +6,12 @@ namespace Isop.CommandLine.Help
 {
     using Domain;
 
-    internal class HelpForArgumentWithOptions(IOptions<Localization.Texts> texts,
+    internal sealed class HelpForArgumentWithOptions(IOptions<Localization.Texts> texts,
         Recognizes recognizes)
     {
         private readonly Localization.Texts _texts = texts.Value ?? new Localization.Texts();
 
-        private string Help(Property entity)
+        private static string Help(ArgumentWithAction entity)
         {
             //var arg = entity.AsArgument();
             return string.Concat(entity.Help(), string.IsNullOrEmpty(entity.Description)
@@ -24,8 +24,8 @@ namespace Isop.CommandLine.Help
             if (string.IsNullOrEmpty(val))
                 return _texts.TheArgumentsAre + Environment.NewLine +
                       string.Join(Environment.NewLine,
-                                  recognizes.Properties.Select(ar => "  "+ Help(ar)).ToArray());
-            return Help(recognizes.Properties.First(ar => ar.Accept(val!)));
+                                  recognizes.Properties.Select(ar => "  "+ HelpForArgumentWithOptions.Help(ar)).ToArray());
+            return HelpForArgumentWithOptions.Help(recognizes.Properties.First(ar => ar.Accept(val!)));
         }
 
         public bool CanHelp(string? val = null)

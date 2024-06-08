@@ -22,7 +22,7 @@ namespace FullExample
                 var parsedMethod = appHost.Parse(args);
                 if (parsedMethod.Unrecognized.Count != 0)//Warning:
                 {
-                    Console.Error.WriteLine($@"Unrecognized arguments: 
+                    await Console.Error.WriteLineAsync($@"Unrecognized arguments: 
     {string.Join(",", parsedMethod.Unrecognized.Select(arg => arg.Value).ToArray())}");
                     return 1;
                 }else
@@ -33,12 +33,12 @@ namespace FullExample
             }
             catch (TypeConversionFailedException ex)
             {
-                Console.Error.WriteLine(
+                await Console.Error.WriteLineAsync(
                     $"Could not convert argument {ex.Argument} with value {ex.Value} to type {ex.TargetType}");
                 if (null!=ex.InnerException)
                 {
-                    Console.Error.WriteLine("Inner exception: ");
-                    Console.Error.WriteLine(ex.InnerException.Message);
+                    await Console.Error.WriteLineAsync("Inner exception: ");
+                    await Console.Error.WriteLineAsync(ex.InnerException.Message);
                 }
                 return 9;
             }

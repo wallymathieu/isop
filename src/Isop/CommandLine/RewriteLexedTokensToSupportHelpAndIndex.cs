@@ -24,7 +24,7 @@ namespace Isop.CommandLine
                 tokens.Insert(3, new Token("action", TokenType.Parameter, 2));
             }
             //help maps to index (should have routing here)
-            if (!tokens.Any())
+            if (tokens.Count == 0)
             {
                 tokens.Add(new Token(conventions.Help,TokenType.Argument,0));
             }

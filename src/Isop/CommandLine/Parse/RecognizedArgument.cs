@@ -1,12 +1,15 @@
+using System.Collections;
+using System.Collections.Generic;
+
 namespace Isop.CommandLine.Parse
 {
     public class RecognizedArgument(Argument argument, 
-        int[] index, 
+        IReadOnlyCollection<int> index, 
         string rawArgument, 
         string? value = null,
         bool inferredOrdinal = false)
     {
-        public int[] Index { get; } = index;
+        public IReadOnlyCollection<int> Index { get; } = index;
 
         /// <summary>
         /// the matched value if any, for instance the "value" of the expression "--argument value"

@@ -9,15 +9,15 @@ using System.Xml;
 
 namespace Isop.Help
 {
-    internal class HelpXmlDocumentation
+    internal sealed class HelpXmlDocumentation
     {
-        private static IDictionary<string, string> GetSummariesFromText(string text)
+        private static Dictionary<string, string> GetSummariesFromText(string text)
         {
             var xml = new XmlDocument();
             xml.LoadXml(text);
             var members = xml.GetElementsByTagName("members");
             var member = members.Item(0)?.ChildNodes;
-            Dictionary<string, string> doc = new Dictionary<string, string>();
+            Dictionary<string, string> doc = new();
             if (member is not null)
                 foreach (XmlNode m in member)
                 {
@@ -26,22 +26,22 @@ namespace Isop.Help
                     var name = attr.GetNamedItem("name");
                     if (name is null) continue;
                     var nodes = m.ChildNodes.Cast<XmlNode>();
-                    var summary = nodes.FirstOrDefault(x => x.Name.Equals("summary"));
+                    var summary = nodes.FirstOrDefault(x => x.Name.Equals("summary", StringComparison.Ordinal));
                     if (null != summary)
                         doc.Add(name.InnerText, summary.InnerText.Trim());
                 }
             return doc;
         }
-        private readonly Dictionary<Assembly, IDictionary<string, string>> _summaries = new Dictionary<Assembly, IDictionary<string, string>>();
+        private readonly Dictionary<Assembly, IDictionary<string, string>> _summaries = [];
         private IDictionary<string, string> GetAssemblyCachedSummaries(Assembly a)
         {
-            if (_summaries.ContainsKey(a)) return _summaries[a];
+            if (_summaries.TryGetValue(a, out var value)) return value;
             else
             {
                 var file = TryGetAssemblyLocation(a);
                 _summaries.Add(a, null != file
                     ? GetSummariesFromText(File.ReadAllText(file))
-                    : new Dictionary<string, string>());
+                    : []);
 
                 return _summaries[a];
             }
@@ -73,7 +73,7 @@ namespace Isop.Help
             if (GetOrSet.IsMatch(method.Name))
                 return string.Format(CultureInfo.InvariantCulture, "P:{0}.{1}", GetFullName(t), method.Name.Substring(4));
             var parameters = method.GetParameters();
-            return string.Format(CultureInfo.InvariantCulture, "M:{0}.{1}{2}", GetFullName(t), method.Name, (parameters.Any() ? string.Concat("(", TypeNames(parameters), ")") : ""));
+            return string.Format(CultureInfo.InvariantCulture, "M:{0}.{1}{2}", GetFullName(t), method.Name, parameters.Length != 0 ? string.Concat("(", TypeNames(parameters), ")") : "");
         }
 
         private static string TypeNames(ParameterInfo[] parameters)
@@ -95,16 +95,16 @@ namespace Isop.Help
             var t = method.DeclaringType;
             var summaries = GetAssemblyCachedSummaries(t!.GetTypeInfo().Assembly);
             var key = GetKey(t!, method);
-            if (summaries.ContainsKey(key))
-                return summaries[key];
+            if (summaries.TryGetValue(key, out string? value))
+                return value;
             return string.Empty;
         }
         public string GetDescriptionForType(Type t)
         {
             var summaries = GetAssemblyCachedSummaries(t.GetTypeInfo().Assembly);
             var key = GetKey(t);
-            if (summaries.ContainsKey(key))
-                return summaries[key];
+            if (summaries.TryGetValue(key, out string? value))
+                return value;
             return string.Empty;
         }
     }

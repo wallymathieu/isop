@@ -14,8 +14,9 @@ namespace Isop
         /// 
         /// </summary>
         [Obsolete("Prefer InvokeAsync")]
-        public static void Invoke(this IParsed parsed, TextWriter output)
+        public static void Invoke(this IParsed parsed, TextWriter? output)
         {
+            if (parsed is null) throw new ArgumentNullException(nameof(parsed));
             parsed.InvokeAsync(output).GetAwaiter().GetResult();
         }
         /// <summary>
@@ -27,11 +28,12 @@ namespace Isop
         /// <returns></returns>
         public static async Task<int> TryInvokeAsync(this IParsed parsed, TextWriter? @out = null, TextWriter? @error = null)
         {
-            if (@out == null) @out = Console.Out;
-            if (error == null) error = Console.Error;
+            if (parsed is null) throw new ArgumentNullException(nameof(parsed));
+            @out ??= Console.Out;
+            error ??= Console.Error;
             try
             {
-                if (parsed.Unrecognized.Any()) //Warning:
+                if (parsed.Unrecognized.Count != 0) //Warning:
                 {
                     await error.WriteLineAsync($@"Unrecognized arguments: 
 {string.Join(",", parsed.Unrecognized.Select(arg => arg.Value).ToArray())}");

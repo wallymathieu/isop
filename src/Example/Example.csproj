@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net8;net462</TargetFrameworks>
     <OutputType>Exe</OutputType>
+    <AnalysisMode>All</AnalysisMode>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Isop\Isop.csproj" />

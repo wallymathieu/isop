@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Isop.Domain;
+using Isop.Abstractions;
 
 namespace Isop.Implementations
 {
-    using Abstractions;
     ///
-    internal class ControllerExpression(string controllerName, AppHost appHost, Controller controller) : IController
+    internal sealed class ControllerExpression(string controllerName, AppHost appHost, Controller controller) : IController
     {
         public IActionOnController Action(string name) =>
             new ActionControllerExpression(Name, name, appHost);
