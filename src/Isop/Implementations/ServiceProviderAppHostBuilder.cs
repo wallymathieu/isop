@@ -3,15 +3,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Isop.Abstractions;
+using Isop.Domain;
+using Isop.CommandLine.Parse;
 
 namespace Isop.Implementations
 {
-    using Abstractions;
-    using CommandLine;
-    using Domain;
     internal class ServiceProviderAppHostBuilder(IServiceProvider serviceProvider, RecognizesBuilder recognizes) : IAppHostBuilder
     {
-        private Abstractions.ToStrings _toStrings = CommandLine.ToStrings.Default;
+        private ToStrings _toStrings = CommandLine.ToStrings.Default;
         private TypeConverter _typeConverter = new DefaultConverter().ConvertFrom;
 
         public IAppHostBuilder SetTypeConverter(TypeConverter typeConverter)
@@ -19,21 +19,42 @@ namespace Isop.Implementations
             _typeConverter = typeConverter;
             return this;
         }
-        public IAppHostBuilder SetFormatter(Abstractions.ToStrings toStrings)
+        public IAppHostBuilder SetFormatter(ToStrings toStrings)
         {
             _toStrings = toStrings;
             return this;
         }
-
         public IAppHostBuilder Parameter(string argument, ArgumentAction? action = null, bool required = false, string? description = null)
         {
-            recognizes.Properties.Add(new Property(argument, action, required, description));
+            return Parameter(
+               argument: ArgumentParameter.Parse(argument, null),
+               action: action,
+               required: required,
+               description: description);
+        }
+
+        public IAppHostBuilder Parameter(ArgumentParameter argument, ArgumentAction? action = null, bool required = false, string? description = null)
+        {
+            recognizes.Properties.Add(new Property(
+                parameter: argument,
+                action: action,
+                required: required,
+                description: description));
             return this;
         }
         public IAppHostBuilder Parameter(string argument, Action<string?> action, bool required = false, string? description = null)
         {
-            var argumentAction = action!=null 
-                ? new ArgumentAction(value=>
+            return Parameter(
+                argument: ArgumentParameter.Parse(argument, null),
+                action: action,
+                required: required,
+                description: description);
+        }
+
+        public IAppHostBuilder Parameter(ArgumentParameter argument, Action<string?> action, bool required = false, string? description = null)
+        {
+            var argumentAction = action != null
+                ? new ArgumentAction(value =>
                 {
                     action(value);
                     return Task.FromResult<object?>(null);
@@ -53,15 +74,15 @@ namespace Isop.Implementations
         /// </summary>
         public IAppHost BuildAppHost()
         {
-            var options = serviceProvider.GetService<IOptions<Configuration>>();
+            var options = serviceProvider.GetService<IOptions<AppHostConfiguration>>();
             var conventions = serviceProvider.GetService<IOptions<Conventions>>();
             var texts = serviceProvider.GetService<IOptions<Localization.Texts>>();
 
-            return new AppHost(options, 
-                serviceProvider, 
+            return new AppHost(options,
+                serviceProvider,
                 new Recognizes(recognizes.Recognizes.ToArray(), recognizes.Properties.ToArray()),
                 _typeConverter,
-                _toStrings, 
+                _toStrings,
                 texts,
                 conventions);
         }

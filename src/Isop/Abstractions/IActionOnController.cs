@@ -4,7 +4,8 @@ namespace Isop.Abstractions
 {
     using CommandLine;
     /// <summary>
-    /// 
+    /// An action on a controller is a single method. This interface represents
+    /// such a method.
     /// </summary>
     public interface IActionOnController
     {

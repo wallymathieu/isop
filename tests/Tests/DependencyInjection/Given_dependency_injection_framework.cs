@@ -26,7 +26,7 @@ namespace Tests.DependencyInjection
             count = 0;
             var registrationBuilder = RegistrationBuilder;
             registrationBuilder.RegisterSingleton(() => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
-            registrationBuilder.RegisterSingleton(() => Options.Create(new Configuration { CultureInfo = CultureInfo.InvariantCulture }));
+            registrationBuilder.RegisterSingleton(() => Options.Create(new AppHostConfiguration { CultureInfo = CultureInfo.InvariantCulture }));
             ServiceProvider = registrationBuilder.Build();
         }
 

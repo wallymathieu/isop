@@ -23,7 +23,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
 
-            var arguments = AppHostBuilder.Create(sc,new Configuration { CultureInfo=CultureInfo.InvariantCulture }).Recognize<MyController>()
+            var arguments = AppHostBuilder.Create(sc,new AppHostConfiguration { CultureInfo=CultureInfo.InvariantCulture }).Recognize<MyController>()
                                 .BuildAppHost()
                                 .Parse(["My", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4"]);
 
@@ -38,7 +38,7 @@ namespace Tests
             var count = 0;
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
-            var arguments = AppHostBuilder.Create(sc, new Configuration { CultureInfo = CultureInfo.InvariantCulture }).Recognize<MyController>()
+            var arguments = AppHostBuilder.Create(sc, new AppHostConfiguration { CultureInfo = CultureInfo.InvariantCulture }).Recognize<MyController>()
                             .BuildAppHost()
                             .Parse(new[] { "My", "Action", "value1", "value2", "3", "3.4" });
 
@@ -54,7 +54,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyController { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
             string[] args = ["My", "Action", "value1", "value2", "3", "3.4"];
-            var parsed = AppHostBuilder.Create(sc, new Configuration
+            var parsed = AppHostBuilder.Create(sc, new AppHostConfiguration
                 {
                     DisableAllowInferParameter = true
                 }).Recognize<MyController>()
@@ -83,7 +83,7 @@ namespace Tests
         [Test]
         public void It_can_parse_class_and_method_and_fail()
         {
-            var builder = AppHostBuilder.Create(new Configuration { CultureInfo = CultureInfo.InvariantCulture }).Recognize<MyController>()
+            var builder = AppHostBuilder.Create(new AppHostConfiguration { CultureInfo = CultureInfo.InvariantCulture }).Recognize<MyController>()
                 .BuildAppHost();
 
             Assert.ThrowsAsync<MissingArgumentException>(async () => await builder

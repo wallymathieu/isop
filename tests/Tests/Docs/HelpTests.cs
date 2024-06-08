@@ -19,7 +19,7 @@ namespace Tests.Docs
         [Test]
         public void It_can_report_usage_for_simple_parameters()
         {
-            var usage = AppHostBuilder.Create(new Configuration
+            var usage = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -40,7 +40,7 @@ namespace Tests.Docs
                     new ServiceCollection()
                         .Tap(s=>s.AddSingleton(Options.Create(
                             new Texts {TheArgumentsAre = "Det finns följande argument:"})))
-                    ,new Configuration
+                    ,new AppHostConfiguration
                     {
                         CultureInfo = CultureInfo.InvariantCulture
                     })
@@ -57,7 +57,7 @@ namespace Tests.Docs
         [Test]
         public void It_can_report_usage_for_controllers()
         {
-            var usage = AppHostBuilder.Create(new Configuration
+            var usage = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -74,7 +74,7 @@ See 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_when_having_required_parameters()
         {
-            var usage = AppHostBuilder.Create(new Configuration
+            var usage = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -105,7 +105,7 @@ See 'COMMANDNAME' help <command> for more information")));
                             HelpSubCommandForMoreInformation =
                             "Se 'Kommandonamn' help <kommando> <subkommando> för mer information"
                         }))),
-                    new Configuration
+                    new AppHostConfiguration
                     {
                         CultureInfo = CultureInfo.InvariantCulture
                     })
@@ -132,7 +132,7 @@ Se 'Kommandonamn' help <kommando> för ytterligare information")));
                         HelpSubCommandForMoreInformation =
                         "Se 'Kommandonamn' help <kommando> <subkommando> för mer information"
                     }))),
-                    new Configuration
+                    new AppHostConfiguration
                     {
                         CultureInfo = CultureInfo.InvariantCulture
                     })
@@ -162,7 +162,7 @@ Se 'Kommandonamn' help <kommando> <subkommando> för mer information")));
                         AndAcceptTheFollowingParameters = "Och accepterar följande parametrar",
                         AndTheShortFormIs = "Och kortformen är"
                     }))),
-                    new Configuration
+                    new AppHostConfiguration
                     {
                         CultureInfo = CultureInfo.InvariantCulture
                     })
@@ -188,7 +188,7 @@ My Action PARAM1, PARAM2, PARAM3, PARAM4")));
         public async Task It_can_report_usage_when_no_parameters_given()
         {
             var cout = new StringWriter();
-            await AppHostBuilder.Create(new Configuration
+            await AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -204,7 +204,7 @@ See 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_and_actions()
         {
-            var usage = AppHostBuilder.Create(new Configuration
+            var usage = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -224,7 +224,7 @@ See 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test]
         public void It_can_report_usage_for_controller_and_action()
         {
-            var usage = AppHostBuilder.Create(new Configuration
+            var usage = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -244,7 +244,7 @@ Another Action1 PARAM1")));
         [Test]
         public void It_can_report_usage_for_controllers_with_description()
         {
-            var usage = AppHostBuilder.Create(new Configuration
+            var usage = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -260,7 +260,7 @@ See 'COMMANDNAME' help <command> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_and_actions_with_description()
         {
-            var usage = AppHostBuilder.Create(new Configuration
+            var usage = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -279,7 +279,7 @@ See 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test]
         public void It_can_report_usage_for_actions_with_description()
         {
-            var usage = AppHostBuilder.Create(new Configuration
+            var usage = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -294,7 +294,7 @@ See 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test]
         public void It_can_report_usage_for_missing_action()
         {
-            var usage = AppHostBuilder.Create(new Configuration
+            var usage = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -310,7 +310,7 @@ actionX")));
         [Test]
         public void It_can_report_usage_for_controllers_and_actions_with_fullname()
         {
-            var usage = AppHostBuilder.Create(new Configuration
+            var usage = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -329,7 +329,7 @@ See 'COMMANDNAME' help <command> <subcommand> for more information")));
         [Test]
         public void It_can_report_usage_for_controllers_and_actions_with_description_in_comments()
         {
-            var usage = AppHostBuilder.Create(new Configuration
+            var usage = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })

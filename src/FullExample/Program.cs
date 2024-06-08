@@ -11,7 +11,7 @@ namespace FullExample
         static async Task<int> Main(string[] args)
         {
             var appHost = AppHostBuilder
-                .Create(new Configuration
+                .Create(new AppHostConfiguration
                 {
                     CultureInfo = CultureInfo.GetCultureInfo("sv-SE")
                 })
@@ -20,9 +20,9 @@ namespace FullExample
             try
             {
                 var parsedMethod = appHost.Parse(args);
-                if (parsedMethod.Unrecognized.Any())//Warning:
+                if (parsedMethod.Unrecognized.Count != 0)//Warning:
                 {
-                    Console.WriteLine($@"Unrecognized arguments: 
+                    Console.Error.WriteLine($@"Unrecognized arguments: 
     {string.Join(",", parsedMethod.Unrecognized.Select(arg => arg.Value).ToArray())}");
                     return 1;
                 }else
@@ -33,19 +33,19 @@ namespace FullExample
             }
             catch (TypeConversionFailedException ex)
             {
-                Console.WriteLine(
+                Console.Error.WriteLine(
                     $"Could not convert argument {ex.Argument} with value {ex.Value} to type {ex.TargetType}");
                 if (null!=ex.InnerException)
                 {
-                    Console.WriteLine("Inner exception: ");
-                    Console.WriteLine(ex.InnerException.Message);
+                    Console.Error.WriteLine("Inner exception: ");
+                    Console.Error.WriteLine(ex.InnerException.Message);
                 }
                 return 9;
             }
             catch (MissingArgumentException ex)
             {
                 Console.WriteLine($"Missing argument(s): {string.Join(", ", ex.Arguments).ToArray()}");
-                Console.WriteLine(appHost.Help());
+                Console.WriteLine(await appHost.HelpAsync());
                 return 10;
             }
         }

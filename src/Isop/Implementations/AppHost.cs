@@ -24,7 +24,7 @@ namespace Isop.Implementations
         internal readonly IServiceProvider ServiceProvider;
         internal readonly ControllerRecognizer ControllerRecognizer;
         internal readonly IOptions<Conventions> Conventions;
-        internal readonly IOptions<Configuration> Configuration;
+        internal readonly IOptions<AppHostConfiguration> Configuration;
         internal readonly TypeConverter TypeConverter;
         private HelpController? _helpController;
         private readonly IOptions<Texts> _texts;
@@ -42,7 +42,7 @@ namespace Isop.Implementations
         /// <summary>
         /// 
         /// </summary>
-        public AppHost(IOptions<Configuration> options,
+        public AppHost(IOptions<AppHostConfiguration> options,
             IServiceProvider serviceProvider,
             Recognizes recognizes,
             TypeConverter typeConverter, 
@@ -51,7 +51,7 @@ namespace Isop.Implementations
             IOptions<Conventions> conventions)
         {
             ToStrings = toStrings;
-            Configuration = options ?? Options.Create(new Configuration());
+            Configuration = options ?? Options.Create(new AppHostConfiguration());
             Recognizes = recognizes;
             ServiceProvider = serviceProvider;
             Conventions = conventions?? Options.Create(new Conventions());
@@ -84,27 +84,21 @@ namespace Isop.Implementations
         
         internal bool AllowInferParameter => !(Configuration.Value?.DisableAllowInferParameter ?? false);
         internal CultureInfo? CultureInfo => Configuration.Value?.CultureInfo;
-        /// <summary>
-        /// Return help-text
-        /// </summary>
+        
         [Obsolete("Prefer HelpAsync")]public string Help()
         {
             using var output = new StringWriter(CultureInfo);
-            Parse(new[] { Conventions.Value.Help }).Invoke(output);
+            Parse([Conventions.Value.Help]).Invoke(output);
             return output.ToString();
         }
-         /// <summary>
-        /// Return help-text
-        /// </summary>
+
         public async Task<string> HelpAsync()
         {
             using var output = new StringWriter(CultureInfo);
-            await Parse(new[] { Conventions.Value.Help }).InvokeAsync(output);
+            await Parse([Conventions.Value.Help]).InvokeAsync(output);
             return output.ToString();
         }
-        /// <summary>
-        /// 
-        /// </summary>
+
         public IController Controller(string controllerName)
         {
             if (ControllerRecognizer.TryFindController(controllerName, out var controller))

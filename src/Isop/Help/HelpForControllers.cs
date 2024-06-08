@@ -13,12 +13,12 @@ namespace Isop.Help
     internal class HelpForControllers(Recognizes recognizes,
         HelpXmlDocumentation helpXmlDocumentation,
         IOptions<Localization.Texts> texts,
-        IOptions<Configuration> configuration,
+        IOptions<AppHostConfiguration> configuration,
         IServiceProvider serviceProvider,
         IOptions<Conventions> conventions)
     {
         private readonly IEnumerable<Controller> _classAndMethodRecognizers = recognizes.Controllers;
-        private readonly Configuration? _configuration = configuration?.Value;
+        private readonly AppHostConfiguration? _configuration = configuration?.Value;
         private readonly Conventions _conventions = conventions.Value ?? throw new ArgumentNullException(nameof(conventions));
         private readonly Localization.Texts _texts = texts.Value ?? new Localization.Texts();
         private readonly Type[] _onlyStringType = { typeof(string) };

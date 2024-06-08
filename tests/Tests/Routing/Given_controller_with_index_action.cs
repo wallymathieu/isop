@@ -28,7 +28,7 @@ namespace Tests.Routing
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new WithIndexController { OnIndex = (p1, p2, p3, p4) => (count++).ToString() });
 
-            var arguments = AppHostBuilder.Create(sc, new Configuration { CultureInfo = CultureInfo.InvariantCulture })
+            var arguments = AppHostBuilder.Create(sc, new AppHostConfiguration { CultureInfo = CultureInfo.InvariantCulture })
                 .Recognize(typeof(WithIndexController))
                 .BuildAppHost()
                 .Parse(new[] { "WithIndex", /*"Index", */"--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4" });

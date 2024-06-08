@@ -17,7 +17,7 @@ namespace Isop.CommandLine
     internal class ControllerRecognizer
     {
         private readonly bool _allowInferParameter;
-        private readonly IOptions<Configuration>? _configuration;
+        private readonly IOptions<AppHostConfiguration>? _configuration;
         private readonly Conventions _conventions;
         private readonly ConvertArgumentsToParameterValue _convertArgument;
         /// <summary>
@@ -26,7 +26,7 @@ namespace Isop.CommandLine
         private readonly IDictionary<string, (Controller, ILookup<string, Method>)> _controllerActionMap;
         
         public ControllerRecognizer(
-            IOptions<Configuration>? configuration,
+            IOptions<AppHostConfiguration>? configuration,
             TypeConverter typeConverterFunc, 
             IOptions<Conventions> conventions,
             Recognizes recognizes)

@@ -10,8 +10,10 @@ namespace Isop.Implementations
     using Abstractions;
     using CommandLine;
     using Domain;
+    using Isop.CommandLine.Parse;
+
     internal class MicrosoftExtensionsDependencyInjectionBuilder(
-        IServiceCollection serviceCollection, 
+        IServiceCollection serviceCollection,
         RecognizesBuilder recognizes) : IAppHostBuilder
     {
         private Abstractions.ToStrings _toStrings = CommandLine.ToStrings.Default;
@@ -29,13 +31,29 @@ namespace Isop.Implementations
         }
         public IAppHostBuilder Parameter(string argument, ArgumentAction? action = null, bool required = false, string? description = null)
         {
+            return Parameter(
+                argument: ArgumentParameter.Parse(argument, null),
+                action: action,
+                required: required,
+                description: description);
+        }
+        public IAppHostBuilder Parameter(ArgumentParameter argument, ArgumentAction? action = null, bool required = false, string? description = null)
+        {
             recognizes.Properties.Add(new Property(argument, action, required, description));
             return this;
         }
         public IAppHostBuilder Parameter(string argument, Action<string?> action, bool required = false, string? description = null)
         {
-            var argumentAction = action!=null 
-                ? new ArgumentAction(value=>
+            return Parameter(
+                argument: ArgumentParameter.Parse(argument, null),
+                action: action,
+                required: required,
+                description: description);
+        }
+        public IAppHostBuilder Parameter(ArgumentParameter argument, Action<string?> action, bool required = false, string? description = null)
+        {
+            var argumentAction = action != null
+                ? new ArgumentAction(value =>
                 {
                     action(value);
                     return Task.FromResult<object?>(null);
@@ -53,15 +71,15 @@ namespace Isop.Implementations
         }
         public IAppHost BuildAppHost()
         {
-            var svcProvider= serviceCollection.BuildServiceProvider();
-            var options = svcProvider.GetService<IOptions<Configuration>>();
+            var svcProvider = serviceCollection.BuildServiceProvider();
+            var options = svcProvider.GetService<IOptions<AppHostConfiguration>>();
             var conventions = svcProvider.GetService<IOptions<Conventions>>();
             var texts = svcProvider.GetService<IOptions<Localization.Texts>>();
-            return new AppHost(options, 
-                svcProvider, 
+            return new AppHost(options,
+                svcProvider,
                 new Recognizes(recognizes.Recognizes.ToArray(), recognizes.Properties.ToArray()),
                 _typeConverter,
-                _toStrings, 
+                _toStrings,
                 texts,
                 conventions);
         }

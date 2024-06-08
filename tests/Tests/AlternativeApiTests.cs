@@ -19,7 +19,7 @@ namespace Tests
             var count = 0;
             var sc = new ServiceCollection();
             sc.AddSingleton(ci=>new MyController() { OnAction = (p1, p2, p3, p4) => (count++).ToString() });
-            var arguments = AppHostBuilder.Create(sc,new Configuration {
+            var arguments = AppHostBuilder.Create(sc,new AppHostConfiguration {
                 CultureInfo= CultureInfo.InvariantCulture
             })
             .Recognize<MyController>()
@@ -35,7 +35,7 @@ namespace Tests
         [Test]
         public void It_can_get_help()
         {
-            var help = AppHostBuilder.Create(new Configuration
+            var help = AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -50,7 +50,7 @@ namespace Tests
         [Test]
         public void It_can_list_controllers()
         {
-            var controllers = AppHostBuilder.Create(new Configuration
+            var controllers = AppHostBuilder.Create(new AppHostConfiguration
                 {
                     CultureInfo = CultureInfo.InvariantCulture
                 })
@@ -63,7 +63,7 @@ namespace Tests
         [Test]
         public void It_can_list_actions()
         {
-            var actions = AppHostBuilder.Create(new Configuration
+            var actions = AppHostBuilder.Create(new AppHostConfiguration
                 {
                     CultureInfo = CultureInfo.InvariantCulture
                 })
@@ -76,7 +76,7 @@ namespace Tests
         [Test]
         public void It_can_list_action_parameters()
         {
-            var actions = AppHostBuilder.Create(new Configuration
+            var actions = AppHostBuilder.Create(new AppHostConfiguration
                 {
                     CultureInfo = CultureInfo.InvariantCulture
                 })

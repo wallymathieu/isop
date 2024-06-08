@@ -51,7 +51,7 @@ namespace Tests.ViewsAndRendering
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new ObjectController() { OnAction = () => new WithTwoProperties(count++) });
 
-            var arguments = AppHostBuilder.Create(sc, new Configuration
+            var arguments = AppHostBuilder.Create(sc, new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             }).Recognize( typeof(ObjectController) )
@@ -72,7 +72,7 @@ namespace Tests.ViewsAndRendering
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new ObjectController { OnAction = () => new[] { new WithTwoProperties(count++), new WithTwoProperties(count++) } });
 
-            var arguments = AppHostBuilder.Create(sc, new Configuration
+            var arguments = AppHostBuilder.Create(sc, new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             }).Recognize(typeof(ObjectController))

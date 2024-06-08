@@ -1,11 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Isop.CommandLine.Parse;
 
 namespace Isop.Abstractions
 {
-    using CommandLine;
-    using CommandLine.Parse;
     /// <summary>
     /// Parsed expression with what's recognized and what's not
     /// </summary>
@@ -29,10 +29,14 @@ namespace Isop.Abstractions
         /// Invoke using parameters
         /// </summary>
         Task<IEnumerable<InvokeResult>> InvokeAsync();
+        
         /// <summary>
         /// Return help text
         /// </summary>
-        /// <returns></returns>
-        string Help();
+        [Obsolete("Prefer HelpAsync")] string Help();
+        /// <summary>
+        /// Return help text
+        /// </summary>
+        public Task<string> HelpAsync();
     }
 }

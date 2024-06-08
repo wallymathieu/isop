@@ -29,7 +29,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new ObjectController());
 
-            _parsed = AppHostBuilder.Create(sc, new Configuration
+            _parsed = AppHostBuilder.Create(sc, new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             }).Recognize<ObjectController>()

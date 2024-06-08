@@ -36,7 +36,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyObjectController() { OnAction = (p1) => (count++).ToString() });
 
-            var arguments = AppHostBuilder.Create(sc, new Configuration { CultureInfo = CultureInfo.InvariantCulture })
+            var arguments = AppHostBuilder.Create(sc, new AppHostConfiguration { CultureInfo = CultureInfo.InvariantCulture })
                 .Recognize(typeof(MyObjectController))
                 .BuildAppHost()
                 .Parse(["MyObject", "Action", "--param2", "value2", "--param3", "3", "--param1", "value1", "--param4", "3.4"]);

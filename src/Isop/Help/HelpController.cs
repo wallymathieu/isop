@@ -11,7 +11,7 @@ namespace Isop.Help
 
     public class HelpController(IOptions<Texts> texts,
         Recognizes recognizes,
-        IOptions<Configuration> config,
+        IOptions<AppHostConfiguration> config,
         IServiceProvider serviceProvider,
         IOptions<Conventions> conventions)
     {

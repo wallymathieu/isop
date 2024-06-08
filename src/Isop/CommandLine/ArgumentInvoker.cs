@@ -3,20 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Isop.Implementations;
 using Microsoft.Extensions.DependencyInjection;
+using Isop.Abstractions;
+using Isop.CommandLine.Parse;
+using Isop.Domain;
+using Isop.Help;
+using Isop.Infrastructure;
+using System.Threading;
+using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Isop.CommandLine
 {
-    using Abstractions;
-    using Parse;
-    using Domain;
-    using Isop.Help;
-    using Infrastructure;
-    using System.Threading;
-    using System.Reflection;
-    using System.Diagnostics.CodeAnalysis;
-
     public class ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recognizes, HelpController helpController)
     {
         private ILookup<string, ArgumentAction>? _recognizesMap;
@@ -75,7 +73,7 @@ namespace Isop.CommandLine
             using (var scope = serviceProvider.CreateScope())
             {
                 var tasks = parsedArguments.Select(
-                    methodMissingArguments: empty=>new[]{Task.FromResult<InvokeResult>(new InvokeResult.Empty())},
+                    methodMissingArguments: empty=>[Task.FromResult<InvokeResult>(new InvokeResult.Empty())],
                     properties: args =>
                     {
                         var enumerable = args.Recognized
@@ -94,7 +92,7 @@ namespace Isop.CommandLine
                                 if (ReferenceEquals(null, instance))
                                     throw new Exception($"Unable to resolve {method.RecognizedClass.Name}");
                                 var result = method.RecognizedAction.Invoke(instance,
-                                    method.RecognizedActionParameters.ToArray());
+                                    [.. method.RecognizedActionParameters]);
                                     
                                 InvokeResult? res;
                                 if (result is Task task)

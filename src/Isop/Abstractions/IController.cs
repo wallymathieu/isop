@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Isop.Abstractions
 {
     /// <summary>
-    /// Controller expression in order to get help for controller or specify action
+    /// This interface represents a controller given by <see cref="Name"/>.
     /// </summary>
     public interface IController
     {
@@ -12,7 +12,7 @@ namespace Isop.Abstractions
         /// </summary>
         string Help();
         /// <summary>
-        /// Get action expression
+        /// Get controller action with <paramref name="name"/>.
         /// </summary>
         /// <param name="name">action name</param>
         /// <returns></returns>

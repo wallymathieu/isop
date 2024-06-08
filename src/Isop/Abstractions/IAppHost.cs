@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Isop.Abstractions
 {
@@ -16,12 +17,19 @@ namespace Isop.Abstractions
         /// <summary>
         /// Return help-text
         /// </summary>
-        String Help();
+        [Obsolete("Prefer HelpAsync")] string Help();
 
         /// <summary>
-        /// 
+        /// Return help-text
         /// </summary>
+        Task<string> HelpAsync();
+
+        /// <summary>
+        /// Get controller with name
+        /// </summary>
+        /// <exception cref="ArgumentException">Throws an argument exception if controller is not found.</exception>
         IController Controller(string controllerName);
+
         /// <summary>
         /// Controllers exposed by the API
         /// </summary>

@@ -42,7 +42,7 @@ namespace Tests
             c.OnDispose += () => count++;
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(c);
-            var build = AppHostBuilder.Create(serviceCollection,new Configuration
+            var build = AppHostBuilder.Create(serviceCollection,new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             }).Recognize(typeof(DisposeController)).BuildAppHost();

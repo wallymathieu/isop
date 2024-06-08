@@ -137,7 +137,7 @@ namespace Tests
         [Test]
         public void When_infer_is_turned_off()
         {
-            var parsed = AppHostBuilder.Create(new Configuration
+            var parsed = AppHostBuilder.Create(new AppHostConfiguration
             {
                 DisableAllowInferParameter = true
             })

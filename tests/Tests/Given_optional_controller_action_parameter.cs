@@ -69,7 +69,7 @@ namespace Tests
             var sc = new ServiceCollection();
             sc.AddSingleton(ci => new MyOptionalController { OnAction = (p1, p2, p3, p4) => 
                 throw new Exception("!")});
-            var parsed = AppHostBuilder.Create(sc, new Configuration()
+            var parsed = AppHostBuilder.Create(sc, new AppHostConfiguration()
                 {
                     DisableAllowInferParameter = true
                 }).Recognize<MyOptionalController>()

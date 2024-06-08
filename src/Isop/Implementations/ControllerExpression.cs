@@ -21,7 +21,7 @@ namespace Isop.Implementations
         public string Help()
         {
             var helpController = appHost.HelpController;
-            return (helpController.Index(Name, null) ?? String.Empty).Trim();
+            return (helpController.Index(Name, null) ?? string.Empty).Trim();
         }
     }
 }

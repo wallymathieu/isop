@@ -12,7 +12,7 @@ namespace Example
         static async Task<int> Main(string[] args)
         {
             var appHost = AppHostBuilder
-                .Create(new Configuration
+                .Create(new AppHostConfiguration
                 {
                     CultureInfo = CultureInfo.InvariantCulture
                 })
