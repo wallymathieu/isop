@@ -36,7 +36,7 @@ namespace Isop.Tests
         [Test]
         public void Can_use_autoconfiguration()
         {
-            var recognizes = new AssemblyScanner(this.GetType().GetTypeInfo().Assembly).LooksLikeControllers().ToArray();
+            var recognizes = new AssemblyScanner(typeof(FullConfiguration).Assembly).LooksLikeControllers().ToArray();
             Assert.That(recognizes, Is.EquivalentTo(new[] { 
                 typeof(MyController), 
                 typeof(ObjectController),
