@@ -388,7 +388,7 @@ namespace Isop.Tests
                                               })
                         //Need to set type converter 
                         .Recognize(typeof(MyFileController))
-                        .Parse(new[] { "MyFile", "Action", "--file", "myfile.txt" });
+                        .Parse(new[] { "MyFile", "Action", "--file", Path.Combine(".", "bin", "Debug", "myfile.txt") });
 
                 Assert.That(arguments.UnRecognizedArguments.Count(), Is.EqualTo(0));
                 arguments.Invoke(new StringWriter());
