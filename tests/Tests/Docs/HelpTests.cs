@@ -17,16 +17,16 @@ namespace Tests.Docs
     public class HelpTests
     {
         [Test]
-        public void It_can_report_usage_for_simple_parameters()
+        public async Task It_can_report_usage_for_simple_parameters()
         {
-            var usage = AppHostBuilder.Create(new AppHostConfiguration
+            var usage = await AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
             .Parameter("beta", arg => { }, description: "Some description about beta")
             .Parameter("alpha", arg => { })
             .BuildAppHost()
-            .Help();
+            .HelpAsync();
             var tab = '\t';
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The arguments are:
   --beta" + tab + @"Some description about beta
@@ -34,9 +34,9 @@ namespace Tests.Docs
         }
 
         [Test]
-        public void It_can_report_usage_for_simple_parameters_with_different_texts()
+        public async Task It_can_report_usage_for_simple_parameters_with_different_texts()
         {
-            var usage = AppHostBuilder.Create(
+            var usage = await AppHostBuilder.Create(
                     new ServiceCollection()
                         .Tap(s=>s.AddSingleton(Options.Create(
                             new Texts {TheArgumentsAre = "Det finns följande argument:"})))
@@ -47,7 +47,7 @@ namespace Tests.Docs
             .Parameter("beta", arg => { }, description: "Beskrivning av beta")
             .Parameter("alpha", arg => { })
             .BuildAppHost()
-            .Help();
+            .HelpAsync();
             var tab = '\t';
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Det finns följande argument:
   --beta" + tab + @"Beskrivning av beta
@@ -55,15 +55,15 @@ namespace Tests.Docs
         }
 
         [Test]
-        public void It_can_report_usage_for_controllers()
+        public async Task It_can_report_usage_for_controllers()
         {
-            var usage = AppHostBuilder.Create(new AppHostConfiguration
+            var usage = await AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
             .Recognize(typeof(MyController))
             .Recognize(typeof(AnotherController))
-            .BuildAppHost().Help();
+            .BuildAppHost().HelpAsync();
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The commands are:
   My
   Another
@@ -72,9 +72,9 @@ See 'COMMANDNAME' help <command> for more information")));
         }
 
         [Test]
-        public void It_can_report_usage_for_controllers_when_having_required_parameters()
+        public async Task It_can_report_usage_for_controllers_when_having_required_parameters()
         {
-            var usage = AppHostBuilder.Create(new AppHostConfiguration
+            var usage = await AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
@@ -82,7 +82,7 @@ See 'COMMANDNAME' help <command> for more information")));
             .Recognize(typeof(MyController))
             .Recognize(typeof(AnotherController))
             .BuildAppHost()
-            .Help();
+            .HelpAsync();
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The arguments are:
   --required
 The commands are:
@@ -93,9 +93,9 @@ See 'COMMANDNAME' help <command> for more information")));
         }
 
         [Test]
-        public void It_can_report_usage_for_controllers_and_have_a_different_help_text()
+        public async Task It_can_report_usage_for_controllers_and_have_a_different_help_text()
         {
-            var usage = AppHostBuilder.Create(
+            var usage =await AppHostBuilder.Create(
                     new ServiceCollection().Tap(s=>s.AddSingleton(
                         Options.Create(new Texts()
                         {
@@ -112,7 +112,7 @@ See 'COMMANDNAME' help <command> for more information")));
             .Recognize(typeof(MyController))
             .Recognize(typeof(AnotherController))
             .BuildAppHost()
-            .Help();
+            .HelpAsync();
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"Det finns följande kommandon:
   My
   Another
@@ -242,15 +242,15 @@ Another Action1 PARAM1")));
         }
 
         [Test]
-        public void It_can_report_usage_for_controllers_with_description()
+        public async Task It_can_report_usage_for_controllers_with_description()
         {
-            var usage = AppHostBuilder.Create(new AppHostConfiguration
+            var usage = await AppHostBuilder.Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.InvariantCulture
             })
             .Recognize(typeof(DescriptionController))
             .BuildAppHost()
-            .Help();
+            .HelpAsync();
             Assert.That(LineSplit(usage), Is.EquivalentTo(LineSplit(@"The commands are:
   Description  Some description
 

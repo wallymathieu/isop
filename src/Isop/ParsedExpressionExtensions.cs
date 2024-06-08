@@ -55,7 +55,7 @@ namespace Isop
             {
                 await error.WriteLineAsync($"Missing argument(s): {string.Join(", ", ex.Arguments??Array.Empty<string>()).ToArray()}");
 
-                await error.WriteLineAsync(parsed.Help());
+                await error.WriteLineAsync(await parsed.HelpAsync());
                 return 400;
             }
 
