@@ -1,11 +1,5 @@
-using System;
-using System.Globalization;
 using System.IO;
-using System.Threading.Tasks;
-using Isop;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
-using Tests.FakeControllers;
 
 namespace Tests;
 

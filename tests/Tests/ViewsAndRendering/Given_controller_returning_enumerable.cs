@@ -1,10 +1,5 @@
-using System;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Isop;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 
 namespace Tests.ViewsAndRendering;
 

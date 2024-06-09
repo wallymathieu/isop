@@ -1,5 +1,3 @@
-using System;
-
 namespace Tests.FakeControllers;
 public class MyController
 {

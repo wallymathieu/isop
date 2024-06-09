@@ -1,9 +1,5 @@
-﻿using System.Globalization;
-using System.IO;
-using Isop;
-using Isop.Abstractions;
+﻿using System.IO;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 
 namespace Tests;
 [TestFixture]

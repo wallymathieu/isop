@@ -1,11 +1,5 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Isop;
+﻿using System.IO;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 
 namespace Tests.ViewsAndRendering;
 

@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 
 namespace Tests.DependencyInjection;
 [TestFixture]

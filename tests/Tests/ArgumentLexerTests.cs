@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Isop.CommandLine.Lex;
-using NUnit.Framework;
+﻿using Isop.CommandLine.Lex;
 
 namespace Tests;
 [TestFixture]

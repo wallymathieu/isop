@@ -1,8 +1,6 @@
-using System;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 using With;
 
 namespace Tests.DependencyInjection;

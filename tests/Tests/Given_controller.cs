@@ -1,12 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Isop;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 using Tests.ArgumentParsers;
 using Tests.FakeControllers;
 
