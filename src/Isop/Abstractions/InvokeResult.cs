@@ -62,7 +62,7 @@ public abstract class InvokeResult
             AsyncControllerAction am => asyncControllerAction(am),
             Argument a => argument(a),
             Empty e => empty(e),
-            _ => throw new ArgumentException("Unimplemented switch case"),
+            _ => throw new InvalidOperationException("Unimplemented switch case"),
         };
     }
 }

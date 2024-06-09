@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
-using Isop.Infrastructure;
 using Isop.CommandLine.Lex;
 using Isop.CommandLine.Parse;
 using Isop.Domain;
 using Isop.Abstractions;
+#if NET8_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace Isop.CommandLine;
 internal sealed class ControllerRecognizer

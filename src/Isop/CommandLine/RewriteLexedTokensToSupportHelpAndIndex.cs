@@ -6,7 +6,7 @@ using Isop.Domain;
 namespace Isop.CommandLine;
 internal static class RewriteLexedTokensToSupportHelpAndIndex
 {
-    // Arg(ControllerName),Param(..),.. -> Arg(ControllerName),Arg('Index'),... 
+    ///<summary>Arg(ControllerName),Param(..),.. -> Arg(ControllerName),Arg('Index'),... </summary>
     public static IReadOnlyList<Token> Rewrite(Conventions conventions, List<Token> tokens)
     {
         //"--command"
