@@ -2,44 +2,31 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 
-namespace Isop.Infrastructure
+namespace Isop.Infrastructure;
+internal sealed class PeekEnumerable<T>(IReadOnlyList<T> buffer) : IEnumerable<T>
 {
-    internal sealed class PeekEnumerable<T>:IEnumerable<T>
-    {
-        public PeekEnumerable(IReadOnlyList<T> buffer)
-        {
-            _buffer = buffer;
-        }
-        private int _currentIndex = -1;
-        private readonly IReadOnlyList<T> _buffer;
-        public T Current()
-        {
-            if (_currentIndex < _buffer.Count)
-            {
-                return _buffer[_currentIndex];
-            }
-            throw new InvalidOperationException();
-        }
-        public bool HasMore() { return _currentIndex+1<_buffer.Count; }
-        public T Next()
-        {
-            _currentIndex++;
-            return Current();
-        }
+    private int _currentIndex = -1;
 
-        public T? Peek()
+    public T Current()
+    {
+        if (_currentIndex < buffer.Count)
         {
-             var idx = _currentIndex+1; 
-             return idx<_buffer.Count ? _buffer[idx] : default;
+            return buffer[_currentIndex];
         }
-        public IEnumerator<T> GetEnumerator()
-        {
-            return _buffer.GetEnumerator();
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        throw new InvalidOperationException();
     }
+    public bool HasMore() { return _currentIndex + 1 < buffer.Count; }
+    public T Next()
+    {
+        _currentIndex++;
+        return Current();
+    }
+
+    public T? Peek()
+    {
+        var idx = _currentIndex + 1;
+        return idx < buffer.Count ? buffer[idx] : default;
+    }
+    public IEnumerator<T> GetEnumerator() => buffer.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
-    

@@ -1,16 +1,14 @@
 using System.Collections.Generic;
+using Isop.Domain;
 
-namespace Isop.Implementations
+namespace Isop.Implementations;
+internal sealed class RecognizesBuilder
 {
-    using Domain;
-    internal sealed class RecognizesBuilder
+    public RecognizesBuilder()
     {
-        public RecognizesBuilder()
-        {
-            Recognizes = [];
-            Properties = [];
-        }
-        public IList<Domain.Controller> Recognizes { get; }
-        public IList<ArgumentWithAction> Properties { get; }
+        Recognizes = [];
+        Properties = [];
     }
+    public IList<Controller> Recognizes { get; }
+    public IList<ArgumentWithAction> Properties { get; }
 }

@@ -1,10 +1,9 @@
-namespace Isop.CommandLine.Lex
+namespace Isop.CommandLine.Lex;
+
+public enum TokenType
 {
-    public enum TokenType
-    {
-        None,
-        Argument,
-        Parameter,
-        ParameterValue,
-    }    
-}
+    None,
+    Argument,
+    Parameter,
+    ParameterValue,
+}    

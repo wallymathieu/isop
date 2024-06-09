@@ -8,10 +8,12 @@ using Isop.Abstractions;
 using Isop.CommandLine.Parse;
 using Isop.Domain;
 using Isop.Help;
+#if NET8_0_OR_GREATER
 using Isop.Infrastructure;
 using System.Threading;
 using System.Reflection;
 using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace Isop.CommandLine;
 public class ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recognizes, HelpController helpController)

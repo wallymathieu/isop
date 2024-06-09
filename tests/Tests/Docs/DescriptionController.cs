@@ -1,25 +1,21 @@
-namespace Tests.Docs
+namespace Tests.Docs;
+internal class DescriptionController
 {
-    internal class DescriptionController
+    public void Action1()
     {
-        public void Action1 ()
-        {
-        }
+    }
 
-        public void Action2 ()
-        {
-        }
+    public void Action2()
+    {
+    }
 
-        public string Help (string command)
+    public string Help(string command)
+    {
+        return command switch
         {
-            switch (command) {
-                case "Action1":
-                    return "Some description 1";
-                case "Action2":
-                    return "Some description 2";
-                default:
-                    return "Some description";
-            }
-        }
+            "Action1" => "Some description 1",
+            "Action2" => "Some description 2",
+            _ => "Some description",
+        };
     }
 }

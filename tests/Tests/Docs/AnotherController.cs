@@ -1,13 +1,11 @@
-namespace Tests.Docs
+namespace Tests.Docs;
+internal class AnotherController
 {
-    internal class AnotherController
+    public void Action1(string param1)
     {
-        public void Action1 (string param1)
-        {
-        }
+    }
 
-        public void Action2 ()
-        {
-        }
+    public void Action2()
+    {
     }
 }

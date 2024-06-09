@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Isop.CommandLine.Parse
-{
+namespace Isop.CommandLine.Parse;
     public class RecognizedArgument(Argument argument, 
         IReadOnlyCollection<int> index, 
         string rawArgument, 
@@ -23,5 +22,5 @@ namespace Isop.CommandLine.Parse
 
         public bool InferredOrdinal { get; } = inferredOrdinal;
     }
-}
+
 

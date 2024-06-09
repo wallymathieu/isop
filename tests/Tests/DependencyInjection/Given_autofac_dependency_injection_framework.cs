@@ -5,19 +5,17 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using With;
 
-namespace Tests.DependencyInjection
+namespace Tests.DependencyInjection;
+[TestFixture]
+public class Given_autofac_dependency_injection_framework : Given_dependency_injection_framework
 {
-    [TestFixture]
-    public class Given_autofac_dependency_injection_framework:Given_dependency_injection_framework
-    { 
-        class AutoFacRegistrationBuilder: RegistrationBuilder
-        {
-            private ContainerBuilder _containerBuilder = new ContainerBuilder().Tap(c=>
-                c.Populate(new ServiceCollection().AddLogging()));
-            public override void RegisterSingleton<T>(Func<T> factory) => _containerBuilder.Register(di => factory()).As<T>().SingleInstance();
-            public override IServiceProvider Build()=>
-                new AutofacServiceProvider(_containerBuilder.Build());
-        }
-        protected override RegistrationBuilder RegistrationBuilder => new AutoFacRegistrationBuilder();
+    class AutoFacRegistrationBuilder : BaseRegistrationBuilder
+    {
+        private ContainerBuilder _containerBuilder = new ContainerBuilder().Tap(c =>
+            c.Populate(new ServiceCollection().AddLogging()));
+        public override void RegisterSingleton<T>(Func<T> factory) => _containerBuilder.Register(di => factory()).As<T>().SingleInstance();
+        public override IServiceProvider Build() =>
+            new AutofacServiceProvider(_containerBuilder.Build());
     }
+    protected override BaseRegistrationBuilder RegistrationBuilder => new AutoFacRegistrationBuilder();
 }
