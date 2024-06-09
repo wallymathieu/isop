@@ -21,8 +21,8 @@ public class Controller(Type type) : IEquatable<Controller>
 
     private static IEnumerable<MethodInfo> GetOwnPublicMethods(Type type) =>
         type.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .Where(m => m.DeclaringType != typeof(object))
-            .Where(m => !m.Name.StartsWithIgnoreCase("get_")
+            .Where(m => m.DeclaringType != typeof(object) 
+                        && !m.Name.StartsWithIgnoreCase("get_")
                         && !m.Name.StartsWithIgnoreCase("set_"));
 
     public Method? GetMethod(Conventions conventions, string name) =>

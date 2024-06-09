@@ -21,7 +21,7 @@ internal sealed class ActionControllerExpression : IActionOnController
     public IReadOnlyCollection<Argument> Arguments =>
         _appHost.ControllerRecognizer.TryFind(_controllerName, Name, out var controllerAndMethod)
             ? controllerAndMethod.Item2.GetArguments(_appHost.CultureInfo).ToArray()
-            : throw new ControllerNotFoundException($"Could not find controller: {_controllerName}, method: {Name}");
+            : throw new ControllerOrActionNotFoundException($"Could not find method or controller. The controller is named \"{_controllerName}\" and the method is named \"{Name}\".");
 
     public IParsed Parameters(IReadOnlyCollection<KeyValuePair<string, string?>> parameters)
     {
