@@ -39,7 +39,7 @@ namespace Isop.Help
             if (string.IsNullOrEmpty(controller))
                 return Index();
             var sb = new StringBuilder();
-            controller = Regex.Replace(controller, _conventions.ControllerName+"$", "", RegexOptions.IgnoreCase);
+            controller = Regex.Replace(controller, _conventions.ControllerName+"$", "", RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
             if (_helpForArgumentWithOptions.CanHelp(controller))
             {
                 sb.AppendLine(_helpForArgumentWithOptions.Help(controller));

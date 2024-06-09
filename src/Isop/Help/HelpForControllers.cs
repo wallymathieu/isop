@@ -39,7 +39,7 @@ namespace Isop.Help
             else
             {
                 using var scope = serviceProvider.CreateScope();
-                var obj = scope.ServiceProvider.GetService(t.Type) ?? throw new Exception($"Unable to resolve {t.Type}");
+                var obj = scope.ServiceProvider.GetService(t.Type) ?? throw new ControllerNotFoundException($"Unable to resolve {t.Type}");
                 var text = (string?)description.Invoke(obj, [method?.Name]);
                 if (text is not null) helpText.Add(text);
             }

@@ -6,7 +6,7 @@ namespace Isop.CommandLine.Parse.Parameters
 {
     public static class OrdinalParameter 
     {
-        private static readonly Regex Pattern = new(@"#(?<ord>\d+)(?<rest>.*)");
+        private static readonly Regex Pattern = new(@"#(?<ord>\d+)(?<rest>.*)", RegexOptions.ExplicitCapture, TimeSpan.FromSeconds(1));
         public static bool TryParse(
             string? value, 
             IFormatProvider? formatProvider,

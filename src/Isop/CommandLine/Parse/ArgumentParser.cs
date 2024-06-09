@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Isop.CommandLine.Parse
 {
+    using System.Runtime.Serialization;
     using Infrastructure;
     using Lex;
 
@@ -74,7 +75,7 @@ namespace Isop.CommandLine.Parse
                     case TokenType.ParameterValue:
                         break;
                     default:
-                        throw new ArgumentException($"Unexpected token type {current.TokenType}");
+                        throw new UnexpectedTokenTypeException($"Unexpected token type {current.TokenType}");
                 }
             }
 
@@ -85,7 +86,7 @@ namespace Isop.CommandLine.Parse
                         !recognized.Any(otherArgument =>
                             argument.InferredOrdinal &&
                             !ReferenceEquals(argument, otherArgument) 
-                            && (otherArgument.RawArgument?.Equals(argument.RawArgument)??false)))
+                            && (otherArgument.RawArgument?.Equals(argument.RawArgument, StringComparison.Ordinal)??false)))
                 .ToList();
             var recognizedIndexes = minusDuplicates.SelectMany(token=>token.Index).ToList();
 

@@ -19,7 +19,7 @@ public class ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recogn
     private ILookup<string, ArgumentAction>? _recognizesMap;
 
     private ILookup<string, ArgumentAction> RecognizesMap =>
-        _recognizesMap ??= recognizes.Properties.Where(p => p.Action != null).ToLookup(p => p.Name, p => p.Action!);
+        _recognizesMap ??= recognizes.Properties.Where(p => p.Action != null).ToLookup(p => p.Name, p => p.Action!, StringComparer.OrdinalIgnoreCase);
 
 #if NET8_0_OR_GREATER
         private static bool IsIAsyncEnumerable(Type type) =>(
@@ -89,7 +89,7 @@ public class ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recogn
                         }
 
                         if (instance is null)
-                            throw new Exception($"Unable to resolve {method.RecognizedClass.Name}");
+                            throw new ControllerNotFoundException($"Unable to resolve {method.RecognizedClass.Name}");
                         var result = method.RecognizedAction.Invoke(instance,
                             [.. method.RecognizedActionParameters]);
 

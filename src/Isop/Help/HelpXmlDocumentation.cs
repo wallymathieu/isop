@@ -17,7 +17,7 @@ namespace Isop.Help
             xml.LoadXml(text);
             var members = xml.GetElementsByTagName("members");
             var member = members.Item(0)?.ChildNodes;
-            Dictionary<string, string> doc = new();
+            Dictionary<string, string> doc = new(StringComparer.Ordinal);
             if (member is not null)
                 foreach (XmlNode m in member)
                 {
@@ -66,7 +66,7 @@ namespace Isop.Help
         {
             return GetKey(method.DeclaringType!, method);
         }
-        private static readonly Regex GetOrSet = new Regex("^(get|set)_", RegexOptions.IgnoreCase);
+        private static readonly Regex GetOrSet = new("^(get|set)_", RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
 
         private static string GetKey(Type t, MethodInfo method)
         {
@@ -87,8 +87,7 @@ namespace Isop.Help
         }
         private static string GetFullName(Type t)
         {
-            if (t.FullName is null) throw new Exception($"Missing fullname for type! {t.Name}");
-            return t.FullName.Replace("+", ".");
+            return t.FullName!.Replace("+", ".");
         }
         public string GetDescriptionForMethod(MethodInfo method)
         {

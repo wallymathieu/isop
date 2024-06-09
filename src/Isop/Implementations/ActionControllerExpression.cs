@@ -27,7 +27,7 @@ namespace Isop.Implementations
         public IReadOnlyCollection<Argument> Arguments =>
             _appHost.ControllerRecognizer.TryFind(_controllerName, Name, out var controllerAndMethod)
                 ? controllerAndMethod.Item2.GetArguments(_appHost.CultureInfo).ToArray()
-                : throw new ArgumentException($"Controller: {_controllerName}, method: {Name}");
+                : throw new ControllerNotFoundException($"Could not find controller: {_controllerName}, method: {Name}");
 
         public IParsed Parameters(Dictionary<string, string?> parameters)
         {
@@ -64,7 +64,7 @@ namespace Isop.Implementations
                 return new ParsedExpression(parsedArguments.Merge(new ParsedArguments.MethodMissingArguments(controller.Type, method, missingParameters!)), _appHost);
             var paramMap = valuePairs
                 .Select((value, index) => (value, index))
-                .ToDictionary(t => t.value.Key, vp => vp);
+                .ToDictionary(t => t.value.Key, vp => vp, StringComparer.OrdinalIgnoreCase);
             var recognized = method.GetArguments(_appHost.CultureInfo)
                 .SelectMany(arg => arg.Name is not null && paramMap.TryGetValue(arg.Name, out var value)
                     ? [(arg, value)]
@@ -84,7 +84,7 @@ namespace Isop.Implementations
                 _appHost);
         }
         public string Help() =>
-            (_appHost.HelpController.Index(_controllerName, Name) ?? String.Empty).Trim();
+            (_appHost.HelpController.Index(_controllerName, Name) ?? string.Empty).Trim();
 
         public string Name { get; }
     }

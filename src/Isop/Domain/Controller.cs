@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -11,13 +10,13 @@ namespace Isop.Domain
     using Infrastructure;
     using Help;
 
-    public class Controller(Type type)
+    public class Controller(Type type) : IEquatable<Controller>
     {
         public Type Type { get; } = type;
         public string GetName(Conventions conventions)
         {
             if (conventions is null) throw new ArgumentNullException(nameof(conventions));
-            return Regex.Replace(Type.Name, conventions.ControllerName + "$", "", RegexOptions.IgnoreCase);
+            return Regex.Replace(Type.Name, conventions.ControllerName + "$", "", RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
         }
 
         public IEnumerable<Method> GetControllerActionMethods(Conventions conventions) => 
@@ -38,8 +37,8 @@ namespace Isop.Domain
 
         public bool IsHelp() => Type == typeof(HelpController);
 
-        public override bool Equals(object? obj) => obj is Controller controller && Equals(controller);
-        public bool Equals(Controller obj) => Type == obj?.Type;
+        public override bool Equals(object? other) => other is Controller controller && Equals(controller);
+        public bool Equals(Controller? other) => Type == other?.Type;
 
         public override int GetHashCode() => Type.GetHashCode();
 

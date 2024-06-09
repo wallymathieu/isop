@@ -104,7 +104,7 @@ namespace Isop.Implementations
             {
                 return new ControllerExpression(controllerName, this, controller!);
             }
-            throw new ArgumentException($"Unknown controller {controllerName}");
+            throw new ControllerNotFoundException($"Unknown controller {controllerName}");
         }
 
         public IReadOnlyList<IController> Controllers => 

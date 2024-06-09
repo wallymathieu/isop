@@ -8,7 +8,7 @@ namespace Isop.CommandLine
     public class Argument(
         ArgumentParameter parameter,
         bool required = false,
-        string? description = null)
+        string? description = null) : System.IEquatable<Argument>
     {
         public ArgumentParameter Parameter { get; } = parameter;
 
@@ -23,7 +23,7 @@ namespace Isop.CommandLine
             return obj is Argument argument && Equals(argument);
         }
 
-        public bool Equals(Argument other)
+        public bool Equals(Argument? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -34,8 +34,8 @@ namespace Isop.CommandLine
         {
             unchecked
             {
-                int result = Description != null ? Description.GetHashCode() : 0;
-                result = (result*397) ^ (Name != null ? Name.GetHashCode() : 0);
+                int result = Description != null ? System.StringComparer.Ordinal.GetHashCode(Description) : 0;
+                result = (result*397) ^ (Name != null ? System.StringComparer.Ordinal.GetHashCode(Name) : 0);
                 result = (result*397) ^ Required.GetHashCode();
                 return result;
             }

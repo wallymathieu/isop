@@ -77,7 +77,7 @@ public abstract class ParsedArguments
             Merged m => merged(m),
             Properties d => properties(d),
             MethodMissingArguments e => methodMissingArguments(e),
-            _ => throw new Exception("Unimplemented switch case"),
+            _ => throw new NotSupportedException("Unimplemented switch case"),
         };
     }
 

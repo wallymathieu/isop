@@ -25,7 +25,7 @@ namespace Isop.Implementations
                         properties: properties => properties.Recognized,
                         merged: merged => Recognized(merged.First).Union(Recognized(merged.Second)).ToArray(),
                         method: method => method.Recognized.ToArray(),
-                        methodMissingArguments: methodMissingArgs=> System.Array.Empty<RecognizedArgument>()
+                        methodMissingArguments: methodMissingArgs=> []
                     );
                 }
                 
@@ -41,8 +41,8 @@ namespace Isop.Implementations
                     return parsedArguments.Select(
                         properties: properties => properties.Unrecognized,
                         merged: merged => GetPotentiallyUnrecognized(merged.First).Union(GetPotentiallyUnrecognized(merged.Second)).ToArray(),
-                        method: method => System.Array.Empty<UnrecognizedArgument>(),
-                        methodMissingArguments: missingArgs=> System.Array.Empty<UnrecognizedArgument>()
+                        method: method => [],
+                        methodMissingArguments: missingArgs=> []
                     );
                 }
 
@@ -65,16 +65,17 @@ namespace Isop.Implementations
                 .Where(property => !Recognized
                     .Any(recognizedArgument => recognizedArgument.Argument.Name.EqualsIgnoreCase(property.Name)))
                 .Select(property =>property.Name);
-            IReadOnlyCollection<string> GetMissing(ParsedArguments parsedArguments)
+
+            static IReadOnlyCollection<string> GetMissing(ParsedArguments parsedArguments)
             {
                 return parsedArguments.Select(
-                    properties: properties => System.Array.Empty<string>(),
-                    merged: merged => GetMissing(merged.First).Union(GetMissing(merged.Second)).ToArray(),
-                    method: method => System.Array.Empty<string>(),
+                    properties: properties => [],
+                    merged: merged => GetMissing(merged.First).Union(GetMissing(merged.Second), StringComparer.OrdinalIgnoreCase).ToArray(),
+                    method: method => [],
                     methodMissingArguments: missingArgs=>missingArgs.MissingParameters
                 );
             }
-            return missingRequiredArguments.Union(GetMissing(_parsedArguments));
+            return missingRequiredArguments.Union(GetMissing(_parsedArguments), StringComparer.OrdinalIgnoreCase);
         }
 
         private void AssertFailOnMissing()
