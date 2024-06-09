@@ -44,8 +44,8 @@ class Program
         }
         catch (MissingArgumentException ex)
         {
-            Console.WriteLine($"Missing argument(s): {string.Join(", ", ex.Arguments).ToArray()}");
-            Console.WriteLine(await appHost.HelpAsync());
+            await Console.Out.WriteLineAsync($"Missing argument(s): {string.Join(", ", ex.Arguments).ToArray()}");
+            await Console.Out.WriteLineAsync(await appHost.HelpAsync());
             return 10;
         }
     }

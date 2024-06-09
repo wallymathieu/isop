@@ -78,7 +78,7 @@ public class MyController
     {
         _repository = new CustomerRepository();
     }
-    public IEnumerable&lt;string&gt; Add(string name)
+    public IEnumerable<string> Add(string name)
     {
         yield return "Starting to insert customer";
         _repository.Insert( new Customer{ Name = name } );
@@ -97,7 +97,7 @@ class Program
     static async Task<int> Main(string[] args)
     {
         var appHost = AppHostBuilder
-            .Create(new Configuration
+            .Create(new AppHostConfiguration
             {
                 CultureInfo = CultureInfo.GetCultureInfo("sv-SE")
             })
@@ -106,11 +106,13 @@ class Program
         try
         {
             var parsedMethod = appHost.Parse(args);
-            if (parsedMethod.Unrecognized.Any())//Warning:
+            if (parsedMethod.Unrecognized.Count != 0)//Warning:
             {
-                Console.WriteLine($@"Unrecognized arguments: {string.Join(",", parsedMethod.Unrecognized.Select(arg => arg.Value).ToArray())}");
+                await Console.Error.WriteLineAsync($@"Unrecognized arguments: 
+    {string.Join(",", parsedMethod.Unrecognized.Select(arg => arg.Value).ToArray())}");
                 return 1;
-            }else
+            }
+            else
             {
                 await parsedMethod.InvokeAsync(Console.Out);
                 return 0;
@@ -118,19 +120,19 @@ class Program
         }
         catch (TypeConversionFailedException ex)
         {
-            Console.WriteLine(
+            await Console.Error.WriteLineAsync(
                 $"Could not convert argument {ex.Argument} with value {ex.Value} to type {ex.TargetType}");
-            if (null!=ex.InnerException)
+            if (null != ex.InnerException)
             {
-                Console.WriteLine("Inner exception: ");
-                Console.WriteLine(ex.InnerException.Message);
+                await Console.Error.WriteLineAsync("Inner exception: ");
+                await Console.Error.WriteLineAsync(ex.InnerException.Message);
             }
             return 9;
         }
         catch (MissingArgumentException ex)
         {
-            Console.WriteLine($"Missing argument(s): {String.Join(", ", ex.Arguments).ToArray()}");
-            Console.WriteLine(appHost.Help());
+            await Console.Out.WriteLineAsync($"Missing argument(s): {string.Join(", ", ex.Arguments).ToArray()}");
+            await Console.Out.WriteLineAsync(await appHost.HelpAsync());
             return 10;
         }
     }
