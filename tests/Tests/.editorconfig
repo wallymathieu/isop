@@ -1,0 +1,13 @@
+# test editor config
+root = false
+
+[*.cs]
+
+#  MA0011: Use an overload of 'ToString' that has a 'System.IFormatProvider' parameter 
+dotnet_diagnostic.MA0011.severity = none
+# MA0006: Use string.Equals instead of Equals operator
+dotnet_diagnostic.MA0006.severity = none
+# MA0002: Use an overload that has a IEqualityComparer<string> or IComparer<string> parameter 
+dotnet_diagnostic.MA0002.severity = none
+# MA0009: Regular expressions should not be vulnerable to Denial of Service attacks
+dotnet_diagnostic.MA0009.severity = none

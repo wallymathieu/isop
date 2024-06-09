@@ -1,71 +1,67 @@
 #if NET8_0_OR_GREATER
-using System;
 using System.IO;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Isop;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 
-namespace Tests.ViewsAndRendering
+namespace Tests.ViewsAndRendering;
+
+[TestFixture]
+public class Given_controller_returning_asyncenumerable
 {
-    [TestFixture]
-    public class Given_controller_returning_asyncenumerable
+    class EnumerableController<T>(Func<T> OnEnumerate, int Length)
     {
-        class EnumerableController<T>(Func<T> OnEnumerate,int Length)
+        public async IAsyncEnumerable<T> Return()
         {
-            public async IAsyncEnumerable<T> Return()
+            for (int i = 0; i < Length; i++)
             {
-                for (int i = 0; i < Length; i++)
-                {
-                    await Task.CompletedTask;
-                    yield return OnEnumerate();
-                }
+                await Task.CompletedTask;
+                yield return OnEnumerate();
             }
         }
-        class EnumerableIntController(Func<int> OnEnumerate,int Length): 
-            EnumerableController<int>(OnEnumerate,Length) { }
-        class EnumerableObjectController(Func<object> OnEnumerate,int Length): 
-            EnumerableController<object>(OnEnumerate,Length) { }
-        
-        [Test]
-        public async Task It_understands_method_returning_enumerable_object()
-        {
-            var count = 0;
-            var sc = new ServiceCollection();
-            sc.AddSingleton(ci => new EnumerableObjectController(Length: 2, OnEnumerate: () => (count++)));
+    }
+    class EnumerableIntController(Func<int> OnEnumerate, int Length) :
+        EnumerableController<int>(OnEnumerate, Length)
+    { }
+    class EnumerableObjectController(Func<object> OnEnumerate, int Length) :
+        EnumerableController<object>(OnEnumerate, Length)
+    { }
 
-            var arguments = AppHostBuilder.Create(sc)
-                .Recognize(typeof(EnumerableObjectController))
-                .BuildAppHost()
-                .Parse(new[] { "EnumerableObject", "Return" });
+    [Test]
+    public async Task It_understands_method_returning_enumerable_object()
+    {
+        var count = 0;
+        var sc = new ServiceCollection();
+        sc.AddSingleton(ci => new EnumerableObjectController(Length: 2, OnEnumerate: () => (count++)));
 
-            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
-            var sw = new StringWriter();
-            await arguments.InvokeAsync(sw);
-            Assert.That(count, Is.EqualTo(2));
-            Assert.AreEqual(new []{"0","1"},sw.ToString().Split(new []{'\r','\n'}, StringSplitOptions.RemoveEmptyEntries));
-        }
+        var arguments = AppHostBuilder.Create(sc)
+            .Recognize(typeof(EnumerableObjectController))
+            .BuildAppHost()
+            .Parse(new[] { "EnumerableObject", "Return" });
 
-        [Test]
-        public async Task It_understands_method_returning_enumerable_int()
-        {
-            var count = 0;
-            var sc = new ServiceCollection();
-            sc.AddSingleton(ci => new EnumerableIntController(Length: 2, OnEnumerate: () => (count++)));
+        Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
+        var sw = new StringWriter();
+        await arguments.InvokeAsync(sw);
+        Assert.That(count, Is.EqualTo(2));
+        Assert.That(sw.ToString().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries), Is.EqualTo(new[] { "0", "1" }));
+    }
 
-            var arguments = AppHostBuilder.Create(sc)
-                .Recognize(typeof(EnumerableIntController))
-                .BuildAppHost()
-                .Parse(new[] { "EnumerableInt", "Return" });
+    [Test]
+    public async Task It_understands_method_returning_enumerable_int()
+    {
+        var count = 0;
+        var sc = new ServiceCollection();
+        sc.AddSingleton(ci => new EnumerableIntController(Length: 2, OnEnumerate: () => (count++)));
 
-            Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
-            var sw = new StringWriter();
-            await arguments.InvokeAsync(sw);
-            Assert.That(count, Is.EqualTo(2));
-            Assert.AreEqual(new []{"0","1"},sw.ToString().Split(new []{'\r','\n'}, StringSplitOptions.RemoveEmptyEntries));
-        }
+        var arguments = AppHostBuilder.Create(sc)
+            .Recognize(typeof(EnumerableIntController))
+            .BuildAppHost()
+            .Parse(new[] { "EnumerableInt", "Return" });
+
+        Assert.That(arguments.Unrecognized.Count(), Is.EqualTo(0));
+        var sw = new StringWriter();
+        await arguments.InvokeAsync(sw);
+        Assert.That(count, Is.EqualTo(2));
+        Assert.That(sw.ToString().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries), Is.EqualTo(new[] { "0", "1" }));
     }
 }
+
 #endif

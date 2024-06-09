@@ -1,28 +1,17 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Isop.Implementations;
 using Microsoft.Extensions.DependencyInjection;
+using Isop.Abstractions;
+using Isop.CommandLine.Parse;
+using Isop.Domain;
+using Isop.Help;
 
-namespace Isop.CommandLine
+namespace Isop.CommandLine;
+public class ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recognizes, HelpController helpController)
 {
-    using Abstractions;
-    using Parse;
-    using Domain;
-    using Isop.Help;
-    using Infrastructure;
-    using System.Threading;
-    using System.Reflection;
-    using System.Diagnostics.CodeAnalysis;
+    private ILookup<string, ArgumentAction>? _recognizesMap;
 
-    public class ArgumentInvoker(IServiceProvider serviceProvider, Recognizes recognizes, HelpController helpController)
-    {
-        private ILookup<string, ArgumentAction>? _recognizesMap;
-        
-        private ILookup<string,ArgumentAction> RecognizesMap =>
-            _recognizesMap ??= recognizes.Properties.Where(p=>p.Action!=null).ToLookup(p=>p.Name, p=>p.Action!);
+    private ILookup<string, ArgumentAction> RecognizesMap =>
+        _recognizesMap ??= recognizes.Properties.Where(p => p.Action != null).ToLookup(p => p.Name, p => p.Action!, StringComparer.OrdinalIgnoreCase);
 
 #if NET8_0_OR_GREATER
         private static bool IsIAsyncEnumerable(Type type) =>(
@@ -51,72 +40,70 @@ namespace Isop.CommandLine
             }
             return false;
         }
-        #endif
+#endif
 
-        public IEnumerable<Task<InvokeResult>> Invoke(ParsedArguments parsedArguments)
+    public IEnumerable<Task<InvokeResult>> Invoke(ParsedArguments parsedArguments)
+    {
+        if (parsedArguments is null) throw new ArgumentNullException(nameof(parsedArguments));
+        IEnumerable<Task<InvokeResult>> ChooseArgument(RecognizedArgument arg)
         {
-            IEnumerable<Task<InvokeResult>> ChooseArgument(RecognizedArgument arg)
+            return RecognizesMap.Contains(arg.Argument.Name)
+                ? RecognizesMap[arg.Argument.Name].Select(async action =>
+                    (InvokeResult)new InvokeResult.Argument(await action(arg.Value)))
+                : [];
+        }
+        async Task<object?> RunTask(Task task)
+        {
+            await task;
+            var type = task.GetType();
+            if (!type.IsGenericType)
             {
-                return RecognizesMap.Contains(arg.Argument.Name) 
-                    ? RecognizesMap[arg.Argument.Name].Select(async action => 
-                        (InvokeResult)new InvokeResult.Argument( await action(arg.Value)))
-                    : Enumerable.Empty<Task<InvokeResult>>();
+                return null;
             }
-            async Task<object?> RunTask(Task task)
+            return type.GetProperty("Result")?.GetValue(task);
+        }
+        using var scope = serviceProvider.CreateScope();
+        var tasks = parsedArguments.Select(
+            methodMissingArguments: empty => [Task.FromResult<InvokeResult>(new InvokeResult.Empty())],
+            properties: args =>
             {
-                await task;
-                var type = task.GetType();
-                if (!type.IsGenericType)
-                {
-                    return null;
-                }
-                return type.GetProperty("Result")?.GetValue(task) ;
-            }
-            using (var scope = serviceProvider.CreateScope())
-            {
-                var tasks = parsedArguments.Select(
-                    methodMissingArguments: empty=>new[]{Task.FromResult<InvokeResult>(new InvokeResult.Empty())},
-                    properties: args =>
+                var enumerable = args.Recognized
+                    .SelectMany(ChooseArgument);
+                return enumerable;
+            },
+            merged: merged => Invoke(merged.First).Concat(Invoke(merged.Second)),
+                    method: method =>
                     {
-                        var enumerable = args.Recognized
-                            .SelectMany(ChooseArgument);
-                        return enumerable;
-                    },
-                    merged: merged => Invoke(merged.First).Concat(Invoke(merged.Second)),
-                            method: method =>
-                            {
-                                var instance = scope.ServiceProvider.GetService(method.RecognizedClass);
-                                if (instance==null && method.RecognizedClass == typeof(HelpController))
-                                {
-                                    instance = helpController;
-                                }
-                        
-                                if (ReferenceEquals(null, instance))
-                                    throw new Exception($"Unable to resolve {method.RecognizedClass.Name}");
-                                var result = method.RecognizedAction.Invoke(instance,
-                                    method.RecognizedActionParameters.ToArray());
-                                    
-                                InvokeResult? res;
-                                if (result is Task task)
-                                {
-                                    res= new InvokeResult.AsyncControllerAction(RunTask(task));
-                                }
-                                #if NET8_0_OR_GREATER
+                        var instance = scope.ServiceProvider.GetService(method.RecognizedClass);
+                        if (instance == null && method.RecognizedClass == typeof(HelpController))
+                        {
+                            instance = helpController;
+                        }
+
+                        if (instance is null)
+                            throw new ControllerNotFoundException($"Unable to resolve {method.RecognizedClass.Name}");
+                        var result = method.RecognizedAction.Invoke(instance,
+                            [.. method.RecognizedActionParameters]);
+
+                        InvokeResult? res;
+                        if (result is Task task)
+                        {
+                            res = new InvokeResult.AsyncControllerAction(RunTask(task));
+                        }
+#if NET8_0_OR_GREATER
                                 else if (AsyncEnumerable(result,out var enumerable))
                                 {
                                     res= new InvokeResult.ControllerAction(enumerable.ToBlockingEnumerable());
                                 }
-                                #endif
-                                else
-                                {
-                                    res = new InvokeResult.ControllerAction(result);
-                                }
+#endif
+                        else
+                        {
+                            res = new InvokeResult.ControllerAction(result);
+                        }
 
-                                return [ 
-                                    Task.FromResult( res)];
-                            });
-                return tasks;
-            }
-        }
+                        return [
+                            Task.FromResult( res)];
+                    });
+        return tasks;
     }
 }
