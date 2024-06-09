@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Isop.Abstractions;
 /// <summary>
 /// This interface represents a controller given by <see cref="Name"/>.

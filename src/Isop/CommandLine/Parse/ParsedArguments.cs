@@ -1,7 +1,5 @@
 #pragma warning disable CA1034 // Do not nest type
-using System.Collections.Generic;
 using System.Linq;
-using System;
 namespace Isop.CommandLine.Parse;
 
 public abstract class ParsedArguments

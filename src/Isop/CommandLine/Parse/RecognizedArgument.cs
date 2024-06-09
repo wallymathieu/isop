@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Isop.CommandLine.Parse;
 public class RecognizedArgument(Argument argument,
     IReadOnlyCollection<int> index,

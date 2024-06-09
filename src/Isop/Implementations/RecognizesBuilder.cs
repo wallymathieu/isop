@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Isop.Domain;
 
 namespace Isop.Implementations;

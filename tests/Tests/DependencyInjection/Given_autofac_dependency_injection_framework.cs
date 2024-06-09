@@ -11,7 +11,7 @@ public class Given_autofac_dependency_injection_framework : Given_dependency_inj
 {
     class AutoFacRegistrationBuilder : BaseRegistrationBuilder
     {
-        private ContainerBuilder _containerBuilder = new ContainerBuilder().Tap(c =>
+        private readonly ContainerBuilder _containerBuilder = new ContainerBuilder().Tap(c =>
             c.Populate(new ServiceCollection().AddLogging()));
         public override void RegisterSingleton<T>(Func<T> factory) => _containerBuilder.Register(di => factory()).As<T>().SingleInstance();
         public override IServiceProvider Build() =>

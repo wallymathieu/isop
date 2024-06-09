@@ -1,6 +1,5 @@
 using System;
 using System.Text.RegularExpressions;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Isop.CommandLine.Parse.Parameters;
 public static class OrdinalParameter

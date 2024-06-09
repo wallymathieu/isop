@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Isop.CommandLine.Lex;
 
 public static class ArgumentLexer
 {
-    private static readonly Regex ParamPattern = new("(?<paramPrefix>--|/|-)(?<param>[^:=]*)([:=]?)(?<paramValue>.*)", RegexOptions.None, TimeSpan.FromSeconds(1));
+    private static readonly Regex ParamPattern = new("(?<paramPrefix>--|/|-)(?<param>[^:=]*)([:=]?)(?<paramValue>.*)", RegexOptions.ExplicitCapture, TimeSpan.FromSeconds(1));
 
     /// <summary>
     /// The case --parameter parametervalue

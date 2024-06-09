@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Isop.Domain;
+﻿namespace Isop.Domain;
 /// <summary>
 /// What controllers and global arguments are recognized by Isop
 /// </summary>
