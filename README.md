@@ -34,6 +34,8 @@ So that the class with the name My or MyController and the method with the name 
 
 This library is intended to be like chocolate pudding mix. Not something that will replace your dinner, but rather something easy to make for dessert. A way of helping you build for instance the essential administrative apps. It's not a replacement for baking cake (building a full blown administrative interface in html). 
 
+Note that the library is from a very object oriented perspective. The library assumes that you want to be using "clean" controllers that do not depend on Isop. You should be able to write your controllers in a separate assembly without any reference to Isop. See clean code.
+
 ## When to use Isop
 
 - Early in your development life cycle (before having tools around for your business app)
